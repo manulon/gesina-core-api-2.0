@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="container-xxl">
+        <div class="d-flex row justify-content-around">
+            <div class="col-5">
+                <div class="card bg-light">
+                    <div class="card-header">Mensajes y logins</div>
+                    <div class="card-body">
+                        <img src="data:image/png;base64, {{ activity }}" class="img-fluid w-100">
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 align-items-start d-flex flex-column justify-content-between mb-5">
+                <div class="input-group justify-content-end">
+                    <div class="d-flex">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Fecha</span>
+                        </div>
+                        <input name="date" id="datepicker" type="text" class="datepicker col">
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-center w-50">
+                    <div class="card bg-light w-100">
+                        <div class="card-header">Denuncias</div>
+                        <div class="card-body">
+                            <p class="card-text">Totales del mes: <b>{{ month_total_complaints|string }}
+                                / {{ total_complaints|string }} (totales)</b></p>
+                            <p class="card-text">Pendientes del mes: <b>{{ month_pending_complaints|string }}
+                                / {{ pending_complaints|string }} (totales)</b></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex row justify-content-center mt-3 h-75">
+            <div class="col-8">
+                <div class="card bg-light">
+                    <div class="card-header">Sesiones</div>
+                    <div class="d-flex align-items-center justify-content-around align-self-center card-body w-100">
+                        <div class="align-self-baseline">
+                            <h3 class="pb-4">Top pa&iacute;ses</h3>
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Pa&iacute;s</th>
+                                    <th scope="col"># Sesiones</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {% for index, country in [] %}
+                                        <tr>
+                                            <td>{{ gettext(country["name"]) }}</td>
+                                            <td>{{ country["sessions"] }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div>
+                            <img src="data:image/png;base64, {{ world_map }}" class="img-fluid">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+      $('#datepicker').datepicker({
+        language: 'es',
+        clearBtn: true,
+        startDate: new Date(2020, 0, 0),
+        format: "mm-yyyy",
+        viewMode: "months",
+        minViewMode: "months"
+      });
+
+      $('#datepicker').datepicker('update', new Date({{ year }}, {{ month }}, 0));
+
+      $('#datepicker').datepicker()
+        .on("changeDate", function (e) {
+          let date = e.date
+          let url = window.location.href.split("?")[0];
+          url = `${url}?year=${date.getFullYear()}&month=${date.getMonth() + 1}`
+          window.location.href = url;
+        });
+
+    </script>
+    <style>
+        body {
+            overflow-y: hidden;
+        }
+    </style>
+{% endblock %}

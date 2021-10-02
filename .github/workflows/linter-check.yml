@@ -1,0 +1,25 @@
+name: Linter check
+
+on:
+  push:
+
+jobs:
+  tests:
+    name: Linter check
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [ 3.8 ]
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Install pipenv
+        run: pip install pipenv
+      - name: Install dependecies
+        run: pipenv install --dev
+      - name: Run linter
+        run:  pipenv run black --check .
