@@ -17,27 +17,19 @@ def require_login():
 @BACKOFFICE_BLUEPRINT.route("/")
 @BACKOFFICE_BLUEPRINT.route("")
 def home():
-    return render_template(
-        "dashboard.html"
-    )
+    return render_template("dashboard.html")
 
 
 @BACKOFFICE_BLUEPRINT.route("/app_users")
 def app_users():
-    return render_template(
-        "app_users.html", app_users=[]
-    )
+    return render_template("app_users.html", app_users=[])
 
 
 @BACKOFFICE_BLUEPRINT.route("/app_users/<_id>")
 def app_user(_id):
-    return render_template(
-        "app_user.html", app_user=[]
-    )
+    return render_template("app_user.html", app_user=[])
 
 
 @BACKOFFICE_BLUEPRINT.route("/complaints")
 def complaints():
     return render_template("complaints.html")
-
-

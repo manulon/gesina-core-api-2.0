@@ -1,6 +1,4 @@
-TRANSLATIONS = {
-    "hi": "Hola"
-}
+TRANSLATIONS = {"hi": "Hola"}
 
 
 def gettext(key):

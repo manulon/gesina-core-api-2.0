@@ -1,10 +1,7 @@
 from http import HTTPStatus
 
 
-from src.util.exception import (
-    UnauthorizedException,
-    ForbiddenException
-)
+from src.util.exception import UnauthorizedException, ForbiddenException
 
 
 def set_up_exception_handlers(app):
