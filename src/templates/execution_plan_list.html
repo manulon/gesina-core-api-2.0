@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="container-xxl p-4">
+        <div class="d-flex justify-content-between pb-4">
+            <h2>Listado de simulaciones</h2>
+            <button type="button" class="btn btn-primary" onClick="window.location.href = '{{url_for("view_controller.execution_plan_new")}}'">Nueva simulaci&oacute;n</button>
+        </div>
+        <table data-toggle="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Geometría</th>
+                <th>Usuario</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Rio uruguay</td>
+                <td>Pepito Fulano</td>
+                <td>12/12/12</td>
+                <td>Finalizado</td>
+                <td>
+                    <button type="button" class="btn btn-info">Ver detalle</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+    </div>
+{% endblock %}
