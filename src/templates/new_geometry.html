@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="container-xxl">
+        <h1>New Geometry</h1>
+        <form method=post enctype=multipart/form-data class="p-4 container" id="new-geometry-form">
+                <div class="row p-1">
+                    <div class="input-group col">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text w-1000">Description</span>
+                        </div>
+                        <input name="description" type="text" class="form-control col">
+                    </div>
+                </div>
+                <div class="input-group col">
+                    <div class="input-group col">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text w-1000">Archivo de geometría</span>
+                        </div>
+                        <input type=file name=file>
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <input id="save-button" class="btn btn-light" type="submit" name="submit" value="Guardar">
+                </div>
+            </form>
+    </div>
+
+{% endblock %}

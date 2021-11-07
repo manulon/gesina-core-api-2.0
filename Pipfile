@@ -13,11 +13,11 @@ requests = "==2.25.1"
 Faker = "==8.1.2"
 firebase-admin = "*"
 flask-login = "*"
-pandas = "*"
 matplotlib = "*"
-numpy = "*"
-geopandas = "*"
-geopip = "*"
+celery = {extras = ["redis"], version = "*"}
+sqlalchemy = "*"
+psycopg2-binary = "*"
+minio = "*"
 
 [dev-packages]
 pytest = "==6.2.2"
