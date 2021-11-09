@@ -7,7 +7,7 @@ from src.controller import (
     BACKOFFICE_BLUEPRINT,
     BACKOFFICE_USER_BLUEPRINT,
     GEOMETRY_BLUEPRINT,
-    VIEW_BLUEPRINT
+    VIEW_BLUEPRINT,
 )
 from src.exception_handler import set_up_exception_handlers
 from src.translations import gettext, pretty_date

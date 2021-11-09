@@ -3,9 +3,15 @@ from flask import Blueprint, render_template
 
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
 
+
 @VIEW_BLUEPRINT.route("/", defaults={"path": ""})
 def home():
     return render_template("dashboard.html")
+
+
+@VIEW_BLUEPRINT.route("/geometry/list")
+def geometry_list():
+    return render_template("geometry_list.html")
 
 
 @VIEW_BLUEPRINT.route("/geometry/new")
@@ -21,4 +27,3 @@ def execution_plan_list():
 @VIEW_BLUEPRINT.route("/execution_plan/new")
 def execution_plan_new():
     return render_template("execution_plan_new.html")
-
