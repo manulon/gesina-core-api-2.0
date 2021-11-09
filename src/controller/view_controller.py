@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template
+from view.view_error import ViewError
 
 
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
@@ -16,7 +17,7 @@ def geometry_list():
 
 @VIEW_BLUEPRINT.route("/geometry/new")
 def geometry_new():
-    return render_template("geometry_new.html")
+    return render_template("geometry_new.html", error=ViewError("Un error"))
 
 
 @VIEW_BLUEPRINT.route("/execution_plan/list")

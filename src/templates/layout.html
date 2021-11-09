@@ -29,12 +29,26 @@
             </div>
         </div>
 
-        <div class="pt-3 w-100">
-            <div class="container p-4">
-            {% block content %}<h2 class="p-5">Bienvenido!</h2>{% endblock %}
+        <div class="w-100">
+            {% if error is defined %}
+            <div class="alert alert-danger error-message mb-n3" role="alert">
+                <button type="button" class="close close-error" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div>
+                {{ error.message }}
+                </div>
+            </div>
+            {% endif %}
+            <div class="pt-3">
+                <div class="container p-4">
+                {% block content %}<h2 class="p-5">Bienvenido!</h2>{% endblock %}
+                </div>
             </div>
         </div>
-
     </div>
     </body>
+    <script>
+        $(".close-error").on("click", function(){ $(".error-message").remove() })
+    </script>
 {% endblock %}
