@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template
 
+
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
 
 @VIEW_BLUEPRINT.route("/", defaults={"path": ""})
