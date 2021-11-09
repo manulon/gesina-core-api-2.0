@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, current_app
+from flask import Blueprint, request, redirect, url_for, current_app
 from src.service import geometry_service
 
 GEOMETRY_BLUEPRINT = Blueprint("geometry_controller", __name__)
@@ -12,4 +12,4 @@ def save():
         "Geometry created with id: " + str(geometry.id) + " for file: " + geometry.name
     )
 
-    return redirect(url_for("view_controller.geometry_new"))
+    return redirect(url_for("view_controller.geometry_list"))

@@ -7,6 +7,11 @@ def home():
     return render_template("dashboard.html")
 
 
+@VIEW_BLUEPRINT.route("/geometry/list")
+def geometry_list():
+    return render_template("geometry_list.html")
+
+
 @VIEW_BLUEPRINT.route("/geometry/new")
 def geometry_new():
     return render_template("geometry_new.html")
