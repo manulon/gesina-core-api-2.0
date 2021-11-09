@@ -1,7 +1,7 @@
 import io
 import os
 
-from flask import current_app
+from src import logger
 from minio import Minio
 
 from src.service.exception.file_exception import FileUploadEmpty, FileUploadError
@@ -34,5 +34,5 @@ def save_geometry(file):
         minio_client.put_object("geometry", file.filename, data, len(file_bytes))
     except Exception as exception:
         error_message = "Error uploading file"
-        current_app.logger.error(error_message, exception)
+        logger.error(error_message, exception)
         raise FileUploadError(error_message)
