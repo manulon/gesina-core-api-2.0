@@ -44,5 +44,4 @@ def list_geometries():
         }
         response_list.append(geometry_row)
 
-    print("respondo " + str({"items": response_list}))
-    return jsonify({"items": response_list})
+    return jsonify({"rows": response_list, "total": len(response_list)})

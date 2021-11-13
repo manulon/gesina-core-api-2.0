@@ -8,6 +8,19 @@ def home():
     return render_template("dashboard.html")
 
 
+class Prueba:
+    def __init__(self):
+        self.description = "description"
+        self.id = 1
+        self.file_url = "https://www.adslzone.net/app/uploads-adslzone.net/2019/04/borrar-fondo-imagen.jpg"
+
+
+@VIEW_BLUEPRINT.route("/geometry")
+def geometry_read():
+
+    return render_template("geometry_read.html", geometry=Prueba())
+
+
 @VIEW_BLUEPRINT.route("/geometry/list")
 def geometry_list():
     return render_template("geometry_list.html")

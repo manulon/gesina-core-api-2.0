@@ -33,23 +33,21 @@
                 <th data-field="created_at">
                     Fecha de creación
                 </th>
-{#                <th>#}
-{#                    Acciones#}
-{#                </th>#}
+                <th data-formatter="geometryActionFormatter">
+                    Acciones
+                </th>
               </tr>
             </thead>
-{#            <tbody>#}
-{#              <tr>#}
-{#                <td>1</td>#}
-{#                <td>Rio uruguay</td>#}
-{#                <td>Pepito Fulano</td>#}
-{#                <td>12/12/12</td>#}
-{#                <td>#}
-{#                    <button type="button" class="btn btn-info">Ver detalle</button>#}
-{#                </td>#}
-{#              </tr>#}
-{#            </tbody>#}
           </table>
         </div>
     </div>
+
+    <script>
+        function geometryActionFormatter(value, row) {
+            let base_url = "{{ url_for("view_controller.geometry_read", id="")}}"
+            return `
+                <a href="${base_url}${row["id"]}">Ver detalle</a>
+            `
+          }
+    </script>
 {% endblock %}
