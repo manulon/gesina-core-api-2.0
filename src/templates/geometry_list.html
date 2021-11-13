@@ -5,27 +5,51 @@
             <h2>Listado de geometrías</h2>
             <button type="button" class="btn btn-primary" onClick="window.location.href = '{{url_for("view_controller.geometry_new")}}'">Nueva geometr&iacute;a</button>
         </div>
-        <table data-toggle="table">
+        <div class="container-fluid">
+            <table
+                id="table"
+                data-toggle="table"
+                data-url="{{ url_for('geometry_controller.list_geometries') }}"
+                data-side-pagination="server"
+                data-pagination="true"
+                data-filter="true"
+                data-filter-control="true"
+                data-locale="es-AR"
+                data-page-size="5"
+                data-page-list="[5, 10, 25, 50, 100, 200]"
+                data-query-params="queryParams"
+        >
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Descripción</th>
-                <th>Usuario</th>
-                <th>Fecha de creación</th>
-                <th>Acciones</th>
+                <th data-field="id">
+                    ID
+                </th>
+                <th data-field="description">
+                    Descripción
+                </th>
+                <th data-field="user">
+                    Usuario
+                </th>
+                <th data-field="created_at">
+                    Fecha de creación
+                </th>
+{#                <th>#}
+{#                    Acciones#}
+{#                </th>#}
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>Rio uruguay</td>
-                <td>Pepito Fulano</td>
-                <td>12/12/12</td>
-                <td>
-                    <button type="button" class="btn btn-info">Ver detalle</button>
-                </td>
-              </tr>
-            </tbody>
+{#            <tbody>#}
+{#              <tr>#}
+{#                <td>1</td>#}
+{#                <td>Rio uruguay</td>#}
+{#                <td>Pepito Fulano</td>#}
+{#                <td>12/12/12</td>#}
+{#                <td>#}
+{#                    <button type="button" class="btn btn-info">Ver detalle</button>#}
+{#                </td>#}
+{#              </tr>#}
+{#            </tbody>#}
           </table>
+        </div>
     </div>
 {% endblock %}
