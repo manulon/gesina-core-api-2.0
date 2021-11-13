@@ -40,6 +40,16 @@
                 </div>
             </div>
             {% endif %}
+            {% if success is defined %}
+            <div class="alert alert-success mb-n3" role="alert">
+                <button type="button" class="close close-success" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div>
+                {{ success.message }}
+                </div>
+            </div>
+            {% endif %}
             <div class="pt-3">
                 <div class="container p-4">
                 {% block content %}<h2 class="p-5">Bienvenido!</h2>{% endblock %}
@@ -50,5 +60,6 @@
     </body>
     <script>
         $(".close-error").on("click", function(){ $(".error-message").remove() })
+        $(".close-success").on("click", function(){ $(".success-message").remove() })
     </script>
 {% endblock %}
