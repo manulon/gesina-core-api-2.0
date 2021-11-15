@@ -11,10 +11,14 @@
                     <textarea class="form-control" id="descriptionInput" name="description" rows=3 readonly>{{ geometry.description }}</textarea>
                 </div>
                 <div class="form-group">
+                    <label for="userInput"><h5>Usuario</h5></label>
+                    <label class="form-control" id="userInput" name="user" readonly>{{ geometry.user.name + " " + geometry.user.lastname }}</label>
+                </div>
+                <div class="form-group">
                     <label for="geometryFileUpload"><h5>Archivo de geometría</h5></label>
                 </div>
                 <div>
-                    <a href="{{ geometry.file_url }}" class="button" download>Descargar</a>
+                    <a href="{{ geometry.get_file_url() }}" class="button" download>Descargar</a>
                 </div>
             </form>
         </div>
