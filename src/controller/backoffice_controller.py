@@ -14,12 +14,6 @@ def require_login():
 # BACKOFFICE_BLUEPRINT.before_request(require_login)
 
 
-@BACKOFFICE_BLUEPRINT.route("/")
-@BACKOFFICE_BLUEPRINT.route("")
-def home():
-    return render_template("dashboard.html")
-
-
 @BACKOFFICE_BLUEPRINT.route("/app_users")
 def app_users():
     return render_template("app_users.html", app_users=[])

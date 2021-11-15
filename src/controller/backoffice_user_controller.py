@@ -16,7 +16,7 @@ def create_session():
     session_id = backoffice_user_service.create_session_id(**params)
     if session_id is None:
         return render_template("login.html", incorrect=True)
-    response = make_response(redirect(url_for("backoffice_controller.home")))
+    response = make_response(redirect(url_for("view_controller.home")))
     response.set_cookie("session_id", str(session_id))
     return response
 

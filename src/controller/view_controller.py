@@ -1,13 +1,13 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template
 
-from src.service import geometry_service, file_storage_service
+from src.service import geometry_service
 
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
 
 
-@VIEW_BLUEPRINT.route("/", defaults={"path": ""})
+@VIEW_BLUEPRINT.route("/")
 def home():
-    return render_template("dashboard.html")
+    return render_template("execution_plan_list.html")
 
 
 @VIEW_BLUEPRINT.route("/geometry/<geometry_id>")
