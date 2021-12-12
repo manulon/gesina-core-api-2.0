@@ -28,7 +28,12 @@ app.jinja_env.globals.update(current_user=current_user)
 
 @app.route("/health-check")
 def health_check():
-    return jsonify({"status": "ok"}), HTTPStatus.OK
+    from src.tasks import add
+    result = add.delay(1,2)
+    try:
+        return jsonify({"count": result.get()}), HTTPStatus.OK
+    except Exception as e:
+        print(e, flush=True)
 
 
 @app.errorhandler(HTTPStatus.NOT_FOUND)

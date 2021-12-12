@@ -6,7 +6,6 @@ environ.setdefault("CELERY_CONFIG_MODULE", "src.celery_config")
 celery_app = Celery()
 celery_app.config_from_envvar("CELERY_CONFIG_MODULE")
 
-
 @celery_app.task
 def add(x, y):
     return x + y
