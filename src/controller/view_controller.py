@@ -1,24 +1,19 @@
 from flask import Blueprint, render_template
 
+from src.service import geometry_service
+
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
 
 
-@VIEW_BLUEPRINT.route("/", defaults={"path": ""})
+@VIEW_BLUEPRINT.route("/")
 def home():
-    return render_template("dashboard.html")
+    return render_template("execution_plan_list.html")
 
 
-class Prueba:
-    def __init__(self):
-        self.description = "description"
-        self.id = 1
-        self.file_url = "https://www.adslzone.net/app/uploads-adslzone.net/2019/04/borrar-fondo-imagen.jpg"
-
-
-@VIEW_BLUEPRINT.route("/geometry")
-def geometry_read():
-
-    return render_template("geometry_read.html", geometry=Prueba())
+@VIEW_BLUEPRINT.route("/geometry/<geometry_id>")
+def geometry_read(geometry_id):
+    geometry = geometry_service.get_geometry(geometry_id)
+    return render_template("geometry_read.html", geometry=geometry)
 
 
 @VIEW_BLUEPRINT.route("/geometry/list")

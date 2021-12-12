@@ -44,7 +44,7 @@
 
     <script>
         function geometryActionFormatter(value, row) {
-            let base_url = "{{ url_for("view_controller.geometry_read", id="")}}"
+            let base_url = "{{ url_for("view_controller.geometry_read", geometry_id="")}}"
             return `
                 <a href="${base_url}${row["id"]}">Ver detalle</a>
             `

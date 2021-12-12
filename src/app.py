@@ -38,7 +38,7 @@ def health_check():
 
 @app.errorhandler(HTTPStatus.NOT_FOUND)
 def page_not_found(e):
-    return redirect(url_for("backoffice_controller.home")), HTTPStatus.MOVED_PERMANENTLY
+    return redirect(url_for("view_controller.home")), HTTPStatus.MOVED_PERMANENTLY
 
 
 app.json_encoder = CustomJSONEncoder

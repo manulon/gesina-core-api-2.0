@@ -25,22 +25,16 @@ def save():
 
 @GEOMETRY_BLUEPRINT.route("", methods=["GET"])
 def list_geometries():
-    # geometries = geometry_service.get_geometries()
-    geometries = [
-        {
-            "id": "1",
-            "description": "la descript",
-            "user": {"name": "Juan", "lastname": "Perez"},
-            "created_at": "2020/2020/2020",
-        }
-    ]
+    geometries = geometry_service.get_geometries()
+
     response_list = []
     for geometry in geometries:
+        user = geometry.user
         geometry_row = {
-            "id": str(geometry["id"]),
-            "description": geometry["description"],
-            "user": geometry["user"]["name"] + " " + geometry["user"]["lastname"],
-            "created_at": geometry["created_at"],
+            "id": geometry.id,
+            "description": geometry.description,
+            "user": user.name + " " + user.lastname,
+            "created_at": geometry.created_at,
         }
         response_list.append(geometry_row)
 

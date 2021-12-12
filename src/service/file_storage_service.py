@@ -17,6 +17,8 @@ minio_client = Minio(
     secure=False,
 )
 
+GEOMETRY_BUCKET = "geometry"
+
 
 def validate_file(files_in_request):
     if "file" not in files_in_request:
@@ -31,8 +33,12 @@ def save_geometry(file):
     file_bytes = file.read()
     data = io.BytesIO(file_bytes)
     try:
-        minio_client.put_object("geometry", file.filename, data, len(file_bytes))
+        minio_client.put_object(GEOMETRY_BUCKET, file.filename, data, len(file_bytes))
     except Exception as exception:
         error_message = "Error uploading file"
         logger.error(error_message, exception)
         raise FileUploadError(error_message)
+
+
+def get_geometry_url(name):
+    return minio_client.get_presigned_url("GET", GEOMETRY_BUCKET, name)
