@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ee0d9bb09cf3caf31f5d29e9db98c2491f4ed39440b178c737d823d8f0bc9863"
+            "sha256": "aa949e8a3ac9ddcd938ba522bcdb694e2168f8a2c42e0d32ad99b46c17abeedf"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -18,11 +18,11 @@
     "default": {
         "amqp": {
             "hashes": [
-                "sha256:03e16e94f2b34c31f8bf1206d8ddd3ccaa4c315f7f6a1879b7b1210d229568c2",
-                "sha256:493a2ac6788ce270a2f6a765b017299f60c1998f5a8617908ee9be082f7300fb"
+                "sha256:4d9cb6b5d69183ba279e97382ff68a071864c25b561d206dab73499d3ed26d1c",
+                "sha256:d757b78fd7d3c6bb60e3ee811b68145583643747ed3ec253329f086aa3a72a5d"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==5.0.6"
+            "version": "==5.0.7"
         },
         "billiard": {
             "hashes": [
@@ -1020,6 +1020,10 @@
                 "sha256:acad2d8b20a1af07d4e4c9d2e9285c5ed9104354062f275f3fcd88dcef4f1326"
             ],
             "version": "==2021.3"
+        },
+        "pywin32": {
+            "sys_platform": "== 'win32'",
+            "version": "*"
         },
         "redis": {
             "hashes": [

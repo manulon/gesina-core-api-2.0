@@ -17,7 +17,8 @@ matplotlib = "*"
 celery = {extras = ["redis"], version = "*"}
 sqlalchemy = "*"
 psycopg2-binary = "*"
-minio = "*"
+minio = "==7.1.2"
+pywin32 = {version = "*", sys_platform = "== 'win32'"}
 
 [dev-packages]
 pytest = "==6.2.2"

@@ -28,8 +28,8 @@ app.jinja_env.globals.update(current_user=current_user)
 
 @app.route("/health-check")
 def health_check():
-    from src.tasks import add
-    result = add.delay(1,2)
+    from src.tasks import simulate
+    result = simulate.delay()
     try:
         return jsonify({"count": result.get()}), HTTPStatus.OK
     except Exception as e:
