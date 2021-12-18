@@ -14,3 +14,7 @@ class User(Base):
     lastname = Column(String)
     email = Column(String)
     password = Column(String)
+
+    @property
+    def fullname(self):
+        return f"{self.name} {self.lastname}"

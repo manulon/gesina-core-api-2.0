@@ -18,9 +18,7 @@ def save():
         logger.error(file_error.message, file_error)
         error = ViewMessage("Error cargando archivo. Intente nuevamente.")
 
-        return render_template(
-            "geometry_new.html", error=error, description=request.form["description"]
-        )
+        return render_template("geometry.html", error=error, **request.form)
 
 
 @GEOMETRY_BLUEPRINT.route("", methods=["GET"])

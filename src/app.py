@@ -29,6 +29,7 @@ app.jinja_env.globals.update(current_user=current_user)
 @app.route("/health-check")
 def health_check():
     from src.tasks import simulate
+
     result = simulate.delay()
     try:
         return jsonify({"count": result.get()}), HTTPStatus.OK

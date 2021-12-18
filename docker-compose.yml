@@ -27,6 +27,8 @@ services:
     environment:
       - BROKER_URL=redis://redis:6379/0 # para encolar
       - RESULT_BACKEND=redis://redis:6379/0 # para guardar el resultado
+      - MINIO_URL=minio:9000
+      - DATABASE_HOST=database:5432
     volumes:
       - ./:/app/
     depends_on:

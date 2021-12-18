@@ -13,7 +13,14 @@ def home():
 @VIEW_BLUEPRINT.route("/geometry/<geometry_id>")
 def geometry_read(geometry_id):
     geometry = geometry_service.get_geometry(geometry_id)
-    return render_template("geometry_read.html", geometry=geometry)
+    geometry_data = {
+        "id": geometry.id,
+        "description": geometry.description,
+        "user_fullname": geometry.user.fullname,
+        "file_url": geometry.get_file_url(),
+        "created_at": geometry.created_at.date(),
+    }
+    return render_template("geometry.html", readonly=True, **geometry_data)
 
 
 @VIEW_BLUEPRINT.route("/geometry/list")
@@ -23,7 +30,7 @@ def geometry_list():
 
 @VIEW_BLUEPRINT.route("/geometry/new")
 def geometry_new():
-    return render_template("geometry_new.html")
+    return render_template("geometry.html")
 
 
 @VIEW_BLUEPRINT.route("/execution_plan/list")
