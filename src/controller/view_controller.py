@@ -33,6 +33,11 @@ def geometry_new():
     return render_template("geometry.html")
 
 
+@VIEW_BLUEPRINT.route("/execution_plan/<execution_plan_id>")
+def execution_plan_read(execution_plan_id):
+    return render_template("execution_plan_new.html")
+
+
 @VIEW_BLUEPRINT.route("/execution_plan/list")
 def execution_plan_list():
     return render_template("execution_plan_list.html")

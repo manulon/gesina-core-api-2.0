@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from flask import Flask, jsonify, redirect, url_for
 
+from src.controller.execution_plan_controller import EXECUTION_PLAN_BLUEPRINT
 from src.encoders import CustomJSONEncoder
 from src.service.backoffice_user_service import current_user
 from src.controller import (
@@ -18,6 +19,7 @@ app = Flask(__name__)
 app.register_blueprint(BACKOFFICE_BLUEPRINT, url_prefix="/backoffice")
 app.register_blueprint(BACKOFFICE_USER_BLUEPRINT, url_prefix="/backoffice_user")
 app.register_blueprint(GEOMETRY_BLUEPRINT, url_prefix="/geometry")
+app.register_blueprint(EXECUTION_PLAN_BLUEPRINT, url_prefix="/execution_plan")
 app.register_blueprint(VIEW_BLUEPRINT, url_prefix="/view")
 
 

@@ -31,7 +31,7 @@ def list_geometries():
         geometry_row = {
             "id": geometry.id,
             "description": geometry.description,
-            "user": user.name + " " + user.lastname,
+            "user": user.fullname,
             "created_at": geometry.created_at,
         }
         response_list.append(geometry_row)

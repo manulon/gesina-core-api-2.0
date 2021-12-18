@@ -24,7 +24,7 @@
                 <th data-field="id">
                     ID
                 </th>
-                <th data-field="description">
+                <th data-field="description" data-formatter="descriptionFormatter">
                     Descripción
                 </th>
                 <th data-field="user">
@@ -49,5 +49,10 @@
                 <a href="${base_url}${row["id"]}">Ver detalle</a>
             `
           }
+        function descriptionFormatter(value) {
+            if (value.length > 20)
+                return value.substr(0, 20).concat('[...]');
+            return value;
+        }
     </script>
 {% endblock %}

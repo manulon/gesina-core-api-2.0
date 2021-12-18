@@ -5,29 +5,61 @@
             <h2>Listado de simulaciones</h2>
             <button type="button" class="btn btn-primary" onClick="window.location.href = '{{url_for("view_controller.execution_plan_new")}}'">Nueva simulaci&oacute;n</button>
         </div>
-        <table data-toggle="table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Geometría</th>
-                <th>Usuario</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>Rio uruguay</td>
-                <td>Pepito Fulano</td>
-                <td>12/12/12</td>
-                <td>Finalizado</td>
-                <td>
-                    <button type="button" class="btn btn-info">Ver detalle</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="container-fluid">
+            <table
+                id="table"
+                data-toggle="table"
+                data-url="{{ url_for('execution_plan_controller.list_execution_plans') }}"
+                data-side-pagination="server"
+                data-pagination="true"
+                data-filter="true"
+                data-filter-control="true"
+                data-locale="es-AR"
+                data-page-size="5"
+                data-page-list="[5, 10, 25, 50, 100, 200]"
+                data-query-params="queryParams"
+        >
+                <thead>
+                <tr>
+                    <th data-field="id">
+                        ID
+                    </th>
+                    <th data-field="geometry" data-formatter="geometryDescriptionFormatter">
+                        Geometría
+                    </th>
+                    <th data-field="user">
+                        Usuario
+                    </th>
+                    <th data-field="start_datetime">
+                        Fecha de creación
+                    </th>
+                    <th data-field="end_datetime">
+                        Fecha de finalización
+                    </th>
+                    <th data-field="status">
+                        Estado
+                    </th>
+                    <th data-formatter="executionPlanActionFormatter">
+                        Acciones
+                    </th>
+                </tr>
+                </thead>
+            </table>
+        </div>
     </div>
+
+    <script>
+        function executionPlanActionFormatter(value, row) {
+            let base_url = "{{ url_for("view_controller.execution_plan_read", execution_plan_id="")}}"
+            return `
+                <a href="${base_url}${row["id"]}">Ver detalle</a>
+            `
+          }
+        function geometryDescriptionFormatter(value) {
+            if (value.length > 20)
+                return value.substr(0, 20).concat('[...]');
+            return value;
+        }
+    </script>
+
 {% endblock %}
