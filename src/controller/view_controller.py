@@ -18,6 +18,7 @@ def geometry_read(geometry_id):
         "description": geometry.description,
         "user_fullname": geometry.user.fullname,
         "file_url": geometry.get_file_url(),
+        "file_name": geometry.name,
         "created_at": geometry.created_at.date(),
     }
     return render_template("geometry.html", readonly=True, **geometry_data)

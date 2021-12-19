@@ -30,6 +30,7 @@ def list_geometries():
         user = geometry.user
         geometry_row = {
             "id": geometry.id,
+            "name": geometry.name,
             "description": geometry.description,
             "user": user.fullname,
             "created_at": geometry.created_at,

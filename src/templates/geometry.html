@@ -14,46 +14,50 @@
                   class="p-4 container needs-validation"
                   id="new-geometry-form"
                   action="{{ url_for("geometry_controller.save") }}">
+            {% if readonly %}
                 <div class="form-group">
                     <label for="descriptionInput"><h5>Descripción</h5></label>
                     <textarea class="form-control"
                               id="descriptionInput"
                               name="description"
                               rows=3
-                              required
-                            {% if readonly %} readonly {% endif %}>
+                              required readonly>{{ description }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="geometryFileUpload"><h5>Archivo de geometría</h5></label>
+                        <div>
+                            <a href="{{ file_url }}" name="geometryFileUpload" download>{{ file_name }}</a>
+                        </div>
+                </div>
+                <div class="form-group">
+                    <label for="userInput"><h5>Usuario</h5></label>
+                    <label class="form-control" id="userInput" name="user" readonly>{{ user_fullname }}</label>
+                </div>
+                <div class="form-group">
+                    <label for="dateInput"><h5>Fecha de creación</h5></label>
+                    <label class="form-control" id="dateInput" name="date" readonly>{{ created_at }}</label>
+                </div>
+                <div class="text-right">
+                    <a class="btn btn-secondary" href={{ url_for("view_controller.geometry_list") }}>Volver</a>
+                </div>
+            {% else %}
+                <div class="form-group">
+                    <label for="descriptionInput"><h5>Descripción</h5></label>
+                    <textarea class="form-control"
+                              id="descriptionInput"
+                              name="description"
+                              rows=3
+                              required>
                         {%- if description is defined %}{{ description }}{% endif %}</textarea>
                 </div>
                 <div class="form-group">
                     <label for="geometryFileUpload"><h5>Archivo de geometría</h5></label>
-                    {% if readonly %}
-                        <div>
-                            <a href="{{ file_url }}" name="geometryFileUpload" download>Descargar</a>
-                        </div>
-                    {% else %}
-                        <input type="file" name="file" class="form-control-file" id="geometryFileUpload" required>
-                    {% endif %}
+                    <input type="file" name="file" class="form-control-file" id="geometryFileUpload" required>
                 </div>
-                {% if readonly %}
-                    <div class="form-group">
-                        <label for="userInput"><h5>Usuario</h5></label>
-                        <label class="form-control" id="userInput" name="user" readonly>{{ user_fullname }}</label>
-                    </div>
-                    <div class="form-group">
-                        <label for="dateInput"><h5>Fecha de creación</h5></label>
-                        <label class="form-control" id="dateInput" name="date" readonly>{{ created_at }}</label>
-                    </div>
-                {% endif %}
-                {% if readonly %}
-                    <div class="text-right">
-                        <a class="btn btn-secondary" href={{ url_for("view_controller.geometry_list") }}>Volver</a>
-                    </div>
-                {% else %}
-                    <div class="text-right">
-                        <button type="submit" class="btn btn-primary">Guardar</button>
-                    </div>
-                {% endif %}
-
+                <div class="text-right">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            {% endif %}
             </form>
         </div>
     </div>
