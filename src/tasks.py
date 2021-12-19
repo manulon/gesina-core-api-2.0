@@ -1,73 +1,51 @@
+from functools import total_ordering
 from celery import Celery
-from os import environ
 from datetime import datetime
-from celery.utils.log import get_task_logger
+import os
+from src import logger
 
-logger = get_task_logger(__name__)
-
-
-environ.setdefault("CELERY_CONFIG_MODULE", "src.celery_config")
+os.environ.setdefault("CELERY_CONFIG_MODULE", "src.celery_config")
 
 celery_app = Celery()
 celery_app.config_from_envvar("CELERY_CONFIG_MODULE")
 
 
 @celery_app.task
-def add(x, y):
-    return x + y
-
-
-@celery_app.task
 def simulate():
-    try:
-        begin = datetime.now()
-        import win32com.client as client
-        from minio import Minio
+    begin = datetime.now()
+    import win32com.client as client
+    from src.service import file_storage_service
 
-        logger.info("Connecting to minio")
+    execution_id = "CP20200911"
+    base_path = f"C:\\gesina\\{execution_id}"
 
-        minio_client = Minio(
-            "10.0.2.2:9000",
-            access_key="minioadmin",
-            secret_key="password",
-            secure=False,
-        )
+    file_storage_service.download_files_for_execution(base_path, execution_id)
 
-        base_path = "C:\\"
+    logger.info("Loading hec ras")
+    RC = client.Dispatch("RAS507.HECRASCONTROLLER")
+    hec_prj = f"{base_path}\\{execution_id}.prj"
+    logger.info("Opening project")
+    RC.Project_Open(hec_prj)
+    logger.info("Obtaining projects names")
+    blnIncludeBasePlansOnly = True
+    plan_names = RC.Plan_Names(None, None, blnIncludeBasePlansOnly)[1]
 
-        logger.info("Downloading files")
-        for file in minio_client.list_objects("ejemplo-ina"):
-            file = file.object_name
-            with minio_client.get_object("ejemplo-ina", file) as response:
-                with open(f"{base_path}\\{file}", "wb") as f:
-                    f.write(response.data)
+    for name in plan_names:
+        logger.info(f"Running plan {name}")
+        RC.Plan_SetCurrent(name)
+        RC.Compute_HideComputationWindow()
+        RC.Compute_CurrentPlan(None, None, True)
 
-        logger.info("Loading hec ras")
-        RC = client.Dispatch("RAS507.HECRASCONTROLLER")
-        hec_prj = f"{base_path}\\CP20200911.prj"
-        logger.info("Opening project")
-        RC.Project_Open(hec_prj)
-        logger.info("Obtaining projects names")
-        blnIncludeBasePlansOnly = True
-        plan_names = RC.Plan_Names(None, None, blnIncludeBasePlansOnly)[1]
+    logger.info("Ending simulations")
+    RC.Project_Close()
+    RC.QuitRAS()
 
-        for name in plan_names:
-            logger.info(f"Running plan {name}")
-            RC.Plan_SetCurrent(name)
-            RC.Compute_HideComputationWindow()
-            RC.Compute_CurrentPlan(None, None, True)
+    total_seconds = (datetime.now() - begin).total_seconds()
 
-        logger.info("Ending simulations")
-        RC.Project_Close()
-        RC.QuitRAS()
-
-        return (datetime.now() - begin).total_seconds()
-    except Exception as e:
-        logger.error(e)
+    logger.info(f"Total runtime seconds {total_seconds}")
+    return (datetime.now() - begin).total_seconds()
 
 
 @celery_app.task
-def tsum(*args, **kwargs):
-    print(args)
-    print(kwargs)
-    return sum(args[0])
+def error_handler(request, exc, traceback):
+    print("Task {0} raised exception: {1!r}\n{2!r}".format(request.id, exc, traceback))

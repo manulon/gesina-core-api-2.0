@@ -12,6 +12,8 @@ from src.controller import (
 )
 from src.exception_handler import set_up_exception_handlers
 from src.translations import gettext, pretty_date
+from src import logger
+
 
 app = Flask(__name__)
 
@@ -30,13 +32,20 @@ app.jinja_env.globals.update(current_user=current_user)
 
 @app.route("/health-check")
 def health_check():
-    from src.tasks import simulate
+    return jsonify({"status": "ok"}), HTTPStatus.OK
 
-    result = simulate.delay()
+
+@app.route("/test")
+def test():
+    from src.tasks import simulate, error_handler
+
+    logger.info("Start simulation")
+    simulate.apply_async(link_error=error_handler.s())
     try:
-        return jsonify({"count": result.get()}), HTTPStatus.OK
+        logger.info("Receiving result")
+        return jsonify({"status": "ok"}), HTTPStatus.CREATED
     except Exception as e:
-        print(e, flush=True)
+        logger.error(e)
 
 
 @app.errorhandler(HTTPStatus.NOT_FOUND)
