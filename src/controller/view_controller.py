@@ -36,7 +36,7 @@ def geometry_new():
 
 @VIEW_BLUEPRINT.route("/execution_plan/<execution_plan_id>")
 def execution_plan_read(execution_plan_id):
-    return render_template("execution_plan_new.html")
+    return render_template("execution_plan.html")
 
 
 @VIEW_BLUEPRINT.route("/execution_plan/list")
@@ -46,4 +46,6 @@ def execution_plan_list():
 
 @VIEW_BLUEPRINT.route("/execution_plan/new")
 def execution_plan_new():
-    return render_template("execution_plan_new.html")
+    geometries = geometry_service.get_geometries()
+    data = {"geometries": geometries}
+    return render_template("execution_plan.html", **data)

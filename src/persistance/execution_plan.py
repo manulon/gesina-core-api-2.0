@@ -20,4 +20,5 @@ class ExecutionPlan(Base):
     flow = relationship("Flow")
     start_datetime = Column(DateTime)
     end_datetime = Column(DateTime)
+    execution_datetime = Column(DateTime)
     status = Column(String)

@@ -33,7 +33,7 @@ def list_geometries():
             "name": geometry.name,
             "description": geometry.description,
             "user": user.fullname,
-            "created_at": geometry.created_at,
+            "created_at": geometry.created_at.date(),
         }
         response_list.append(geometry_row)
 
