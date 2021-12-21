@@ -28,3 +28,7 @@ def get_execution_plan(execution_plan_id):
             .get(execution_plan_id)
         )
         return result
+
+
+def update_execution_plan_status(execution_plan_id, status):
+    pass

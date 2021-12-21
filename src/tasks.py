@@ -1,4 +1,4 @@
-from functools import total_ordering
+src/service/execution_plan_service.pyfrom functools import total_ordering
 from celery import Celery
 from datetime import datetime
 import os
@@ -11,12 +11,11 @@ celery_app.config_from_envvar("CELERY_CONFIG_MODULE")
 
 
 @celery_app.task
-def simulate():
+def simulate(execution_id=1):
     begin = datetime.now()
     import win32com.client as client
     from src.service import file_storage_service
 
-    execution_id = "CP20200911"
     base_path = f"C:\\gesina\\{execution_id}"
 
     file_storage_service.download_files_for_execution(base_path, execution_id)
@@ -39,6 +38,9 @@ def simulate():
     logger.info("Ending simulations")
     RC.Project_Close()
     RC.QuitRAS()
+
+    # Subir todos los archivos de resultados a minio en results/1
+    # Cambiar el estado al execution plan
 
     total_seconds = (datetime.now() - begin).total_seconds()
 
