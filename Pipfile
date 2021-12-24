@@ -21,6 +21,7 @@ minio = "==7.1.2"
 pywin32 = {version = "*", sys_platform = "== 'win32'"}
 gevent = {version = "21.12.0", sys_platform = "== 'win32'"}
 flask-wtf = "*"
+yoyo-migrations = "*"
 
 [dev-packages]
 pytest = "==6.2.2"

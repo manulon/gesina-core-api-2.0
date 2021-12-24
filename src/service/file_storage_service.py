@@ -14,8 +14,11 @@ minio_client = Minio(
     secure=False,
 )
 
-GEOMETRY_BUCKET = "geometry"
-EXECUTION_BUCKET = "execution-plans"
+ROOT_BUCKET = config.minio_bucket
+
+GEOMETRY_BUCKET = f"{ROOT_BUCKET}/geometry"
+EXECUTION_BUCKET = f"{ROOT_BUCKET}/execution-plans"
+
 
 
 def save_geometry(file):

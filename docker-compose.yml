@@ -40,7 +40,8 @@ services:
       restart: always
       volumes:
         - database:/var/lib/postgresql/data
-        - ./migrations:/docker-entrypoint-initdb.d
+        - ./migrations/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql
+        - ./migrations/002_default_execution.sql:/docker-entrypoint-initdb.d/002_default_execution.sql
       environment:
         POSTGRES_PASSWORD: password
         POSTGRES_USER: user

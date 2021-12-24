@@ -14,6 +14,8 @@ from src.translations import gettext, pretty_date
 from src import logger
 from src import config
 
+# RUN MIGRATIONS WITH YOYO
+
 
 app = Flask(__name__)
 
