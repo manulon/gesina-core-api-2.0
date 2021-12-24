@@ -1,20 +1,15 @@
 import io
-import logging
 import os
 
 from minio import Minio
-from src import logger
+from src import logger, config
 
 from src.service.exception.file_exception import FileUploadEmpty, FileUploadError
 
-minio_url = os.getenv("MINIO_URL", "localhost:9000")
-minio_user = os.getenv("MINIO_ROOT_USER", "minioadmin")
-minio_password = os.getenv("MINIO_ROOT_PASSWORD", "password")
-
 minio_client = Minio(
-    endpoint=minio_url,
-    access_key=minio_user,
-    secret_key=minio_password,
+    endpoint=config.minio_url,
+    access_key=config.minio_user,
+    secret_key=config.minio_password,
     secure=False,
 )
 

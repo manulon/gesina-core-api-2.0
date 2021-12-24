@@ -8,15 +8,12 @@ from sqlalchemy import (
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 
+from src import config
+
 Base = declarative_base(metadata=MetaData(schema="gesina"))
 
-user = os.getenv("DATABASE_USER", "user")
-password = os.getenv("DATABASE_PASSWORD", "password")
-database_name = os.getenv("DATABASE_NAME", "main")
-database_host = os.getenv("DATABASE_HOST", "localhost:5432")
-
 engine = create_engine(
-    f"postgresql://{user}:{password}@{database_host}/{database_name}"
+    f"postgresql://{config.database_user}:{config.database_password}@{config.database_host}/{config.database_name}"
 )
 
 
