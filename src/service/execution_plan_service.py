@@ -2,32 +2,30 @@ from datetime import datetime
 
 from sqlalchemy.orm import joinedload
 
-from src.persistance.execution_plan import ExecutionPlan
+from src.persistance.execution_plan import ExecutionPlan, ExecutionPlanStatus
 from src.persistance.session import get_session
-from src.service import file_storage_service
 
 
-def create(request):
-    flow_file = request.files["file"]
-    flow_id = flow_file.filename
-    form = request.form
-    geometry_id = form["geometryOption"]
+def create(form):
+    plan_name = form.plan_name.data
+    geometry_id = form.geometry_option.data
     user_id = 1  # hardcode
-    execution_datetime = datetime.now()
-    start_datetime = form["startDate"]
-    end_datetime = form["endDate"]
+    created_at = datetime.now()
+    start_datetime = form.start_date.data
+    end_datetime = form.end_date.data
 
     with get_session() as session:
-        file_storage_service.save_flow(flow_file)
-        # flow = Flow(id=flow_id)
-        # session.add(flow)
+        # TODO falta crear la carpeta de la ejecucion en minio y todos los archivos necesarios
+        # flow_file_field = form.file
+        # file_storage_service.save_flow(flow_file_field.data)
         execution_plan = ExecutionPlan(
-            flow_id=flow_id,
+            plan_name=plan_name,
             geometry_id=geometry_id,
             user_id=user_id,
-            execution_datetime=execution_datetime,
+            created_at=created_at,
             start_datetime=start_datetime,
             end_datetime=end_datetime,
+            status=ExecutionPlanStatus.PENDING,
         )
         session.add(execution_plan)
         return execution_plan

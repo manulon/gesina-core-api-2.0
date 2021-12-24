@@ -11,7 +11,7 @@ from sqlalchemy.orm import relationship
 from src.persistance.session import Base
 
 
-class ExecutionPlanStatus(enum.Enum):
+class ExecutionPlanStatus(str, enum.Enum):
     PENDING = "PENDING"
     RUNNING = "RUNNING"
     FINISHED = "FINISHED"
