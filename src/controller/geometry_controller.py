@@ -3,7 +3,7 @@ from flask import Blueprint, request, render_template, jsonify
 from src import logger
 from src.service import geometry_service
 from src.service.exception.file_exception import FileUploadError
-from src.view.view_message import ViewMessage
+from src.view.forms.geometry_form import GeometryForm
 
 GEOMETRY_BLUEPRINT = Blueprint("geometry_controller", __name__)
 
@@ -11,14 +11,19 @@ GEOMETRY_BLUEPRINT = Blueprint("geometry_controller", __name__)
 @GEOMETRY_BLUEPRINT.route("", methods=["POST"])
 def save():
     try:
-        geometry = geometry_service.create(request)
-        success = ViewMessage("Geometría #" + str(geometry.id) + " creada con éxito.")
-        return render_template("geometry_list.html", success=success)
+        form = GeometryForm()
+
+        if form.validate_on_submit():
+            geometry = geometry_service.create(form)
+            success_message = f"Geometría #{str(geometry.id)} creada con éxito."
+            return render_template("geometry_list.html", success=success_message)
+
+        return render_template("geometry.html", form=form, errors=form.get_errors(), **request.form)
     except FileUploadError as file_error:
         logger.error(file_error.message, file_error)
-        error = ViewMessage("Error cargando archivo. Intente nuevamente.")
+        error_message = "Error cargando archivo. Intente nuevamente."
 
-        return render_template("geometry.html", error=error, **request.form)
+        return render_template("geometry.html", errors=[error_message], **request.form)
 
 
 @GEOMETRY_BLUEPRINT.route("", methods=["GET"])

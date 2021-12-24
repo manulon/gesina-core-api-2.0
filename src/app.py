@@ -13,10 +13,13 @@ from src.controller import (
 from src.exception_handler import set_up_exception_handlers
 from src.translations import gettext, pretty_date
 from src import logger
+from src import config
+
 
 
 app = Flask(__name__)
 
+app.config['SECRET_KEY'] = config.secret_key
 
 app.register_blueprint(BACKOFFICE_BLUEPRINT, url_prefix="/backoffice")
 app.register_blueprint(BACKOFFICE_USER_BLUEPRINT, url_prefix="/backoffice_user")

@@ -12,7 +12,7 @@ from src.service import file_storage_service
 
 class Geometry(Base):
     __tablename__ = "geometry"
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String)
     description = Column(String)
     created_at = Column(DateTime)

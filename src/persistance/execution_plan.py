@@ -3,7 +3,7 @@ from sqlalchemy import (
     Column,
     ForeignKey,
     Enum,
-    DateTime,
+    DateTime, String,
 )
 import enum
 from sqlalchemy.orm import relationship
@@ -20,6 +20,8 @@ class ExecutionPlanStatus(enum.Enum):
 
 class ExecutionPlan(Base):
     __tablename__ = "execution_plan"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    plan_name = Column(String)
     geometry_id = Column(Integer, ForeignKey("geometry.id"))
     geometry = relationship("Geometry")
     user_id = Column(Integer, ForeignKey("user.id"))

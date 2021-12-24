@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template
 
 from src.service import geometry_service
+from src.view.forms.geometry_form import GeometryForm
 
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
 
@@ -31,7 +32,7 @@ def geometry_list():
 
 @VIEW_BLUEPRINT.route("/geometry/new")
 def geometry_new():
-    return render_template("geometry.html")
+    return render_template("geometry.html", form=GeometryForm())
 
 
 @VIEW_BLUEPRINT.route("/execution_plan/<execution_plan_id>")

@@ -5,6 +5,7 @@ from minio import Minio
 from src import logger, config
 
 from src.service.exception.file_exception import FileUploadEmpty, FileUploadError
+from werkzeug.utils import secure_filename
 
 minio_client = Minio(
     endpoint=config.minio_url,
@@ -30,7 +31,7 @@ def save_geometry(file):
     file_bytes = file.read()
     data = io.BytesIO(file_bytes)
     try:
-        minio_client.put_object(GEOMETRY_BUCKET, file.filename, data, len(file_bytes))
+        minio_client.put_object(GEOMETRY_BUCKET, secure_filename(file.filename), data, len(file_bytes))
     except Exception as exception:
         error_message = "Error uploading file"
         logger.error(error_message, exception)

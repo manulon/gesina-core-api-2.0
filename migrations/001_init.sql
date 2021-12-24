@@ -39,7 +39,7 @@ create table if not exists gesina.execution_plan
 	user_id integer not null constraint execution_plan_user_id_fk references gesina."user",
 	start_datetime timestamp not null,
 	end_datetime timestamp not null,
-	create_at timestamp not null,
+	created_at timestamp not null,
 	status text not null
 );
 
