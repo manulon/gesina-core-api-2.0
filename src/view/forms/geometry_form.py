@@ -4,7 +4,12 @@ from flask_wtf.file import FileField, FileRequired
 
 
 class GeometryForm(FlaskForm):
-    description = StringField([validators.Length(max=256), validators.DataRequired(message="Error: Ingrese una descripción")])
+    description = StringField(
+        [
+            validators.Length(max=256),
+            validators.DataRequired(message="Error: Ingrese una descripción"),
+        ]
+    )
     file = FileField(validators=[FileRequired(message="Error: Seleccione un archivo")])
 
     def get_errors(self):

@@ -16,7 +16,10 @@ def create(form):
     created_at = datetime.now()
 
     geometry = Geometry(
-        name=name, description=description_field.data, user_id=user_id, created_at=created_at
+        name=name,
+        description=description_field.data,
+        user_id=user_id,
+        created_at=created_at,
     )
     with get_session() as session:
         session.add(geometry)

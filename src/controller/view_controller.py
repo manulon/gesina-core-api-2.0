@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template
 
 from src.service import geometry_service
+from src.view.forms.execution_plan_form import ExecutionPlanForm
 from src.view.forms.geometry_form import GeometryForm
 
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
@@ -14,6 +15,12 @@ def home():
 @VIEW_BLUEPRINT.route("/geometry/<geometry_id>")
 def geometry_read(geometry_id):
     geometry = geometry_service.get_geometry(geometry_id)
+    errors = []
+    if not geometry.get_file_url():
+        errors.append(
+            f"Error obteniendo archivo de geometría {geometry.name}. Intente nuevamente"
+        )
+
     geometry_data = {
         "id": geometry.id,
         "description": geometry.description,
@@ -22,7 +29,14 @@ def geometry_read(geometry_id):
         "file_name": geometry.name,
         "created_at": geometry.created_at.date(),
     }
-    return render_template("geometry.html", readonly=True, **geometry_data)
+
+    return render_template(
+        "geometry.html",
+        form=GeometryForm(),
+        readonly=True,
+        errors=errors,
+        **geometry_data,
+    )
 
 
 @VIEW_BLUEPRINT.route("/geometry/list")
@@ -48,5 +62,5 @@ def execution_plan_list():
 @VIEW_BLUEPRINT.route("/execution_plan/new")
 def execution_plan_new():
     geometries = geometry_service.get_geometries()
-    data = {"geometries": geometries}
+    data = {"form": ExecutionPlanForm(), "geometries": geometries}
     return render_template("execution_plan.html", **data)

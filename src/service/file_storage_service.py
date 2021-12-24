@@ -4,7 +4,7 @@ import os
 from minio import Minio
 from src import logger, config
 
-from src.service.exception.file_exception import FileUploadEmpty, FileUploadError
+from src.service.exception.file_exception import FileUploadError, FilePreSignedUrlError
 from werkzeug.utils import secure_filename
 
 minio_client = Minio(
@@ -18,20 +18,17 @@ GEOMETRY_BUCKET = "geometry"
 EXECUTION_BUCKET = "execution-plans"
 
 
-def validate_file(files_in_request):
-    if "file" not in files_in_request:
-        raise FileUploadEmpty("Not a file in request.")
-
-    file = files_in_request["file"]
-    if not file or file.filename == "":
-        raise FileUploadEmpty("No selected file.")
-
-
 def save_geometry(file):
+    save_file(GEOMETRY_BUCKET, file)
+
+
+def save_file(bucket, file):
     file_bytes = file.read()
     data = io.BytesIO(file_bytes)
     try:
-        minio_client.put_object(GEOMETRY_BUCKET, secure_filename(file.filename), data, len(file_bytes))
+        minio_client.put_object(
+            bucket, secure_filename(file.filename), data, len(file_bytes)
+        )
     except Exception as exception:
         error_message = "Error uploading file"
         logger.error(error_message, exception)
@@ -39,7 +36,12 @@ def save_geometry(file):
 
 
 def get_geometry_url(name):
-    return minio_client.get_presigned_url("GET", GEOMETRY_BUCKET, name)
+    try:
+        return minio_client.get_presigned_url("GET", GEOMETRY_BUCKET, name)
+    except Exception as exception:
+        error_message = f"Error generating presigned url for {name}"
+        logger.error(error_message, exception)
+        raise FilePreSignedUrlError(error_message)
 
 
 def list_files_for_execution(execution_id):

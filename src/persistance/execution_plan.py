@@ -3,7 +3,8 @@ from sqlalchemy import (
     Column,
     ForeignKey,
     Enum,
-    DateTime, String,
+    DateTime,
+    String,
 )
 import enum
 from sqlalchemy.orm import relationship

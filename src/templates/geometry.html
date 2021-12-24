@@ -14,6 +14,7 @@
                   class="p-4 container"
                   id="geometry-form"
                   action="{{ url_for("geometry_controller.save") }}">
+            {{ form.csrf_token }}
             {% if readonly %}
                 <div class="form-group">
                     <label for="descriptionInput"><h5>Descripción</h5></label>
@@ -25,9 +26,11 @@
                 </div>
                 <div class="form-group">
                     <label for="geometryFileUpload"><h5>Archivo de geometría</h5></label>
-                        <div>
-                            <a href="{{ file_url }}" name="geometryFileUpload" download>{{ file_name }}</a>
-                        </div>
+                        {% if file_url %}
+                            <div>
+                                <a href="{{ file_url }}" name="geometryFileUpload" download>{{ file_name }}</a>
+                            </div>
+                        {% endif %}
                 </div>
                 <div class="form-group">
                     <label for="userInput"><h5>Usuario</h5></label>
@@ -41,14 +44,13 @@
                     <a class="btn btn-secondary" href={{ url_for("view_controller.geometry_list") }}>Volver</a>
                 </div>
             {% else %}
-                {{ form.csrf_token }}
                 <div class="form-group">
                     <label for="descriptionInput"><h5>Descripción</h5></label>
                     <textarea class="form-control"
                               id="descriptionInput"
                               name="description"
                               rows=3>
-                        {%- if description is defined %}{{ description }}{% endif %}</textarea>
+                        {%- if form.description.data %}{{ form.description.data }}{% endif %}</textarea>
                 </div>
                 <div class="form-group">
                     <label for="geometryFileUpload"><h5>Archivo de geometría</h5></label>

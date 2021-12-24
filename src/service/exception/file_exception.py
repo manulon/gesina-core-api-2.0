@@ -4,7 +4,7 @@ class FileUploadError(Exception):
         self.message = message
 
 
-class FileUploadEmpty(FileUploadError):
+class FilePreSignedUrlError(Exception):
     def __init__(self, message):
         Exception.__init__(self)
         self.message = message

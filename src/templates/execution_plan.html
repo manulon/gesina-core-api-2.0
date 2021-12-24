@@ -29,11 +29,19 @@
                 </div>
                 <div class="form-group">
                     <label for="startDateInput"><h5>Fecha desde</h5></label>
-                    <input name="startDate" id="startDateInput" type="text" class="datepicker col" required>
+                    {% if startDate %}
+                        <input name="startDate" id="startDateInput" value={{ startDate }} type="text" class="datepicker col" required>
+                    {% else %}
+                        <input name="startDate" id="startDateInput" type="text" class="datepicker col" required>
+                    {% endif %}
                 </div>
                 <div class="form-group">
                     <label for="endDateInput"><h5>Fecha hasta</h5></label>
-                    <input name="endDate" id="endDateInput" type="text" class="datepicker col" required>
+                    {% if startDate %}
+                        <input name="endDate" id="endDateInput" value={{ endDate }} type="text" class="datepicker col" required>
+                    {% else %}
+                        <input name="endDate" id="endDateInput" type="text" class="datepicker col" required>
+                    {% endif %}
                 </div>
                 <div class="text-right">
                     <button type="submit" class="btn btn-primary">Guardar</button>

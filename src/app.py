@@ -16,10 +16,9 @@ from src import logger
 from src import config
 
 
-
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = config.secret_key
+app.config["SECRET_KEY"] = config.secret_key
 
 app.register_blueprint(BACKOFFICE_BLUEPRINT, url_prefix="/backoffice")
 app.register_blueprint(BACKOFFICE_USER_BLUEPRINT, url_prefix="/backoffice_user")
