@@ -39,7 +39,7 @@ def list_execution_plans():
             "id": execution_plan.id,
             "geometry": geometry.description,
             "user": user.fullname,
-            "created_at": execution_plan.created_at.date(),
+            "created_at": execution_plan.created_at.strftime("%d/%m/%Y"),
             "status": execution_plan.status,
         }
         response_list.append(execution_plan_row)

@@ -31,3 +31,15 @@ class ExecutionPlan(Base):
     end_datetime = Column(DateTime)
     created_at = Column(DateTime)
     status = Column(Enum(ExecutionPlanStatus))
+
+    def get_geometry_file_url(self):
+        # TODO recuperar desde la carpeta del exe_plan
+        if self.id:
+            return ""
+        return ""
+
+    def get_flow_file_url(self):
+        # TODO recuperar desde la carpeta del exe_plan
+        if self.id:
+            return ""
+        return ""

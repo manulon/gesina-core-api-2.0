@@ -15,42 +15,84 @@
                   id="execution-plan-form"
                   action="{{ url_for("execution_plan_controller.save") }}">
                 {{ form.csrf_token }}
-                <div class="form-group">
-                    <label for="planName"><h5>Nombre del plan</h5></label>
-                    <input class="form-control" id="plan_name" name="plan_name">{% if form.plan_name.data %}{{ form.plan_name_data }}{% endif %}
-                </div>
-                <div class="form-group">
-                    <label for="geometryInput"><h5>Geometría</h5></label>
-                    <select class="custom-select" id="status-select" name="geometry_option">
-                        <option value="default">Seleccione una categoría..</option>
-                        {% for geometry in geometries %}
-                            <option value="{{ geometry.id }}">{{ geometry.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="flowFileUpload"><h5>Condiciones de borde</h5></label>
-                    <input type="file" name="flow_file" class="form-control-file" id="flowFileUpload">
-                </div>
-                <div class="form-group">
-                    <label for="startDateInput"><h5>Fecha desde</h5></label>
-                    {% if startDate %}
-                        <input name="start_date" id="startDateInput" value={{ startDate }} type="text" class="datepicker col">
-                    {% else %}
-                        <input name="start_date" id="startDateInput" type="text" class="datepicker col">
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    <label for="endDateInput"><h5>Fecha hasta</h5></label>
-                    {% if startDate %}
-                        <input name="end_date" id="endDateInput" value={{ endDate }} type="text" class="datepicker col">
-                    {% else %}
-                        <input name="end_date" id="endDateInput" type="text" class="datepicker col">
-                    {% endif %}
-                </div>
-                <div class="text-right">
-                    <button type="submit" class="btn btn-primary">Guardar</button>
-                </div>
+                {% if readonly %}
+                    <div class="form-group">
+                        <label for="planName"><h5>Nombre del plan</h5></label>
+                        <label class="form-control" id="plan_name" name="plan_name" readonly>{{ plan_name }}</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="geometryFileUpload"><h5>Geometría</h5></label>
+                        {% if geometry_file_url %}
+                            <div>
+                                <a href="{{ geometry_file_url }}" name="geometryFileUpload" download>{{ plan_name }}.g01</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="flowFileUpload"><h5>Condiciones de borde</h5></label>
+                        {% if flow_file_url %}
+                            <div>
+                                <a href="{{ flow_file_url }}" name="flowFileUpload" download>{{ plan_name }}.u01</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="userInput"><h5>Usuario</h5></label>
+                        <label class="form-control" id="userInput" name="user" readonly>{{ user_fullname }}</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="startDateInput"><h5>Fecha desde</h5></label>
+                        <label class="form-control" name="startDate" id="startDateInput" readonly>{{ start_date }}</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="endDateInput"><h5>Fecha hasta</h5></label>
+                        <label class="form-control" name="endDate" id="endDateInput" readonly>{{ end_date }}</label>
+                    </div>
+                    <div class="form-group">
+                        <label for="createdAt"><h5>Fecha de creación</h5></label>
+                        <label class="form-control" name="createdAt" id="createdAt" readonly>{{ created_at }}</label>
+                    </div>
+                    <div class="text-right">
+                        <a class="btn btn-secondary" href={{ url_for("view_controller.execution_plan_list") }}>Volver</a>
+                    </div>
+                {% else %}
+                    <div class="form-group">
+                        <label for="planName"><h5>Nombre del plan</h5></label>
+                        <input class="form-control" id="plan_name" name="plan_name">{% if form.plan_name.data %}{{ form.plan_name.data }}{% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="geometryInput"><h5>Geometría</h5></label>
+                        <select class="custom-select" id="status-select" name="geometry_option">
+                            <option value="default">Seleccione una categoría..</option>
+                            {% for geometry in geometries %}
+                                <option value="{{ geometry.id }}">{{ geometry.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="flowFileUpload"><h5>Condiciones de borde</h5></label>
+                        <input type="file" name="flow_file" class="form-control-file" id="flowFileUpload">
+                    </div>
+                    <div class="form-group">
+                        <label for="startDateInput"><h5>Fecha desde</h5></label>
+                        {% if startDate %}
+                            <input name="start_date" id="startDateInput" value={{ startDate }} type="text" class="datepicker col">
+                        {% else %}
+                            <input name="start_date" id="startDateInput" type="text" class="datepicker col">
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="endDateInput"><h5>Fecha hasta</h5></label>
+                        {% if startDate %}
+                            <input name="end_date" id="endDateInput" value={{ endDate }} type="text" class="datepicker col">
+                        {% else %}
+                            <input name="end_date" id="endDateInput" type="text" class="datepicker col">
+                        {% endif %}
+                    </div>
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                {% endif %}
             </form>
         </div>
     </div>

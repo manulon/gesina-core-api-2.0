@@ -33,7 +33,7 @@
                     <th data-field="created_at">
                         Fecha de creación
                     </th>
-                    <th data-field="status">
+                    <th data-field="status" data-formatter="statusFormatter">
                         Estado
                     </th>
                     <th data-formatter="executionPlanActionFormatter">
@@ -56,6 +56,16 @@
             if (value.length > 20)
                 return value.substr(0, 20).concat('[...]');
             return value;
+        }
+        function statusFormatter(value) {
+            const status_map = {
+                PENDING: 'Pendiente',
+                RUNNING: 'En ejecución',
+                FINISHED: 'Finalizada',
+                CANCELED: 'Cancelada',
+                ERROR: 'Fallida'
+            };
+            return status_map[value];
         }
     </script>
 
