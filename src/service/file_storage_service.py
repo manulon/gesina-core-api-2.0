@@ -20,7 +20,6 @@ GEOMETRY_BUCKET = f"{ROOT_BUCKET}/geometry"
 EXECUTION_BUCKET = f"{ROOT_BUCKET}/execution-plans"
 
 
-
 def save_geometry(file):
     save_file(GEOMETRY_BUCKET, file)
 
