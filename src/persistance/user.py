@@ -14,6 +14,7 @@ class User(Base):
     lastname = Column(String)
     email = Column(String)
     password = Column(String)
+    session_id = Column(String)
 
     @property
     def fullname(self):

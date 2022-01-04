@@ -6,7 +6,8 @@ create table if not exists gesina."user"
 	name text not null,
 	lastname text not null,
 	email text not null,
-	password text not null
+	password text not null,
+	session_id text null
 );
 
 alter table gesina."user" owner to "user";

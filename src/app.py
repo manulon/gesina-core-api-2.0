@@ -5,7 +5,6 @@ from src.controller.execution_plan_controller import EXECUTION_PLAN_BLUEPRINT
 from src.encoders import CustomJSONEncoder
 from src.service.backoffice_user_service import current_user
 from src.controller import (
-    BACKOFFICE_BLUEPRINT,
     BACKOFFICE_USER_BLUEPRINT,
     GEOMETRY_BLUEPRINT,
     VIEW_BLUEPRINT,
@@ -20,12 +19,10 @@ app = Flask(__name__)
 
 app.config["SECRET_KEY"] = config.secret_key
 
-app.register_blueprint(BACKOFFICE_BLUEPRINT, url_prefix="/backoffice")
 app.register_blueprint(BACKOFFICE_USER_BLUEPRINT, url_prefix="/backoffice_user")
 app.register_blueprint(GEOMETRY_BLUEPRINT, url_prefix="/geometry")
 app.register_blueprint(EXECUTION_PLAN_BLUEPRINT, url_prefix="/execution_plan")
 app.register_blueprint(VIEW_BLUEPRINT, url_prefix="/view")
-
 
 app.jinja_env.globals.update(gettext=gettext)
 app.jinja_env.globals.update(pretty_date=pretty_date)
