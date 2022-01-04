@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, jsonify
+from flask import Blueprint, render_template, jsonify
 
 from src import logger
 from src.service import geometry_service
@@ -14,7 +14,9 @@ def save():
     try:
         if form.validate_on_submit():
             geometry = geometry_service.create(form)
-            success_message = f"Geometría #{str(geometry.id)} creada con éxito."
+            success_message = (
+                f"Geometr&iacute;a #{str(geometry.id)} creada con &eacute;xito."
+            )
             return render_template("geometry_list.html", success=success_message)
 
         return render_template("geometry.html", form=form, errors=form.get_errors())

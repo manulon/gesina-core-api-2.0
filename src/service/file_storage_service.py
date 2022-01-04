@@ -16,20 +16,23 @@ minio_client = Minio(
 
 ROOT_BUCKET = config.minio_bucket
 
-GEOMETRY_BUCKET = f"{ROOT_BUCKET}/geometry"
-EXECUTION_BUCKET = f"{ROOT_BUCKET}/execution-plans"
+GEOMETRY_FOLDER = "geometry"
+EXECUTION_FOLDER = f"{ROOT_BUCKET}/execution-plans"
 
 
 def save_geometry(file):
-    save_file(GEOMETRY_BUCKET, file)
+    save_file(GEOMETRY_FOLDER, file)
 
 
-def save_file(bucket, file):
+def save_file(folder, file):
     file_bytes = file.read()
     data = io.BytesIO(file_bytes)
     try:
         minio_client.put_object(
-            bucket, secure_filename(file.filename), data, len(file_bytes)
+            ROOT_BUCKET,
+            f"{folder}/{secure_filename(file.filename)}",
+            data,
+            len(file_bytes),
         )
     except Exception as exception:
         error_message = "Error uploading file"
@@ -39,7 +42,9 @@ def save_file(bucket, file):
 
 def get_geometry_url(name):
     try:
-        return minio_client.get_presigned_url("GET", GEOMETRY_BUCKET, name)
+        return minio_client.get_presigned_url(
+            "GET", ROOT_BUCKET, f"{GEOMETRY_FOLDER}/{name}"
+        )
     except Exception as exception:
         error_message = f"Error generating presigned url for {name}"
         logger.error(error_message, exception)
@@ -47,11 +52,11 @@ def get_geometry_url(name):
 
 
 def list_files_for_execution(execution_id):
-    return minio_client.list_objects(EXECUTION_BUCKET, f"{execution_id}/")
+    return minio_client.list_objects(ROOT_BUCKET, f"{EXECUTION_FOLDER}/{execution_id}/")
 
 
 def get_file_for_execution(file):
-    return minio_client.get_object(EXECUTION_BUCKET, file)
+    return minio_client.get_object(ROOT_BUCKET, f"{EXECUTION_FOLDER}/{file}")
 
 
 def download_files_for_execution(base_path, execution_id):
