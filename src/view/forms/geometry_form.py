@@ -5,7 +5,7 @@ from flask_wtf.file import FileField, FileRequired
 
 class GeometryForm(FlaskForm):
     description = StringField(
-        [
+        validators=[
             validators.Length(max=256),
             validators.DataRequired(message="Error: Ingrese una descripción"),
         ]

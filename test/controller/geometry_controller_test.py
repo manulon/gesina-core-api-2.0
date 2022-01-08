@@ -9,8 +9,7 @@ def test_add_new_geometry_fails_on_empty_description(a_client, a_geometry_file):
     }
 
     response = a_client.post("/geometry", data=data, content_type="multipart/form-data")
-
-    assert b"Error: Ingrese una descripcion" in response.data
+    assert b"Error: Ingrese una descripc" in response.data
 
 
 # def test_add_new_geometry_fails_on_empty_file(a_client, a_geometry_file):
