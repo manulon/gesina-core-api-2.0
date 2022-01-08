@@ -21,7 +21,7 @@ class ExecutionPlanStatus(str, enum.Enum):
 
 class ExecutionPlan(Base):
     __tablename__ = "execution_plan"
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True)
     plan_name = Column(String)
     geometry_id = Column(Integer, ForeignKey("geometry.id"))
     geometry = relationship("Geometry")

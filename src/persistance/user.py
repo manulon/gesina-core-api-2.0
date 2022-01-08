@@ -9,7 +9,7 @@ from src.persistance.session import Base
 
 class User(Base):
     __tablename__ = "user"
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True)
     name = Column(String)
     lastname = Column(String)
     email = Column(String)
