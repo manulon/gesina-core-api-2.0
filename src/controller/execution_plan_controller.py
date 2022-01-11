@@ -1,3 +1,4 @@
+import sqlalchemy
 from flask import Blueprint, jsonify, render_template, request
 
 from src import logger
@@ -20,11 +21,20 @@ def save():
         return render_template(
             "execution_plan.html", form=form, errors=form.get_errors()
         )
+    except sqlalchemy.exc.IntegrityError as database_error:
+        logger.error(database_error)
+        error_message = "Error guardando información en la base de datos."
+
+        return render_template(
+            "execution_plan.html", form=form, errors=[error_message], **request.form
+        )
     except FileUploadError as file_error:
         logger.error(file_error.message, file_error)
         error_message = "Error cargando archivo. Intente nuevamente."
 
-        return render_template("geometry.html", error=[error_message], **request.form)
+        return render_template(
+            "execution_plan.html", form=form, errors=[error_message], **request.form
+        )
 
 
 @EXECUTION_PLAN_BLUEPRINT.route("", methods=["GET"])
