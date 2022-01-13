@@ -1,3 +1,3 @@
-from src.controller.backoffice_user_controller import BACKOFFICE_USER_BLUEPRINT
+from src.controller.user_controller import USER_BLUEPRINT
 from src.controller.geometry_controller import GEOMETRY_BLUEPRINT
 from src.controller.view_controller import VIEW_BLUEPRINT
