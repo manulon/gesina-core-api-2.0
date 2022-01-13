@@ -1,4 +1,4 @@
-INSERT INTO gesina."user" (id, "name", lastname,email, "password") VALUES
+INSERT INTO gesina."user" (id, firs_name, last_name,email, "password") VALUES
 	 (1, 'Admin','Ina','admin@ina.com.ar','123456');
 
 INSERT INTO gesina.geometry (id, "name", description, created_at, user_id) VALUES
