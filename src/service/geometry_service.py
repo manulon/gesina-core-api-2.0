@@ -12,13 +12,13 @@ def create(form):
     file_field = form.file
     name = secure_filename(file_field.data.filename)
     description_field = form.description
-    user_id = 1  # hardcode
+    user_id_field = form.user_id
     created_at = datetime.now()
 
     geometry = Geometry(
         name=name,
         description=description_field.data,
-        user_id=user_id,
+        user_id=user_id_field.data,
         created_at=created_at,
     )
     with get_session() as session:

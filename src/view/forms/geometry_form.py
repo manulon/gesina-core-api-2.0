@@ -1,5 +1,5 @@
 from flask_wtf.form import FlaskForm
-from wtforms import StringField, validators
+from wtforms import StringField, IntegerField, validators
 from flask_wtf.file import FileField, FileRequired
 
 
@@ -15,6 +15,7 @@ class GeometryForm(FlaskForm):
         ]
     )
     file = FileField(validators=[FileRequired(message="Error: Seleccione un archivo")])
+    user_id = IntegerField()
 
     def get_errors(self):
         errors = []

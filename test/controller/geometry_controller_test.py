@@ -45,6 +45,41 @@ def test_add_new_geometry_fails_on_empty_file(a_client, a_geometry_file):
     assert geometry_service.get_geometry(2) is None
 
 
+def test_add_new_geometry_fails_on_invalid_user(a_client, a_geometry_file):
+    filename = "test_geometry.g01"
+    description = "some_description"
+    data = {
+        "description": description,
+        "file": (io.BytesIO(a_geometry_file), filename),
+        "files": {"file": (io.BytesIO(a_geometry_file), filename)},
+        "user_id": 2,
+    }
+
+    response = a_client.post("/geometry", data=data, content_type="multipart/form-data")
+
+    assert b"Error guardando info" in response.data
+    assert b"base de datos" in response.data
+    assert geometry_service.get_geometry(2) is None
+
+
+# @mock.patch('src.service.file_storage_service.save_geometry')
+# def test_add_new_geometry_fails_on_upload_file_error(save_geometry, a_client, a_geometry_file):
+#     save_geometry.side_effect = FileUploadError('')
+#
+#     filename = "test_geometry.g01"
+#     description = "some_description"
+#     data = {
+#         "description": description,
+#         "file": (io.BytesIO(a_geometry_file), filename),
+#         "files": {"file": (io.BytesIO(a_geometry_file), filename)},
+#     }
+#
+#     response = a_client.post("/geometry", data=data, content_type="multipart/form-data")
+#
+#     print("error ? " + str(response.data))
+#     assert geometry_service.get_geometry(2) is None
+
+
 def test_add_new_geometry_success(a_client, a_geometry_file):
     filename = "test_geometry.g01"
     description = "some_description"
