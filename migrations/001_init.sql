@@ -3,8 +3,8 @@ create schema gesina;
 create table if not exists gesina."user"
 (
 	id serial constraint user_pk primary key,
-	name text not null,
-	lastname text not null,
+	first_name me text not null,
+	last_name text not null,
 	email text not null,
 	password text not null,
 	session_id text null

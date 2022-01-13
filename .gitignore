@@ -142,3 +142,4 @@ cython_debug/
 .vscode
 
 minio_data
+package.box
