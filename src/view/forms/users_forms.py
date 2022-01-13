@@ -11,3 +11,9 @@ class SingUpForm(FlaskForm):
     last_name = StringField(validators=[DataRequired(message="Ingrese un apellido")])
 
     password = PasswordField(validators=[DataRequired(message="Ingrese un password")])
+
+
+class LoginForm(FlaskForm):
+    email = EmailField(validators=[DataRequired(message="Ingrese un email")])
+
+    password = PasswordField(validators=[DataRequired(message="Ingrese un password")])

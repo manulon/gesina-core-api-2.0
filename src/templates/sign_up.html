@@ -4,7 +4,7 @@
 <div class="column is-4 is-offset-4">
     <h3 class="title">Sign Up</h3>
     <div class="box">
-        <form method="POST" action="{{ url_for("user_controller.do_sign_up") }}">
+        <form method="POST" action="{{ url_for('user_controller.do_sign_up') }}">
             {{ form.csrf_token() }}
             <div class="field">
                 <div class="control">

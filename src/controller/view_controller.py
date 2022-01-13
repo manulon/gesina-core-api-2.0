@@ -1,10 +1,14 @@
 from flask import Blueprint, render_template
 
+from src.login_manager import user_is_authenticated
 from src.service import geometry_service, execution_plan_service
 from src.view.forms.execution_plan_form import ExecutionPlanForm
 from src.view.forms.geometry_form import GeometryForm
 
+
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
+
+VIEW_BLUEPRINT.before_request(user_is_authenticated)
 
 
 @VIEW_BLUEPRINT.route("/")
@@ -25,7 +29,7 @@ def geometry_read(geometry_id):
     geometry_data = {
         "id": geometry.id,
         "description": geometry.description,
-        "user_fullname": geometry.user.fullname,
+        "user_full_name": geometry.user.full_name,
         "file_url": geometry_url,
         "file_name": geometry.name,
         "created_at": geometry.created_at.strftime("%d/%m/%Y"),
@@ -70,7 +74,7 @@ def execution_plan_read(execution_plan_id):
         "plan_name": execution_plan.plan_name,
         "geometry_file_name": geometry_url,
         "flow_file_url": flow_url,
-        "user_fullname": user.fullname,
+        "user_full_name": user.full_name,
         "start_date": execution_plan.start_datetime.date(),
         "end_date": execution_plan.end_datetime.date(),
         "created_at": execution_plan.created_at.date(),

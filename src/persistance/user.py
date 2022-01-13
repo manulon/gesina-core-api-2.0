@@ -11,7 +11,7 @@ from src.persistance.session import Base
 
 class User(Base, flask_login.UserMixin):
     __tablename__ = "user"
-    id = Column(Integer)
+    id = Column(Integer, primary_key=True)
     first_name = Column(String)
     last_name = Column(String)
     email = Column(String)
@@ -30,5 +30,5 @@ class User(Base, flask_login.UserMixin):
         return check_password_hash(self.password, password_to_validate)
 
     @property
-    def fullname(self):
+    def full_name(self):
         return f"{self.first_name} {self.last_name}"
