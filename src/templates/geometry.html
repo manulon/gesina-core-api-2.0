@@ -13,7 +13,7 @@
                   enctype=multipart/form-data
                   class="p-4 container"
                   id="geometry-form"
-                  action="{{ url_for("geometry_controller.save") }}">
+                  action="{{ url_for("view_controller.save_geometry") }}">
             {{ form.csrf_token }}
             {% if readonly %}
                 <div class="form-group">

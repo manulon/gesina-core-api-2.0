@@ -12,7 +12,6 @@ app = Flask(__name__)
 
 app.config["SECRET_KEY"] = config.secret_key
 
-app.register_blueprint(controller.USER_BLUEPRINT, url_prefix="/user")
 app.register_blueprint(controller.GEOMETRY_BLUEPRINT, url_prefix="/geometry")
 app.register_blueprint(
     controller.EXECUTION_PLAN_BLUEPRINT, url_prefix="/execution_plan"
