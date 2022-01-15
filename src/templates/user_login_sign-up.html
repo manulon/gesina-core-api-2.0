@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="column is-4 is-offset-4">
+    <h2  class="title">{{ form.title }}</h2>
+    <div class="box m-3 d-flex justify-content-center">
+        <form method="POST" action="{{ form.endpoint }}" class="w-50">
+            {{ form.csrf_token() }}
+
+            {% for field in form %}
+                {% if field.type == "SubmitField" %}
+                    <div class="d-flex">
+                        {{ form.submit(class_ = "btn btn-primary") }}
+                        {% if form.show_register_button %}
+                            <a class="btn btn-outline-secondary ml-2" href="{{ url_for('public_view_controller.sign_up') }}">Registrarse</a>
+                        {% endif%}
+                    </div>
+                {% elif field.widget.input_type != 'hidden' %}
+                    <div class="form-group">
+                        <label><h5>{{ field.label }}</h5></label>
+                            {{ field(class="form-control") }}
+                    </div>
+                {% endif %}
+
+            {% endfor %}
+        </form>
+    </div>
+
+</div>
+{% endblock %}

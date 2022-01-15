@@ -2,8 +2,10 @@ from flask_wtf.form import FlaskForm
 from wtforms import StringField, validators
 from flask_wtf.file import FileField, FileRequired
 
+from src.view.forms import ErrorMixin
 
-class GeometryForm(FlaskForm):
+
+class GeometryForm(FlaskForm, ErrorMixin):
     description = StringField(
         [
             validators.Length(max=256),
@@ -11,9 +13,3 @@ class GeometryForm(FlaskForm):
         ]
     )
     file = FileField(validators=[FileRequired(message="Error: Seleccione un archivo")])
-
-    def get_errors(self):
-        errors = []
-        errors += self.description.errors
-        errors += self.file.errors
-        return errors

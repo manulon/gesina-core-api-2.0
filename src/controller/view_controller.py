@@ -1,7 +1,11 @@
-from flask import Blueprint, render_template
+import flask
+import flask_login
+from flask import Blueprint, render_template, url_for
 
+from src import logger
 from src.login_manager import user_is_authenticated
 from src.service import geometry_service, execution_plan_service
+from src.service.exception.file_exception import FileUploadError
 from src.view.forms.execution_plan_form import ExecutionPlanForm
 from src.view.forms.geometry_form import GeometryForm
 
@@ -49,9 +53,26 @@ def geometry_list():
     return render_template("geometry_list.html")
 
 
-@VIEW_BLUEPRINT.route("/geometry/new")
+@VIEW_BLUEPRINT.route("/geometry")
 def geometry_new():
     return render_template("geometry.html", form=GeometryForm())
+
+
+@VIEW_BLUEPRINT.route("/geometry", methods=["POST"])
+def save_geometry():
+    form = GeometryForm()
+    try:
+        if form.validate_on_submit():
+            geometry = geometry_service.create(form)
+            success_message = f"Geometría #{str(geometry.id)} creada con éxito."
+            return render_template("geometry_list.html", success=success_message)
+
+        return render_template("geometry.html", form=form, errors=form.get_errors())
+    except FileUploadError as file_error:
+        logger.error(file_error.message, file_error)
+        error_message = "Error cargando archivo. Intente nuevamente."
+
+        return render_template("geometry.html", form=form, errors=[error_message])
 
 
 @VIEW_BLUEPRINT.route("/execution_plan/<execution_plan_id>")
@@ -94,8 +115,33 @@ def execution_plan_list():
     return render_template("execution_plan_list.html")
 
 
-@VIEW_BLUEPRINT.route("/execution_plan/new")
+@VIEW_BLUEPRINT.route("/execution_plan")
 def execution_plan_new():
     geometries = geometry_service.get_geometries()
     data = {"form": ExecutionPlanForm(), "geometries": geometries}
     return render_template("execution_plan.html", **data)
+
+
+@VIEW_BLUEPRINT.route("/execution_plan", methods=["POST"])
+def save_execution_plan():
+    form = ExecutionPlanForm()
+    try:
+        if form.validate_on_submit():
+            execution_plan = execution_plan_service.create(form)
+            success_message = f"Simulación #{str(execution_plan.id)} creada con éxito."
+            return render_template("execution_plan_list.html", success=success_message)
+
+        return render_template(
+            "execution_plan.html", form=form, errors=form.get_errors()
+        )
+    except FileUploadError as file_error:
+        logger.error(file_error.message, file_error)
+        error_message = "Error cargando archivo. Intente nuevamente."
+
+        return render_template("geometry.html", error=[error_message], **request.form)
+
+
+@VIEW_BLUEPRINT.route("/user/logout", methods=["GET"])
+def do_logout():
+    flask_login.logout_user()
+    return flask.redirect(url_for("public_view_controller.login"))
