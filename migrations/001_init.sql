@@ -4,7 +4,7 @@ SET search_path TO gesina;
 create table if not exists "user"
 (
 	id serial constraint user_pk primary key,
-	first_name me text not null,
+	first_name text not null,
 	last_name text not null,
 	email text not null,
 	password text not null,
