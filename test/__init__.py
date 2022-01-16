@@ -9,3 +9,8 @@ config.minio_user = config.minio_user
 config.minio_password = config.minio_password
 config.minio_bucket = "gesina-test"
 config.secret_key = config.secret_key
+
+
+def log_default_user(a_client):
+    data = {"email": "admin@ina.com.ar", "password": "123456"}
+    a_client.post("/view/login", data=data, content_type="multipart/form-data")

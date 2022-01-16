@@ -145,16 +145,12 @@ def save_execution_plan():
         logger.error(database_error)
         error_message = "Error guardando información en la base de datos."
 
-        return render_template(
-            "execution_plan.html", form=form, errors=[error_message]
-        )
+        return render_template("execution_plan.html", form=form, errors=[error_message])
     except FileUploadError as file_error:
         logger.error(file_error.message, file_error)
         error_message = "Error cargando archivo. Intente nuevamente."
 
-        return render_template(
-            "execution_plan.html", form=form, errors=[error_message]
-        )
+        return render_template("execution_plan.html", form=form, errors=[error_message])
 
 
 @VIEW_BLUEPRINT.route("/user/logout", methods=["GET"])

@@ -3,15 +3,17 @@ from datetime import datetime, timedelta
 
 from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service import execution_plan_service
+from test import log_default_user
 
 
 def test_add_new_execution_plan_fails_on_empty_plan_name(a_client):
+    log_default_user(a_client)
     data = {
         "plan_name": "",
     }
 
     response = a_client.post(
-        "/execution_plan", data=data, content_type="multipart/form-data"
+        "/view/execution_plan", data=data, content_type="multipart/form-data"
     )
 
     assert b"Error: Ingrese un nombre de plan" in response.data
@@ -19,10 +21,11 @@ def test_add_new_execution_plan_fails_on_empty_plan_name(a_client):
 
 
 def test_add_new_execution_plan_fails_on_empty_geometry_option(a_client):
+    log_default_user(a_client)
     data = {"plan_name": "some_plan", "geometry_option": None}
 
     response = a_client.post(
-        "/execution_plan", data=data, content_type="multipart/form-data"
+        "/view/execution_plan", data=data, content_type="multipart/form-data"
     )
 
     assert b"Error: Ingrese un nombre de plan" not in response.data
@@ -31,10 +34,11 @@ def test_add_new_execution_plan_fails_on_empty_geometry_option(a_client):
 
 
 def test_add_new_execution_plan_fails_on_empty_flow_file(a_client):
+    log_default_user(a_client)
     data = {"plan_name": "some_plan", "geometry_option": 1}
 
     response = a_client.post(
-        "/execution_plan", data=data, content_type="multipart/form-data"
+        "/view/execution_plan", data=data, content_type="multipart/form-data"
     )
 
     assert b"Error: Ingrese un nombre de plan" not in response.data
@@ -44,6 +48,7 @@ def test_add_new_execution_plan_fails_on_empty_flow_file(a_client):
 
 
 def test_add_new_execution_plan_fails_on_empty_start_dates(a_client, a_flow_file):
+    log_default_user(a_client)
     file = (io.BytesIO(a_flow_file), "flow.b01")
     data = {
         "plan_name": "some_plan",
@@ -53,7 +58,7 @@ def test_add_new_execution_plan_fails_on_empty_start_dates(a_client, a_flow_file
     }
 
     response = a_client.post(
-        "/execution_plan", data=data, content_type="multipart/form-data"
+        "/view/execution_plan", data=data, content_type="multipart/form-data"
     )
 
     assert b"Error: Ingrese un nombre de plan" not in response.data
@@ -64,6 +69,7 @@ def test_add_new_execution_plan_fails_on_empty_start_dates(a_client, a_flow_file
 
 
 def test_add_new_execution_plan_fails_on_invalid_dates(a_client, a_flow_file):
+    log_default_user(a_client)
     file = (io.BytesIO(a_flow_file), "flow.b01")
     data = {
         "plan_name": "some_plan",
@@ -75,7 +81,7 @@ def test_add_new_execution_plan_fails_on_invalid_dates(a_client, a_flow_file):
     }
 
     response = a_client.post(
-        "/execution_plan", data=data, content_type="multipart/form-data"
+        "/view/execution_plan", data=data, content_type="multipart/form-data"
     )
 
     assert b"Error: Ingrese un nombre de plan" not in response.data
@@ -89,6 +95,7 @@ def test_add_new_execution_plan_fails_on_invalid_dates(a_client, a_flow_file):
 
 
 def test_add_new_execution_plan_fails_on_invalid_geometry_option(a_client, a_flow_file):
+    log_default_user(a_client)
     file = (io.BytesIO(a_flow_file), "flow.b01")
     data = {
         "plan_name": "some_plan",
@@ -100,7 +107,7 @@ def test_add_new_execution_plan_fails_on_invalid_geometry_option(a_client, a_flo
     }
 
     response = a_client.post(
-        "/execution_plan", data=data, content_type="multipart/form-data"
+        "/view/execution_plan", data=data, content_type="multipart/form-data"
     )
 
     assert b"Error: Ingrese un nombre de plan" not in response.data
@@ -115,6 +122,7 @@ def test_add_new_execution_plan_fails_on_invalid_geometry_option(a_client, a_flo
 
 
 def test_add_new_execution_plan_success(a_client, a_flow_file):
+    log_default_user(a_client)
     file = (io.BytesIO(a_flow_file), "flow.b01")
     start_datetime = datetime.now()
     end_datetime = start_datetime + timedelta(days=1)
@@ -128,7 +136,7 @@ def test_add_new_execution_plan_success(a_client, a_flow_file):
     }
 
     response = a_client.post(
-        "/execution_plan", data=data, content_type="multipart/form-data"
+        "/view/execution_plan", data=data, content_type="multipart/form-data"
     )
 
     assert b"creada con \xc3\xa9xito." in response.data
