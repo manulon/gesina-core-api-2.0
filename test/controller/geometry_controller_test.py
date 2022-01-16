@@ -64,9 +64,11 @@ def test_add_new_geometry_fails_on_invalid_user(a_client, a_geometry_file):
     assert geometry_service.get_geometry(2) is None
 
 
-@mock.patch('src.service.file_storage_service.save_geometry')
-def test_add_new_geometry_fails_on_upload_file_error(save_geometry, a_client, a_geometry_file):
-    save_geometry.side_effect = FileUploadError('cualki')
+@mock.patch("src.service.file_storage_service.save_geometry")
+def test_add_new_geometry_fails_on_upload_file_error(
+    save_geometry, a_client, a_geometry_file
+):
+    save_geometry.side_effect = FileUploadError("cualki")
 
     filename = "test_geometry.g01"
     description = "some_description"
