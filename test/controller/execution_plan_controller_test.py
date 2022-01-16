@@ -1,5 +1,7 @@
 import io
+import json
 from datetime import datetime, timedelta
+from unittest import mock
 
 from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service import execution_plan_service
@@ -148,3 +150,68 @@ def test_add_new_execution_plan_success(a_client, a_flow_file):
     assert execution_plan.start_datetime.day == start_datetime.day
     assert execution_plan.end_datetime.day == end_datetime.day
     assert execution_plan.status == ExecutionPlanStatus.PENDING
+
+
+@mock.patch("src.service.execution_plan_service.get_execution_plans")
+def test_list_geometries_when_there_are_none(get_execution_plans, a_client):
+    get_execution_plans.return_value = []
+    log_default_user(a_client)
+
+    response = a_client.get("/execution_plan")
+
+    expected_response = {
+        "rows": [],
+        "total": 0,
+    }
+
+    assert json.loads(response.data) == expected_response
+
+
+def test_list_geometries_when_there_one(a_client):
+    log_default_user(a_client)
+
+    response = a_client.get("/execution_plan")
+
+    expected_response = {
+        "rows": [
+            {
+                "created_at": "21/12/2021",
+                "geometry": "Ejemplo dado por el INA",
+                "id": 1,
+                "status": "PENDING",
+                "user": "Admin Ina",
+            }
+        ],
+        "total": 1,
+    }
+
+    assert json.loads(response.data) == expected_response
+
+
+def test_list_geometries_when_there_two(a_client, a_flow_file):
+    log_default_user(a_client)
+    test_add_new_execution_plan_success(a_client, a_flow_file)
+
+    response = a_client.get("/execution_plan")
+
+    expected_response = {
+        "rows": [
+            {
+                "created_at": "21/12/2021",
+                "geometry": "Ejemplo dado por el INA",
+                "id": 1,
+                "status": "PENDING",
+                "user": "Admin Ina",
+            },
+            {
+                "created_at": datetime.now().strftime("%d/%m/%Y"),
+                "geometry": "Ejemplo dado por el INA",
+                "id": 2,
+                "status": "PENDING",
+                "user": "Admin Ina",
+            },
+        ],
+        "total": 2,
+    }
+
+    assert json.loads(response.data) == expected_response

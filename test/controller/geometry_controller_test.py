@@ -135,6 +135,21 @@ def test_file_name_secure_on_geometry_creation(a_client, a_geometry_file):
     assert geometry.name == "test_geometry.g01"
 
 
+@mock.patch("src.service.geometry_service.get_geometries")
+def test_list_geometries_when_there_are_none(get_geometries, a_client):
+    get_geometries.return_value = []
+    log_default_user(a_client)
+
+    response = a_client.get("/geometry")
+
+    expected_response = {
+        "rows": [],
+        "total": 0,
+    }
+
+    assert json.loads(response.data) == expected_response
+
+
 def test_list_geometries_when_there_only_one(a_client):
     log_default_user(a_client)
     response = a_client.get("/geometry")
