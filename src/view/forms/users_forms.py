@@ -30,7 +30,7 @@ class SingUpForm(FlaskForm, ErrorMixin):
         "Apellido", validators=[DataRequired(message="Ingrese un apellido")]
     )
     password = PasswordField(
-        "Contraseña", validators=[DataRequired(message="Ingrese un password")]
+        "Contraseña", validators=[DataRequired(message="Ingrese una contraseña")]
     )
     repeat_password = PasswordField(
         "Confirmación",
@@ -51,6 +51,6 @@ class LoginForm(FlaskForm, ErrorMixin):
 
     email = EmailField(validators=[DataRequired(message="Ingrese un email")])
     password = PasswordField(
-        "Contraseña", validators=[DataRequired(message="Ingrese un password")]
+        "Contraseña", validators=[DataRequired(message="Ingrese una contraseña")]
     )
     submit = SubmitField("Ingresar")
