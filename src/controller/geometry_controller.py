@@ -28,7 +28,7 @@ def save():
 
         return render_template("geometry.html", form=form, errors=[error_message])
     except FileUploadError as file_error:
-        logger.error(file_error.message, file_error)
+        logger.error(file_error.message)
         error_message = "Error cargando archivo. Intente nuevamente."
 
         return render_template("geometry.html", form=form, errors=[error_message])
