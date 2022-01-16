@@ -3,6 +3,8 @@ from wtforms.validators import DataRequired, ValidationError
 from wtforms import StringField, IntegerField, DateField
 from flask_wtf.file import FileField, FileRequired
 
+from src.view.forms import ErrorMixin
+
 
 class DateRangeValidator(object):
     def __call__(self, form, field):
@@ -12,7 +14,7 @@ class DateRangeValidator(object):
             )
 
 
-class ExecutionPlanForm(FlaskForm):
+class ExecutionPlanForm(FlaskForm, ErrorMixin):
     plan_name = StringField(
         validators=[DataRequired(message="Error: Ingrese un nombre de plan")]
     )
@@ -33,12 +35,3 @@ class ExecutionPlanForm(FlaskForm):
             DateRangeValidator(),
         ],
     )
-
-    def get_errors(self):
-        errors = []
-        errors += self.plan_name.errors
-        errors += self.geometry_option.errors
-        errors += self.flow_file.errors
-        errors += self.start_date.errors
-        errors += self.end_date.errors
-        return errors

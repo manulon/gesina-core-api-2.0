@@ -13,11 +13,11 @@
                   enctype=multipart/form-data
                   class="p-4 container needs-validation"
                   id="execution-plan-form"
-                  action="{{ url_for("execution_plan_controller.save") }}">
+                  action="{{ url_for("view_controller.save_execution_plan") }}">
                 {{ form.csrf_token }}
                 {% if readonly %}
                     <div class="form-group">
-                        <label for="planName"><h5>Nombre del plan</h5></label>
+                        <label for="plan_name"><h5>Nombre del plan</h5></label>
                         <label class="form-control" id="plan_name" name="plan_name" readonly>{{ plan_name }}</label>
                     </div>
                     <div class="form-group">
@@ -38,7 +38,7 @@
                     </div>
                     <div class="form-group">
                         <label for="userInput"><h5>Usuario</h5></label>
-                        <label class="form-control" id="userInput" name="user" readonly>{{ user_fullname }}</label>
+                        <label class="form-control" id="userInput" name="user" readonly>{{ user_full_name }}</label>
                     </div>
                     <div class="form-group">
                         <label for="startDateInput"><h5>Fecha desde</h5></label>
@@ -57,11 +57,11 @@
                     </div>
                 {% else %}
                     <div class="form-group">
-                        <label for="planName"><h5>Nombre del plan</h5></label>
+                        <label for="plan_name"><h5>Nombre del plan</h5></label>
                         <input class="form-control" id="plan_name" name="plan_name">{% if form.plan_name.data %}{{ form.plan_name.data }}{% endif %}
                     </div>
                     <div class="form-group">
-                        <label for="geometryInput"><h5>Geometría</h5></label>
+                        <label for="status-select"><h5>Geometría</h5></label>
                         <select class="custom-select" id="status-select" name="geometry_option">
                             <option value="default">Seleccione una categoría..</option>
                             {% for geometry in geometries %}

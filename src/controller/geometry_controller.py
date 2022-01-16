@@ -1,7 +1,9 @@
 import sqlalchemy
 from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, render_template, jsonify
 
 from src import logger
+from src.login_manager import user_is_authenticated
 from src.service import geometry_service
 from src.service.exception.file_exception import FileUploadError
 from src.view.forms.geometry_form import GeometryForm
@@ -32,6 +34,7 @@ def save():
         error_message = "Error cargando archivo. Intente nuevamente."
 
         return render_template("geometry.html", form=form, errors=[error_message])
+GEOMETRY_BLUEPRINT.before_request(user_is_authenticated)
 
 
 @GEOMETRY_BLUEPRINT.route("", methods=["GET"])
@@ -45,7 +48,7 @@ def list_geometries():
             "id": geometry.id,
             "name": geometry.name,
             "description": geometry.description,
-            "user": user.fullname,
+            "user": user.full_name,
             "created_at": geometry.created_at.strftime("%d/%m/%Y"),
         }
         response_list.append(geometry_row)

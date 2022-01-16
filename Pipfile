@@ -22,6 +22,7 @@ pywin32 = {version = "*", sys_platform = "== 'win32'"}
 gevent = {version = "21.12.0", sys_platform = "== 'win32'"}
 flask-wtf = "*"
 yoyo-migrations = "==7.3.2"
+werkzeug = "*"
 
 [dev-packages]
 pytest = "==6.2.5"
