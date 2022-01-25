@@ -4,13 +4,15 @@ from flask import Blueprint, render_template, url_for, redirect
 
 from src import logger
 from src.login_manager import user_is_authenticated
-from src.service import geometry_service, execution_plan_service
+from src.service import geometry_service, execution_plan_service, user_service
 from src.service.exception.file_exception import FileUploadError
 from src.view.forms.execution_plan_form import ExecutionPlanForm
 from src.view.forms.geometry_form import GeometryForm
 
 
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
+VIEW_BLUEPRINT.before_request(user_is_authenticated)
+
 VIEW_BLUEPRINT.before_request(user_is_authenticated)
 
 
@@ -60,12 +62,10 @@ def geometry_new():
 @VIEW_BLUEPRINT.route("/geometry", methods=["POST"])
 def save_geometry():
     form = GeometryForm()
-    form.user_id.data = (
-        1 if form.user_id.data is None else form.user_id.data
-    )  # HARDCODED
+    user = user_service.get_current_user()
     try:
         if form.validate_on_submit():
-            geometry = geometry_service.create(form)
+            geometry = geometry_service.create(form, user)
             success_message = f"Geometría #{str(geometry.id)} creada con éxito."
             return render_template("geometry_list.html", success=success_message)
 

@@ -24,6 +24,7 @@ def get_session():
         session.commit()
         session.expunge_all()
     except Exception as e:
+        session.expunge_all()
         session.rollback()
         raise e
     finally:

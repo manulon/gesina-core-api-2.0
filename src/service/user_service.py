@@ -1,10 +1,12 @@
+from flask_login import current_user
+
 from src.login_manager import login_manager
 from src.persistance import User
 from src.persistance.session import get_session
 
 
-def current_user():
-    return get_user(1)
+def get_current_user():
+    return current_user
 
 
 @login_manager.user_loader
