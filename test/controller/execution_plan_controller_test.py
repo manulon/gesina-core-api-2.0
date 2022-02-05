@@ -50,10 +50,8 @@ def test_add_new_execution_plan_fails_on_empty_flow_file(a_client):
 
 
 def test_add_new_execution_plan_fails_on_invalid_geometry_option(
-        a_client,
-        a_flow_file,
-        a_plan_file,
-        a_project_file):
+    a_client, a_flow_file, a_plan_file, a_project_file
+):
     log_default_user(a_client)
     project_file = (io.BytesIO(a_project_file), "project.prj")
     plan_file = (io.BytesIO(a_plan_file), "plan.p01")
@@ -63,7 +61,7 @@ def test_add_new_execution_plan_fails_on_invalid_geometry_option(
         "geometry_option": 5,
         "project_file": project_file,
         "plan_file": plan_file,
-        "flow_file": flow_file
+        "flow_file": flow_file,
     }
 
     response = a_client.post(

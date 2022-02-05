@@ -32,9 +32,15 @@ def create(form):
         flow_file_field = form.flow_file
 
         file_storage_service.copy_geometry_to(execution_plan_id, geometry.name)
-        file_storage_service.save_execution_file(project_file_field.data, execution_plan_id)
-        file_storage_service.save_execution_file(plan_file_field.data, execution_plan_id)
-        file_storage_service.save_execution_file(flow_file_field.data, execution_plan_id)
+        file_storage_service.save_execution_file(
+            project_file_field.data, execution_plan_id
+        )
+        file_storage_service.save_execution_file(
+            plan_file_field.data, execution_plan_id
+        )
+        file_storage_service.save_execution_file(
+            flow_file_field.data, execution_plan_id
+        )
 
         return execution_plan
 

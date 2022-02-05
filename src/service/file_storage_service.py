@@ -34,7 +34,7 @@ def copy_geometry_to(execution_id, geometry_filename):
     minio_client.copy_object(
         ROOT_BUCKET,
         f"{EXECUTION_FOLDER}/{execution_id}/{geometry_filename}",
-        CopySource(ROOT_BUCKET, f"{GEOMETRY_FOLDER}/{geometry_filename}")
+        CopySource(ROOT_BUCKET, f"{GEOMETRY_FOLDER}/{geometry_filename}"),
     )
 
 
