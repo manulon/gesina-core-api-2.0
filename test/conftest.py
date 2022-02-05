@@ -27,5 +27,5 @@ def a_geometry_file():
 
 @pytest.fixture()
 def a_flow_file():
-    with open("test/resources/dummy_flow.b01", "rb") as f:
+    with open("test/resources/dummy_flow.u01", "rb") as f:
         return f.read()

@@ -51,7 +51,7 @@ def test_add_new_execution_plan_fails_on_empty_flow_file(a_client):
 
 def test_add_new_execution_plan_fails_on_empty_start_dates(a_client, a_flow_file):
     log_default_user(a_client)
-    file = (io.BytesIO(a_flow_file), "flow.b01")
+    file = (io.BytesIO(a_flow_file), "flow.u01")
     data = {
         "plan_name": "some_plan",
         "geometry_option": 1,
@@ -72,7 +72,7 @@ def test_add_new_execution_plan_fails_on_empty_start_dates(a_client, a_flow_file
 
 def test_add_new_execution_plan_fails_on_invalid_dates(a_client, a_flow_file):
     log_default_user(a_client)
-    file = (io.BytesIO(a_flow_file), "flow.b01")
+    file = (io.BytesIO(a_flow_file), "flow.u01")
     data = {
         "plan_name": "some_plan",
         "geometry_option": 1,
@@ -98,7 +98,7 @@ def test_add_new_execution_plan_fails_on_invalid_dates(a_client, a_flow_file):
 
 def test_add_new_execution_plan_fails_on_invalid_geometry_option(a_client, a_flow_file):
     log_default_user(a_client)
-    file = (io.BytesIO(a_flow_file), "flow.b01")
+    file = (io.BytesIO(a_flow_file), "flow.u01")
     data = {
         "plan_name": "some_plan",
         "geometry_option": 5,
@@ -125,7 +125,7 @@ def test_add_new_execution_plan_fails_on_invalid_geometry_option(a_client, a_flo
 
 def test_add_new_execution_plan_success(a_client, a_flow_file):
     log_default_user(a_client)
-    file = (io.BytesIO(a_flow_file), "flow.b01")
+    file = (io.BytesIO(a_flow_file), "flow.u01")
     start_datetime = datetime.now()
     end_datetime = start_datetime + timedelta(days=1)
     data = {
