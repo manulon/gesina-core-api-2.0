@@ -2,6 +2,8 @@ import io
 import os
 
 from minio import Minio
+from minio.commonconfig import CopySource
+
 from src import logger, config
 
 from src.service.exception.file_exception import FileUploadError, FilePreSignedUrlError
@@ -17,11 +19,23 @@ minio_client = Minio(
 ROOT_BUCKET = config.minio_bucket
 
 GEOMETRY_FOLDER = "geometry"
-EXECUTION_FOLDER = f"{ROOT_BUCKET}/execution-plans"
+EXECUTION_FOLDER = "execution-plans"
 
 
 def save_geometry(file):
     save_file(GEOMETRY_FOLDER, file)
+
+
+def save_execution_file(file, execution_id):
+    save_file(f"{EXECUTION_FOLDER}/{execution_id}", file)
+
+
+def copy_geometry_to(execution_id, geometry_filename):
+    minio_client.copy_object(
+        ROOT_BUCKET,
+        f"{EXECUTION_FOLDER}/{execution_id}/{geometry_filename}",
+        CopySource(ROOT_BUCKET, f"{GEOMETRY_FOLDER}/{geometry_filename}")
+    )
 
 
 def save_file(folder, file):

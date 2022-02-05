@@ -70,24 +70,16 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label for="projectFileUpload"><h5>Proyecto</h5></label>
+                        <input type="file" name="project_file" class="form-control-file" id="projectFileUpload">
+                    </div>
+                    <div class="form-group">
+                        <label for="planFileUpload"><h5>Plan</h5></label>
+                        <input type="file" name="plan_file" class="form-control-file" id="planFileUpload">
+                    </div>
+                    <div class="form-group">
                         <label for="flowFileUpload"><h5>Condiciones de borde</h5></label>
                         <input type="file" name="flow_file" class="form-control-file" id="flowFileUpload">
-                    </div>
-                    <div class="form-group">
-                        <label for="startDateInput"><h5>Fecha desde</h5></label>
-                        {% if startDate %}
-                            <input name="start_date" id="startDateInput" value={{ startDate }} type="text" class="datepicker col">
-                        {% else %}
-                            <input name="start_date" id="startDateInput" type="text" class="datepicker col">
-                        {% endif %}
-                    </div>
-                    <div class="form-group">
-                        <label for="endDateInput"><h5>Fecha hasta</h5></label>
-                        {% if startDate %}
-                            <input name="end_date" id="endDateInput" value={{ endDate }} type="text" class="datepicker col">
-                        {% else %}
-                            <input name="end_date" id="endDateInput" type="text" class="datepicker col">
-                        {% endif %}
                     </div>
                     <div class="text-right">
                         <button type="submit" class="btn btn-primary">Guardar</button>

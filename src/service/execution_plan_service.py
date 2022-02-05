@@ -4,30 +4,38 @@ from sqlalchemy.orm import joinedload
 
 from src.persistance.execution_plan import ExecutionPlan, ExecutionPlanStatus
 from src.persistance.session import get_session
+from src.service import file_storage_service, user_service
 
 
 def create(form):
     plan_name = form.plan_name.data
     geometry_id = form.geometry_option.data
-    user_id = 1  # hardcode
+    user = user_service.get_current_user()
     created_at = datetime.now()
-    start_datetime = form.start_date.data
-    end_datetime = form.end_date.data
 
     with get_session() as session:
-        # TODO falta crear la carpeta de la ejecucion en minio y todos los archivos necesarios
-        # flow_file_field = form.file
-        # file_storage_service.save_flow(flow_file_field.data)
         execution_plan = ExecutionPlan(
             plan_name=plan_name,
             geometry_id=geometry_id,
-            user_id=user_id,
+            user_id=user.id,
             created_at=created_at,
-            start_datetime=start_datetime,
-            end_datetime=end_datetime,
             status=ExecutionPlanStatus.PENDING,
         )
         session.add(execution_plan)
+        session.commit()
+        session.refresh(execution_plan)
+        execution_plan_id = execution_plan.id
+        geometry = execution_plan.geometry
+
+        project_file_field = form.project_file
+        plan_file_field = form.plan_file
+        flow_file_field = form.flow_file
+
+        file_storage_service.copy_geometry_to(execution_plan_id, geometry.name)
+        file_storage_service.save_execution_file(project_file_field.data, execution_plan_id)
+        file_storage_service.save_execution_file(plan_file_field.data, execution_plan_id)
+        file_storage_service.save_execution_file(flow_file_field.data, execution_plan_id)
+
         return execution_plan
 
 

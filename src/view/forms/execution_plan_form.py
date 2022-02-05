@@ -1,17 +1,9 @@
 from flask_wtf.form import FlaskForm
-from wtforms.validators import DataRequired, ValidationError
-from wtforms import StringField, IntegerField, DateField
+from wtforms.validators import DataRequired
+from wtforms import StringField, IntegerField
 from flask_wtf.file import FileField, FileRequired
 
 from src.view.forms import ErrorMixin
-
-
-class DateRangeValidator(object):
-    def __call__(self, form, field):
-        if form.start_date.data > form.end_date.data:
-            raise ValidationError(
-                'Error: "Fecha desde" debe ser menor a la "fecha hasta"'
-            )
 
 
 class ExecutionPlanForm(FlaskForm, ErrorMixin):
@@ -21,17 +13,12 @@ class ExecutionPlanForm(FlaskForm, ErrorMixin):
     geometry_option = IntegerField(
         validators=[DataRequired(message="Error: Seleccione una geometría")]
     )
-    flow_file = FileField(
+    project_file = FileField(
         validators=[FileRequired(message="Error: Seleccione un archivo")]
     )
-    start_date = DateField(
-        format="%d/%m/%Y",
-        validators=[DataRequired(message="Error: Seleccione una fecha desde")],
+    plan_file = FileField(
+        validators=[FileRequired(message="Error: Seleccione un archivo")]
     )
-    end_date = DateField(
-        format="%d/%m/%Y",
-        validators=[
-            DataRequired(message="Error: Seleccione una fecha hasta"),
-            DateRangeValidator(),
-        ],
+    flow_file = FileField(
+        validators=[FileRequired(message="Error: Seleccione un archivo")]
     )

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import (
     Integer,
     Column,
@@ -27,8 +29,8 @@ class ExecutionPlan(Base):
     geometry = relationship("Geometry")
     user_id = Column(Integer, ForeignKey("user.id"))
     user = relationship("User")
-    start_datetime = Column(DateTime)
-    end_datetime = Column(DateTime)
+    start_datetime = Column(DateTime, default=datetime.now())
+    end_datetime = Column(DateTime, default=datetime.now())
     created_at = Column(DateTime)
     status = Column(Enum(ExecutionPlanStatus))
 
