@@ -1,16 +1,23 @@
+from flask_login import current_user
+
 from src.login_manager import login_manager
 from src.persistance import User
 from src.persistance.session import get_session
 
 
-def current_user():
-    return get_user(1)
+def get_current_user():
+    return current_user
 
 
 @login_manager.user_loader
 def get_user(user_id):
     with get_session() as session:
         return session.query(User).filter(User.id == user_id).first()
+
+
+def get_users(limit):
+    with get_session() as session:
+        return session.query(User).limit(limit).all()
 
 
 def save(email, first_name, last_name, password):

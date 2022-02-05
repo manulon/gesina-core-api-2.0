@@ -5,7 +5,7 @@
     <h2  class="title">{{ form.title }}</h2>
     <div class="box m-3 d-flex justify-content-center">
         <form method="POST" action="{{ form.endpoint }}" class="w-50">
-            {{ form.csrf_token() }}
+            {{ form.csrf_token }}
 
             {% for field in form %}
                 {% if field.type == "SubmitField" %}

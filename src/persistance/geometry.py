@@ -13,7 +13,7 @@ from src.service.exception.file_exception import FilePreSignedUrlError
 
 class Geometry(Base):
     __tablename__ = "geometry"
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True)
     name = Column(String)
     description = Column(String)
     created_at = Column(DateTime)

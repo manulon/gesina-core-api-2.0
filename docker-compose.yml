@@ -4,21 +4,6 @@ services:
     image: redis
     ports:
     - "6379:6379"
-  # worker:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   command: ['celery', '-A', 'src.tasks', 'worker', '-l', 'info']
-  #   environment:
-  #     - BROKER_URL=redis://10.0.0.2:6379/0 # para encolar
-  #     - RESULT_BACKEND=redis://10.0.0.2:6379/0 # para guardar el resultado
-  #     - DATABASE_HOST=10.0.0.2:5432
-  #     - MINIO_URL=10.0.0.2:9000
-  #     - C_FORCE_ROOT=true
-  #   volumes:
-  #     - ./:/app/
-  #   depends_on:
-  #     - redis
   web:
     build:
       context: .
@@ -33,6 +18,7 @@ services:
       - ./:/app/
     depends_on:
       - redis
+      - database
     ports:
       - 5000:5000
   database:
@@ -40,7 +26,7 @@ services:
       restart: always
       volumes:
         - database:/var/lib/postgresql/data
-        - ./migrations:/docker-entrypoint-initdb.d
+        - ./docker-entrypoint.sql:/docker-entrypoint-initdb.d/docker-entrypoint.sql
       environment:
         POSTGRES_PASSWORD: password
         POSTGRES_USER: user

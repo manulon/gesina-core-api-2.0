@@ -1,10 +1,7 @@
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, jsonify
 
-from src import logger
 from src.login_manager import user_is_authenticated
 from src.service import geometry_service
-from src.service.exception.file_exception import FileUploadError
-from src.view.forms.geometry_form import GeometryForm
 
 GEOMETRY_BLUEPRINT = Blueprint("geometry_controller", __name__)
 GEOMETRY_BLUEPRINT.before_request(user_is_authenticated)

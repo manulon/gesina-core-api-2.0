@@ -1,16 +1,17 @@
-import flask
 import flask_login
-from flask import Blueprint, render_template, url_for
+import sqlalchemy
+from flask import Blueprint, render_template, url_for, redirect
 
 from src import logger
 from src.login_manager import user_is_authenticated
-from src.service import geometry_service, execution_plan_service
+from src.service import geometry_service, execution_plan_service, user_service
 from src.service.exception.file_exception import FileUploadError
 from src.view.forms.execution_plan_form import ExecutionPlanForm
 from src.view.forms.geometry_form import GeometryForm
 
 
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
+VIEW_BLUEPRINT.before_request(user_is_authenticated)
 
 VIEW_BLUEPRINT.before_request(user_is_authenticated)
 
@@ -61,15 +62,21 @@ def geometry_new():
 @VIEW_BLUEPRINT.route("/geometry", methods=["POST"])
 def save_geometry():
     form = GeometryForm()
+    user = user_service.get_current_user()
     try:
         if form.validate_on_submit():
-            geometry = geometry_service.create(form)
+            geometry = geometry_service.create(form, user)
             success_message = f"Geometría #{str(geometry.id)} creada con éxito."
             return render_template("geometry_list.html", success=success_message)
 
         return render_template("geometry.html", form=form, errors=form.get_errors())
+    except sqlalchemy.exc.IntegrityError as database_error:
+        logger.error(database_error)
+        error_message = "Error guardando información en la base de datos."
+
+        return render_template("geometry.html", form=form, errors=[error_message])
     except FileUploadError as file_error:
-        logger.error(file_error.message, file_error)
+        logger.error(file_error.message)
         error_message = "Error cargando archivo. Intente nuevamente."
 
         return render_template("geometry.html", form=form, errors=[error_message])
@@ -134,14 +141,19 @@ def save_execution_plan():
         return render_template(
             "execution_plan.html", form=form, errors=form.get_errors()
         )
+    except sqlalchemy.exc.IntegrityError as database_error:
+        logger.error(database_error)
+        error_message = "Error guardando información en la base de datos."
+
+        return render_template("execution_plan.html", form=form, errors=[error_message])
     except FileUploadError as file_error:
         logger.error(file_error.message, file_error)
         error_message = "Error cargando archivo. Intente nuevamente."
 
-        return render_template("geometry.html", error=[error_message], **request.form)
+        return render_template("execution_plan.html", form=form, errors=[error_message])
 
 
 @VIEW_BLUEPRINT.route("/user/logout", methods=["GET"])
 def do_logout():
     flask_login.logout_user()
-    return flask.redirect(url_for("public_view_controller.login"))
+    return redirect(url_for("public_view_controller.login"))

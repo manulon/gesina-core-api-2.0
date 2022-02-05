@@ -17,9 +17,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Check out repository code
         uses: actions/checkout@v2
+      - name: Setup Database & Minio
+        run: docker-compose up -d minio database
       - name: Install pipenv
         run: pip install pipenv
       - name: Install dependecies
         run: pipenv install --dev
       - name: Run tests
         run:  pipenv run pytest test
+      - name: Teardown Database & Minio
+        run: docker-compose down

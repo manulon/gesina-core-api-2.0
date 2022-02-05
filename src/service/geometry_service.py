@@ -8,17 +8,16 @@ from src.service import file_storage_service
 from werkzeug.utils import secure_filename
 
 
-def create(form):
+def create(form, user):
     file_field = form.file
     name = secure_filename(file_field.data.filename)
     description_field = form.description
-    user_id = 1  # hardcode
     created_at = datetime.now()
 
     geometry = Geometry(
         name=name,
         description=description_field.data,
-        user_id=user_id,
+        user=user,
         created_at=created_at,
     )
     with get_session() as session:
