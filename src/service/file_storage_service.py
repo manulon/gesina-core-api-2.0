@@ -69,8 +69,16 @@ def list_files_for_execution(execution_id):
     return minio_client.list_objects(ROOT_BUCKET, f"{EXECUTION_FOLDER}/{execution_id}/")
 
 
-def get_file_for_execution(file):
-    return minio_client.get_object(ROOT_BUCKET, f"{EXECUTION_FOLDER}/{file}")
+def get_file(file):
+    return minio_client.get_object(ROOT_BUCKET, file)
+
+
+def get_geometry_file(file):
+    return get_file(f"{GEOMETRY_FOLDER}/{file}")
+
+
+def get_execution_file(file):
+    return get_file(f"{EXECUTION_FOLDER}/{file}")
 
 
 def download_files_for_execution(base_path, execution_id):
@@ -81,7 +89,7 @@ def download_files_for_execution(base_path, execution_id):
     for file in list_files_for_execution(execution_id):
         file = file.object_name
         logger.info(file)
-        with get_file_for_execution(file) as response:
+        with get_execution_file(file) as response:
             file = file.split("/")[-1]
             with open(f"{base_path}\\{file}", "wb") as f:
                 f.write(response.data)

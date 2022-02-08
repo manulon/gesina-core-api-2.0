@@ -20,7 +20,7 @@ services:
       - redis
       - database
     ports:
-      - 5000:5000
+      - "5000:5000"
   database:
       image: postgres:latest
       restart: always
@@ -36,8 +36,8 @@ services:
   minio:
       image: minio/minio:RELEASE.2021-07-22T05-23-32Z
       ports:
-        - 9000:9000
-        - 9001:9001
+        - "9000:9000"
+        - "9001:9001"
       volumes:
         - ./minio_data:/data
       environment:

@@ -1,7 +1,9 @@
-from flask import Blueprint, jsonify
+from io import BytesIO
+
+from flask import Blueprint, jsonify, send_file
 
 from src.login_manager import user_is_authenticated
-from src.service import execution_plan_service
+from src.service import execution_plan_service, file_storage_service
 
 EXECUTION_PLAN_BLUEPRINT = Blueprint("execution_plan_controller", __name__)
 EXECUTION_PLAN_BLUEPRINT.before_request(user_is_authenticated)
@@ -25,3 +27,9 @@ def list_execution_plans():
         response_list.append(execution_plan_row)
 
     return jsonify({"rows": response_list, "total": len(response_list)})
+
+
+@EXECUTION_PLAN_BLUEPRINT.route("/download/<_id>/<_file>")
+def download(_id, _file):
+    file = BytesIO(file_storage_service.get_execution_file(f"{_id}/{_file}").data)
+    return send_file(file, attachment_filename=_file)

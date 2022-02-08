@@ -139,7 +139,7 @@ def test_list_geometries_when_there_only_one(a_client):
                 "created_at": "21/12/2021",
                 "description": "Ejemplo dado por el INA",
                 "id": 1,
-                "name": "Modelo1-Atucha",
+                "name": "Modelo1-Atucha.g01",
                 "user": "Admin Ina",
             }
         ],
@@ -160,7 +160,7 @@ def test_list_geometries_when_there_two(a_client, a_geometry_file):
                 "created_at": "21/12/2021",
                 "description": "Ejemplo dado por el INA",
                 "id": 1,
-                "name": "Modelo1-Atucha",
+                "name": "Modelo1-Atucha.g01",
                 "user": "Admin Ina",
             },
             {

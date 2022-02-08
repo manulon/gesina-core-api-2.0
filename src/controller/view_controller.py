@@ -4,7 +4,12 @@ from flask import Blueprint, render_template, url_for, redirect
 
 from src import logger
 from src.login_manager import user_is_authenticated
-from src.service import geometry_service, execution_plan_service, user_service
+from src.service import (
+    geometry_service,
+    execution_plan_service,
+    user_service,
+    file_storage_service,
+)
 from src.service.exception.file_exception import FileUploadError
 from src.view.forms.execution_plan_form import ExecutionPlanForm
 from src.view.forms.geometry_form import GeometryForm
@@ -31,21 +36,12 @@ def geometry_read(geometry_id):
             f"Error obteniendo archivo de geometría {geometry.name}. Intente nuevamente"
         )
 
-    geometry_data = {
-        "id": geometry.id,
-        "description": geometry.description,
-        "user_full_name": geometry.user.full_name,
-        "file_url": geometry_url,
-        "file_name": geometry.name,
-        "created_at": geometry.created_at.strftime("%d/%m/%Y"),
-    }
-
     return render_template(
         "geometry.html",
         form=GeometryForm(),
         readonly=True,
         errors=errors,
-        **geometry_data,
+        geometry=geometry,
     )
 
 
@@ -85,35 +81,16 @@ def save_geometry():
 @VIEW_BLUEPRINT.route("/execution_plan/<execution_plan_id>")
 def execution_plan_read(execution_plan_id):
     execution_plan = execution_plan_service.get_execution_plan(execution_plan_id)
-    errors = []
-    geometry_url = execution_plan.get_geometry_file_url()
-    if not geometry_url:
-        errors.append(f"Error obteniendo archivo de geometría. Intente nuevamente")
-    flow_url = execution_plan.get_flow_file_url()
-    if not flow_url:
-        errors.append(
-            f"Error obteniendo archivo de condiciones de borde. Intente nuevamente"
-        )
-
-    user = execution_plan.user
-
-    execution_plan_data = {
-        "id": execution_plan.id,
-        "plan_name": execution_plan.plan_name,
-        "geometry_file_name": geometry_url,
-        "flow_file_url": flow_url,
-        "user_full_name": user.full_name,
-        "start_date": execution_plan.start_datetime.date(),
-        "end_date": execution_plan.end_datetime.date(),
-        "created_at": execution_plan.created_at.date(),
-    }
 
     return render_template(
         "execution_plan.html",
         form=ExecutionPlanForm(),
         readonly=True,
-        errors=errors,
-        **execution_plan_data,
+        execution_plan=execution_plan,
+        execution_files=[
+            f.object_name.split("/")[-1]
+            for f in file_storage_service.list_files_for_execution(execution_plan_id)
+        ],
     )
 
 
