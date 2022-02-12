@@ -30,14 +30,13 @@ def health_check():
     return jsonify({"status": "ok"}), HTTPStatus.OK
 
 
-@app.route("/test")
-def test():
+@app.route("/test/<execution_id>")
+def test(execution_id):
     from src.tasks import simulate, error_handler
 
-    logger.info("Start simulation")
-    simulate.apply_async(link_error=error_handler.s())
+    logger.info(f"Queueing simulation for {execution_id}")
+    simulate.apply_async(kwargs={"execution_id": execution_id}, link_error=error_handler.s())
     try:
-        logger.info("Receiving result")
         return jsonify({"status": "ok"}), HTTPStatus.CREATED
     except Exception as e:
         logger.error(e)

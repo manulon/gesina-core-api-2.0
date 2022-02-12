@@ -1,4 +1,5 @@
 import io
+import logging
 import os
 
 from minio import Minio
@@ -69,8 +70,9 @@ def list_files_for_execution(execution_id):
     return minio_client.list_objects(ROOT_BUCKET, f"{EXECUTION_FOLDER}/{execution_id}/")
 
 
-def get_file(file):
-    return minio_client.get_object(ROOT_BUCKET, file)
+def get_file(file, bucket=ROOT_BUCKET):
+    logging.info(f"Obtaining file {file} from bucket {bucket}")
+    return minio_client.get_object(bucket, file)
 
 
 def get_geometry_file(file):
@@ -89,7 +91,8 @@ def download_files_for_execution(base_path, execution_id):
     for file in list_files_for_execution(execution_id):
         file = file.object_name
         logger.info(file)
-        with get_execution_file(file) as response:
+        with get_file(file) as response:
             file = file.split("/")[-1]
-            with open(f"{base_path}\\{file}", "wb") as f:
+            file_extension = file.split(".")[-1]
+            with open(f"{base_path}\\{execution_id}.{file_extension}", "wb") as f:
                 f.write(response.data)
