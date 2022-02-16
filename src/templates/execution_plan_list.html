@@ -3,7 +3,7 @@
     <div>
         <div class="d-flex justify-content-between pb-4">
             <h2>Listado de simulaciones</h2>
-            <button type="button" class="btn btn-primary" onClick="window.location.href = '{{url_for("view_controller.execution_plan_new")}}'">Nueva simulaci&oacute;n</button>
+            <button type="button" class="btn btn-info" onClick="window.location.href = '{{url_for("view_controller.execution_plan_new")}}'">Nueva simulaci&oacute;n</button>
         </div>
         <div class="container-fluid">
             <table
@@ -46,10 +46,23 @@
     </div>
 
     <script>
+        update_url = {{url_for('execution_plan_controller.update', execution_id='')}}
         function executionPlanActionFormatter(value, row) {
             let base_url = "{{ url_for("view_controller.execution_plan_read", execution_plan_id="")}}"
+            form = `
+                <form action="${update_url}${row["id"]}" method="POST">
+                    <button type="submit" class="btn btn-outline-secondary" ${row['status'] == "PENDING" ? '' : 'disabled'}>
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                </form>
+            `
             return `
-                <a href="${base_url}${row["id"]}">Ver detalle</a>
+                <div class="d-flex justify-content-around">
+                    <a class="btn btn-outline-secondary" href="${base_url}${row["id"]}">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </a>
+                    ${form}
+                </div>
             `
           }
         function geometryDescriptionFormatter(value) {

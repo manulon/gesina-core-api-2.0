@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from sqlalchemy.orm import joinedload
 
 from src.persistance.execution_plan import ExecutionPlan, ExecutionPlanStatus
@@ -11,15 +9,10 @@ def create(form):
     plan_name = form.plan_name.data
     geometry_id = form.geometry_option.data
     user = user_service.get_current_user()
-    created_at = datetime.now()
 
     with get_session() as session:
         execution_plan = ExecutionPlan(
-            plan_name=plan_name,
-            geometry_id=geometry_id,
-            user_id=user.id,
-            created_at=created_at,
-            status=ExecutionPlanStatus.PENDING,
+            plan_name=plan_name, geometry_id=geometry_id, user_id=user.id
         )
         session.add(execution_plan)
         session.commit()
@@ -48,12 +41,7 @@ def create(form):
 def get_execution_plans():
     execution_plans = []
     with get_session() as session:
-        data = (
-            session.query(ExecutionPlan)
-            .options(joinedload(ExecutionPlan.user))
-            .options(joinedload(ExecutionPlan.geometry))
-            .all()
-        )
+        data = session.query(ExecutionPlan).order_by(ExecutionPlan.id.desc()).all()
         if data:
             execution_plans = data
 
@@ -62,10 +50,14 @@ def get_execution_plans():
 
 def get_execution_plan(execution_plan_id):
     with get_session() as session:
-        result = (
-            session.query(ExecutionPlan)
-            .options(joinedload(ExecutionPlan.user))
-            .options(joinedload(ExecutionPlan.geometry))
-            .get(execution_plan_id)
+        return (
+            session.query(ExecutionPlan).filter_by(id=execution_plan_id).one_or_none()
         )
-        return result
+
+
+def update_execution_plan_status(execution_plan_id, status: ExecutionPlanStatus):
+    ep = get_execution_plan(execution_plan_id)
+
+    with get_session() as session:
+        session.add(ep)
+        ep.status = status

@@ -2,11 +2,10 @@ from http import HTTPStatus
 from flask import Flask, jsonify, redirect, url_for
 
 from src.encoders import CustomJSONEncoder
-from src import controller
 from src.translations import gettext, pretty_date
-from src import logger
 from src import config
 from src import login_manager
+from src import controller
 
 app = Flask(__name__)
 
@@ -28,18 +27,6 @@ login_manager.set_up_login(app)
 @app.route("/health-check")
 def health_check():
     return jsonify({"status": "ok"}), HTTPStatus.OK
-
-
-@app.route("/test/<execution_id>")
-def test(execution_id):
-    from src.tasks import simulate, error_handler
-
-    logger.info(f"Queueing simulation for {execution_id}")
-    simulate.apply_async(kwargs={"execution_id": execution_id}, link_error=error_handler.s())
-    try:
-        return jsonify({"status": "ok"}), HTTPStatus.CREATED
-    except Exception as e:
-        logger.error(e)
 
 
 @app.errorhandler(HTTPStatus.NOT_FOUND)

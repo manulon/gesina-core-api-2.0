@@ -26,13 +26,13 @@ class ExecutionPlan(Base):
     id = Column(Integer, primary_key=True)
     plan_name = Column(String)
     geometry_id = Column(Integer, ForeignKey("geometry.id"))
-    geometry = relationship("Geometry")
+    geometry = relationship("Geometry", lazy="joined")
     user_id = Column(Integer, ForeignKey("user.id"))
-    user = relationship("User")
+    user = relationship("User", lazy="joined")
     start_datetime = Column(DateTime, default=datetime.now())
     end_datetime = Column(DateTime, default=datetime.now())
-    created_at = Column(DateTime)
-    status = Column(Enum(ExecutionPlanStatus))
+    created_at = Column(DateTime, default=datetime.now())
+    status = Column(Enum(ExecutionPlanStatus), default=ExecutionPlanStatus.PENDING)
 
     def get_geometry_file_url(self):
         # TODO recuperar desde la carpeta del exe_plan

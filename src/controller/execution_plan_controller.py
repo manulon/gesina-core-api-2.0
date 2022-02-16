@@ -1,8 +1,10 @@
 from io import BytesIO
 
-from flask import Blueprint, jsonify, send_file
+from flask import Blueprint, jsonify, send_file, url_for, redirect
+from src import logger
 
 from src.login_manager import user_is_authenticated
+from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service import execution_plan_service, file_storage_service
 
 EXECUTION_PLAN_BLUEPRINT = Blueprint("execution_plan_controller", __name__)
@@ -33,3 +35,21 @@ def list_execution_plans():
 def download(_id, _file):
     file = BytesIO(file_storage_service.get_execution_file(f"{_id}/{_file}").data)
     return send_file(file, attachment_filename=_file)
+
+
+@EXECUTION_PLAN_BLUEPRINT.route("/<execution_id>", methods=["POST"])
+def update(execution_id):
+    from src.tasks import simulate, error_handler
+
+    try:
+        execution_plan_service.update_execution_plan_status(
+            execution_id, ExecutionPlanStatus.RUNNING
+        )
+        logger.info(f"Queueing simulation for {execution_id}")
+        simulate.apply_async(
+            kwargs={"execution_id": execution_id}, link_error=error_handler.s()
+        )
+        return redirect(url_for("view_controller.execution_plan_list"))
+    except Exception as e:
+        logger.error(e)
+        raise e

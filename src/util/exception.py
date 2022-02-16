@@ -17,6 +17,10 @@ class ForbiddenException(BasicException):
     pass
 
 
+class BadStatus(BaseException):
+    pass
+
+
 @app.errorhandler(UnauthorizedException)
 def handle_exception(e):
     return "Error"
