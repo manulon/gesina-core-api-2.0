@@ -12,6 +12,11 @@ celery_app.config_from_envvar("CELERY_CONFIG_MODULE")
 
 
 @celery_app.task
+def create_simulation(*args, **kwargs):
+    pass
+
+
+@celery_app.task
 def simulate(execution_id):
     begin = datetime.now()
     import win32com.client as client
