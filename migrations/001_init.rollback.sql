@@ -6,3 +6,4 @@ drop table if exists "geometry";
 drop table if exists "user";
 
 drop schema gesina;
+drop schema scheduler;
