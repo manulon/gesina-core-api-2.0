@@ -2,7 +2,7 @@ from pytz import utc
 
 from apscheduler.schedulers.background import BlockingScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
-from apscheduler.executors.pool import ProcessPoolExecutor, ThreadPoolExecutor
+from apscheduler.executors.pool import ThreadPoolExecutor
 from src import config
 
 jobstores = {
@@ -20,7 +20,8 @@ executors = {
     "default": ThreadPoolExecutor(2),
 }
 
-job_defaults = {"coalesce": False, "max_instances": 3}
+job_defaults = {"coalesce": True, "max_instances": 1}
+
 scheduler = BlockingScheduler(
     jobstores=jobstores, executors=executors, job_defaults=job_defaults, timezone=utc
 )
@@ -30,7 +31,7 @@ class Job:
     def __init__(self, name):
         self.name = name
 
-    def __call__(self, *args, **kwargs):
+    def simulate(self):
         print(f"Simulando {self.name}")
 
 
@@ -46,7 +47,7 @@ def check_for_scheduled_tasks():
         all_jobs_ids = [j.id for j in scheduler.get_jobs()]
         if str(st.id) not in all_jobs_ids:
             print(f"Adding {st.name}")
-            scheduler.add_job(Job(st.name), "interval", seconds=10, id=str(st.id))
+            scheduler.add_job(Job(st.name).simulate, "interval", seconds=10, id=str(st.id))
         else:
             print(f"Already in scheduler {st.name}")
 
