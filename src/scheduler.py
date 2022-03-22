@@ -47,7 +47,9 @@ def check_for_scheduled_tasks():
         all_jobs_ids = [j.id for j in scheduler.get_jobs()]
         if str(st.id) not in all_jobs_ids:
             print(f"Adding {st.name}")
-            scheduler.add_job(Job(st.name).simulate, "interval", seconds=10, id=str(st.id))
+            scheduler.add_job(
+                Job(st.name).simulate, "interval", seconds=10, id=str(st.id)
+            )
         else:
             print(f"Already in scheduler {st.name}")
 
