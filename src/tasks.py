@@ -1,3 +1,5 @@
+import io
+
 from celery import Celery
 from datetime import datetime
 import os
@@ -18,9 +20,9 @@ def create_simulation(*args, **kwargs):
 
 @celery_app.task
 def simulate(execution_id):
-    begin = datetime.now()
     import win32com.client as client
     from src.service import file_storage_service
+    begin = datetime.now()
 
     base_path = f"C:\\gesina\\{execution_id}"
 
@@ -56,13 +58,25 @@ def simulate(execution_id):
             RC.Project_Close()
             RC.QuitRAS()
 
-    # Subir todos los archivos de resultados a minio en results/1
+    file_storage_service.save_result_for_execution(base_path, execution_id)
 
     total_seconds = (datetime.now() - begin).total_seconds()
 
     logger.info(f"Total runtime seconds {total_seconds}")
     return (datetime.now() - begin).total_seconds()
 
+
+def fake_simulate(execution_id):
+    from src.service import file_storage_service
+
+    fake_result_file = io.BytesIO(b"fake_result")
+    file_storage_service.save_execution_result_file(fake_result_file, execution_id, str(execution_id))
+
+    execution_plan_service.update_execution_plan_status(
+        execution_id, ExecutionPlanStatus.FINISHED
+    )
+
+    return 0
 
 @celery_app.task
 def error_handler(request, exc, traceback):

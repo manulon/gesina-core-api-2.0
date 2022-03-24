@@ -21,14 +21,20 @@ ROOT_BUCKET = config.minio_bucket
 
 GEOMETRY_FOLDER = "geometry"
 EXECUTION_FOLDER = "execution-plans"
+RESULT_FOLDER = "results"
+RESULT_FILE_EXTENSION = ".dss"
 
 
 def save_geometry(file):
-    save_file(GEOMETRY_FOLDER, file)
+    save_file(GEOMETRY_FOLDER, file, file.filename)
 
 
 def save_execution_file(file, execution_id):
-    save_file(f"{EXECUTION_FOLDER}/{execution_id}", file)
+    save_file(f"{EXECUTION_FOLDER}/{execution_id}", file, file.filename)
+
+
+def save_execution_result_file(file, execution_id, filename):
+    save_file(f"{EXECUTION_FOLDER}/{execution_id}/{RESULT_FOLDER}", file, filename)
 
 
 def copy_geometry_to(execution_id, geometry_filename):
@@ -39,13 +45,13 @@ def copy_geometry_to(execution_id, geometry_filename):
     )
 
 
-def save_file(folder, file):
+def save_file(folder, file, filename):
     file_bytes = file.read()
     data = io.BytesIO(file_bytes)
     try:
         minio_client.put_object(
             ROOT_BUCKET,
-            f"{folder}/{secure_filename(file.filename)}",
+            f"{folder}/{secure_filename(filename)}",
             data,
             len(file_bytes),
         )
@@ -96,3 +102,12 @@ def download_files_for_execution(base_path, execution_id):
             file_extension = file.split(".")[-1]
             with open(f"{base_path}\\{execution_id}.{file_extension}", "wb") as f:
                 f.write(response.data)
+
+
+def save_result_for_execution(base_path, execution_id):
+    logger.info(f"Saving result files for execution: {execution_id}")
+
+    for filename in os.listdir(base_path):
+        if filename.endswith(RESULT_FILE_EXTENSION):
+            with open(f"{base_path}\\{filename}", "rb") as file:
+                save_execution_result_file(file, execution_id, filename)
