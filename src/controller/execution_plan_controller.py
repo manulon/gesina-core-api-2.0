@@ -39,17 +39,18 @@ def download(_id, _file):
 
 @EXECUTION_PLAN_BLUEPRINT.route("/<execution_id>", methods=["POST"])
 def update(execution_id):
-    from src.tasks import simulate, fake_simulate, error_handler
+    from src.tasks import simulate, error_handler
 
     try:
         execution_plan_service.update_execution_plan_status(
             execution_id, ExecutionPlanStatus.RUNNING
         )
         logger.info(f"Queueing simulation for {execution_id}")
-        # simulate.apply_async(
-        #     kwargs={"execution_id": execution_id}, link_error=error_handler.s()
-        # )
-        fake_simulate(execution_id)
+        simulate.apply_async(
+            kwargs={"execution_id": execution_id}, link_error=error_handler.s()
+        )
+        # para probar simulaciones dummy, comentar el async de arriba y descomentar el fake
+        # fake_simulate(execution_id)
         return redirect(url_for("view_controller.execution_plan_list"))
     except Exception as e:
         logger.error(e)

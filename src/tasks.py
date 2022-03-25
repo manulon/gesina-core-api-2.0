@@ -22,6 +22,7 @@ def create_simulation(*args, **kwargs):
 def simulate(execution_id):
     import win32com.client as client
     from src.service import file_storage_service
+
     begin = datetime.now()
 
     base_path = f"C:\\gesina\\{execution_id}"
@@ -66,17 +67,21 @@ def simulate(execution_id):
     return (datetime.now() - begin).total_seconds()
 
 
+# ONLY FOR TEST PURPOSE
 def fake_simulate(execution_id):
     from src.service import file_storage_service
 
     fake_result_file = io.BytesIO(b"fake_result")
-    file_storage_service.save_execution_result_file(fake_result_file, execution_id, str(execution_id))
+    file_storage_service.save_execution_result_file(
+        fake_result_file, execution_id, str(execution_id)
+    )
 
     execution_plan_service.update_execution_plan_status(
         execution_id, ExecutionPlanStatus.FINISHED
     )
 
     return 0
+
 
 @celery_app.task
 def error_handler(request, exc, traceback):
