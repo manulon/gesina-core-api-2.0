@@ -6,6 +6,7 @@ import os
 from src import logger
 from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service import execution_plan_service
+from src.service.file_storage_service import FileType
 
 os.environ.setdefault("CELERY_CONFIG_MODULE", "src.celery_config")
 
@@ -72,10 +73,9 @@ def fake_simulate(execution_id):
     from src.service import file_storage_service
 
     fake_result_file = io.BytesIO(b"fake_result")
-    file_storage_service.save_execution_result_file(
-        fake_result_file, execution_id, str(execution_id)
+    file_storage_service.save_file(
+        FileType.RESULT, fake_result_file, execution_id, execution_id
     )
-
     execution_plan_service.update_execution_plan_status(
         execution_id, ExecutionPlanStatus.FINISHED
     )

@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from flask import Blueprint, jsonify, send_file, url_for, redirect
+from flask import Blueprint, jsonify, send_file, url_for, redirect, request
 from src import logger
 
 from src.login_manager import user_is_authenticated
@@ -33,13 +33,21 @@ def list_execution_plans():
 
 @EXECUTION_PLAN_BLUEPRINT.route("/download/<_id>/<_file>")
 def download(_id, _file):
-    file = BytesIO(file_storage_service.get_execution_file(f"{_id}/{_file}").data)
+    args = request.args
+    file_type_arg = args.get("file_type")
+    file = BytesIO(
+        file_storage_service.get_execution_file_by_type(
+            file_type_arg, f"{_id}/{_file}"
+        ).data
+    )
     return send_file(file, attachment_filename=_file)
 
 
 @EXECUTION_PLAN_BLUEPRINT.route("/<execution_id>", methods=["POST"])
 def update(execution_id):
     from src.tasks import simulate, error_handler
+
+    # from src.tasks import fake_simulate
 
     try:
         execution_plan_service.update_execution_plan_status(
