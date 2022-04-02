@@ -24,6 +24,9 @@ flask-wtf = "*"
 yoyo-migrations = "==7.3.2"
 werkzeug = "*"
 apscheduler = "*"
+pandas = "*"
+numpy = "*"
+seaborn = "*"
 
 [dev-packages]
 pytest = "==6.2.5"
