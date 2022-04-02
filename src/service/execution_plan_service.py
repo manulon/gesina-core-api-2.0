@@ -22,21 +22,21 @@ def create(form):
         file_storage_service.copy_geometry_to(execution_plan_id, geometry.name)
         project_file_data = form.project_file.data
         file_storage_service.save_file(
-            FileType.EXECUTION_PLANS,
+            FileType.EXECUTION_PLAN,
             project_file_data,
             project_file_data.filename,
             execution_plan_id,
         )
         plan_file_data = form.plan_file.data
         file_storage_service.save_file(
-            FileType.EXECUTION_PLANS,
+            FileType.EXECUTION_PLAN,
             plan_file_data,
             plan_file_data.filename,
             execution_plan_id,
         )
         flow_file_data = form.flow_file.data
         file_storage_service.save_file(
-            FileType.EXECUTION_PLANS,
+            FileType.EXECUTION_PLAN,
             flow_file_data,
             flow_file_data.filename,
             execution_plan_id,

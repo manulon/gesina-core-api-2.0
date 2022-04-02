@@ -23,7 +23,7 @@
                     <div class="form-group">
                         <h5>Archivos de ejecución</h5>
                         {% for file in execution_files %}
-                            <a href="{{ url_for('execution_plan_controller.download', _id=execution_plan.id, _file=file, file_type="execution-plans")}}" class="btn btn-info" role="button" aria-pressed="true" name="geometryFileUpload" download style="font-size: smaller;">
+                            <a href="{{ url_for('execution_plan_controller.download', _id=execution_plan.id, _file_type="execution-plan", _file=file)}}" class="btn btn-info" role="button" aria-pressed="true" name="geometryFileUpload" download style="font-size: smaller;">
                                 <i class="fa-solid fa-arrow-down"></i> {{file}}
                             </a>
                         {% endfor %}
@@ -32,7 +32,7 @@
                         {% if execution_result_files %}
                             <h5>Resultados</h5>
                             {% for file in execution_result_files %}
-                                <a href="{{ url_for('execution_plan_controller.download', _id=execution_plan.id, _file=file, file_type="results")}}" class="btn btn-info" role="button" aria-pressed="true" name="resultFileUpload" download style="font-size: smaller;">
+                                <a href="{{ url_for('execution_plan_controller.download', _id=execution_plan.id, _file_type="result", _file=file)}}" class="btn btn-info" role="button" aria-pressed="true" name="resultFileUpload" download style="font-size: smaller;">
                                     <i class="fa-solid fa-arrow-down"></i> {{file}}
                                 </a>
                             {% endfor %}

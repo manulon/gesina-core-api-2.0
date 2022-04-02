@@ -91,7 +91,7 @@ def execution_plan_read(execution_plan_id):
         execution_files=[
             f.object_name.split("/")[-1]
             for f in file_storage_service.list_execution_files(
-                FileType.EXECUTION_PLANS, execution_plan_id
+                FileType.EXECUTION_PLAN, execution_plan_id
             )
         ],
         execution_result_files=[

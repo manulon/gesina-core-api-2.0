@@ -3,7 +3,7 @@ import io
 from celery import Celery
 from datetime import datetime
 import os
-from src import logger
+from src import logger, config
 from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service import execution_plan_service
 from src.service.file_storage_service import FileType
@@ -12,11 +12,6 @@ os.environ.setdefault("CELERY_CONFIG_MODULE", "src.celery_config")
 
 celery_app = Celery()
 celery_app.config_from_envvar("CELERY_CONFIG_MODULE")
-
-
-@celery_app.task
-def create_simulation(*args, **kwargs):
-    pass
 
 
 @celery_app.task
@@ -80,7 +75,15 @@ def fake_simulate(execution_id):
         execution_id, ExecutionPlanStatus.FINISHED
     )
 
-    return 0
+
+def start_simulation(execution_id):
+    if config.dry_run:
+        fake_simulate(execution_id)
+    else:
+        logger.info(f"Queueing simulation for {execution_id}")
+        simulate.apply_async(
+            kwargs={"execution_id": execution_id}, link_error=error_handler.s()
+        )
 
 
 @celery_app.task

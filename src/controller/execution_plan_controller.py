@@ -1,11 +1,12 @@
 from io import BytesIO
 
-from flask import Blueprint, jsonify, send_file, url_for, redirect, request
+from flask import Blueprint, jsonify, send_file, url_for, redirect
 from src import logger
 
 from src.login_manager import user_is_authenticated
 from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service import execution_plan_service, file_storage_service
+from src.service.file_storage_service import FileType
 
 EXECUTION_PLAN_BLUEPRINT = Blueprint("execution_plan_controller", __name__)
 EXECUTION_PLAN_BLUEPRINT.before_request(user_is_authenticated)
@@ -31,13 +32,11 @@ def list_execution_plans():
     return jsonify({"rows": response_list, "total": len(response_list)})
 
 
-@EXECUTION_PLAN_BLUEPRINT.route("/download/<_id>/<_file>")
-def download(_id, _file):
-    args = request.args
-    file_type_arg = args.get("file_type")
+@EXECUTION_PLAN_BLUEPRINT.route("/download/<_id>/<_file_type>/<_file>")
+def download(_id, _file_type, _file):
     file = BytesIO(
-        file_storage_service.get_execution_file_by_type(
-            file_type_arg, f"{_id}/{_file}"
+        file_storage_service.get_file_by_type(
+            FileType(_file_type), f"{_id}/{_file}"
         ).data
     )
     return send_file(file, attachment_filename=_file)
@@ -45,20 +44,13 @@ def download(_id, _file):
 
 @EXECUTION_PLAN_BLUEPRINT.route("/<execution_id>", methods=["POST"])
 def update(execution_id):
-    from src.tasks import simulate, error_handler
-
-    # from src.tasks import fake_simulate
+    from src.tasks import start_simulation
 
     try:
         execution_plan_service.update_execution_plan_status(
             execution_id, ExecutionPlanStatus.RUNNING
         )
-        logger.info(f"Queueing simulation for {execution_id}")
-        simulate.apply_async(
-            kwargs={"execution_id": execution_id}, link_error=error_handler.s()
-        )
-        # para probar simulaciones dummy, comentar el async de arriba y descomentar el fake
-        # fake_simulate(execution_id)
+        start_simulation(execution_id)
         return redirect(url_for("view_controller.execution_plan_list"))
     except Exception as e:
         logger.error(e)

@@ -21,14 +21,14 @@ minio_client = Minio(
 ROOT_BUCKET = config.minio_bucket
 
 GEOMETRY_FOLDER = "geometry"
-EXECUTION_FOLDER = "execution-plans"
-RESULT_FOLDER = "results"
+EXECUTION_FOLDER = "execution-plan"
+RESULT_FOLDER = "result"
 RESULT_FILE_EXTENSION = ".dss"
 
 
 class FileType(Enum):
     GEOMETRY = GEOMETRY_FOLDER
-    EXECUTION_PLANS = EXECUTION_FOLDER
+    EXECUTION_PLAN = EXECUTION_FOLDER
     RESULT = RESULT_FOLDER
 
 
@@ -87,19 +87,12 @@ def get_file_by_type(file_type, filename):
     return get_file(file_path)
 
 
-def get_execution_file_by_type(file_type, filename):
-    if FileType.RESULT.value == file_type:
-        return get_file_by_type(FileType.RESULT, filename)
-
-    return get_file_by_type(FileType.EXECUTION_PLANS, filename)
-
-
 def download_files_for_execution(base_path, execution_id):
     if not os.path.exists(base_path):
         os.makedirs(base_path)
 
     logger.info("Downloading files")
-    for file in list_execution_files(FileType.EXECUTION_PLANS, execution_id):
+    for file in list_execution_files(FileType.EXECUTION_PLAN, execution_id):
         file = file.object_name
         logger.info(file)
         with get_file(file) as response:
