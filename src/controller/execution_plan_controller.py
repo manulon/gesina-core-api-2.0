@@ -44,13 +44,13 @@ def download(_id, _file_type, _file):
 
 @EXECUTION_PLAN_BLUEPRINT.route("/<execution_id>", methods=["POST"])
 def update(execution_id):
-    from src.tasks import start_simulation
+    from src.tasks import queue_or_fake_simulate
 
     try:
         execution_plan_service.update_execution_plan_status(
             execution_id, ExecutionPlanStatus.RUNNING
         )
-        start_simulation(execution_id)
+        queue_or_fake_simulate(execution_id)
         return redirect(url_for("view_controller.execution_plan_list"))
     except Exception as e:
         logger.error(e)

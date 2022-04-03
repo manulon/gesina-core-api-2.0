@@ -141,4 +141,5 @@ cython_debug/
 .vagrant
 .vscode
 
+minio_data
 package.box

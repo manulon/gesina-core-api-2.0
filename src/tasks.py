@@ -76,7 +76,7 @@ def fake_simulate(execution_id):
     )
 
 
-def start_simulation(execution_id):
+def queue_or_fake_simulate(execution_id):
     if config.dry_run:
         fake_simulate(execution_id)
     else:
