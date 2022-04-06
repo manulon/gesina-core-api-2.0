@@ -1,5 +1,4 @@
-import datetime
-from datetime import timedelta
+from datetime import timedelta, datetime
 import pandas as pd
 import numpy as np
 import logging
@@ -7,45 +6,40 @@ import logging
 from src.service import ina_service
 from src.parana import utils
 
+DAYS_MOD = 60  # Largo de la corrida
 
-ahora = datetime.datetime.now()
-yr = str(ahora.year)
-mes = str(ahora.month)
-dia = str(ahora.day)
-hora = str(ahora.hour)
-cod = ''.join([yr, mes, dia, hora])
+now = datetime.now()
+cod = f"{now.year}-{now.month}-{now.day}-{now.hour}"
 
-DaysMod = 60  # Largo de la corrida
-f_fin_0 = (ahora + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
-f_inicio_0 = (f_fin_0 - timedelta(days=DaysMod)).replace(hour=0, minute=0, second=0)
+f_fin_0 = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+f_inicio_0 = (f_fin_0 - timedelta(days=DAYS_MOD)).replace(hour=0, minute=0, second=0)
 
 # Guarda un Id de la corrida tomando Año / mes / dia y hora de la corrida
-nom_clv = str(ahora.year)[2:] + str(ahora.month) + str(ahora.day) + str(ahora.hour)
-logging.info('Id Corrida: ', nom_clv)
+logging.info('Id Corrida: ', cod)
 
 Df_Estaciones = pd.DataFrame.from_dict({
-    "unid": [29, 30, 31, 52, 85, 1696, 1699],
+    "id": [29, 30, 31, 52, 85, 1696, 1699],
     "nombre": ["Parana", "SantaFe", "Diamante", "SanFernando", "Martinez", "BsAs", "Nueva Palmira"],
     "series_id": [29, 30, 31, 52, 85, 3278, 3280],
     "cero_escala": [9.432, 8.378, 6.747, -0.53, 0, 0, 0.0275]
-})
+}).set_index("id")
 
 df_CB = ina_service.obtain_obeservations_for_stations(Df_Estaciones, f_inicio_0, f_fin_0)
 
 # Aguas arribas
 l_idEst = [29, 30, 31]  # CB Aguas Arriba: Parana Santa Fe y Diamante
-Df_EstacionesAA = Df_Estaciones[Df_Estaciones.unid.isin(l_idEst)]
-df_CB_AA = df_CB[df_CB.unid.isin(l_idEst)]
+Df_EstacionesAA = Df_Estaciones[Df_Estaciones.index.isin(l_idEst)]
+df_CB_AA = df_CB[df_CB.id.isin(l_idEst)]
 
 # Margen Derecha
 l_idE_MDer = [52, 85]
-Df_EstacionesMD = Df_Estaciones[Df_Estaciones['unid'].isin(l_idE_MDer)]
-df_CB_MD = df_CB[df_CB['unid'].isin(l_idE_MDer)]
+Df_EstacionesMD = Df_Estaciones[Df_Estaciones.index.isin(l_idE_MDer)]
+df_CB_MD = df_CB[df_CB.id.isin(l_idE_MDer)]
 
 # Margen izquierdo
 l_idE_MIzq = [1696, 1699]
-Df_EstacionesMI = Df_Estaciones[Df_Estaciones['unid'].isin(l_idE_MIzq)]
-df_CB_MI = df_CB[df_CB['unid'].isin(l_idE_MIzq)]
+Df_EstacionesMI = Df_Estaciones[Df_Estaciones.index.isin(l_idE_MIzq)]
+df_CB_MI = df_CB[df_CB.id.isin(l_idE_MIzq)]
 
 
 """### Paso 1:
@@ -61,27 +55,33 @@ También:
 
 """
 
+
+df_CB_AA.fecha = df_CB_AA.fecha.dt.round("1D")
+df_CB_AA.set_index(["fecha", "id"], inplace=True)
+df_CB_AA = df_CB_AA.groupby([pd.Grouper(level=0, freq="1D"), pd.Grouper(level=1)]).mean()
+df_CB_AA = df_CB_AA.join(Df_Estaciones).droplevel(level=1)
+df_CB_AA.set_index("nombre", append=True, inplace=True)
+df_CB_AA[["valor"]].unstack("nombre")
+df_CB_AA = df_CB_AA.pivot(index="fecha", columns="nombre", values="valor")
+
+
+
 # Crea DF con una frecuencia constante para unir las series
 f_finAA = df_CB_AA['fecha'].max()  # Ahora en lugar de la fecha f_fin_0 toma el maximo de las series consultadas.
-indexUnico = pd.date_range(start=f_inicio_0, end=f_finAA,
-                           freq='1D')  # Fechas desde f_inicio a f_finAA con un paso de 1 Dia
+indexUnico = pd.date_range(start=f_inicio_0, end=f_finAA, freq='1D', name="fecha")  # Fechas desde f_inicio a f_finAA con un paso de 1 Dia
 df_base_CB_AA = pd.DataFrame(index=indexUnico)  # Crea el Df con indexUnico
-df_base_CB_AA.index.rename('fecha', inplace=True)
 df_base_CB_AA.index = df_base_CB_AA.index.round("1D")
 
-df_FrecD = pd.DataFrame()
+
 
 for index, row in Df_EstacionesAA.iterrows():
     nombre = (row['nombre'])
-    # print(nombre)
 
     # Toma cada serie del dataframe todo
-    df_var = df_CB_AA[(df_CB_AA['id'] == row['unid'])].copy()
+    df_var = df_CB_AA[index == row['unid']].copy()
 
     # Valores unicos de Horas
     df_var['Horas'] = df_var['fecha'].apply(lambda x: x.hour)
-    df_FrecD[nombre] = pd.Series(df_var['Horas'].value_counts())
-    # print(df_var['Horas'].value_counts())
     del df_var['Horas']
 
     # Acomoda DF para unir
