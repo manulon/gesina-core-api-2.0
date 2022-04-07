@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+from datetime import timedelta
 
 
 def obtain_obeservations_for_stations(stations, timestart, timeend):
@@ -30,6 +31,7 @@ def obtain_observations(serie_id, timestart, timeend):
 
     df_obs_i = df_obs_i.sort_values(by='fecha')
 
-    df_obs_i['fecha'] = df_obs_i.fecha.dt.tz_convert("America/Argentina/Buenos_Aires")
+    df_obs_i['fecha'] = df_obs_i.fecha.dt.tz_convert(None)
+    df_obs_i['fecha'] = df_obs_i.fecha - timedelta(hours=3)
 
     return df_obs_i

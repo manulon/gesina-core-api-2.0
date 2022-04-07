@@ -7,9 +7,9 @@ def delete_jumps_parana_santa_fe_diamante(df_base):
 
     # Parana
     for index, row in df_base.iterrows():
-        if abs(row['Diff_Para']) > umbral_1:
-            if (abs(row['Diff_Sant']) > umbral_1) and (abs(row['Diff_Diam']) > umbral_1):
-                if abs(row['Diff_Para']) > umbral_2:
+        if abs(row['Parana_diff']) > umbral_1:
+            if (abs(row['SantaFe_diff']) > umbral_1) and (abs(row['Diamante_diff']) > umbral_1):
+                if abs(row['Parana_diff']) > umbral_2:
                     df_base.loc[index, 'Parana'] = np.nan
                 else:
                     # print('Los 3 presentan un salto. Se supone que esta ok.')
@@ -22,9 +22,9 @@ def delete_jumps_parana_santa_fe_diamante(df_base):
 
     # Santa Fe
     for index, row in df_base.iterrows():
-        if abs(row['Diff_Sant']) > umbral_1:
-            if (abs(row['Diff_Para']) > umbral_1) and (abs(row['Diff_Diam']) > umbral_1):
-                if abs(row['Diff_Sant']) > umbral_2:
+        if abs(row['SantaFe_diff']) > umbral_1:
+            if (abs(row['Parana_diff']) > umbral_1) and (abs(row['Diamante_diff']) > umbral_1):
+                if abs(row['SantaFe_diff']) > umbral_2:
                     df_base.loc[index, 'SantaFe'] = np.nan
                 else:
                     # print('Los 3 presentan un salto. Se supone que esta ok.')
@@ -37,9 +37,9 @@ def delete_jumps_parana_santa_fe_diamante(df_base):
 
     # Diamante
     for index, row in df_base.iterrows():
-        if abs(row['Diff_Diam']) > umbral_1:
-            if (abs(row['Diff_Para']) > umbral_1) and (abs(row['Diff_Sant']) > umbral_1):
-                if abs(row['Diff_Diam']) > umbral_2:
+        if abs(row['Diamante_diff']) > umbral_1:
+            if (abs(row['Parana_diff']) > umbral_1) and (abs(row['SantaFe_diff']) > umbral_1):
+                if abs(row['Diamante_diff']) > umbral_2:
                     df_base.loc[index, 'Diamante'] = np.nan
                 else:
                     # print('Los 3 presentan un salto. Se supone que esta ok.')
@@ -58,9 +58,9 @@ def delete_jumps_san_fernando_bs_as(df_base):  # Elimina Saltos en la serie
 
     # SFernando
     for index, row in df_base.iterrows():
-        if abs(row['Diff_SanF']) > umbral_1:
-            if (abs(row['Diff_BsAs']) > umbral_1):
-                if abs(row['Diff_SanF']) > umbral_2:
+        if abs(row['SanFernando_diff']) > umbral_1:
+            if abs(row['BsAs_diff']) > umbral_1:
+                if abs(row['SanFernando_diff']) > umbral_2:
                     df_base.loc[index, 'SanFernando'] = np.nan
                 else:
                     continue
@@ -72,9 +72,9 @@ def delete_jumps_san_fernando_bs_as(df_base):  # Elimina Saltos en la serie
             continue
     # BsAs
     for index, row in df_base.iterrows():
-        if abs(row['Diff_BsAs']) > umbral_1:
-            if (abs(row['Diff_SanF']) > umbral_1):
-                if abs(row['Diff_BsAs']) > umbral_2:
+        if abs(row['BsAs_diff']) > umbral_1:
+            if abs(row['SanFernando_diff']) > umbral_1:
+                if abs(row['BsAs_diff']) > umbral_2:
                     df_base.loc[index, 'BsAs'] = np.nan
                 else:
                     continue
@@ -93,9 +93,9 @@ def delete_jumps_nueva_palmira_martinez(df_base):  # Elimina Saltos en la serie
 
     # Nueva Palmira
     for index, row in df_base.iterrows():
-        if abs(row['Diff_Nuev']) > umbral_1:
-            if abs(row['Diff_Mart']) > umbral_1:
-                if abs(row['Diff_Nuev']) > umbral_2:
+        if abs(row['Nueva Palmira_diff']) > umbral_1:
+            if abs(row['Martinez_diff']) > umbral_1:
+                if abs(row['Nueva Palmira_diff']) > umbral_2:
                     df_base.loc[index, 'Nueva Palmira'] = np.nan
                 else:
                     continue
@@ -108,9 +108,9 @@ def delete_jumps_nueva_palmira_martinez(df_base):  # Elimina Saltos en la serie
 
     # Martinez
     for index, row in df_base.iterrows():
-        if abs(row['Diff_Mart']) > umbral_1:
-            if abs(row['Diff_Nuev']) > umbral_1:
-                if abs(row['Diff_Mart']) > umbral_2:
+        if abs(row['Martinez_diff']) > umbral_1:
+            if abs(row['Nueva Palmira_diff']) > umbral_1:
+                if abs(row['Martinez_diff']) > umbral_2:
                     df_base.loc[index, 'Martinez'] = np.nan
                 else:
                     continue
