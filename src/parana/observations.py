@@ -42,12 +42,17 @@ Df_EstacionesMI = Df_Estaciones[Df_Estaciones.index.isin(l_idE_MIzq)]
 df_MI = df_obs[df_obs.id.isin(l_idE_MIzq)].copy()
 
 
-def obtain_diffs(df, period):
+def reindex(df, period):
     df.fecha = df.fecha.dt.round(period)
     max_date = df.fecha.max()
     df.set_index(["fecha", "id"], inplace=True)
     df = df.groupby([pd.Grouper(level=0, freq=period), pd.Grouper(level=1)]).mean()
     df.reindex(pd.date_range(start=f_inicio_0, end=max_date, freq=period), level=0)
+
+    return df
+
+
+def obtain_diffs(df):
     df = df.join(Df_Estaciones).droplevel(level=1)
     df.set_index("nombre", append=True, inplace=True)
     df[["valor"]].unstack("nombre")
@@ -70,7 +75,8 @@ También:
 
 """
 
-df_AA = obtain_diffs(df_AA, "1D")
+df_AA = reindex(df_AA, "1D")
+df_AA = obtain_diffs(df_AA)
 
 """### Paso 2:
 Elimina saltos:
@@ -149,7 +155,8 @@ También:
 *   Calcula diferencias entre valores concecutivos.'''
 """
 
-df_MD = obtain_diffs(df_MD, "15m")
+df_MD = reindex(df_MD, "5min")
+df_MD = obtain_diffs(df_MD)
 
 """### Paso 2:
 Elimina saltos:
