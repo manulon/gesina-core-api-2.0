@@ -10,6 +10,7 @@ minio_user = os.getenv("MINIO_ROOT_USER", "minioadmin")
 minio_bucket = os.getenv("MINIO_BUCKET", "gesina")
 minio_password = os.getenv("MINIO_ROOT_PASSWORD", "password")
 secret_key = os.getenv("SECRET_KEY", "default")
+dry_run = os.getenv("DRY_RUN", "true")
 
 scheduler_database_user = os.getenv("DATABASE_USER", "user")
 scheduler_database_password = os.getenv("DATABASE_PASSWORD", "password")

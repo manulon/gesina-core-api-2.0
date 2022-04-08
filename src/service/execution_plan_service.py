@@ -1,8 +1,7 @@
-from sqlalchemy.orm import joinedload
-
 from src.persistance.execution_plan import ExecutionPlan, ExecutionPlanStatus
 from src.persistance.session import get_session
 from src.service import file_storage_service, user_service
+from src.service.file_storage_service import FileType
 
 
 def create(form):
@@ -20,19 +19,27 @@ def create(form):
         execution_plan_id = execution_plan.id
         geometry = execution_plan.geometry
 
-        project_file_field = form.project_file
-        plan_file_field = form.plan_file
-        flow_file_field = form.flow_file
-
         file_storage_service.copy_geometry_to(execution_plan_id, geometry.name)
-        file_storage_service.save_execution_file(
-            project_file_field.data, execution_plan_id
+        project_file_data = form.project_file.data
+        file_storage_service.save_file(
+            FileType.EXECUTION_PLAN,
+            project_file_data,
+            project_file_data.filename,
+            execution_plan_id,
         )
-        file_storage_service.save_execution_file(
-            plan_file_field.data, execution_plan_id
+        plan_file_data = form.plan_file.data
+        file_storage_service.save_file(
+            FileType.EXECUTION_PLAN,
+            plan_file_data,
+            plan_file_data.filename,
+            execution_plan_id,
         )
-        file_storage_service.save_execution_file(
-            flow_file_field.data, execution_plan_id
+        flow_file_data = form.flow_file.data
+        file_storage_service.save_file(
+            FileType.EXECUTION_PLAN,
+            flow_file_data,
+            flow_file_data.filename,
+            execution_plan_id,
         )
 
         return execution_plan

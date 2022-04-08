@@ -1,6 +1,7 @@
 import io
 import logging
 import os
+from enum import Enum
 
 from minio import Minio
 from minio.commonconfig import CopySource
@@ -20,15 +21,15 @@ minio_client = Minio(
 ROOT_BUCKET = config.minio_bucket
 
 GEOMETRY_FOLDER = "geometry"
-EXECUTION_FOLDER = "execution-plans"
+EXECUTION_FOLDER = "execution-plan"
+RESULT_FOLDER = "result"
+RESULT_FILE_EXTENSION = ".dss"
 
 
-def save_geometry(file):
-    save_file(GEOMETRY_FOLDER, file)
-
-
-def save_execution_file(file, execution_id):
-    save_file(f"{EXECUTION_FOLDER}/{execution_id}", file)
+class FileType(Enum):
+    GEOMETRY = GEOMETRY_FOLDER
+    EXECUTION_PLAN = EXECUTION_FOLDER
+    RESULT = RESULT_FOLDER
 
 
 def copy_geometry_to(execution_id, geometry_filename):
@@ -39,13 +40,18 @@ def copy_geometry_to(execution_id, geometry_filename):
     )
 
 
-def save_file(folder, file):
+def save_file(file_type, file, filename, execution_id=None):
     file_bytes = file.read()
     data = io.BytesIO(file_bytes)
     try:
+        minio_path = f"{file_type.value}"
+        if execution_id:
+            minio_path += f"/{execution_id}"
+        minio_path += f"/{secure_filename(filename)}"
+
         minio_client.put_object(
             ROOT_BUCKET,
-            f"{folder}/{secure_filename(file.filename)}",
+            minio_path,
             data,
             len(file_bytes),
         )
@@ -66,21 +72,19 @@ def get_geometry_url(name):
         raise FilePreSignedUrlError(error_message)
 
 
-def list_files_for_execution(execution_id):
-    return minio_client.list_objects(ROOT_BUCKET, f"{EXECUTION_FOLDER}/{execution_id}/")
+def list_execution_files(file_type, execution_id):
+    return minio_client.list_objects(ROOT_BUCKET, f"{file_type.value}/{execution_id}/")
 
 
-def get_file(file, bucket=ROOT_BUCKET):
-    logging.info(f"Obtaining file {file} from bucket {bucket}")
-    return minio_client.get_object(bucket, file)
+def get_file(file_path):
+    logging.info(f"Obtaining file {file_path} from bucket {ROOT_BUCKET}")
+    return minio_client.get_object(ROOT_BUCKET, file_path)
 
 
-def get_geometry_file(file):
-    return get_file(f"{GEOMETRY_FOLDER}/{file}")
-
-
-def get_execution_file(file):
-    return get_file(f"{EXECUTION_FOLDER}/{file}")
+def get_file_by_type(file_type, filename):
+    logging.info(f"Obtaining file {filename} as {file_type.name}")
+    file_path = f"{file_type.value}/{filename}"
+    return get_file(file_path)
 
 
 def download_files_for_execution(base_path, execution_id):
@@ -88,7 +92,7 @@ def download_files_for_execution(base_path, execution_id):
         os.makedirs(base_path)
 
     logger.info("Downloading files")
-    for file in list_files_for_execution(execution_id):
+    for file in list_execution_files(FileType.EXECUTION_PLAN, execution_id):
         file = file.object_name
         logger.info(file)
         with get_file(file) as response:
@@ -96,3 +100,12 @@ def download_files_for_execution(base_path, execution_id):
             file_extension = file.split(".")[-1]
             with open(f"{base_path}\\{execution_id}.{file_extension}", "wb") as f:
                 f.write(response.data)
+
+
+def save_result_for_execution(base_path, execution_id):
+    logger.info(f"Saving result files for execution: {execution_id}")
+
+    for filename in os.listdir(base_path):
+        if filename.endswith(RESULT_FILE_EXTENSION):
+            with open(f"{base_path}\\{filename}", "rb") as file:
+                save_file(FileType.RESULT, file, filename, execution_id)

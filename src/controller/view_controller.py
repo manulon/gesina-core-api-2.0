@@ -11,6 +11,7 @@ from src.service import (
     file_storage_service,
 )
 from src.service.exception.file_exception import FileUploadError
+from src.service.file_storage_service import FileType
 from src.view.forms.execution_plan_form import ExecutionPlanForm
 from src.view.forms.geometry_form import GeometryForm
 
@@ -89,7 +90,15 @@ def execution_plan_read(execution_plan_id):
         execution_plan=execution_plan,
         execution_files=[
             f.object_name.split("/")[-1]
-            for f in file_storage_service.list_files_for_execution(execution_plan_id)
+            for f in file_storage_service.list_execution_files(
+                FileType.EXECUTION_PLAN, execution_plan_id
+            )
+        ],
+        execution_result_files=[
+            f.object_name.split("/")[-1]
+            for f in file_storage_service.list_execution_files(
+                FileType.RESULT, execution_plan_id
+            )
         ],
     )
 
