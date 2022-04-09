@@ -26,16 +26,6 @@ Df_Estaciones = pd.DataFrame.from_dict({
 
 df_obs = ina_service.obtain_obeservations_for_stations(Df_Estaciones, f_inicio_0, f_fin_0)
 
-# Aguas arribas
-l_idEst = [29, 30, 31]  # CB Aguas Arriba: Parana Santa Fe y Diamante
-Df_EstacionesAA = Df_Estaciones[Df_Estaciones.index.isin(l_idEst)]
-df_AA = df_obs[df_obs.id.isin(l_idEst)].copy()
-
-# Margen Derecha
-l_idE_MDer = [52, 85]
-Df_EstacionesMD = Df_Estaciones[Df_Estaciones.index.isin(l_idE_MDer)]
-df_MD = df_obs[df_obs.id.isin(l_idE_MDer)].copy()
-
 # Margen izquierdo
 l_idE_MIzq = [1696, 1699]
 Df_EstacionesMI = Df_Estaciones[Df_Estaciones.index.isin(l_idE_MIzq)]
@@ -62,200 +52,175 @@ def obtain_diffs(df):
     return df
 
 
-"""### Paso 1:
+def obtain_upstream(df_obs, Df_Estaciones):
+    # Aguas arribas
+    l_idEst = [29, 30, 31]  # CB Aguas Arriba: Parana Santa Fe y Diamante
+    Df_EstacionesAA = Df_Estaciones[Df_Estaciones.index.isin(l_idEst)]
+    df_AA = df_obs[df_obs.id.isin(l_idEst)].copy()
 
-Une las series en un DF Base:
+    """### Paso 1:
+    
+    Une las series en un DF Base:
+    
+    Cada serie en una columna. Todas con la misma frecuencia, en este caso diaria.
+    
+    También:
+    *   Calcula la frecuencia horaria de los datos.
+    *   Reemplaza Ceros por NAN.
+    *   Calcula diferencias entre valores concecutivos.
+    
+    """
 
-Cada serie en una columna. Todas con la misma frecuencia, en este caso diaria.
+    df_AA = reindex(df_AA, "1D")
+    df_AA = obtain_diffs(df_AA)
 
-También:
-*   Calcula la frecuencia horaria de los datos.
-*   Reemplaza Ceros por NAN.
-*   Calcula diferencias entre valores concecutivos.
+    """### Paso 2:
+    Elimina saltos:
+    
+    Se establece un umbral_1: si la diferencia entre datos consecutivos supera este umbral_1, se fija si en el resto de las series tambien se produce el salto (se supera el umbral_1).
+    
+    Si en todas las series se observa un salto se toma el dato como valido.
+    
+    Si el salto no se produce en las tres o si es mayo al segundo umbral_2 (> que el 1ero) se elimina el dato.
+    
+    """
 
-"""
+    # Datos faltante
+    # Elimina Saltos
+    df_AA = utils.delete_jumps_parana_santa_fe_diamante(df_AA)
+    df_AA = df_AA.drop(['Parana_diff', 'SantaFe_diff', 'Diamante_diff'], axis=1)
 
-df_AA = reindex(df_AA, "1D")
-df_AA = obtain_diffs(df_AA)
+    """### Paso 3:
+    Completa Faltantes en base a los datos en las otras series.
+    1. Lleva las saries al mismo plano.
+    2. Calcula meidas de a pares. Parana-Santa Fe , Parana-Diamanate, Parana-Diamante.
+    3. Si no hay datos toma el de la media de las otras dos.
+    4. Si la diferencia entre el dato y la media es mayor al umbral_3 elimina el dato.
+    """
 
-"""### Paso 2:
-Elimina saltos:
+    # Llevo a la misma face y plano de referencia
+    corim_SantaFe = -0.30
+    corim_Diamante = -0.30
+    df_AA['SantaFe'] = df_AA['SantaFe'].add(corim_SantaFe)
+    df_AA['Diamante'] = df_AA['Diamante'].add(corim_Diamante)
 
-Se establece un umbral_1: si la diferencia entre datos consecutivos supera este umbral_1, se fija si en el resto de las series tambien se produce el salto (se supera el umbral_1).
+    # Calcula media de a pares
+    mediaPS = df_AA[['Parana', 'SantaFe']].mean(axis=1, )
+    mediaPD = df_AA[['Parana', 'Diamante']].mean(axis=1, )
+    mediaSD = df_AA[['SantaFe', 'Diamante']].mean(axis=1, )
 
-Si en todas las series se observa un salto se toma el dato como valido.
+    # Completo los faltantes
+    df_AA["Parana"].fillna(mediaSD)
+    df_AA["SantaFe"].fillna(mediaPD)
+    df_AA["Diamante"].fillna(mediaPS)
 
-Si el salto no se produce en las tres o si es mayo al segundo umbral_2 (> que el 1ero) se elimina el dato.
-
-"""
-
-# Datos faltante
-# Elimina Saltos
-df_AA = utils.delete_jumps_parana_santa_fe_diamante(df_AA)
-df_AA = df_AA.drop(['Parana_diff', 'SantaFe_diff', 'Diamante_diff'], axis=1)
-
-"""### Paso 3:
-Completa Faltantes en base a los datos en las otras series.
-1. Lleva las saries al mismo plano.
-2. Calcula meidas de a pares. Parana-Santa Fe , Parana-Diamanate, Parana-Diamante.
-3. Si no hay datos toma el de la media de las otras dos.
-4. Si la diferencia entre el dato y la media es mayor al umbral_3 elimina el dato.
-"""
-
-# Llevo a la misma face y plano de referencia
-corim_SantaFe = -0.30
-corim_Diamante = -0.30
-df_AA['SantaFe'] = df_AA['SantaFe'].add(corim_SantaFe)
-df_AA['Diamante'] = df_AA['Diamante'].add(corim_Diamante)
-
-# Calcula media de a pares
-mediaPS = df_AA[['Parana', 'SantaFe']].mean(axis=1, )
-mediaPD = df_AA[['Parana', 'Diamante']].mean(axis=1, )
-mediaSD = df_AA[['SantaFe', 'Diamante']].mean(axis=1, )
-
-# Completo los faltantes
-df_AA["Parana"].fillna(mediaSD)
-df_AA["SantaFe"].fillna(mediaPD)
-df_AA["Diamante"].fillna(mediaPS)
-
-# Elimina los saltos grandes
-umbral = 0.3
-df_AA[(df_AA["Parana"] - mediaSD) > umbral] = np.nan
-df_AA[(df_AA["SantaFe"] - mediaPD) > umbral] = np.nan
-df_AA[(df_AA["Diamante"] - mediaPS) > umbral] = np.nan
-
-
-"""Interpola de forma Linal"""
-
-# Interpola para completa todos los fltantes
-df_AA = df_AA.interpolate(method='linear', limit_direction='backward')
-
-# Vuelve las series a su nivel original
-df_AA['SantaFe'] = df_AA['SantaFe'].add(-corim_SantaFe)
-df_AA['Diamante'] = df_AA['Diamante'].add(-corim_Diamante)
-
-# Series final
-
-df_aux_i = pd.DataFrame()  # Pasa lista a DF
-cero_parana = Df_Estaciones[Df_Estaciones['nombre'] == 'Parana']['cero_escala'].values[0]
-df_aux_i['Nivel'] = df_AA['Parana'] + cero_parana
-df_aux_i['Caudal'] = np.nan
-df_aux_i['Id_CB'] = Df_Estaciones[Df_Estaciones.nombre == 'Parana'].index.values[0]
-
-"""## CB Frente Margen Derecha"""
-
-# Margen Derecha
-"""### Paso 1:
-Une las series en un DF Base:
-Cada serie en una columna.
-Todas con la misma frecuencia, en este caso diaria.
-
-También:
-*   Calcula la frecuencia horaria de los datos.
-*   Calcula diferencias entre valores concecutivos.'''
-"""
-
-df_MD = reindex(df_MD, "5min")
-df_MD = obtain_diffs(df_MD)
-
-"""### Paso 2:
-Elimina saltos:
-
-Se establece un umbral_1: si la diferencia entre datos consecutivos supera este umbral_1, se fija si en el resto de las series tambien se produce el salto (se supera el umbral_1).
-
-Si en todas las series se observa un salto se toma el dato como valido.
-
-Si el salto no se produce en las tres o si es mayo al segundo umbral_2 (> que el 1ero) se elimina el dato.
-
-"""
-
-# Datos faltante
-#  Elimina Saltos
-df_MD = utils.delete_jumps_san_fernando_bs_as(df_MD)
-df_MD = df_MD.drop(['SanFernando_diff', 'BsAs_diff'], axis=1)
-
-"""### Paso 3:
-Completa Faltantes en base a los datos en las otras series.
-
-1.   Lleva las saries al mismo plano.
-2.   Calcula meidas de a pares. Parana-Santa Fe , Parana-Diamanate, Parana-Diamante.
-3.   Si no hay datos toma el de la media de las otras dos.
-4.   Si la diferencia entre el dato y la media es mayor al umbral_3 elimina el dato.'''
-"""
-
-df_Niveles = df_MD.copy()
-
-# Copia cada serie en un DF distinto
-df_SFer = df_Niveles[['SanFernando']].copy()
-df_BsAs = df_Niveles[['BsAs']].copy()
-
-# Corrimiento Vertical
-corim_BsAs = 0.2
-df_BsAs['BsAs'] = df_BsAs['BsAs'].add(corim_BsAs)
-
-# Corrimiento Temporal
-df_BsAs.index = df_BsAs.index + pd.DateOffset(minutes=50)
-
-# Crea DF para unir todas las series/ frec 5 minutos
-index5m = pd.date_range(start=f_inicio_0, end=f_finMD,
-                        freq='5min')  # Fechas desde f_inicio a f_fin con un paso de 5 minutos
-df_5m = pd.DataFrame(index=index5m)  # Crea el Df con indexUnico
-df_5m.index.rename('fecha', inplace=True)  # Cambia nombre incide por Fecha
-df_5m.index = df_5m.index.round("5min")
-
-# Une en df_5m
-df_5m = df_5m.join(df_SFer, how='left')
-df_5m = df_5m.join(df_BsAs, how='left')
-
-# Calcula la media de las tres series. E interpola para completar todos los vacios
-df_5m['medio'] = df_5m[['SanFernando', 'BsAs', ]].mean(axis=1, )
-df_5m = df_5m.interpolate(method='linear', limit_direction='both')
-# print('\nNaN medio: '+str(df_5m['medio'].isna().sum()))
-
-# A cada DF de las series les une la serie media de las 3.
-# Siempre se une por Izquierda
-df_SFer = df_SFer.join(df_5m['medio'], how='left')
-df_BsAs = df_BsAs.join(df_5m['medio'], how='left')
+    # Elimina los saltos grandes
+    umbral = 0.3
+    df_AA[(df_AA["Parana"] - mediaSD) > umbral] = np.nan
+    df_AA[(df_AA["SantaFe"] - mediaPD) > umbral] = np.nan
+    df_AA[(df_AA["Diamante"] - mediaPS) > umbral] = np.nan
 
 
-df_SFer = utils.complete_missings(df_SFer)
-df_BsAs = utils.complete_missings(df_BsAs)
+    """Interpola de forma Linal"""
 
-print('\nFaltentes luego de completar con serie media:')
-print('NaN SFernando: ' + str(df_SFer['SanFernando'].isna().sum()))
-print('NaN BsAs: ' + str(df_BsAs['BsAs'].isna().sum()))
+    # Interpola para completa todos los fltantes
+    df_AA = df_AA.interpolate(method='linear', limit_direction='backward')
 
-# Vuelve a llevar las series a su lugar original
-df_BsAs['BsAs'] = df_BsAs['BsAs'].add(-corim_BsAs)
-df_BsAs.index = df_BsAs.index - pd.DateOffset(minutes=50)
+    # Vuelve las series a su nivel original
+    df_AA['SantaFe'] = df_AA['SantaFe'].add(-corim_SantaFe)
+    df_AA['Diamante'] = df_AA['Diamante'].add(-corim_Diamante)
 
-# Une en df_
-df_SFer.columns = ['SanFernando_f', 'medio']
-df_BsAs.columns = ['BsAs_f', 'medio']
+    # Series final
 
-df_Niveles = df_Niveles.join(df_SFer['SanFernando_f'], how='left')
-df_Niveles = df_Niveles.join(df_BsAs['BsAs_f'], how='left')
+    df_aux_i = pd.DataFrame()  # Pasa lista a DF
+    cero_parana = Df_Estaciones[Df_Estaciones['nombre'] == 'Parana']['cero_escala'].values[0]
+    df_aux_i['Nivel'] = df_AA['Parana'] + cero_parana
+    df_aux_i['Caudal'] = np.nan
+    df_aux_i['Id_CB'] = Df_Estaciones[Df_Estaciones.nombre == 'Parana'].index.values[0]
 
-del df_SFer
-del df_BsAs
+    return df_aux_i
 
-# Interpola de forma Linal. Maximo 3 dias
 
-# df_Niveles[nombre] = df_Niveles[nombre].replace(np.nan,-1)
-print('\n Interpola para que no queden faltantes')
-df_Niveles = df_Niveles.interpolate(method='linear', limit_direction='backward')
-print('NaN SFernando: ' + str(df_Niveles['SanFernando_f'].isna().sum()))
-print('NaN BsAs: ' + str(df_Niveles['BsAs_f'].isna().sum()))
+def obtain_rigth_margin(df_obs, Df_Estaciones):
+    # Margen Derecha
+    l_idE_MDer = [52, 85]
+    Df_EstacionesMD = Df_Estaciones[Df_Estaciones.index.isin(l_idE_MDer)]
+    df_MD = df_obs[df_obs.id.isin(l_idE_MDer)].copy()
 
-df_aux_i = pd.DataFrame()  # Pasa lista a DF
-cero_sanfer = Df_Estaciones[Df_Estaciones['nombre'] == 'SanFernando']['cero_escala'].values[0]
-df_aux_i['Nivel'] = df_Niveles['SanFernando_f'] + cero_sanfer
-df_aux_i['Fecha'] = df_Niveles.index
-df_aux_i['Id_CB'] = Df_Estaciones[Df_Estaciones.nombre == 'SanFernando']["unid"].values[0]
-df_aux_i.to_sql('DataEntrada', con=connLoc, if_exists='append', index=False)
+    """## CB Frente Margen Derecha"""
 
-del df_Niveles
-del df_aux_i
+    # Margen Derecha
+    """### Paso 1:
+    Une las series en un DF Base:
+    Cada serie en una columna.
+    Todas con la misma frecuencia, en este caso diaria.
+    
+    También:
+    *   Calcula la frecuencia horaria de los datos.
+    *   Calcula diferencias entre valores concecutivos.'''
+    """
+
+    df_MD = reindex(df_MD, "5min")
+    df_MD = obtain_diffs(df_MD)
+
+    """### Paso 2:
+    Elimina saltos:
+    
+    Se establece un umbral_1: si la diferencia entre datos consecutivos supera este umbral_1, se fija si en el resto de las series tambien se produce el salto (se supera el umbral_1).
+    
+    Si en todas las series se observa un salto se toma el dato como valido.
+    
+    Si el salto no se produce en las tres o si es mayo al segundo umbral_2 (> que el 1ero) se elimina el dato.
+    
+    """
+
+    # Datos faltante
+    #  Elimina Saltos
+    df_MD = utils.delete_jumps_san_fernando_bs_as(df_MD)
+    df_MD = df_MD.drop(['SanFernando_diff', 'BsAs_diff'], axis=1)
+
+    """### Paso 3:
+    Completa Faltantes en base a los datos en las otras series.
+    
+    1.   Lleva las saries al mismo plano.
+    2.   Calcula meidas de a pares. Parana-Santa Fe , Parana-Diamanate, Parana-Diamante.
+    3.   Si no hay datos toma el de la media de las otras dos.
+    4.   Si la diferencia entre el dato y la media es mayor al umbral_3 elimina el dato.'''
+    """
+
+    # Corrimiento Vertical
+    corim_BsAs = 0.2
+    df_MD['BsAs'] = df_MD['BsAs'].add(corim_BsAs)
+
+    # Corrimiento Temporal
+    df_MD["BsAs"] = df_MD["BsAs"].shift(periods=50, freq="min")
+
+    # Calcula la media de las tres series. E interpola para completar todos los vacios
+    df_MD['medio'] = df_MD[['SanFernando', 'BsAs']].mean(axis=1, )
+    df_MD = df_MD.interpolate(method='linear', limit_direction='both')
+
+    df_MD = utils.complete_missings(df_MD)
+
+
+    # Vuelve a llevar las series a su lugar original
+    df_MD['BsAs'] = df_MD['BsAs'].add(-corim_BsAs)
+    df_MD["BsAs"] = df_MD["BsAs"].shift(periods=-50, freq="min")
+
+    cero_sanfer = Df_Estaciones[Df_Estaciones['nombre'] == 'SanFernando']['cero_escala'].values[0]
+    df_MD['SanFernando'] = df_MD['SanFernando'] + cero_sanfer
+
+    # Interpola de forma Linal. Maximo 3 dias
+    df_MD = df_MD.interpolate(method='linear', limit_direction='backward')
+
+
+    df_aux_i = pd.DataFrame()  # Pasa lista a DF
+    df_aux_i['Nivel'] = df_MD['SanFernando']
+    df_aux_i['Caudal'] = np.nan
+    df_aux_i['Id_CB'] = Df_Estaciones[Df_Estaciones.nombre == 'SanFernando'].index.values[0]
+
+    return df_aux_i
+
+
 
 """## CB Frente Margen Izquierda"""
 
