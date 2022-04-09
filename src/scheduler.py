@@ -3,7 +3,11 @@ from pytz import utc
 from apscheduler.schedulers.background import BlockingScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor
+from src.service import execution_plan_service
 from src import config
+from src.persistance.execution_plan import ExecutionPlanStatus
+from src.service.execution_plan_service import update_execution_plan_status
+from src.tasks import queue_or_fake_simulate
 
 jobstores = {
     "default": SQLAlchemyJobStore(
@@ -28,11 +32,15 @@ scheduler = BlockingScheduler(
 
 
 class Job:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, task):
+        self.task = task
 
     def simulate(self):
-        print(f"Simulando {self.name}")
+        print(f"Ajusto los .u de la corrida {self.task.name}")
+        form = 'paquita'
+        execution_plan = execution_plan_service.create(form)
+        update_execution_plan_status(execution_plan.id, ExecutionPlanStatus.RUNNING)
+        queue_or_fake_simulate(execution_plan.id)
 
 
 def check_for_scheduled_tasks():
@@ -48,10 +56,16 @@ def check_for_scheduled_tasks():
         if str(st.id) not in all_jobs_ids:
             print(f"Adding {st.name}")
             scheduler.add_job(
-                Job(st.name).simulate, "interval", seconds=10, id=str(st.id)
+                lambda: start_scheduled_task(st), "date", run_date=st.start_datetime, id=str(st.id)
             )
         else:
             print(f"Already in scheduler {st.name}")
+
+
+def start_scheduled_task(st):
+    scheduler.add_job(
+        Job(st).simulate, "interval", seconds=st.frequency, id=str(st.id)
+    )
 
 
 scheduler.add_job(check_for_scheduled_tasks, "interval", seconds=10)

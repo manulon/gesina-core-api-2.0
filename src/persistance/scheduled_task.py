@@ -1,4 +1,6 @@
-from sqlalchemy import Integer, Column, String, DateTime, JSON, Boolean
+from sqlalchemy import Integer, Column, String, DateTime, JSON, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
+
 from src.persistance.session import Base
 
 
@@ -12,3 +14,7 @@ class ScheduledTask(Base):
     start_datetime = Column(DateTime)
     _metadata = Column("metadata", JSON)
     enabled = Column(Boolean)
+    geometry_id = Column(Integer, ForeignKey("geometry.id"))
+    geometry = relationship("Geometry", lazy="joined")
+    user_id = Column(Integer, ForeignKey("user.id"))
+    user = relationship("User", lazy="joined")
