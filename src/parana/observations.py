@@ -55,7 +55,6 @@ def obtain_diffs(df):
 def obtain_upstream(df_obs, Df_Estaciones):
     # Aguas arribas
     l_idEst = [29, 30, 31]  # CB Aguas Arriba: Parana Santa Fe y Diamante
-    Df_EstacionesAA = Df_Estaciones[Df_Estaciones.index.isin(l_idEst)]
     df_AA = df_obs[df_obs.id.isin(l_idEst)].copy()
 
     """### Paso 1:
@@ -144,7 +143,6 @@ def obtain_upstream(df_obs, Df_Estaciones):
 def obtain_rigth_margin(df_obs, Df_Estaciones):
     # Margen Derecha
     l_idE_MDer = [52, 85]
-    Df_EstacionesMD = Df_Estaciones[Df_Estaciones.index.isin(l_idE_MDer)]
     df_MD = df_obs[df_obs.id.isin(l_idE_MDer)].copy()
 
     """## CB Frente Margen Derecha"""
@@ -221,129 +219,66 @@ def obtain_rigth_margin(df_obs, Df_Estaciones):
     return df_aux_i
 
 
-
-"""## CB Frente Margen Izquierda"""
-
-"""### Paso 1:
-Une las series en un DF Base:
-
-Cada serie en una columna. Todas con la misma frecuencia, en este caso diaria.
-
-También:
-*   Calcula la frecuencia horaria de los datos.
-*   Calcula diferencias entre valores concecutivos.
-"""
-
-f_finMI = df_MI['fecha'].max()
-
-indexUnico15M = pd.date_range(start=f_inicio_0, end=f_finMI, freq='15min')
-df_base_CB_MI = pd.DataFrame(index=indexUnico15M)  # Crea el Df con indexUnico
-df_base_CB_MI.index.rename('fecha', inplace=True)  # Cambia nombre incide por Fecha
-
-for index, row in Df_EstacionesMI.iterrows():
-    nombre = (row['nombre'])
-    # print(nombre)
-    df_var = df_MI[(df_MI['id'] == row['unid'])].copy()
-
-    # Acomoda DF para unir
-    df_var.set_index(pd.DatetimeIndex(df_var['fecha']),
-                     inplace=True)  # Pasa la fecha al indice del dataframe (DatetimeIndex)
-    del df_var['fecha']
-    del df_var['id']
-    df_var.columns = [nombre, ]
-
-    # Une al DF Base.
-    df_base_CB_MI = df_base_CB_MI.join(df_var, how='left')
-del df_var
-
-# print(df_base_CB_MI.tail(30))
-df_base_CB_MI = df_base_CB_MI.interpolate(method='linear', limit=2, limit_direction='backward')
-# print(df_base_CB_MI.tail(30))
-
-indexUnico1H = pd.date_range(start=f_inicio_0, end=f_finMD,
-                             freq='H')  # Fechas desde f_inicio a f_fin con un paso de 5 minutos
-df_base_CB_MI_H = pd.DataFrame(index=indexUnico1H)  # Crea el Df con indexUnico
-df_base_CB_MI_H.index.rename('fecha', inplace=True)
-df_base_CB_MI_H = df_base_CB_MI_H.join(df_base_CB_MI, how='left')
-
-df_base_CB_MI = df_base_CB_MI_H.copy()
-del df_base_CB_MI_H
-# print(df_base_CB_MI.tail(30))
-for index, row in Df_EstacionesMI.iterrows():
-    nombre = (row['nombre'])
-
-    # Reemplaza Ceros por NAN
-    # df_base[nombre] = df_base[nombre].replace(0, np.nan)
-
-    # Calcula diferencias entre valores concecutivos
-    VecDif = abs(np.diff(df_base_CB_MI[nombre].values))
-    VecDif = np.append([0, ], VecDif)
-    coldiff = 'Diff_' + nombre[:4]
-    df_base_CB_MI[coldiff] = VecDif
-
-"""### Paso 2:
-
-Elimina saltos:
-
-Se establece un umbral_1: si la diferencia entre datos consecutivos supera este umbral_1, se fija si en el resto de las series tambien se produce el salto (se supera el umbral_1).
-
-Si en todas las series se observa un salto se toma el dato como valido.
-
-Si el salto no se produce en las tres o si es mayo al segundo umbral_2 (> que el 1ero) se elimina el dato.
-"""
-
-# Datos faltante
-# Elimina Saltos
-df_base_CB_MI = utils.delete_jumps_nueva_palmira_martinez(df_base_CB_MI)
-
-# Datos Faltantes Luego de limpiar saltos
-print('\nDatos Faltantes Luego de limpiar saltos')
-
-"""### Paso 3:
-
-Completa Faltantes en base a los datos en las otras series.
-
-1.   Lleva las saries al mismo plano.
-2.   
-3.   Si no hay datos toma el de la media de las otras dos.
-4.   Si la diferencia entre el dato y la media es mayor al umbral_3 elimina el dato.'''
-"""
-
-# Copia cada serie en un DF distinto
-df_NPal = df_base_CB_MI[['Nueva Palmira']].copy()
-df_Mart = df_base_CB_MI[['Martinez']].copy()
-
-# Corrimiento Vertical y Temporal
-corim_Mart = 0.24
-df_Mart['Martinez'] = df_Mart['Martinez'].add(corim_Mart)
-df_Mart.index = df_Mart.index - pd.DateOffset(minutes=60)
-
-# Crea DF para unir todas las series/ frec 1 hora
-index1H = pd.date_range(start=f_inicio_0, end=f_finMI,
-                        freq='1H')  # Fechas desde f_inicio a f_fin con un paso de 5 minutos
-df_1H = pd.DataFrame(index=index1H)  # Crea el Df con indexUnico
-df_1H.index.rename('fecha', inplace=True)  # Cambia nombre incide por Fecha
-df_1H.index = df_1H.index.round("H")
-
-# Une en df_1H
-df_1H = df_1H.join(df_NPal, how='left')
-df_1H = df_1H.join(df_Mart, how='left')
-
-df_1H['Diff'] = df_1H['Nueva Palmira'] - df_1H['Martinez']
-# print(df_1H['Diff'].describe())
-
-# boxplot = df_1H.boxplot(column=['Diff'])
+def obtain_left_margin():
+    # Margen izquierdo
+    l_idE_MIzq = [1696, 1699]
+    df_MI = df_obs[df_obs.id.isin(l_idE_MIzq)].copy()
 
 
-df_1H['Nueva Palmira'] = df_1H['Nueva Palmira'].interpolate(method='linear', limit_direction='backward')
+    """## CB Frente Margen Izquierda"""
 
+    """### Paso 1:
+    Une las series en un DF Base:
+    
+    Cada serie en una columna. Todas con la misma frecuencia, en este caso diaria.
+    
+    También:
+    *   Calcula la frecuencia horaria de los datos.
+    *   Calcula diferencias entre valores concecutivos.
+    """
 
-################# Guarda para modelo
-df_aux_i = pd.DataFrame()  # Pasa lista a DF
-cero_NPalmira = Df_Estaciones[Df_Estaciones['nombre'] == 'Nueva Palmira']['cero_escala'].values[0]
-df_aux_i['Nivel'] = df_1H['Nueva Palmira'] + cero_NPalmira
-df_aux_i['Fecha'] = df_1H.index
-df_aux_i['Id_CB'] = Df_Estaciones[Df_Estaciones.nombre == 'Nueva Palmira'][0]["unid"]
-df_aux_i = df_aux_i.dropna()
+    df_MI = reindex(df_MI, "15min")
+    df_MI = obtain_diffs(df_MI)
+    df_MI = df_MI.interpolate(method='linear', limit=2, limit_direction='backward')
 
-df_aux_i
+    """### Paso 2:
+    
+    Elimina saltos:
+    
+    Se establece un umbral_1: si la diferencia entre datos consecutivos supera este umbral_1, se fija si en el resto de las series tambien se produce el salto (se supera el umbral_1).
+    
+    Si en todas las series se observa un salto se toma el dato como valido.
+    
+    Si el salto no se produce en las tres o si es mayo al segundo umbral_2 (> que el 1ero) se elimina el dato.
+    """
+
+    # Elimina Saltos
+    df_MI = utils.delete_jumps_nueva_palmira_martinez(df_MI)
+
+    """### Paso 3:
+    
+    Completa Faltantes en base a los datos en las otras series.
+    
+    1.   Lleva las saries al mismo plano.
+    2.   
+    3.   Si no hay datos toma el de la media de las otras dos.
+    4.   Si la diferencia entre el dato y la media es mayor al umbral_3 elimina el dato.'''
+    """
+
+    # Corrimiento Vertical y Temporal
+    corim_Mart = 0.24
+    df_MI['Martinez'] = df_MI['Martinez'].add(corim_Mart)
+    df_MI["Martinez"] = df_MI["Martinez"].shift(periods=-60, freq="min")
+
+    df_MI['Nueva Palmira'] = df_MI['Nueva Palmira'].interpolate(method='linear', limit_direction='backward')
+
+    ################# Guarda para modelo
+    df_aux_i = pd.DataFrame()  # Pasa lista a DF
+    cero_NPalmira = Df_Estaciones[Df_Estaciones['nombre'] == 'Nueva Palmira']['cero_escala'].values[0]
+    df_aux_i['Nivel'] = df_MI['Nueva Palmira'] + cero_NPalmira
+    df_aux_i['Fecha'] = df_MI.index
+    df_aux_i['Id_CB'] = Df_Estaciones[Df_Estaciones.nombre == 'Nueva Palmira'].index.values[0]
+
+    df_aux_i = df_aux_i.dropna()
+
+    return df_aux_i
