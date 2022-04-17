@@ -3,11 +3,12 @@ from pytz import utc
 from apscheduler.schedulers.background import BlockingScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor
-from src.service import execution_plan_service
+from src.service import execution_plan_service, user_service
 from src import config
 from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service.execution_plan_service import update_execution_plan_status
 from src.tasks import queue_or_fake_simulate
+from io import StringIO
 
 jobstores = {
     "default": SQLAlchemyJobStore(
@@ -37,8 +38,20 @@ class Job:
 
     def simulate(self):
         print(f"Ajusto los .u de la corrida {self.task.name}")
-        form = 'paquita'
-        execution_plan = execution_plan_service.create(form)
+
+        user = user_service.get_admin_user()
+        geometry_id = 1
+        project_file = StringIO('This is the Project File')
+        project_name = 'scheduled_task.prj'
+        plan_file = StringIO('This is the Plan File')
+        plan_name = 'scheduled_task.p'
+        flow_file = StringIO('This is the Flow File')
+        flow_name = 'scheduled_task.u'
+
+        execution_plan = execution_plan_service.create(self.task.name, geometry_id, user,
+                                                       project_name, project_file,
+                                                       plan_name, plan_file,
+                                                       flow_name, flow_file)
         update_execution_plan_status(execution_plan.id, ExecutionPlanStatus.RUNNING)
         queue_or_fake_simulate(execution_plan.id)
 
