@@ -9,8 +9,8 @@ def create_from_form(form):
     geometry_id = form.geometry_option.data
     user = user_service.get_current_user()
     project_file_data = form.project_file.data
-    plan_file_data = form.project_file.plan_file
-    flow_file_data = form.project_file.flow_file
+    plan_file_data = form.plan_file.data
+    flow_file_data = form.flow_file.data
     return create(
         plan_name,
         geometry_id,
