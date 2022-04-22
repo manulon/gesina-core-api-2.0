@@ -1,4 +1,6 @@
 from pytz import utc
+from datetime import datetime
+from datetime import timedelta
 
 from apscheduler.schedulers.background import BlockingScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
@@ -9,6 +11,8 @@ from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service.execution_plan_service import update_execution_plan_status
 from src.tasks import queue_or_fake_simulate
 from io import StringIO
+
+from src.util.file_builder import build_project, build_plan
 
 jobstores = {
     "default": SQLAlchemyJobStore(
@@ -31,24 +35,29 @@ scheduler = BlockingScheduler(
     jobstores=jobstores, executors=executors, job_defaults=job_defaults, timezone=utc
 )
 
+SIMULATION_DURATION = 60
+
 
 class Job:
     def __init__(self, task):
         self.task = task
 
     def simulate(self):
-        print(f"Ajusto los .u de la corrida {self.task.name}")
+        start_date = datetime.now()
+        end_date = start_date + timedelta(days=SIMULATION_DURATION)
+
+        simulation_name = f'{self.task.name.replace(" ", "_")}-{start_date.strftime("%Y%m%d_%Hhs")}'
 
         user = user_service.get_admin_user()
         geometry_id = 1
-        project_file = StringIO('This is the Project File')
+        project_file = build_project(simulation_name, start_date, end_date)
         project_name = 'scheduled_task.prj'
-        plan_file = StringIO('This is the Plan File')
-        plan_name = 'scheduled_task.p'
-        flow_file = StringIO('This is the Flow File')
-        flow_name = 'scheduled_task.u'
+        plan_file = build_plan(simulation_name, start_date, end_date)
+        plan_name = 'scheduled_task.p01'
+        flow_file = StringIO('This is the Flow File')  # Armar Flow File desde el módulo de Marian
+        flow_name = 'scheduled_task.u01'
 
-        execution_plan = execution_plan_service.create(self.task.name, geometry_id, user,
+        execution_plan = execution_plan_service.create(simulation_name, geometry_id, user,
                                                        project_name, project_file,
                                                        plan_name, plan_file,
                                                        flow_name, flow_file)
