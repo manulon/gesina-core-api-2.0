@@ -40,4 +40,8 @@ def get_user_by_email_and_password(email, password):
 
 def get_admin_user():
     with get_session() as session:
-        return session.query(User).filter(User.first_name == 'Admin', User.last_name == 'Ina').one()
+        return (
+            session.query(User)
+            .filter(User.first_name == "Admin", User.last_name == "Ina")
+            .one()
+        )

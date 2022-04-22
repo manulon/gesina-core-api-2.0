@@ -11,14 +11,30 @@ def create_from_form(form):
     project_file_data = form.project_file.data
     plan_file_data = form.project_file.plan_file
     flow_file_data = form.project_file.flow_file
-    return create(plan_name, geometry_id, user,
-                  project_file_data.filename, project_file_data,
-                  plan_file_data.filename, plan_file_data,
-                  flow_file_data.filename, flow_file_data)
+    return create(
+        plan_name,
+        geometry_id,
+        user,
+        project_file_data.filename,
+        project_file_data,
+        plan_file_data.filename,
+        plan_file_data,
+        flow_file_data.filename,
+        flow_file_data,
+    )
 
 
-def create(execution_plan_name, geometry_id, user, project_name, project_file,
-           plan_name, plan_file, flow_name, flow_file):
+def create(
+    execution_plan_name,
+    geometry_id,
+    user,
+    project_name,
+    project_file,
+    plan_name,
+    plan_file,
+    flow_name,
+    flow_file,
+):
     with get_session() as session:
         execution_plan = ExecutionPlan(
             plan_name=execution_plan_name, geometry_id=geometry_id, user_id=user.id

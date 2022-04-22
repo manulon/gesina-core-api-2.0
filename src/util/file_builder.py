@@ -20,8 +20,8 @@ def build_project(title, start_date, end_date):
 
 def build_plan(title, start_datetime, end_datetime):
     data = {
-        "PLAN_TITLE": f'{title}-TRAZA',
-        "PLAN_ID": f'{title}-TR',
+        "PLAN_TITLE": f"{title}-TRAZA",
+        "PLAN_ID": f"{title}-TR",
         "TIMEFRAME": f'{start_datetime.strftime("%d%b%Y,%H:%M")},{end_datetime.strftime("%d%b%Y,%H:%M")}',
     }
     with open("src/file_templates/parana_plan_template.txt", "r") as f:

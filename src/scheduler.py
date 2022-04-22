@@ -46,21 +46,32 @@ class Job:
         start_date = datetime.now()
         end_date = start_date + timedelta(days=SIMULATION_DURATION)
 
-        simulation_name = f'{self.task.name.replace(" ", "_")}-{start_date.strftime("%Y%m%d_%Hhs")}'
+        simulation_name = (
+            f'{self.task.name.replace(" ", "_")}-{start_date.strftime("%Y%m%d_%Hhs")}'
+        )
 
         user = user_service.get_admin_user()
         geometry_id = 1
         project_file = build_project(simulation_name, start_date, end_date)
-        project_name = 'scheduled_task.prj'
+        project_name = "scheduled_task.prj"
         plan_file = build_plan(simulation_name, start_date, end_date)
-        plan_name = 'scheduled_task.p01'
-        flow_file = StringIO('This is the Flow File')  # Armar Flow File desde el módulo de Marian
-        flow_name = 'scheduled_task.u01'
+        plan_name = "scheduled_task.p01"
+        flow_file = StringIO(
+            "This is the Flow File"
+        )  # Armar Flow File desde el módulo de Marian
+        flow_name = "scheduled_task.u01"
 
-        execution_plan = execution_plan_service.create(simulation_name, geometry_id, user,
-                                                       project_name, project_file,
-                                                       plan_name, plan_file,
-                                                       flow_name, flow_file)
+        execution_plan = execution_plan_service.create(
+            simulation_name,
+            geometry_id,
+            user,
+            project_name,
+            project_file,
+            plan_name,
+            plan_file,
+            flow_name,
+            flow_file,
+        )
         update_execution_plan_status(execution_plan.id, ExecutionPlanStatus.RUNNING)
         queue_or_fake_simulate(execution_plan.id)
 
@@ -78,16 +89,17 @@ def check_for_scheduled_tasks():
         if str(st.id) not in all_jobs_ids:
             print(f"Adding {st.name}")
             scheduler.add_job(
-                lambda: start_scheduled_task(st), "date", run_date=st.start_datetime, id=str(st.id)
+                lambda: start_scheduled_task(st),
+                "date",
+                run_date=st.start_datetime,
+                id=str(st.id),
             )
         else:
             print(f"Already in scheduler {st.name}")
 
 
 def start_scheduled_task(st):
-    scheduler.add_job(
-        Job(st).simulate, "interval", seconds=st.frequency, id=str(st.id)
-    )
+    scheduler.add_job(Job(st).simulate, "interval", seconds=st.frequency, id=str(st.id))
 
 
 scheduler.add_job(check_for_scheduled_tasks, "interval", seconds=10)
