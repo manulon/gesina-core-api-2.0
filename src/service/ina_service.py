@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 from datetime import timedelta
+import os
 
 
 def obtain_obeservations_for_stations(stations, timestart, timeend):
@@ -22,9 +23,7 @@ def obtain_observations(serie_id, timestart, timeend):
         + str(serie_id)
         + "/observaciones",
         params={"timestart": timestart, "timeend": timeend},
-        headers={
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlNhbnRpYWdvIEd1aXp6YXJkaSIsImlhdCI6MTUxNjIzOTAyMn0.YjqQYMCh4AIKSsSEq-QsTGz3Q4WOS5VE-CplGQdInfQ"
-        },
+        headers={"Authorization": f"Bearer {os.getenv('INA_TOKEN')}"},
     )
     json_response = response.json()
 

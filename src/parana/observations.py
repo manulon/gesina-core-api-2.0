@@ -7,6 +7,15 @@ from src.service import ina_service
 from src.parana import utils
 
 
+PARANA_ID = 29
+SANTA_FE_ID = 30
+DIAMANTE_ID = 31
+SAN_FERNANDO_ID = 52
+BSAS_ID = 85
+MARTINEZ_ID = 1696
+NUEVA_PALMIRA_ID = 1699
+
+
 def obtain_observations(days=60, starttime=datetime.now()):
     cod = f"{starttime.year}-{starttime.month}-{starttime.day}-{starttime.hour}"
 
@@ -20,7 +29,15 @@ def obtain_observations(days=60, starttime=datetime.now()):
 
     Df_Estaciones = pd.DataFrame.from_dict(
         {
-            "id": [29, 30, 31, 52, 85, 1696, 1699],
+            "id": [
+                PARANA_ID,
+                SANTA_FE_ID,
+                DIAMANTE_ID,
+                SAN_FERNANDO_ID,
+                BSAS_ID,
+                MARTINEZ_ID,
+                NUEVA_PALMIRA_ID,
+            ],
             "nombre": [
                 "Parana",
                 "SantaFe",
@@ -141,7 +158,7 @@ def obtain_upstream(df_obs, Df_Estaciones, f_inicio_0):
     df_AA[(df_AA["SantaFe"] - mediaPD) > umbral] = np.nan
     df_AA[(df_AA["Diamante"] - mediaPS) > umbral] = np.nan
 
-    """Interpola de forma Linal"""
+    """Interpola de forma Linial"""
 
     # Interpola para completa todos los fltantes
     df_AA = df_AA.interpolate(method="linear", limit_direction="backward")
@@ -233,7 +250,7 @@ def obtain_rigth_margin(df_obs, Df_Estaciones, f_inicio_0):
     ].values[0]
     df_MD["SanFernando"] = df_MD["SanFernando"] + cero_sanfer
 
-    # Interpola de forma Linal. Maximo 3 dias
+    # Interpola de forma Linial. Maximo 3 dias
     df_MD = df_MD.interpolate(method="linear", limit_direction="backward")
 
     df_aux_i = pd.DataFrame()  # Pasa lista a DF
