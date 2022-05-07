@@ -12,8 +12,8 @@
                   action="{{ url_for('view_controller.save_schedule_config', schedule_config_id=schedule_config.id) }}">
                 {{ form.csrf_token }}
                 <div class="form-inline">
-                    <div class="form-group col-4">
-                        <label for="schedule_config_enabled"><h5>Ejecución habilitada</h5></label>
+                    <div class="form-group col-5">
+                        <label for="schedule_config_enabled" style="padding-right:20px"><h5>Ejecución habilitada</h5></label>
                         <input type="checkbox"
                                class="form-control"
                                id="schedule_config_enabled"
@@ -23,9 +23,9 @@
                                 {% endif %}>
                     </div>
                 </div>
-                <div class="form-group col-4">
-                    <label for="frequency"><h5>Frecuencia de ejecución</h5></label>
-                    <input type=number class="form-control pl-2" id="frequency" name="frequency" value="{{ schedule_config.frequency }}"/>
+                <div class="form-group col-5">
+                    <label for="frequency"><h5>Frecuencia de ejecución (en minutos)</h5></label>
+                    <input type=number class="form-control pl-2 text-right" id="frequency" name="frequency" value="{{ schedule_config.frequency }}"/>
                 </div>
                 <div class="text-right">
                     <button type="submit" class="btn btn-primary">Guardar</button>
