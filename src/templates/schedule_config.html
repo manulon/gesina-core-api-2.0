@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div>
+        <div class="d-flex justify-content-between pb-4">
+            <h2>Configuración de simulaciones recurrentes</h2>
+        </div>
+        <div class="container-xxl">
+            <form method=post
+                  enctype=multipart/form-data
+                  class="p-4 container needs-validation"
+                  id="schedule-config-form"
+                  action="{{ url_for('view_controller.save_schedule_config', schedule_config_id=schedule_config.id) }}">
+                {{ form.csrf_token }}
+                <div class="form-inline">
+                    <div class="form-group col-4">
+                        <label for="schedule_config_enabled"><h5>Ejecución habilitada</h5></label>
+                        <input type="checkbox"
+                               class="form-control"
+                               id="schedule_config_enabled"
+                               name="schedule_config_enabled"
+                                {% if schedule_config.enabled %}
+                               checked
+                                {% endif %}>
+                    </div>
+                </div>
+                <div class="form-group col-4">
+                    <label for="frequency"><h5>Frecuencia de ejecución</h5></label>
+                    <input type=number class="form-control pl-2" id="frequency" name="frequency" value="{{ schedule_config.frequency }}"/>
+                </div>
+                <div class="text-right">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

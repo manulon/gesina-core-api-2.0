@@ -9,12 +9,13 @@ from src.service import (
     execution_plan_service,
     user_service,
     file_storage_service,
+    schedule_task_service,
 )
 from src.service.exception.file_exception import FileUploadError
 from src.service.file_storage_service import FileType
 from src.view.forms.execution_plan_form import ExecutionPlanForm
 from src.view.forms.geometry_form import GeometryForm
-
+from src.view.forms.schedule_config_form import ScheduleConfigForm
 
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
 VIEW_BLUEPRINT.before_request(user_is_authenticated)
@@ -137,6 +138,37 @@ def save_execution_plan():
         error_message = "Error cargando archivo. Intente nuevamente."
 
         return render_template("execution_plan.html", form=form, errors=[error_message])
+
+
+@VIEW_BLUEPRINT.route("/schedule-config")
+def get_schedule_task_config():
+    schedule_config = schedule_task_service.get_schedule_task_config()
+    return render_template(
+        "schedule_config.html",
+        form=ScheduleConfigForm(),
+        schedule_config=schedule_config,
+    )
+
+
+@VIEW_BLUEPRINT.route("/schedule-config/<schedule_config_id>", methods=["POST"])
+def save_schedule_config(schedule_config_id):
+    form = ScheduleConfigForm()
+    try:
+        if form.validate_on_submit():
+            schedule_task_service.update(schedule_config_id, form)
+            success_message = f"Configuración actualizada con éxito."
+            return render_template("execution_plan_list.html", success=success_message)
+
+        return render_template(
+            "schedule_config.html", form=form, errors=form.get_errors()
+        )
+    except Exception as exception:
+        logger.error("Error inesperado.", exception)
+        error_message = "Error inesperado."
+
+        return render_template(
+            "schedule_config.html", form=form, errors=[error_message]
+        )
 
 
 @VIEW_BLUEPRINT.route("/user/logout", methods=["GET"])
