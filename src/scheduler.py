@@ -49,7 +49,7 @@ class ScheduledTaskJob:
         simulation_name = f'{self.scheduled_task.name.replace(" ", "_")}-{start_date.strftime("%Y%m%d_%Hhs")}'
 
         user = user_service.get_admin_user()
-        geometry_id = 1
+        geometry_id = self.scheduled_task.geometry_id
         project_file = build_project(simulation_name, start_date, end_date)
         project_name = "scheduled_task.prj"
         plan_file = build_plan(simulation_name, start_date, end_date)
@@ -98,7 +98,7 @@ def check_for_scheduled_tasks():
 
 def start_scheduled_task(st):
     scheduler.add_job(
-        ScheduledTaskJob(st).simulate, "interval", seconds=st.frequency, id=str(st.id)
+        ScheduledTaskJob(st).simulate, "interval", minutes=st.frequency, id=str(st.id)
     )
 
 
