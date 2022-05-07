@@ -140,7 +140,7 @@ def save_execution_plan():
         return render_template("execution_plan.html", form=form, errors=[error_message])
 
 
-@VIEW_BLUEPRINT.route("/schedule-config")
+@VIEW_BLUEPRINT.route("/schedule_config")
 def get_schedule_task_config():
     schedule_config = schedule_task_service.get_schedule_task_config()
     return render_template(
@@ -150,24 +150,31 @@ def get_schedule_task_config():
     )
 
 
-@VIEW_BLUEPRINT.route("/schedule-config/<schedule_config_id>", methods=["POST"])
+@VIEW_BLUEPRINT.route("/schedule_config/<schedule_config_id>", methods=["POST"])
 def save_schedule_config(schedule_config_id):
+    schedule_task_config = schedule_task_service.get_schedule_task_config()
     form = ScheduleConfigForm()
     try:
         if form.validate_on_submit():
             schedule_task_service.update(schedule_config_id, form)
-            success_message = f"Configuración actualizada con éxito."
+            success_message = "Configuración actualizada con éxito."
             return render_template("execution_plan_list.html", success=success_message)
 
         return render_template(
-            "schedule_config.html", form=form, errors=form.get_errors()
+            "schedule_config.html",
+            form=form,
+            schedule_config=schedule_task_config,
+            errors=form.get_errors(),
         )
     except Exception as exception:
-        logger.error("Error inesperado.", exception)
-        error_message = "Error inesperado."
+        logger.error(str(exception))
+        error_message = "Error actualizando la configuración."
 
         return render_template(
-            "schedule_config.html", form=form, errors=[error_message]
+            "schedule_config.html",
+            form=form,
+            schedule_config=schedule_task_config,
+            errors=[error_message],
         )
 
 
