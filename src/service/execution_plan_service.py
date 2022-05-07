@@ -24,6 +24,30 @@ def create_from_form(form):
     )
 
 
+def create_from_scheduler(
+    execution_plan_name,
+    geometry_id,
+    user,
+    project_name,
+    project_file,
+    plan_name,
+    plan_file,
+    flow_name,
+    flow_file,
+):
+    return create(
+        execution_plan_name,
+        geometry_id,
+        user,
+        project_name,
+        project_file,
+        plan_name,
+        plan_file,
+        flow_name,
+        flow_file,
+    )
+
+
 def create(
     execution_plan_name,
     geometry_id,

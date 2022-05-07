@@ -38,17 +38,15 @@ scheduler = BlockingScheduler(
 SIMULATION_DURATION = 60
 
 
-class Job:
+class ScheduledTaskJob:
     def __init__(self, task):
-        self.task = task
+        self.scheduled_task = task
 
     def simulate(self):
         start_date = datetime.now()
         end_date = start_date + timedelta(days=SIMULATION_DURATION)
 
-        simulation_name = (
-            f'{self.task.name.replace(" ", "_")}-{start_date.strftime("%Y%m%d_%Hhs")}'
-        )
+        simulation_name = f'{self.scheduled_task.name.replace(" ", "_")}-{start_date.strftime("%Y%m%d_%Hhs")}'
 
         user = user_service.get_admin_user()
         geometry_id = 1
@@ -61,7 +59,7 @@ class Job:
         )  # Armar Flow File desde el módulo de Marian
         flow_name = "scheduled_task.u01"
 
-        execution_plan = execution_plan_service.create(
+        execution_plan = execution_plan_service.create_from_scheduler(
             simulation_name,
             geometry_id,
             user,
@@ -99,7 +97,9 @@ def check_for_scheduled_tasks():
 
 
 def start_scheduled_task(st):
-    scheduler.add_job(Job(st).simulate, "interval", seconds=st.frequency, id=str(st.id))
+    scheduler.add_job(
+        ScheduledTaskJob(st).simulate, "interval", seconds=st.frequency, id=str(st.id)
+    )
 
 
 scheduler.add_job(check_for_scheduled_tasks, "interval", seconds=10)
