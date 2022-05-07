@@ -4,16 +4,7 @@ import numpy as np
 import logging
 
 from src.service import ina_service
-from src.parana import utils
-
-
-PARANA_ID = 29
-SANTA_FE_ID = 30
-DIAMANTE_ID = 31
-SAN_FERNANDO_ID = 52
-BSAS_ID = 85
-MARTINEZ_ID = 1696
-NUEVA_PALMIRA_ID = 1699
+from src.parana import utils, Df_Estaciones
 
 
 def obtain_observations(days=60, starttime=datetime.now()):
@@ -26,31 +17,6 @@ def obtain_observations(days=60, starttime=datetime.now()):
 
     # Guarda un Id de la corrida tomando Año / mes / dia y hora de la corrida
     logging.info("Id Corrida: ", cod)
-
-    Df_Estaciones = pd.DataFrame.from_dict(
-        {
-            "id": [
-                PARANA_ID,
-                SANTA_FE_ID,
-                DIAMANTE_ID,
-                SAN_FERNANDO_ID,
-                BSAS_ID,
-                MARTINEZ_ID,
-                NUEVA_PALMIRA_ID,
-            ],
-            "nombre": [
-                "Parana",
-                "SantaFe",
-                "Diamante",
-                "SanFernando",
-                "BsAs",
-                "Martinez",
-                "Nueva Palmira",
-            ],
-            "series_id": [29, 30, 31, 52, 85, 3278, 3280],
-            "cero_escala": [9.432, 8.378, 6.747, -0.53, 0, 0, 0.0275],
-        }
-    ).set_index("id")
 
     df_obs = ina_service.obtain_obeservations_for_stations(
         Df_Estaciones, f_inicio_0, f_fin_0
@@ -330,3 +296,7 @@ def obtain_left_margin(df_obs, Df_Estaciones, f_inicio_0):
     df_aux_i = df_aux_i.dropna()
 
     return df_aux_i
+
+
+if __name__ == "__main__":
+    print(obtain_observations())
