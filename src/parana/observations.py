@@ -31,7 +31,7 @@ def obtain_observations(days=60, starttime=datetime.now()):
     )
 
 
-def reindex(df, period, f_inicio_0):
+def reindex(df, period, f_inicio_0=None):
     df.fecha = df.fecha.dt.round(period)
     max_date = df.fecha.max()
     df.set_index(["fecha", "id"], inplace=True)
@@ -299,4 +299,4 @@ def obtain_left_margin(df_obs, Df_Estaciones, f_inicio_0):
 
 
 if __name__ == "__main__":
-    print(obtain_observations())
+    print(obtain_observations(starttime=datetime(2022, 3, 1)))
