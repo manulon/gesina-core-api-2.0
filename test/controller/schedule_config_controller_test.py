@@ -17,8 +17,9 @@ def test_update_only_schedule_config_frequency_success(a_client):
         content_type="multipart/form-data",
     )
 
-    assert b"Configuraci\xc3\xb3n actualizada con \xc3\xa9xito." in response.data
     schedule_task = schedule_task_service.get_schedule_task_config()
+
+    assert b"Configuraci\xc3\xb3n actualizada con \xc3\xa9xito." in response.data
     assert schedule_task is not None
     assert schedule_task.frequency == new_frequency
     assert schedule_task.enabled == original_schedule_task.enabled

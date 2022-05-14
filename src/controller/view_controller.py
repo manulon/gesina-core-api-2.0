@@ -143,11 +143,7 @@ def save_execution_plan():
 @VIEW_BLUEPRINT.route("/schedule_config")
 def get_schedule_task_config():
     schedule_config = schedule_task_service.get_schedule_task_config()
-    return render_template(
-        "schedule_config.html",
-        form=ScheduleConfigForm(),
-        schedule_config=schedule_config,
-    )
+    return render_schedule_view(ScheduleConfigForm(), schedule_config, [])
 
 
 @VIEW_BLUEPRINT.route("/schedule_config/<schedule_config_id>", methods=["POST"])
@@ -160,22 +156,21 @@ def save_schedule_config(schedule_config_id):
             success_message = "Configuración actualizada con éxito."
             return render_template("execution_plan_list.html", success=success_message)
 
-        return render_template(
-            "schedule_config.html",
-            form=form,
-            schedule_config=schedule_task_config,
-            errors=form.get_errors(),
-        )
+        return render_schedule_view(form, schedule_task_config, form.get_errors())
     except Exception as exception:
-        logger.error(str(exception))
+        logger.error(exception)
         error_message = "Error actualizando la configuración."
 
-        return render_template(
-            "schedule_config.html",
-            form=form,
-            schedule_config=schedule_task_config,
-            errors=[error_message],
-        )
+        return render_schedule_view(form, schedule_task_config, [error_message])
+
+
+def render_schedule_view(form, schedule_config, errors):
+    return render_template(
+        "schedule_config.html",
+        form=form,
+        schedule_config=schedule_config,
+        errors=errors,
+    )
 
 
 @VIEW_BLUEPRINT.route("/user/logout", methods=["GET"])
