@@ -28,10 +28,6 @@ def test_scheduler_execute():
         "src.service.file_storage_service.copy_geometry_to", return_value=None
     )
 
-    mock_save_file = mocker.patch(
-        "src.persistance.session.get_session", return_value=None
-    )
-
     mock_update_execution = mocker.patch(
         "src.service.execution_plan_service.update_execution_plan_status",
         return_value=None,
@@ -44,6 +40,5 @@ def test_scheduler_execute():
     job.simulate()
 
     assert mock_copy_geometry.call_count == 1
-    assert mock_save_file.call_count == 3
     assert mock_update_execution.call_count == 1
     assert mock_fake_execution.call_count == 1

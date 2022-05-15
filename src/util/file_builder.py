@@ -1,4 +1,4 @@
-from io import StringIO
+from io import BytesIO
 from datetime import datetime
 from string import Template
 
@@ -15,7 +15,7 @@ def build_project(title, start_date, end_date):
         src = Template(f.read())
     result = src.substitute(data)
 
-    return StringIO(result)
+    return BytesIO(result.encode('utf8'))
 
 
 def build_plan(title, start_datetime, end_datetime):
@@ -28,4 +28,4 @@ def build_plan(title, start_datetime, end_datetime):
         src = Template(f.read())
     result = src.substitute(data)
 
-    return StringIO(result)
+    return BytesIO(result.encode('utf8'))

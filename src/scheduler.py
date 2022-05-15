@@ -10,7 +10,7 @@ from src import config
 from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service.execution_plan_service import update_execution_plan_status
 from src.tasks import queue_or_fake_simulate
-from io import StringIO
+from io import BytesIO
 
 from src.util.file_builder import build_project, build_plan
 
@@ -54,9 +54,7 @@ class ScheduledTaskJob:
         project_name = "scheduled_task.prj"
         plan_file = build_plan(simulation_name, start_date, end_date)
         plan_name = "scheduled_task.p01"
-        flow_file = StringIO(
-            "This is the Flow File"
-        )  # Armar Flow File desde el módulo de Marian
+        flow_file = BytesIO("This is the Flow File".encode('utf8'))  # Armar Flow File desde el módulo de Marian
         flow_name = "scheduled_task.u01"
 
         execution_plan = execution_plan_service.create_from_scheduler(
