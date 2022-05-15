@@ -6,8 +6,6 @@ from src.persistance import User
 from src.persistance.scheduled_task import ScheduledTask
 from datetime import datetime
 
-from src.scheduler import ScheduledTaskJob
-
 
 def test_scheduler_execute(mocker: MagicMock):
     user = User()
@@ -24,6 +22,7 @@ def test_scheduler_execute(mocker: MagicMock):
 
     mocker.patch("src.persistance.session.get_session", return_value=MagicMock())
     mocker.patch("src.scheduler.setup_scheduler", return_value=None)
+    from src.scheduler import ScheduledTaskJob
 
     mock_copy_geometry = mocker.patch(
         "src.service.file_storage_service.copy_geometry_to", return_value=None
