@@ -2,6 +2,7 @@ from http import HTTPStatus
 from flask import Flask, jsonify, redirect, url_for
 
 from src.encoders import CustomJSONEncoder
+from src.scheduler import setup_scheduler
 from src.translations import gettext, pretty_date
 from src import config
 from src import login_manager
@@ -22,6 +23,8 @@ app.jinja_env.globals.update(gettext=gettext)
 app.jinja_env.globals.update(pretty_date=pretty_date)
 
 login_manager.set_up_login(app)
+if not config.env == "test":
+    setup_scheduler()
 
 
 @app.route("/health-check")
