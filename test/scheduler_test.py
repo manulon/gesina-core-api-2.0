@@ -23,6 +23,7 @@ def test_scheduler_execute(mocker: MagicMock):
     scheduled_task.start_datetime = datetime.now()
 
     mocker.patch("src.persistance.session.get_session", return_value=MagicMock())
+    mocker.patch("src.scheduler.setup_scheduler", return_value=None)
 
     mock_copy_geometry = mocker.patch(
         "src.service.file_storage_service.copy_geometry_to", return_value=None

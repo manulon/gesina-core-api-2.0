@@ -102,6 +102,6 @@ def start_scheduled_task(st):
     )
 
 
-scheduler.add_job(check_for_scheduled_tasks, "interval", seconds=10)
-
-scheduler.start()
+def setup_scheduler():
+    scheduler.add_job(check_for_scheduled_tasks, "interval", seconds=10)
+    scheduler.start()
