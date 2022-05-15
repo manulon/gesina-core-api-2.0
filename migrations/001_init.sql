@@ -62,5 +62,6 @@ create table if not exists "scheduled_task"
 	metadata jsonb null,
 	created_at timestamp default now() not null,
     enabled bool default true not null
+    geometry_id integer not null constraint scheduled_task_geometry_id_fk references geometry,
 );
 
