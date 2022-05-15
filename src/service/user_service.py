@@ -36,3 +36,12 @@ def get_user_by_email_and_password(email, password):
 
     if user and user.check_password_hash(password):
         return user
+
+
+def get_admin_user():
+    with get_session() as session:
+        return (
+            session.query(User)
+            .filter(User.first_name == "Admin", User.last_name == "Ina")
+            .one()
+        )

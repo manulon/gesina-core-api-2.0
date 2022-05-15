@@ -69,7 +69,7 @@ def fake_simulate(execution_id):
 
     fake_result_file = io.BytesIO(b"fake_result")
     file_storage_service.save_file(
-        FileType.RESULT, fake_result_file, execution_id, execution_id
+        FileType.RESULT, fake_result_file, str(execution_id), execution_id
     )
     execution_plan_service.update_execution_plan_status(
         execution_id, ExecutionPlanStatus.FINISHED

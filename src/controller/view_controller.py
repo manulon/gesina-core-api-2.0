@@ -121,7 +121,7 @@ def save_execution_plan():
     form = ExecutionPlanForm()
     try:
         if form.validate_on_submit():
-            execution_plan = execution_plan_service.create(form)
+            execution_plan = execution_plan_service.create_from_form(form)
             success_message = f"Simulación #{str(execution_plan.id)} creada con éxito."
             return render_template("execution_plan_list.html", success=success_message)
 
