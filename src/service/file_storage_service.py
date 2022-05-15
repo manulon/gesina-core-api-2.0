@@ -41,7 +41,7 @@ def copy_geometry_to(execution_id, geometry_filename):
 
 
 def save_file(file_type, file, filename, execution_id=None):
-    file_bytes = file.read()
+    file_bytes = file.read().encode('utf8')
     data = io.BytesIO(file_bytes)
     try:
         minio_path = f"{file_type.value}"
