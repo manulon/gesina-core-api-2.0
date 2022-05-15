@@ -23,8 +23,8 @@ app.jinja_env.globals.update(gettext=gettext)
 app.jinja_env.globals.update(pretty_date=pretty_date)
 
 login_manager.set_up_login(app)
-
-setup_scheduler()
+if config.env == 'test':
+    setup_scheduler()
 
 
 @app.route("/health-check")
