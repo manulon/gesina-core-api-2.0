@@ -1,5 +1,3 @@
-from unittest.mock import MagicMock
-
 import pytest
 
 from src.persistance import User
@@ -8,7 +6,6 @@ from datetime import datetime
 
 
 def test_scheduler_execute():
-    mocker = MagicMock()
     user = User()
     user.id = 1
     user.first_name = "test_user"
@@ -23,21 +20,6 @@ def test_scheduler_execute():
 
     from src.scheduler import ScheduledTaskJob
 
-    mock_copy_geometry = mocker.patch(
-        "src.service.file_storage_service.copy_geometry_to", return_value=None
-    )
-
-    mock_update_execution = mocker.patch(
-        "src.service.execution_plan_service.update_execution_plan_status",
-        return_value=None,
-    )
-
-    mock_fake_execution = mocker.patch("src.tasks.fake_simulate", return_value=None)
-
     job = ScheduledTaskJob(scheduled_task)
 
     job.simulate()
-
-    assert mock_copy_geometry.call_count == 1
-    assert mock_update_execution.call_count == 1
-    assert mock_fake_execution.call_count == 1
