@@ -4,6 +4,8 @@ from src.persistance import User
 from src.persistance.scheduled_task import ScheduledTask
 from datetime import datetime
 
+from src.service import execution_plan_service
+
 
 def test_scheduler_execute():
     user = User()
@@ -23,3 +25,5 @@ def test_scheduler_execute():
     job = ScheduledTaskJob(scheduled_task)
 
     job.simulate()
+
+    assert execution_plan_service.get_execution_plan(2) is not None
