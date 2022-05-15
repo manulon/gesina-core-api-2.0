@@ -54,7 +54,9 @@ class ScheduledTaskJob:
         project_name = "scheduled_task.prj"
         plan_file = build_plan(simulation_name, start_date, end_date)
         plan_name = "scheduled_task.p01"
-        flow_file = BytesIO("This is the Flow File".encode('utf8'))  # Armar Flow File desde el módulo de Marian
+        flow_file = BytesIO(
+            "This is the Flow File".encode("utf8")
+        )  # Armar Flow File desde el módulo de Marian
         flow_name = "scheduled_task.u01"
 
         execution_plan = execution_plan_service.create_from_scheduler(

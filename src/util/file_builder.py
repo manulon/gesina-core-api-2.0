@@ -15,7 +15,7 @@ def build_project(title, start_date, end_date):
         src = Template(f.read())
     result = src.substitute(data)
 
-    return BytesIO(result.encode('utf8'))
+    return BytesIO(result.encode("utf8"))
 
 
 def build_plan(title, start_datetime, end_datetime):
@@ -28,4 +28,4 @@ def build_plan(title, start_datetime, end_datetime):
         src = Template(f.read())
     result = src.substitute(data)
 
-    return BytesIO(result.encode('utf8'))
+    return BytesIO(result.encode("utf8"))
