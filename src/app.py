@@ -23,7 +23,7 @@ app.jinja_env.globals.update(gettext=gettext)
 app.jinja_env.globals.update(pretty_date=pretty_date)
 
 login_manager.set_up_login(app)
-if config.env == 'test':
+if not config.env == 'test':
     setup_scheduler()
 
 
