@@ -41,6 +41,62 @@ def forecast(df):
     )
     df_nueva_palmira = df_nueva_palmira.combine(df_nueva_palmira_sim)
 
+    forecast_df = pd.DataFrame(
+        {
+            "Parana": df_parana["val"],
+            "SanFernando": df_san_fernando["val"],
+            "NuevaPalmira": df_nueva_palmira["val"],
+        }
+    )
+
+    forecast_df = forecast_df.interpolate(method="linear", limit_direction="backward")
+
+    aux = forecast_df["SanFernando"] - forecast_df["NuevaPalmira"]
+
+    forecast_df["Lujan"] = forecast_df["SanFernando"]
+    forecast_df["SanAntonio"] = forecast_df["SanFernando"] - (aux * 0.024)
+    forecast_df["CanaldelEste"] = forecast_df["SanFernando"] - (aux * 0.077)
+    forecast_df["Palmas"] = forecast_df["SanFernando"] - (aux * 0.123)
+    forecast_df["Palmas b"] = forecast_df["SanFernando"] - (aux * 0.227)
+    forecast_df["Mini"] = forecast_df["SanFernando"] - (aux * 0.388)
+    forecast_df["LaBarquita"] = forecast_df["SanFernando"] - (aux * 0.427)
+    forecast_df["BarcaGrande"] = forecast_df["SanFernando"] - (aux * 0.493)
+    forecast_df["Correntoso"] = forecast_df["SanFernando"] - (aux * 0.598)
+    forecast_df["Guazu"] = forecast_df["SanFernando"] - (aux * 0.800)
+    forecast_df["Sauce"] = forecast_df["SanFernando"] - (aux * 0.900)
+    forecast_df["Bravo"] = forecast_df["NuevaPalmira"]
+    forecast_df["Gutierrez"] = forecast_df["NuevaPalmira"]
+
+    forecast_df = pd.melt(
+        forecast_df,
+        id_vars=["Fecha"],
+        value_vars=[
+            "Lujan",
+            "SanAntonio",
+            "CanaldelEste",
+            "Palmas",
+            "Palmas b",
+            "Mini",
+            "LaBarquita",
+            "BarcaGrande",
+            "Correntoso",
+            "Guazu",
+            "Sauce",
+            "Bravo",
+            "Gutierrez",
+        ],
+        var_name="Estacion",
+        value_name="Nivel",
+    )
+    forecast_df["Nivel"] = forecast_df["Nivel"].round(3)
+
+    ## Lujan
+    df_data_entrada = pd.DataFrame(
+        index=forecast_df.index, data={"Lujan": 10, "Gualeguay": 10, "Ibicuy": 50}
+    )
+
+    return forecast_df, df_data_entrada
+
 
 def ArmaProno(id_Mod, est_id, f_i_prono, f_f_prono):
     ## Consulta id de las corridas Guardadas
@@ -68,102 +124,3 @@ def ArmaProno(id_Mod, est_id, f_i_prono, f_f_prono):
             )
 
     return df_pronos.dropna()
-
-
-"""## Prepara series para Interpolar"""
-
-indexUnico = pd.date_range(
-    start=df_CB_SF.index.min(), end=df_CB_SF_Prono.index.max(), freq="H"
-)  # Fechas desde f_inicio a f_fin con un paso de 5 minutos
-df_CB_F = pd.DataFrame(index=indexUnico)
-
-df_CB_F = df_CB_F.join(df_CB_SF, how="left")
-df_CB_F = df_CB_F.join(df_CB_NP, how="left")
-
-del df_CB_SF
-del df_CB_SF_Prono
-del df_CB_NP
-del df_CB_NP_Prono
-
-df_CB_F["SanFernando"] = df_CB_F["SanFernando"].interpolate(
-    method="linear", limit_direction="backward"
-)
-df_CB_F["NuevaPalmira"] = df_CB_F["NuevaPalmira"].interpolate(
-    method="linear", limit_direction="backward"
-)
-
-"""## Interpola Frente"""
-
-df_CB_F["aux"] = df_CB_F["SanFernando"] - df_CB_F["NuevaPalmira"]
-
-df_CB_F["Lujan"] = df_CB_F["SanFernando"]
-df_CB_F["SanAntonio"] = df_CB_F["SanFernando"] - (df_CB_F["aux"] * 0.024)
-df_CB_F["CanaldelEste"] = df_CB_F["SanFernando"] - (df_CB_F["aux"] * 0.077)
-df_CB_F["Palmas"] = df_CB_F["SanFernando"] - (df_CB_F["aux"] * 0.123)
-df_CB_F["Palmas b"] = df_CB_F["SanFernando"] - (df_CB_F["aux"] * 0.227)
-df_CB_F["Mini"] = df_CB_F["SanFernando"] - (df_CB_F["aux"] * 0.388)
-df_CB_F["LaBarquita"] = df_CB_F["SanFernando"] - (df_CB_F["aux"] * 0.427)
-df_CB_F["BarcaGrande"] = df_CB_F["SanFernando"] - (df_CB_F["aux"] * 0.493)
-df_CB_F["Correntoso"] = df_CB_F["SanFernando"] - (df_CB_F["aux"] * 0.598)
-df_CB_F["Guazu"] = df_CB_F["SanFernando"] - (df_CB_F["aux"] * 0.800)
-df_CB_F["Sauce"] = df_CB_F["SanFernando"] - (df_CB_F["aux"] * 0.900)
-df_CB_F["Bravo"] = df_CB_F["NuevaPalmira"]
-df_CB_F["Gutierrez"] = df_CB_F["NuevaPalmira"]
-
-del df_CB_F["aux"]
-df_CB_F["Fecha"] = df_CB_F.index
-
-df_CB_F2 = pd.melt(
-    df_CB_F,
-    id_vars=["Fecha"],
-    value_vars=[
-        "Lujan",
-        "SanAntonio",
-        "CanaldelEste",
-        "Palmas",
-        "Palmas b",
-        "Mini",
-        "LaBarquita",
-        "BarcaGrande",
-        "Correntoso",
-        "Guazu",
-        "Sauce",
-        "Bravo",
-        "Gutierrez",
-    ],
-    var_name="Estacion",
-    value_name="Nivel",
-)
-df_CB_F2["Nivel"] = df_CB_F2["Nivel"].round(3)
-
-df_CB_F2.to_sql("CB_FrenteDelta", con=connLoc, if_exists="replace", index=False)
-connLoc.commit()
-
-### Temporal Agrega condBorde Lujan, Gualeguay y Ibicuy
-print("\nTemporal:  ----------------------------------------")
-print("Agrega condBorde Lujan, Gualeguay y Ibicuy: Q cte")
-## Lujan
-df_aux_i = pd.DataFrame()
-df_aux_i["Fecha"] = df_CB_F.index
-df_aux_i["Nivel"] = np.nan
-df_aux_i["Caudal"] = 10
-df_aux_i["Id_CB"] = 10  # Lujan
-df_aux_i.to_sql("DataEntrada", con=connLoc, if_exists="append", index=False)
-
-## Gualeguay
-df_aux_i = pd.DataFrame()
-df_aux_i["Fecha"] = df_CB_F.index
-df_aux_i["Nivel"] = np.nan
-df_aux_i["Caudal"] = 10
-df_aux_i["Id_CB"] = 11  # Gualeguay
-df_aux_i.to_sql("DataEntrada", con=connLoc, if_exists="append", index=False)
-
-## Ibicuy
-df_aux_i = pd.DataFrame()
-df_aux_i["Fecha"] = df_CB_F.index
-df_aux_i["Nivel"] = np.nan
-df_aux_i["Caudal"] = 50
-df_aux_i["Id_CB"] = 12  # Ibicuy
-df_aux_i.to_sql("DataEntrada", con=connLoc, if_exists="append", index=False)
-
-del df_CB_F
