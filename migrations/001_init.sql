@@ -1,6 +1,6 @@
 create schema gesina;
 create schema scheduler;
-GRANT ALL ON SCHEMA scheduler TO my_user;
+GRANT ALL ON SCHEMA scheduler TO "user";
 
 SET search_path TO gesina;
 
