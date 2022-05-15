@@ -10,11 +10,6 @@ from src.scheduler import ScheduledTaskJob
 
 
 def test_scheduler_execute(mocker: MagicMock):
-    mocker.patch(
-        'apscheduler.schedulers.blocking.BlockingScheduler.start',
-        return_value=None
-    )
-
     user = User()
     user.id = 1
     user.first_name = "test_user"
