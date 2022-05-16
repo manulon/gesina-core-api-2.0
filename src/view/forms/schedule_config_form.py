@@ -9,4 +9,4 @@ class ScheduleConfigForm(FlaskForm, ErrorMixin):
     frequency = IntegerField(
         validators=[DataRequired(message="Error: La frecuencia no puede estar vacía")]
     )
-    schedule_config_enabled = BooleanField()
+    schedule_config_enabled = BooleanField(default="disabled")

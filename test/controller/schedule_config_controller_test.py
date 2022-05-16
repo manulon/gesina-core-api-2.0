@@ -47,7 +47,7 @@ def test_update_only_schedule_config_enabled_success(a_client):
     assert not schedule_task.enabled
 
 
-def test_update_both_schedule_config_enabled_and_frequencysuccess(a_client):
+def test_update_both_schedule_config_enabled_and_frequency_success(a_client):
     log_default_user(a_client)
     original_schedule_task = schedule_task_service.get_schedule_task_config()
 
