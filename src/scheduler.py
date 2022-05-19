@@ -1,3 +1,5 @@
+import logging
+
 from pytz import utc
 from datetime import datetime
 from datetime import timedelta
@@ -10,7 +12,7 @@ from src import config
 from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service.execution_plan_service import update_execution_plan_status
 from src.tasks import queue_or_fake_simulate
-from io import BytesIO
+from src.parana import unsteady_builder
 
 from src.util.file_builder import build_project, build_plan
 
@@ -43,6 +45,7 @@ class ScheduledTaskJob:
         self.scheduled_task = task
 
     def simulate(self):
+        print("Starting simulation")
         start_date = datetime.now()
         end_date = start_date + timedelta(days=SIMULATION_DURATION)
 
@@ -54,9 +57,7 @@ class ScheduledTaskJob:
         project_name = "scheduled_task.prj"
         plan_file = build_plan(simulation_name, start_date, end_date)
         plan_name = "scheduled_task.p01"
-        flow_file = BytesIO(
-            "This is the Flow File".encode("utf8")
-        )  # Armar Flow File desde el módulo de Marian
+        flow_file = unsteady_builder.build(start_date)
         flow_name = "scheduled_task.u01"
 
         execution_plan = execution_plan_service.create_from_scheduler(
@@ -79,29 +80,43 @@ def check_for_scheduled_tasks():
     from src.persistance.scheduled_task import ScheduledTask
 
     with get_session() as session:
-        scheduled_tasks = session.query(ScheduledTask).filter_by(enabled=True).all()
+        scheduled_tasks = session.query(ScheduledTask).all()
 
     for st in scheduled_tasks:
         print(f"Found {st.name} for execution")
         all_jobs_ids = [j.id for j in scheduler.get_jobs()]
-        if str(st.id) not in all_jobs_ids:
+        job_id = str(st.id)
+
+        if (
+            job_id not in all_jobs_ids
+            and st.start_datetime < datetime.now()
+            and st.enabled
+        ):
             print(f"Adding {st.name}")
             scheduler.add_job(
-                lambda: start_scheduled_task(st),
-                "date",
-                run_date=st.start_datetime,
-                id=str(st.id),
+                ScheduledTaskJob(st).simulate,
+                "interval",
+                minutes=st.frequency,
+                id=job_id,
             )
-        else:
+        elif job_id in all_jobs_ids:
             print(f"Already in scheduler {st.name}")
 
+            job = scheduler.get_job(job_id)
+            interval = timedelta(minutes=st.frequency)
+            changed_interval = job.trigger.interval != interval
 
-def start_scheduled_task(st):
-    scheduler.add_job(
-        ScheduledTaskJob(st).simulate, "interval", minutes=st.frequency, id=str(st.id)
-    )
+            if changed_interval:
+                print(f"Updating interval for {st.name} with {interval}")
+                scheduler.reschedule_job(
+                    job_id, trigger="interval", minutes=st.frequency
+                )
+
+            if not st.enabled:
+                print(f"Removing {st.name}")
+                scheduler.remove_job(job_id)
 
 
-def setup_scheduler():
+if __name__ == "__main__":
     scheduler.add_job(check_for_scheduled_tasks, "interval", seconds=10)
     scheduler.start()
