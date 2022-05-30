@@ -12,9 +12,9 @@ from src import config
 from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service.execution_plan_service import update_execution_plan_status
 from src.tasks import queue_or_fake_simulate
-from src.parana import unsteady_builder
 
-from src.util.file_builder import build_project, build_plan
+
+from src.util.file_builder import build_project, build_plan, build_flow
 
 jobstores = {
     "default": SQLAlchemyJobStore(
@@ -57,7 +57,7 @@ class ScheduledTaskJob:
         project_name = "scheduled_task.prj"
         plan_file = build_plan(simulation_name, start_date, end_date)
         plan_name = "scheduled_task.p01"
-        flow_file = unsteady_builder.build(start_date)
+        flow_file = build_flow(start_date)
         flow_name = "scheduled_task.u01"
 
         execution_plan = execution_plan_service.create_from_scheduler(
