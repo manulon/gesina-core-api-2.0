@@ -33,23 +33,24 @@ def forecast(df):
     df_san_fernando_sim = ArmaProno(
         ID_MODELO, SAN_FERNANDO_FORECAST_ID, f_inicio_prono, f_fin_prono
     )
-    df_san_fernando = df_san_fernando.combine(df_san_fernando_sim)
+    df_san_fernando = df_san_fernando.combine_first(df_san_fernando_sim)
 
     df_nueva_palmira = df[df.Id_CB == NUEVA_PALMIRA_ID]
     df_nueva_palmira_sim = ArmaProno(
         ID_MODELO, NUEVA_PALMIRA_FORECAST_ID, f_inicio_prono, f_fin_prono
     )
-    df_nueva_palmira = df_nueva_palmira.combine(df_nueva_palmira_sim)
+    df_nueva_palmira = df_nueva_palmira.combine_first(df_nueva_palmira_sim)
 
     forecast_df = pd.DataFrame(
         {
-            "Parana": df_parana["val"],
-            "SanFernando": df_san_fernando["val"],
-            "NuevaPalmira": df_nueva_palmira["val"],
+            "Parana": pd.to_numeric(df_parana["Nivel"]),
+            "SanFernando": pd.to_numeric(df_san_fernando["Nivel"]),
+            "NuevaPalmira": pd.to_numeric(df_nueva_palmira["Nivel"]),
         }
     )
 
     forecast_df = forecast_df.interpolate(method="linear", limit_direction="backward")
+    forecast_df.groupby([pd.Grouper(level=0, freq="H")]).mean()
 
     aux = forecast_df["SanFernando"] - forecast_df["NuevaPalmira"]
 
@@ -67,35 +68,14 @@ def forecast(df):
     forecast_df["Bravo"] = forecast_df["NuevaPalmira"]
     forecast_df["Gutierrez"] = forecast_df["NuevaPalmira"]
 
-    forecast_df = pd.melt(
-        forecast_df,
-        id_vars=["Fecha"],
-        value_vars=[
-            "Lujan",
-            "SanAntonio",
-            "CanaldelEste",
-            "Palmas",
-            "Palmas b",
-            "Mini",
-            "LaBarquita",
-            "BarcaGrande",
-            "Correntoso",
-            "Guazu",
-            "Sauce",
-            "Bravo",
-            "Gutierrez",
-        ],
-        var_name="Estacion",
-        value_name="Nivel",
-    )
-    forecast_df["Nivel"] = forecast_df["Nivel"].round(3)
+    forecast_df = forecast_df.round(3)
 
     ## Lujan
-    df_data_entrada = pd.DataFrame(
+    df_entry_points = pd.DataFrame(
         index=forecast_df.index, data={"Lujan": 10, "Gualeguay": 10, "Ibicuy": 50}
     )
 
-    return forecast_df, df_data_entrada
+    return forecast_df, df_entry_points
 
 
 def ArmaProno(id_Mod, est_id, f_i_prono, f_f_prono):
@@ -112,15 +92,16 @@ def ArmaProno(id_Mod, est_id, f_i_prono, f_f_prono):
     ultimas_corridas["Fuente"] = "Ultimas"
 
     index1H = pd.date_range(start=f_i_prono, end=f_f_prono, freq="1H")
-    df_pronos = pd.DataFrame(columns=["h_sim", "cor_id"], index=index1H)
+    df_pronos = pd.DataFrame(columns=["h_sim"], index=index1H)
     corridas = pd.concat([corridas_guardadas, ultimas_corridas]).sort_index()[-10:]
 
     for idx, corrida in corridas.iterrows():
         if corrida["Fuente"] == "Guardada":
-            df_pronos.update(ina_service.C_corr_guar(id_Mod, corrida["cor_id"], est_id))
+            df_pronos.update(ina_service.C_corr_guar(id_Mod, corrida["cor_id"]))
         if corrida["Fuente"] == "Ultimas":
             df_pronos.update(
                 ina_service.C_corr_ultimas(id_Mod, corrida["cor_id"], est_id)
             )
 
+    df_pronos.rename(columns={"h_sim": "Nivel"}, inplace=True)
     return df_pronos.dropna()

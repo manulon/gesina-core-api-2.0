@@ -55,7 +55,7 @@ def C_id_corr_guar(id_Mod, est_id):
     return json_response
 
 
-def C_corr_guar(id_Mod, corrida_id, est_id):
+def C_corr_guar(id_Mod, corrida_id):
     ## Carga Simulados
     response = requests.get(
         "https://alerta.ina.gob.ar/a5/sim/calibrados/"
@@ -80,7 +80,7 @@ def C_corr_guar(id_Mod, corrida_id, est_id):
     df_sim.index = df_sim.index - timedelta(hours=3)
 
     del df_sim["fecha"]
-    return df_sim
+    return df_sim.groupby(level=0).mean()
 
 
 def C_id_corr_ultimas(id_Mod, est_id):

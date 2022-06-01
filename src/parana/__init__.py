@@ -10,7 +10,7 @@ MARTINEZ_ID = 1696
 NUEVA_PALMIRA_ID = 1699
 NUEVA_PALMIRA_FORECAST_ID = 1843
 
-ID_MODELO = 308
+ID_MODELO = 445
 
 Df_Estaciones = pd.DataFrame.from_dict(
     {
@@ -32,84 +32,115 @@ Df_Estaciones = pd.DataFrame.from_dict(
             "Martinez",
             "Nueva Palmira",
         ],
-        "series_id": [29, 30, 31, 52, 85, 3278, 3280],
+        "series_id": [29, 30, 31, 52, 85, 26285, 3280],
         "cero_escala": [9.432, 8.378, 6.747, -0.53, 0, 0, 0.0275],
     }
 ).set_index("id")
 
-df_cb = pd.DataFrame.from_records(
+border_conditions_points = pd.DataFrame.from_records(
     [
         {
-            "FID": 1,
-            "River": "AnaCua",
-            "Reach": "Canal_AnaCua",
-            "River_Stat": "25686.44",
-            "Interval": "1DAY",
-            "CondBorde": "Flow Hydrograph",
+            "river": "Bravo",
+            "reach": "Desembocadura",
+            "river_stat": "0",
+            "interval": "1HOUR",
+            "border_condition": "Stage Hydrograph",
         },
         {
-            "FID": 2,
-            "River": "Parana",
-            "Reach": "Embalse",
-            "River_Stat": "1115600",
-            "Interval": "1DAY",
-            "CondBorde": "Flow Hydrograph",
+            "river": "Mini",
+            "reach": "Desembocadura",
+            "river_stat": "0",
+            "interval": "1HOUR",
+            "border_condition": "Stage Hydrograph",
         },
         {
-            "FID": 3,
-            "River": "Paraguay",
-            "Reach": "Paraguay",
-            "River_Stat": "375000",
-            "Interval": "1DAY",
-            "CondBorde": "Flow Hydrograph",
+            "river": "BarcaGrande",
+            "reach": "Desembocadura",
+            "river_stat": "0",
+            "interval": "1HOUR",
+            "border_condition": "Stage Hydrograph",
         },
         {
-            "FID": 4,
-            "River": "Parana",
-            "Reach": "Palmas-Desemboca",
-            "River_Stat": "-29.4",
-            "Interval": "1DAY",
-            "CondBorde": "Stage Hydrograph",
+            "river": "Sauce",
+            "reach": "Desembocadura",
+            "river_stat": "0",
+            "interval": "1HOUR",
+            "border_condition": "Stage Hydrograph",
         },
         {
-            "FID": 5,
-            "River": "Parana",
-            "Reach": "Bravo-Desembocad",
-            "River_Stat": "0",
-            "Interval": "1DAY",
-            "CondBorde": "Stage Hydrograph",
+            "river": "LaBarquita",
+            "reach": "Desembocadura",
+            "river_stat": "0",
+            "interval": "1HOUR",
+            "border_condition": "Stage Hydrograph",
         },
         {
-            "FID": 6,
-            "River": "Parana",
-            "Reach": "Mini-Desembocadu",
-            "River_Stat": "0",
-            "Interval": "1DAY",
-            "CondBorde": "Stage Hydrograph",
+            "river": "CanaldelEste",
+            "reach": "Desembocadura",
+            "river_stat": "0",
+            "interval": "1HOUR",
+            "border_condition": "Stage Hydrograph",
         },
         {
-            "FID": 7,
-            "River": "Parana",
-            "Reach": "Guazu-6Desemboca",
-            "River_Stat": "-37.96",
-            "Interval": "1DAY",
-            "CondBorde": "Stage Hydrograph",
+            "river": "Lujan",
+            "reach": "Desembocadura",
+            "river_stat": "0",
+            "interval": "1HOUR",
+            "border_condition": "Stage Hydrograph",
         },
         {
-            "FID": 8,
-            "River": "Parana",
-            "Reach": "BarcaGrande",
-            "River_Stat": "0",
-            "Interval": "1DAY",
-            "CondBorde": "Stage Hydrograph",
+            "river": "SanAntonio",
+            "reach": "Desembocadura",
+            "river_stat": "0",
+            "interval": "1HOUR",
+            "border_condition": "Stage Hydrograph",
         },
         {
-            "FID": 9,
-            "River": "Parana",
-            "Reach": "Sauce",
-            "River_Stat": "0",
-            "Interval": "1DAY",
-            "CondBorde": "Stage Hydrograph",
+            "river": "Palmas",
+            "reach": "Desembocadura",
+            "river_stat": "6246.783",
+            "interval": "1HOUR",
+            "border_condition": "Stage Hydrograph",
+        },
+        {
+            "river": "Gutierrez",
+            "reach": "Desembocadura",
+            "river_stat": "1960.748",
+            "interval": "1HOUR",
+            "border_condition": "Stage Hydrograph",
+        },
+        {
+            "river": "Guazu",
+            "reach": "Desembocadura",
+            "river_stat": "8000",
+            "interval": "1HOUR",
+            "border_condition": "Stage Hydrograph",
+        },
+    ]
+)
+
+entry_points = pd.DataFrame.from_records(
+    [
+        {
+            "river": "Parana",
+            "reach": "ParanaAA",
+            "river_stat": "224000",
+            "interval": "1DAY",
+            "border_condition": "Stage Hydrograph",
+        },
+        {
+            "river": "Lujan",
+            "reach": "1",
+            "river_stat": "30.664",
+            "interval": "1HOUR",
+            "border_condition": "Flow Hydrograph",
+        },
+        {
+            "river": "Ibicuy",
+            "reach": "Ibicuy",
+            "river_stat": "67.930*",
+            "interval": "1HOUR",
+            "border_condition": "Lateral Inflow Hydrograph",
         },
     ]
 )

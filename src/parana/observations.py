@@ -1,42 +1,44 @@
-from datetime import timedelta, datetime
+from datetime import datetime
 import pandas as pd
 import numpy as np
 import logging
 
 from src.service import ina_service
-from src.parana import utils, Df_Estaciones
+from src.parana import (
+    utils,
+    Df_Estaciones,
+    PARANA_ID,
+    SANTA_FE_ID,
+    DIAMANTE_ID,
+    SAN_FERNANDO_ID,
+    BSAS_ID,
+    MARTINEZ_ID,
+    NUEVA_PALMIRA_ID,
+)
 
 
-def obtain_observations(days=60, starttime=datetime.now()):
-    cod = f"{starttime.year}-{starttime.month}-{starttime.day}-{starttime.hour}"
-
-    f_fin_0 = (starttime + timedelta(days=1)).replace(
-        hour=0, minute=0, second=0, microsecond=0
-    )
-    f_inicio_0 = (f_fin_0 - timedelta(days=days)).replace(hour=0, minute=0, second=0)
-
-    # Guarda un Id de la corrida tomando Año / mes / dia y hora de la corrida
-    logging.info("Id Corrida: ", cod)
-
+def obtain_observations(start_date, end_date):
     df_obs = ina_service.obtain_obeservations_for_stations(
-        Df_Estaciones, f_inicio_0, f_fin_0
+        Df_Estaciones, start_date, end_date
     )
 
-    return pd.concat(
+    df = pd.concat(
         [
-            obtain_upstream(df_obs, Df_Estaciones, f_inicio_0),
-            obtain_left_margin(df_obs, Df_Estaciones, f_inicio_0),
-            obtain_rigth_margin(df_obs, Df_Estaciones, f_inicio_0),
+            obtain_upstream(df_obs, Df_Estaciones, start_date).round(3),
+            obtain_left_margin(df_obs, Df_Estaciones, start_date),
+            obtain_rigth_margin(df_obs, Df_Estaciones, start_date),
         ]
     )
 
+    return df
 
-def reindex(df, period, f_inicio_0=None):
+
+def reindex(df, period, start_date=None):
     df.fecha = df.fecha.dt.round(period)
     max_date = df.fecha.max()
     df.set_index(["fecha", "id"], inplace=True)
     df = df.groupby([pd.Grouper(level=0, freq=period), pd.Grouper(level=1)]).mean()
-    df.reindex(pd.date_range(start=f_inicio_0, end=max_date, freq=period), level=0)
+    df.reindex(pd.date_range(start=start_date, end=max_date, freq=period), level=0)
 
     return df
 
@@ -51,9 +53,13 @@ def obtain_diffs(df, Df_Estaciones):
     return df
 
 
-def obtain_upstream(df_obs, Df_Estaciones, f_inicio_0):
+def obtain_upstream(df_obs, Df_Estaciones, start_date):
     # Aguas arribas
-    l_idEst = [29, 30, 31]  # CB Aguas Arriba: Parana Santa Fe y Diamante
+    l_idEst = [
+        PARANA_ID,
+        SANTA_FE_ID,
+        DIAMANTE_ID,
+    ]  # CB Aguas Arriba: Parana Santa Fe y Diamante
     df_AA = df_obs[df_obs.id.isin(l_idEst)].copy()
 
     """### Paso 1:
@@ -69,7 +75,7 @@ def obtain_upstream(df_obs, Df_Estaciones, f_inicio_0):
     
     """
 
-    df_AA = reindex(df_AA, "1D", f_inicio_0)
+    df_AA = reindex(df_AA, "H", start_date)
     df_AA = obtain_diffs(df_AA, Df_Estaciones)
 
     """### Paso 2:
@@ -146,9 +152,9 @@ def obtain_upstream(df_obs, Df_Estaciones, f_inicio_0):
     return df_aux_i
 
 
-def obtain_rigth_margin(df_obs, Df_Estaciones, f_inicio_0):
+def obtain_rigth_margin(df_obs, Df_Estaciones, start_date):
     # Margen Derecha
-    l_idE_MDer = [52, 85]
+    l_idE_MDer = [SAN_FERNANDO_ID, BSAS_ID]
     df_MD = df_obs[df_obs.id.isin(l_idE_MDer)].copy()
 
     """## CB Frente Margen Derecha"""
@@ -164,7 +170,7 @@ def obtain_rigth_margin(df_obs, Df_Estaciones, f_inicio_0):
     *   Calcula diferencias entre valores concecutivos.'''
     """
 
-    df_MD = reindex(df_MD, "5min", f_inicio_0)
+    df_MD = reindex(df_MD, "5min", start_date)
     df_MD = obtain_diffs(df_MD, Df_Estaciones)
 
     """### Paso 2:
@@ -229,9 +235,9 @@ def obtain_rigth_margin(df_obs, Df_Estaciones, f_inicio_0):
     return df_aux_i
 
 
-def obtain_left_margin(df_obs, Df_Estaciones, f_inicio_0):
+def obtain_left_margin(df_obs, Df_Estaciones, start_date):
     # Margen izquierdo
-    l_idE_MIzq = [1696, 1699]
+    l_idE_MIzq = [MARTINEZ_ID, NUEVA_PALMIRA_ID]
     df_MI = df_obs[df_obs.id.isin(l_idE_MIzq)].copy()
 
     """## CB Frente Margen Izquierda"""
@@ -246,7 +252,7 @@ def obtain_left_margin(df_obs, Df_Estaciones, f_inicio_0):
     *   Calcula diferencias entre valores concecutivos.
     """
 
-    df_MI = reindex(df_MI, "15min", f_inicio_0)
+    df_MI = reindex(df_MI, "15min", start_date)
     df_MI = obtain_diffs(df_MI, Df_Estaciones)
     df_MI = df_MI.interpolate(method="linear", limit=2, limit_direction="backward")
 
