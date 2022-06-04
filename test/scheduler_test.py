@@ -1,5 +1,3 @@
-import pytest
-
 from src.persistance import User
 from src.persistance.scheduled_task import ScheduledTask
 from datetime import datetime
