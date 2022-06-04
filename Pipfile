@@ -28,6 +28,7 @@ pandas = "*"
 numpy = "*"
 seaborn = "*"
 click = "==8.0.1"
+more-itertools = "*"
 
 [dev-packages]
 pytest = "==6.2.5"

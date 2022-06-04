@@ -1,0 +1,8 @@
+minio_data
+package.box
+Vagrantfile
+.vagrant
+.pytest_cache
+.idea
+.github
+installation
