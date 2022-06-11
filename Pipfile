@@ -26,9 +26,11 @@ werkzeug = "==2.0.3"
 apscheduler = "*"
 pandas = "*"
 numpy = "*"
+mpld3= "*"
 seaborn = "*"
 click = "==8.0.1"
 more-itertools = "*"
+python-dateutil = "*"
 
 [dev-packages]
 pytest = "==6.2.5"

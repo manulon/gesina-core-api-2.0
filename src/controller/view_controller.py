@@ -10,6 +10,7 @@ from src.service import (
     user_service,
     file_storage_service,
     schedule_task_service,
+    activity_service,
 )
 from src.service.exception.file_exception import FileUploadError
 from src.service.file_storage_service import FileType
@@ -25,7 +26,10 @@ VIEW_BLUEPRINT.before_request(user_is_authenticated)
 
 @VIEW_BLUEPRINT.route("/")
 def home():
-    return render_template("execution_plan_list.html")
+
+    execution_results = activity_service.execution_results()
+
+    return render_template("dashboard.html", execution_results=execution_results)
 
 
 @VIEW_BLUEPRINT.route("/geometry/<geometry_id>")

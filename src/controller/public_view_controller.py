@@ -47,9 +47,7 @@ def do_login():
             login_user(user)
             flask.flash("Logged in successfully.")
 
-            return flask.redirect(
-                next or flask.url_for("view_controller.execution_plan_list")
-            )
+            return flask.redirect(next or flask.url_for("view_controller.home"))
         else:
             return render_template(
                 "user_login_sign-up.html",

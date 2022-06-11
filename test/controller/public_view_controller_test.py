@@ -8,7 +8,7 @@ def test_do_sign_in_with_valid_credentials(a_client):
         "/view/login", data=data, content_type="multipart/form-data"
     )
 
-    assert b"/view/execution_plan/list" in response.data
+    assert b"/view/" in response.data
     assert user_to_login.is_authenticated
 
 
