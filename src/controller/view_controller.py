@@ -177,15 +177,22 @@ def save_execution_plan():
         return render_template("execution_plan.html", form=form, errors=[error_message])
 
 
-@VIEW_BLUEPRINT.route("/schedule_config")
-def get_schedule_task_config():
-    schedule_config = schedule_task_service.get_schedule_task_config()
+@VIEW_BLUEPRINT.route("/schedule_tasks/<schedule_task_id>", methods=["GET"])
+def get_schedule_task_config(schedule_task_id):
+    schedule_config = schedule_task_service.get_schedule_task_config(schedule_task_id)
     return render_schedule_view(ScheduleConfigForm(), schedule_config, [])
 
 
-@VIEW_BLUEPRINT.route("/schedule_config/<schedule_config_id>", methods=["POST"])
+@VIEW_BLUEPRINT.route("/schedule_tasks")
+def get_schedule_tasks():
+    return render_template("schedule_tasks_list.html")
+
+
+@VIEW_BLUEPRINT.route("/schedule_tasks/<schedule_config_id>", methods=["POST"])
 def save_schedule_config(schedule_config_id):
-    schedule_tasks_configs = schedule_task_service.get_schedule_task_config()
+    schedule_tasks_configs = schedule_task_service.get_schedule_task_config(
+        schedule_config_id
+    )
     form = ScheduleConfigForm()
     try:
         if form.validate_on_submit():

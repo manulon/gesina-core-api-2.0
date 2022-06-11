@@ -20,6 +20,9 @@ class Geometry(Base):
     user_id = Column(Integer, ForeignKey("user.id"))
     user = relationship("User")
 
+    def __str__(self):
+        return self.name
+
     def get_file_url(self):
         try:
             return file_storage_service.get_geometry_url(self.name)

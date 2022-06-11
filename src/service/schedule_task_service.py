@@ -13,7 +13,15 @@ def update(_id, form):
         session.add(schedule_config)
 
 
-def get_schedule_task_config():
+def get_schedule_tasks():
     with get_session() as session:
-        schedule_task_list = session.query(ScheduledTask).all()
-        return schedule_task_list[0]
+        return session.query(ScheduledTask).all()
+
+
+def get_schedule_task_config(schedule_config_id):
+    with get_session() as session:
+        return (
+            session.query(ScheduledTask)
+            .filter(ScheduledTask.id == schedule_config_id)
+            .first()
+        )

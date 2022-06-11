@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div>
+        <div class="d-flex justify-content-between pb-4">
+            <h2>Listado de corridas programadas</h2>
+            <button type="button" class="btn btn-info" onClick="window.location.href = '{{url_for("view_controller.geometry_new")}}'">Nueva corrida programada</button>
+        </div>
+        <div class="container-fluid">
+            <table
+                id="table"
+                data-toggle="table"
+                data-url="{{ url_for('schedule_controller.list_schedule_tasks') }}"
+                data-side-pagination="server"
+                data-pagination="true"
+                data-filter="true"
+                data-filter-control="true"
+                data-locale="es-AR"
+                data-page-size="5"
+                data-page-list="[5, 10, 25, 50, 100, 200]"
+                data-query-params="queryParams"
+        >
+                <thead>
+                <tr>
+                    <th data-field="id">
+                        ID
+                    </th>
+                    <th data-field="name">
+                        Nombre
+                    </th>
+                    <th data-field="description" data-formatter="descriptionFormatter">
+                        Descripción
+                    </th>
+                    <th data-field="user">
+                        Usuario
+                    </th>
+                    <th data-field="created_at">
+                        Fecha de creación
+                    </th>
+                    <th data-formatter="actionFormatter">
+                        Acciones
+                    </th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <script>
+        function actionFormatter(value, row) {
+            let base_url = "{{ url_for("view_controller.get_schedule_task_config", schedule_task_id="")}}"
+            return `
+                <a class="btn btn-outline-secondary" href="${base_url}${row["id"]}">
+                    <i class="fa-solid fa-pencil"></i>
+                </a>
+            `
+          }
+        function descriptionFormatter(value) {
+            if (value.length > 20)
+                return value.substr(0, 20).concat('[...]');
+            return value;
+        }
+    </script>
+{% endblock %}
