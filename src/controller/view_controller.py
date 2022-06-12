@@ -27,9 +27,11 @@ VIEW_BLUEPRINT.before_request(user_is_authenticated)
 @VIEW_BLUEPRINT.route("/")
 def home():
 
-    execution_results = activity_service.execution_results()
-
-    return render_template("dashboard.html", execution_results=execution_results)
+    return render_template(
+        "dashboard.html",
+        execution_results=activity_service.execution_results(),
+        execution_time_average=activity_service.execution_time_average(),
+    )
 
 
 @VIEW_BLUEPRINT.route("/geometry/<geometry_id>")

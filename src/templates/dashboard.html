@@ -1,12 +1,20 @@
 {% extends "layout.html" %}
 {% block content %}
     <div class="container-xxl">
-        <div class="d-flex row justify-content-around">
+        <div class="d-flex column justify-content-around">
             <div class="col-7">
                 <div class="card bg-light">
                     <div class="card-header"><h4>Resultado de las ejecuciones</h4></div>
                     <div class="card-body" class="img-fluid w-100">
                         {{ execution_results|safe }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-7">
+                <div class="card bg-light">
+                    <div class="card-header"><h4>Tiempo promedio de ejecución</h4></div>
+                    <div class="card-body" class="img-fluid w-100">
+                        {{ execution_time_average|safe }}
                     </div>
                 </div>
             </div>
