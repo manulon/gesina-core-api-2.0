@@ -26,7 +26,7 @@ def execution_results():
     ):
         labels.append(day.date())
         success_count.append(random.randint(0, 50))
-        error_count.append(random.randint(0, 25))
+        error_count.append(random.randint(0, 5))
 
     width = 0.60
     fig = Figure(figsize=(6, 4))
@@ -94,7 +94,7 @@ def execution_time_average():
         )
         execution_time_list = list(map(lambda a: a.time_in_seconds, executions_in_day))
         average = 0
-        if execution_time_list and execution_time_list > 0:
+        if execution_time_list:
             average = sum(execution_time_list) / len(execution_time_list)
         data.append(average)
 

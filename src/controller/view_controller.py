@@ -1,6 +1,6 @@
 import flask_login
 import sqlalchemy
-from flask import Blueprint, render_template, url_for, redirect
+from flask import Blueprint, render_template, url_for, redirect, request
 
 from src import logger
 from src.login_manager import user_is_authenticated
@@ -26,11 +26,18 @@ VIEW_BLUEPRINT.before_request(user_is_authenticated)
 
 @VIEW_BLUEPRINT.route("/")
 def home():
+    query_params = request.args
+    refresh_rate = int(query_params.get("refresh_rate", -1))
+    date_from = query_params.get("date_from")
+    date_to = query_params.get("date_to")
 
     return render_template(
         "dashboard.html",
         execution_results=activity_service.execution_results(),
         execution_time_average=activity_service.execution_time_average(),
+        refresh_rate=refresh_rate,
+        date_from=date_from,
+        date_to=date_to,
     )
 
 

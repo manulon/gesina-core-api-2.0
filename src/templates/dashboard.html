@@ -1,5 +1,41 @@
 {% extends "layout.html" %}
 {% block content %}
+    <meta http-equiv="refresh" content={{ refresh_rate }} >
+    <div class="d-flex justify-content-end pb-4">
+        <div class="d-flex pl-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Refresco (seg)</span>
+            </div>
+            {% if refresh_rate > 0 %}
+                <input name="refresh_rate" id="refresh_rate" type="number" style="text-align: right" value={{ refresh_rate }}>
+            {% else %}
+                <input name="refresh_rate" id="refresh_rate" type="number" style="text-align: right">
+            {% endif %}
+
+        </div>
+    </div>
+    <div class="d-flex justify-content-end pb-4">
+        <div class="d-flex pl-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Fecha desde</span>
+            </div>
+            {% if date_from %}
+                <input name="date_from" id="date_from" type="text" class="datepicker" style="text-align: right" value={{ date_from }}>
+            {% else %}
+                <input name="date_from" id="date_from" type="text" class="datepicker" style="text-align: right">
+            {% endif %}
+        </div>
+        <div class="d-flex pl-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Fecha hasta</span>
+            </div>
+            {% if date_to %}
+                <input name="date_to" id="date_to" type="text" class="datepicker" style="text-align: right" value={{ date_to }}>
+            {% else %}
+                <input name="date_to" id="date_to" type="text" class="datepicker" style="text-align: right">
+            {% endif %}
+        </div>
+    </div>
     <div class="container-xxl">
         <div class="d-flex column justify-content-around">
             <div class="col-7">
@@ -13,7 +49,7 @@
             <div class="col-7">
                 <div class="card bg-light">
                     <div class="card-header"><h4>Tiempo promedio de ejecución</h4></div>
-                    <div class="card-body" class="img-fluid w-100">
+                    <div class="card-body" class="img-fluid w-100" id="result">
                         {{ execution_time_average|safe }}
                     </div>
                 </div>
@@ -21,29 +57,38 @@
         </div>
     </div>
     <script>
-      $('#datepicker').datepicker({
-        language: 'es',
-        clearBtn: true,
-        startDate: new Date(2020, 0, 0),
-        format: "mm-yyyy",
-        viewMode: "months",
-        minViewMode: "months"
-      });
-
-      $('#datepicker').datepicker('update', new Date({{ year }}, {{ month }}, 0));
-
-      $('#datepicker').datepicker()
-        .on("changeDate", function (e) {
-          let date = e.date
-          let url = window.location.href.split("?")[0];
-          url = `${url}?year=${date.getFullYear()}&month=${date.getMonth() + 1}`
-          window.location.href = url;
+        $('#date_from').datepicker({
+            language: 'es',
+            clearBtn: true,
+            startDate: new Date(2021, 0, 0),
+            endDate: "0d"
+        });
+        $('#date_to').datepicker({
+            language: 'es',
+            clearBtn: true,
+            startDate: new Date(2021, 0, 0),
+            endDate: "0d"
         });
 
-    </script>
-    <style>
-        body {
-            overflow-y: hidden;
+        $('#refresh_rate').on("change", onChangeAnyInput);
+        $('#date_from').on("change", onChangeAnyInput);
+        $('#date_to').on("change", onChangeAnyInput);
+
+        function onChangeAnyInput(event) {
+            let url = window.location.href.split("?")[0];
+            let refreshRateValue = document.getElementById('refresh_rate').value;
+            let dateFromValue = document.getElementById('date_from').value;
+            let dateToValue = document.getElementById('date_to').value;
+            if (refreshRateValue && refreshRateValue > 0) {
+                url = `${url}?refresh_rate=${refreshRateValue}`
+            }
+            if (dateFromValue) {
+                url = url + (url.includes('?')? '&' : '?') + "date_from=" + dateFromValue;
+            }
+            if (dateToValue) {
+                url = url + (url.includes('?')? '&' : '?') + "date_to=" + dateToValue;
+            }
+            window.location.href = url;
         }
-    </style>
+    </script>
 {% endblock %}
