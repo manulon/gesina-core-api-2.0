@@ -6,6 +6,7 @@ import random
 import pandas
 
 from matplotlib.figure import Figure
+from matplotlib import cm
 
 np.random.seed(19680801)
 
@@ -37,8 +38,8 @@ def execution_results():
         success_count,
         width,
         label="Ok",
-        color="green",
-        edgecolor="black",
+        color="#298f37",
+        edgecolor="#113f0c",
         align="edge",
     )
     ax.bar(
@@ -46,9 +47,9 @@ def execution_results():
         error_count,
         width,
         bottom=success_count,
-        color="red",
+        color="#f0604d",
         label="Error",
-        edgecolor="black",
+        edgecolor="#8f3229",
         align="edge",
     )
 
@@ -100,7 +101,7 @@ def execution_time_average():
 
     fig = Figure(figsize=(6, 4))
     axs = fig.subplots()
-    axs.plot(labels, data)
+    axs.plot(labels, data, c=cm.hot(0.25))
     axs.set_ylabel("Segundos")
     axs.grid(True)
 
