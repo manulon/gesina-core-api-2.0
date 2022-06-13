@@ -3,7 +3,6 @@ from dateutil import rrule
 from datetime import datetime, timedelta
 import numpy as np
 import random
-import pandas
 
 from matplotlib.figure import Figure
 from matplotlib import cm

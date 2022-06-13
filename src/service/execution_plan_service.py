@@ -113,8 +113,18 @@ def get_execution_plan(execution_plan_id):
 
 
 def update_execution_plan_status(execution_plan_id, status: ExecutionPlanStatus):
-    ep = get_execution_plan(execution_plan_id)
+    execution_plan = get_execution_plan(execution_plan_id)
 
     with get_session() as session:
-        session.add(ep)
-        ep.status = status
+        session.add(execution_plan)
+        execution_plan.status = status
+
+
+def update_finished_execution_plan(execution_plan_id, start_datetime, end_datetime):
+    execution_plan = get_execution_plan(execution_plan_id)
+
+    with get_session() as session:
+        session.add(execution_plan)
+        execution_plan.status = ExecutionPlanStatus.FINISHED
+        execution_plan.start_datetime = start_datetime
+        execution_plan.end_datetime = end_datetime
