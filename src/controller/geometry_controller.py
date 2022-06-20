@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, send_file
 
 from src.login_manager import user_is_authenticated
 from src.service import geometry_service, file_storage_service
+from src.service.file_storage_service import FileType
 
 GEOMETRY_BLUEPRINT = Blueprint("geometry_controller", __name__)
 GEOMETRY_BLUEPRINT.before_request(user_is_authenticated)
@@ -31,5 +32,7 @@ def list_geometries():
 @GEOMETRY_BLUEPRINT.route("/download/<_id>")
 def download(_id):
     geometry = geometry_service.get_geometry(_id)
-    file = BytesIO(file_storage_service.get_geometry_file(geometry.name).data)
+    file = BytesIO(
+        file_storage_service.get_file_by_type(FileType.GEOMETRY, geometry.name).data
+    )
     return send_file(file, attachment_filename=geometry.name)

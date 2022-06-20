@@ -7,6 +7,8 @@ from src.persistance.session import get_session
 from src.service import file_storage_service
 from werkzeug.utils import secure_filename
 
+from src.service.file_storage_service import FileType
+
 
 def create(form, user):
     file_field = form.file
@@ -22,7 +24,8 @@ def create(form, user):
     )
     with get_session() as session:
         session.add(geometry)
-        file_storage_service.save_geometry(file_field.data)
+        file = file_field.data
+        file_storage_service.save_file(FileType.GEOMETRY, file, file.filename)
 
     return geometry
 

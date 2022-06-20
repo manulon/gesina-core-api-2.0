@@ -1,18 +1,67 @@
-from sqlalchemy.orm import joinedload
-
 from src.persistance.execution_plan import ExecutionPlan, ExecutionPlanStatus
 from src.persistance.session import get_session
 from src.service import file_storage_service, user_service
+from src.service.file_storage_service import FileType
 
 
-def create(form):
+def create_from_form(form):
     plan_name = form.plan_name.data
     geometry_id = form.geometry_option.data
     user = user_service.get_current_user()
+    project_file_data = form.project_file.data
+    plan_file_data = form.plan_file.data
+    flow_file_data = form.flow_file.data
+    return create(
+        plan_name,
+        geometry_id,
+        user,
+        project_file_data.filename,
+        project_file_data,
+        plan_file_data.filename,
+        plan_file_data,
+        flow_file_data.filename,
+        flow_file_data,
+    )
 
+
+def create_from_scheduler(
+    execution_plan_name,
+    geometry_id,
+    user,
+    project_name,
+    project_file,
+    plan_name,
+    plan_file,
+    flow_name,
+    flow_file,
+):
+    return create(
+        execution_plan_name,
+        geometry_id,
+        user,
+        project_name,
+        project_file,
+        plan_name,
+        plan_file,
+        flow_name,
+        flow_file,
+    )
+
+
+def create(
+    execution_plan_name,
+    geometry_id,
+    user,
+    project_name,
+    project_file,
+    plan_name,
+    plan_file,
+    flow_name,
+    flow_file,
+):
     with get_session() as session:
         execution_plan = ExecutionPlan(
-            plan_name=plan_name, geometry_id=geometry_id, user_id=user.id
+            plan_name=execution_plan_name, geometry_id=geometry_id, user_id=user.id
         )
         session.add(execution_plan)
         session.commit()
@@ -20,19 +69,27 @@ def create(form):
         execution_plan_id = execution_plan.id
         geometry = execution_plan.geometry
 
-        project_file_field = form.project_file
-        plan_file_field = form.plan_file
-        flow_file_field = form.flow_file
-
         file_storage_service.copy_geometry_to(execution_plan_id, geometry.name)
-        file_storage_service.save_execution_file(
-            project_file_field.data, execution_plan_id
+
+        file_storage_service.save_file(
+            FileType.EXECUTION_PLAN,
+            project_file,
+            project_name,
+            execution_plan_id,
         )
-        file_storage_service.save_execution_file(
-            plan_file_field.data, execution_plan_id
+
+        file_storage_service.save_file(
+            FileType.EXECUTION_PLAN,
+            plan_file,
+            plan_name,
+            execution_plan_id,
         )
-        file_storage_service.save_execution_file(
-            flow_file_field.data, execution_plan_id
+
+        file_storage_service.save_file(
+            FileType.EXECUTION_PLAN,
+            flow_file,
+            flow_name,
+            execution_plan_id,
         )
 
         return execution_plan

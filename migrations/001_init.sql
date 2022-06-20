@@ -1,4 +1,6 @@
 create schema gesina;
+create schema scheduler;
+
 SET search_path TO gesina;
 
 create table if not exists "user"
@@ -48,3 +50,18 @@ create table if not exists execution_plan
 alter table execution_plan owner to "user";
 
 create unique index if not exists execution_plan_id_uindex on execution_plan (id);
+
+
+create table if not exists "scheduled_task"
+(
+	id serial constraint scheduled_task_pk primary key,
+	name text not null,
+	description text not null,
+	frequency integer not null,
+	start_datetime timestamp not null,
+	metadata jsonb null,
+	created_at timestamp default now() not null,
+    enabled bool default true not null,
+    geometry_id integer not null constraint scheduled_task_geometry_id_fk references geometry,
+    user_id integer not null constraint scheduled_task_user_id_fk references "user"
+);

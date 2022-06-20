@@ -131,16 +131,16 @@ def test_list_execution_plan_when_there_two(a_client, a_execution_plan):
     expected_response = {
         "rows": [
             {
-                "created_at": "21/12/2021",
+                "created_at": datetime.now().strftime("%d/%m/%Y"),
                 "geometry": "Ejemplo dado por el INA",
-                "id": 1,
+                "id": 2,
                 "status": "PENDING",
                 "user": "Admin Ina",
             },
             {
-                "created_at": datetime.now().strftime("%d/%m/%Y"),
+                "created_at": "21/12/2021",
                 "geometry": "Ejemplo dado por el INA",
-                "id": 2,
+                "id": 1,
                 "status": "PENDING",
                 "user": "Admin Ina",
             },
