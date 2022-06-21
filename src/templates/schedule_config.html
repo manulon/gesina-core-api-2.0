@@ -9,7 +9,7 @@
                   enctype=multipart/form-data
                   class="p-4 container needs-validation"
                   id="schedule-config-form"
-                  action="{{ url_for('view_controller.save_schedule_config', schedule_config_id=id or '') }}">
+                  action="{{ url_for('view_controller.save_or_create_schedule_config', schedule_config_id=id or '') }}">
                 {{ form.csrf_token }}
                 <div class="form-inline">
                     {{ form.frequency.label }}: {{ form.frequency() }}

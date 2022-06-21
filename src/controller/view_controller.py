@@ -189,14 +189,18 @@ def get_schedule_tasks():
 
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/<schedule_config_id>", methods=["POST"])
-def save_schedule_config(schedule_config_id):
+def save_or_create_schedule_config(schedule_config_id):
     schedule_tasks_configs = schedule_task_service.get_schedule_task_config(
         schedule_config_id
     )
     form = ScheduleConfigForm()
     try:
         if form.validate_on_submit():
-            schedule_task_service.update(schedule_config_id, form)
+            if schedule_config_id:
+                schedule_task_service.update(schedule_config_id, form)
+            else:
+                schedule_tasks_configs = schedule_task_service.create(form)
+
             success_message = "Configuración actualizada con éxito."
             return render_template("execution_plan_list.html", success=success_message)
 

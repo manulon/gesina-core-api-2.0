@@ -13,6 +13,14 @@ def update(_id, form):
         session.add(schedule_config)
 
 
+def create(form):
+    with get_session() as session:
+        schedule_config = ScheduledTask(frequency=form.frequency, enabled=form.enabled)
+        session.add(schedule_config)
+        session.refresh(schedule_config)
+        return schedule_config
+
+
 def get_schedule_tasks():
     with get_session() as session:
         return session.query(ScheduledTask).all()
