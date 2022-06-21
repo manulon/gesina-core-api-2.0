@@ -180,7 +180,7 @@ def save_execution_plan():
 @VIEW_BLUEPRINT.route("/schedule_tasks/<schedule_task_id>", methods=["GET"])
 def get_schedule_task_config(schedule_task_id):
     schedule_config = schedule_task_service.get_schedule_task_config(schedule_task_id)
-    return render_schedule_view(ScheduleConfigForm(), schedule_config, [])
+    return render_schedule_view(ScheduleConfigForm(), schedule_config)
 
 
 @VIEW_BLUEPRINT.route("/schedule_tasks")
@@ -208,13 +208,19 @@ def save_schedule_config(schedule_config_id):
         return render_schedule_view(form, schedule_tasks_configs, [error_message])
 
 
-def render_schedule_view(form, schedule_config, errors):
-    return render_template(
-        "schedule_config.html",
-        form=form,
-        schedule_config=schedule_config,
-        errors=errors,
-    )
+@VIEW_BLUEPRINT.route("/schedule_tasks/new", methods=["GET"])
+def schedule_task_new():
+    render_schedule_view(ScheduleConfigForm())
+
+
+def render_schedule_view(form, schedule_config=None, errors=()):
+    _id = None
+    if schedule_config:
+        form.schedule_config_enabled.data = schedule_config.enabled
+        form.frequency.data = schedule_config.frequency
+        _id = schedule_config.id
+
+    return render_template("schedule_config.html", form=form, errors=errors, id=_id)
 
 
 @VIEW_BLUEPRINT.route("/user/logout", methods=["GET"])

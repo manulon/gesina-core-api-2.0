@@ -128,6 +128,6 @@ def test_get_schedule_config(a_client):
 
     assert b"Configuraci\xc3\xb3n de simulaciones recurrentes<" in response.data
     frequency_info = (
-        f'id="frequency" name="frequency" value="{schedule_task_config.frequency}"'
+        f'<input id="frequency" name="frequency" required type="number" value="{schedule_task_config.frequency}">'
     )
     assert str.encode(frequency_info) in response.data
