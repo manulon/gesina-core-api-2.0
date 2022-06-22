@@ -72,7 +72,10 @@ class ScheduledTaskJob:
             flow_file,
         )
         update_execution_plan_status(execution_plan.id, ExecutionPlanStatus.RUNNING)
-        queue_or_fake_simulate(execution_plan.id)
+        try:
+            queue_or_fake_simulate(execution_plan.id)
+        except Exception as e:
+            print(e)
 
 
 def check_for_scheduled_tasks():
