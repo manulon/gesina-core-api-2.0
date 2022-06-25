@@ -8,8 +8,8 @@ from src.view.forms import ErrorMixin
 class ScheduleConfigForm(FlaskForm, ErrorMixin):
     frequency = IntegerField(
         validators=[DataRequired(message="Error: La frecuencia no puede estar vacía")],
-        label="Ejecución habilitada",
+        label="Frecuencia de ejecución (en minutos)",
     )
     schedule_config_enabled = BooleanField(
-        default="disabled", label="Frecuencia de ejecución (en minutos)"
+        default="disabled", label="Ejecución habilitada"
     )

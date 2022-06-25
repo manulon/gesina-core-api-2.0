@@ -189,6 +189,8 @@ def get_schedule_tasks():
 
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/<schedule_config_id>", methods=["POST"])
+@VIEW_BLUEPRINT.route("/schedule_tasks/", methods=["POST"], defaults={'schedule_config_id': None})
+@VIEW_BLUEPRINT.route("/schedule_tasks", methods=["POST"], defaults={'schedule_config_id': None})
 def save_or_create_schedule_config(schedule_config_id):
     schedule_tasks_configs = schedule_task_service.get_schedule_task_config(
         schedule_config_id
@@ -214,7 +216,7 @@ def save_or_create_schedule_config(schedule_config_id):
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/new", methods=["GET"])
 def schedule_task_new():
-    render_schedule_view(ScheduleConfigForm())
+    return render_schedule_view(ScheduleConfigForm())
 
 
 def render_schedule_view(form, schedule_config=None, errors=()):
