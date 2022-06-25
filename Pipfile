@@ -29,6 +29,7 @@ numpy = "*"
 seaborn = "*"
 click = "==8.0.1"
 more-itertools = "*"
+"zope.interface" = "*"
 
 [dev-packages]
 pytest = "==6.2.5"

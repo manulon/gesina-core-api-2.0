@@ -18,7 +18,7 @@ Vagrant.configure("2") do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
   config.vm.box = "gusztavvargadr/windows-10-enterprise"
-  config.vm.box_version = "2102.0.2111"
+  config.vm.box_version = "2102.0.2112"
 
 
   # Disable automatic box update checking. If you disable this, then
