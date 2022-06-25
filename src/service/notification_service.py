@@ -11,13 +11,19 @@ def post_notification(execution_id, user_id):
 
 def get_notifications_for_user(user_id):
     with get_session() as session:
-        notifications = session.query(UserNotification).filter_by(user_id=user_id, seen=False).all()
+        notifications = (
+            session.query(UserNotification).filter_by(user_id=user_id, seen=False).all()
+        )
     return notifications
 
 
 def mark_notification_as_read(notification_id):
     with get_session() as session:
-        notification = session.query(UserNotification).filter_by(notification_id=notification_id).one_or_none()
+        notification = (
+            session.query(UserNotification)
+            .filter_by(notification_id=notification_id)
+            .one_or_none()
+        )
         if not notification:
             return
         notification.seen = True
