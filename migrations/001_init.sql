@@ -71,5 +71,5 @@ create table if not exists "user_notification"
     id serial constraint notification_pk primary key,
     execution_plan_id integer not null constraint notification_execution_id_fk references "execution_plan",
     user_id integer not null constraint notification_user_id_fk references "user",
-    seen boolean not null default 0
+    seen boolean not null default False
 );

@@ -5,7 +5,7 @@ from src.persistance.session import Base
 
 
 class UserNotification(Base):
-    __tablename__ = "user_notifications"
+    __tablename__ = "user_notification"
     id = Column(Integer, primary_key=True)
     seen = Column(Boolean, nullable=False, default=False)
 
@@ -14,8 +14,3 @@ class UserNotification(Base):
 
     execution_plan_id = Column(Integer, ForeignKey("execution_plan.id"))
     execution_plan = relationship("ExecutionPlan")
-
-    def __init__(self, user_id, execution_id):
-        self.user_id = user_id
-        self.execution_plan_id = execution_id
-        self.seen = False

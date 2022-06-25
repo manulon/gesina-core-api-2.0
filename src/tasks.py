@@ -46,8 +46,6 @@ def simulate(execution_id, user_id):
         execution_plan_service.update_execution_plan_status(
             execution_id, ExecutionPlanStatus.FINISHED
         )
-
-        notification_service.post_notification(execution_id, user_id)
     except:
         execution_plan_service.update_execution_plan_status(
             execution_id, ExecutionPlanStatus.ERROR
@@ -58,6 +56,7 @@ def simulate(execution_id, user_id):
             RC.QuitRAS()
 
     file_storage_service.save_result_for_execution(base_path, execution_id)
+    notification_service.post_notification(execution_id, user_id)
 
     total_seconds = (datetime.now() - begin).total_seconds()
 

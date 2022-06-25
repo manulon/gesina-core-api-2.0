@@ -3,7 +3,7 @@ from src.persistance.user_notification import UserNotification
 
 
 def post_notification(execution_id, user_id):
-    notification = UserNotification(user_id, execution_id)
+    notification = UserNotification(user_id=user_id, execution_plan_id=execution_id)
     with get_session() as session:
         session.add(notification)
     return notification
@@ -11,7 +11,7 @@ def post_notification(execution_id, user_id):
 
 def get_notifications_for_user(user_id):
     with get_session() as session:
-        notifications = session.query(UserNotification).filter_by(user_id=user_id).all()
+        notifications = session.query(UserNotification).filter_by(user_id=user_id, seen=False).all()
     return notifications
 
 
