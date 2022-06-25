@@ -9,6 +9,7 @@ from test import log_default_user
 @pytest.fixture(autouse=True)
 def run_around_test():
     from src import migrate, rollback
+
     migrate()
     yield
     rollback()
