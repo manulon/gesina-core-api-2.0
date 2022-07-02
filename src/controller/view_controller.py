@@ -102,7 +102,9 @@ def save_geometry():
         if form.validate_on_submit():
             geometry = geometry_service.create(form, user)
             success_message = f"Geometría #{str(geometry.id)} creada con éxito."
-            return render_template("geometry_list.html", success=success_message)
+            return render_template(
+                "geometry_list.html", success_message=success_message
+            )
 
         return render_template("geometry.html", form=form, errors=form.get_errors())
     except sqlalchemy.exc.IntegrityError as database_error:
@@ -160,7 +162,9 @@ def save_execution_plan():
         if form.validate_on_submit():
             execution_plan = execution_plan_service.create_from_form(form)
             success_message = f"Simulación #{str(execution_plan.id)} creada con éxito."
-            return render_template("execution_plan_list.html", success=success_message)
+            return render_template(
+                "execution_plan_list.html", success_message=success_message
+            )
 
         return render_template(
             "execution_plan.html", form=form, errors=form.get_errors()
@@ -185,12 +189,14 @@ def get_schedule_task_config(schedule_task_id):
 
 @VIEW_BLUEPRINT.route("/schedule_tasks")
 def get_schedule_tasks():
-    return render_template("schedule_tasks_list.html")
+    success_message = request.args.get("success_message", None)
+    return render_template("schedule_tasks_list.html", success_message=success_message)
 
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/<schedule_config_id>", methods=["POST"])
-@VIEW_BLUEPRINT.route("/schedule_tasks/", methods=["POST"], defaults={'schedule_config_id': None})
-@VIEW_BLUEPRINT.route("/schedule_tasks", methods=["POST"], defaults={'schedule_config_id': None})
+@VIEW_BLUEPRINT.route(
+    "/schedule_tasks/", methods=["POST"], defaults={"schedule_config_id": None}
+)
 def save_or_create_schedule_config(schedule_config_id):
     schedule_tasks_configs = schedule_task_service.get_schedule_task_config(
         schedule_config_id
@@ -204,7 +210,13 @@ def save_or_create_schedule_config(schedule_config_id):
                 schedule_tasks_configs = schedule_task_service.create(form)
 
             success_message = "Configuración actualizada con éxito."
-            return render_template("execution_plan_list.html", success=success_message)
+
+            return redirect(
+                url_for(
+                    "view_controller.get_schedule_tasks",
+                    success_message=success_message,
+                )
+            )
 
         return render_schedule_view(form, schedule_tasks_configs, form.get_errors())
     except Exception as exception:
@@ -222,8 +234,12 @@ def schedule_task_new():
 def render_schedule_view(form, schedule_config=None, errors=()):
     _id = None
     if schedule_config:
-        form.schedule_config_enabled.data = schedule_config.enabled
+        form.enabled.data = schedule_config.enabled
         form.frequency.data = schedule_config.frequency
+        form.description.data = schedule_config.description
+        form.name.data = schedule_config.name
+        form.start_datetime.data = schedule_config.start_datetime
+        form.geometry_id.process_data(schedule_config.geometry_id)
         _id = schedule_config.id
 
     return render_template("schedule_config.html", form=form, errors=errors, id=_id)

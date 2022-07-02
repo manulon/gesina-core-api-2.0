@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import Integer, Column, String, DateTime, JSON, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -10,7 +12,7 @@ class ScheduledTask(Base):
     name = Column(String)
     description = Column(String)
     frequency = Column(Integer)  # in minutes
-    created_at = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.now)
     start_datetime = Column(DateTime)
     _metadata = Column("metadata", JSON)
     enabled = Column(Boolean)

@@ -50,13 +50,13 @@
                     </div>
                 {% endfor %}
             {% endif %}
-            {% if success is defined %}
+            {% if success_message is defined and success_message is not none %}
             <div class="alert alert-success success-message mb-n3" role="alert">
                 <button type="button" class="close close-success" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <div>
-                {{ success }}
+                {{ success_message }}
                 </div>
             </div>
             {% endif %}

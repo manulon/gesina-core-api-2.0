@@ -29,9 +29,9 @@ class ExecutionPlan(Base):
     geometry = relationship("Geometry", lazy="joined")
     user_id = Column(Integer, ForeignKey("user.id"))
     user = relationship("User", lazy="joined")
-    start_datetime = Column(DateTime, default=datetime.now())
-    end_datetime = Column(DateTime, default=datetime.now())
-    created_at = Column(DateTime, default=datetime.now())
+    start_datetime = Column(DateTime, default=datetime.now)
+    end_datetime = Column(DateTime, default=datetime.now)
+    created_at = Column(DateTime, default=datetime.now)
     status = Column(Enum(ExecutionPlanStatus), default=ExecutionPlanStatus.PENDING)
 
     def get_geometry_file_url(self):
