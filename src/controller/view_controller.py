@@ -12,6 +12,7 @@ from src.service import (
     schedule_task_service,
     activity_service,
 )
+from src.service.exception.activity_exception import ActivityException
 from src.service.exception.file_exception import FileUploadError
 from src.service.file_storage_service import FileType
 from src.view.forms.execution_plan_form import ExecutionPlanForm
@@ -31,14 +32,40 @@ def home():
     date_from = query_params.get("date_from")
     date_to = query_params.get("date_to")
 
-    return render_template(
-        "dashboard.html",
-        execution_results=activity_service.execution_results(),
-        execution_time_average=activity_service.execution_time_average(),
-        refresh_rate=refresh_rate,
-        date_from=date_from,
-        date_to=date_to,
-    )
+    try:
+        (execution_results, execution_time_average) = activity_service.get_activity(
+            date_from, date_to
+        )
+        return render_template(
+            "dashboard.html",
+            execution_results=execution_results,
+            execution_time_average=execution_time_average,
+            refresh_rate=refresh_rate,
+            date_from=date_from,
+            date_to=date_to,
+        )
+    except ActivityException as activity_exception:
+        logger.error(activity_exception)
+        error_message = activity_exception.message
+
+        return render_template(
+            "dashboard.html",
+            execution_results=None,
+            execution_time_average=None,
+            refresh_rate=-1,
+            errors=[error_message],
+        )
+    except Exception as generic_exception:
+        logger.error(generic_exception)
+        error_message = "Hubo un error inesperado. Intente nuevamente."
+
+        return render_template(
+            "dashboard.html",
+            execution_results=None,
+            execution_time_average=None,
+            refresh_rate=-1,
+            errors=[error_message],
+        )
 
 
 @VIEW_BLUEPRINT.route("/geometry/<geometry_id>")

@@ -40,17 +40,17 @@
         <div class="d-flex column justify-content-around">
             <div class="col-7">
                 <div class="card bg-light">
-                    <div class="card-header"><h4>Resultado de las ejecuciones</h4></div>
-                    <div class="card-body" class="img-fluid w-100">
-                        {{ execution_results|safe }}
+                    <div class="card-header"><h5>Cantidad de ejecuciones</h5></div>
+                    <div class="card-body img-fluid w-100" style="background: white">
+                        <img src="data:image/png;base64, {{ execution_results }}" class="img-fluid w-100">
                     </div>
                 </div>
             </div>
             <div class="col-7">
                 <div class="card bg-light">
-                    <div class="card-header"><h4>Tiempo promedio de ejecución</h4></div>
-                    <div class="card-body" class="img-fluid w-100" id="result">
-                        {{ execution_time_average|safe }}
+                    <div class="card-header"><h5>Tiempo promedio de ejecución</h5></div>
+                    <div class="card-body img-fluid w-100" style="background: white">
+                        <img src="data:image/png;base64, {{ execution_time_average }}" class="img-fluid w-100">
                     </div>
                 </div>
             </div>
