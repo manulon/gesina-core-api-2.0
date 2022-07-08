@@ -1,8 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
     <div>
-        <div class="d-flex justify-content-between pb-4">
+        <div class="d-flex justify-content-between">
             <h2>Configuración de simulaciones recurrentes</h2>
+        </div>
+        <div class="d-flex justify-content-between pt-4">
+            <h4>General</h4>
         </div>
         <div class="container-xxl">
             {% if id %}
@@ -39,12 +42,32 @@
                              {{ form.enabled(class_="custom-control-input") }} {{ form.enabled.label(class_="custom-control-label") }}
                         </div>
                     </div>
+
+                    <div class="d-flex justify-content-between pt-4">
+                        <h4>Configuración de borde</h4>
+                    </div>
+
                     <div class="form-group">
+                        {{ form.observation_days.label }}: {{ form.observation_days(class_="form-control") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.forecast_days.label }}: {{ form.forecast_days(class_="form-control") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.start_condition_type.label }}: {{ form.start_condition_type(class_="form-control") }}
+                    </div>
+
+
+                    <div class="d-flex justify-content-between pt-4">
+                        <h4>Configuración de plan</h4>
+                    </div>
+
+                    <div class="form-group pt-4">
                         <button type="submit" class="btn btn-primary">Guardar</button>
                     </div>
                 </form>
-
-
         </div>
     </div>
 {% endblock %}

@@ -240,6 +240,10 @@ def render_schedule_view(form, schedule_config=None, errors=()):
         form.name.data = schedule_config.name
         form.start_datetime.data = schedule_config.start_datetime
         form.geometry_id.process_data(schedule_config.geometry_id)
+        form.start_condition_type.process_data(schedule_config.start_condition_type)
+        form.observation_days.data = schedule_config.observation_days
+        form.forecast_days.data = schedule_config.forecast_days
+
         _id = schedule_config.id
 
     return render_template("schedule_config.html", form=form, errors=errors, id=_id)

@@ -12,6 +12,9 @@ def update(_id, form):
         schedule_config.geometry_id = form.geometry_id.data
         schedule_config.start_datetime = form.start_datetime.data
         schedule_config.enabled = form.enabled.data
+        schedule_config.observation_days = form.observation_days.data
+        schedule_config.forecast_days = form.forecast_days.data
+        schedule_config.start_condition_type = form.start_condition_type.data
         session.add(schedule_config)
 
 
