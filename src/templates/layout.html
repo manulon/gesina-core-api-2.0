@@ -14,7 +14,7 @@
                 <h5 class="d-inline pr-3">
                     {{ current_user.full_name }}
                 </h5>
-                {% if results == []  %}
+                {% if current_user.notifications == []  %}
                     <button class="btn btn-lg btn-link" type="button" id="notificationDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="fa-regular fa-bell"></span><span class="caret"></span>
                     </button>
@@ -26,11 +26,9 @@
                         <span class="fa-solid fa-bell"></span><span class="caret"></span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-right" id="notificationsDropdown" aria-labelledby="dropdownMenuButton">
-                    {% for notification in current_user.notifications %}
-                        {% if notification.seen == false %}
-                            <li><a class="dropdown-item" onclick="return markSeen(this)">Termino la corrida: {{ notification.execution_plan.id }} | {{notification.execution_plan.plan_name}}</a></li>
-                        {% endif %}
-                    {% endfor %}
+                        {% for notification in current_user.notifications %}
+                            <li><a class="dropdown-item" onclick="markSeen(this, '{{ notification.id }}')">Termino la corrida: {{ notification.execution_plan.id }} | {{notification.execution_plan.plan_name}}</a></li>
+                        {% endfor %}
                     </div>
                 {% endif %}
 
@@ -87,13 +85,15 @@
     </div>
     </body>
     <script>
-        function markSeen(item){
+        function markSeen(item, id){
             console.log(item);
-            console.log(item.classList)
-            window.location.href = "{{url_for('view_controller.read_notification', notification_id=1)}}";
-            item.className = 'dropdown-item disabled'
-            item.remove()
-            console.log(item);
+            console.log(item.classList);
+            console.log(id);
+            var url = "{{url_for('view_controller.read_notification', notification_id='')}}" + id
+            console.log(url);
+            window.location.href = url;
+            item.className = 'dropdown-item disabled';
+            item.remove();
         };
         $(document).on('click', 'notificationDropdownButton', function (e) { e.stopPropagation();});
         $(".close-error").on("click", function(){ $(".error-message").remove() })

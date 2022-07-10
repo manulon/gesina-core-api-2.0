@@ -83,12 +83,12 @@ def save_geometry():
 @VIEW_BLUEPRINT.route("/execution_plan/<execution_plan_id>")
 def execution_plan_read(execution_plan_id):
     execution_plan = execution_plan_service.get_execution_plan(execution_plan_id)
-
     return render_template(
         "execution_plan.html",
         form=ExecutionPlanForm(),
         readonly=True,
         execution_plan=execution_plan,
+        current_user=user_service.get_updated_user(),
         execution_files=[
             f.object_name.split("/")[-1]
             for f in file_storage_service.list_execution_files(
