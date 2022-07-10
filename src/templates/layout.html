@@ -27,7 +27,7 @@
                     </button>
                     <div class="dropdown-menu dropdown-menu-right" id="notificationsDropdown" aria-labelledby="dropdownMenuButton">
                         {% for notification in current_user.notifications %}
-                            <li><a class="dropdown-item" onclick="markSeen(this, '{{ notification.id }}')">Termino la corrida: {{ notification.execution_plan.id }} | {{notification.execution_plan.plan_name}}</a></li>
+                            <li><a class="dropdown-item" href="{{url_for('view_controller.read_notification', notification_id=notification.id)}}">La simulación Nº{{ notification.execution_plan.id }} con nombre {{notification.execution_plan.plan_name}} ha finalizado</a></li>
                         {% endfor %}
                     </div>
                 {% endif %}
@@ -85,17 +85,6 @@
     </div>
     </body>
     <script>
-        function markSeen(item, id){
-            console.log(item);
-            console.log(item.classList);
-            console.log(id);
-            var url = "{{url_for('view_controller.read_notification', notification_id='')}}" + id
-            console.log(url);
-            window.location.href = url;
-            item.className = 'dropdown-item disabled';
-            item.remove();
-        };
-        $(document).on('click', 'notificationDropdownButton', function (e) { e.stopPropagation();});
         $(".close-error").on("click", function(){ $(".error-message").remove() })
         $(".close-success").on("click", function(){ $(".success-message").remove() })
     </script>
