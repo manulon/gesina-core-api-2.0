@@ -9,7 +9,7 @@ from src.service import (
     execution_plan_service,
     user_service,
     file_storage_service,
-    schedule_task_service,
+    schedule_task_service, notification_service,
 )
 from src.service.exception.file_exception import FileUploadError
 from src.service.file_storage_service import FileType
@@ -102,6 +102,12 @@ def execution_plan_read(execution_plan_id):
             )
         ],
     )
+
+
+@VIEW_BLUEPRINT.route("read_notification/<notification_id>")
+def read_notification(notification_id):
+    notification = notification_service.mark_notification_as_read(notification_id)
+    return execution_plan_read(notification.execution_plan_id)
 
 
 @VIEW_BLUEPRINT.route("/execution_plan/list")

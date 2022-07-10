@@ -21,10 +21,11 @@ def mark_notification_as_read(notification_id):
     with get_session() as session:
         notification = (
             session.query(UserNotification)
-            .filter_by(notification_id=notification_id)
+            .filter_by(id=notification_id)
             .one_or_none()
         )
         if not notification:
-            return
+            return None
         notification.seen = True
         session.add(notification)
+    return notification
