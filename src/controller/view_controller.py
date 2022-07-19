@@ -3,6 +3,7 @@ import sqlalchemy
 from flask import Blueprint, render_template, url_for, redirect, request
 
 from src import logger
+from src.controller.schemas import ActivityParams
 from src.login_manager import user_is_authenticated
 from src.service import (
     geometry_service,
@@ -27,22 +28,18 @@ VIEW_BLUEPRINT.before_request(user_is_authenticated)
 
 @VIEW_BLUEPRINT.route("/")
 def home():
-    query_params = request.args
-    refresh_rate = int(query_params.get("refresh_rate", -1))
-    date_from = query_params.get("date_from")
-    date_to = query_params.get("date_to")
-
+    activity_params = ActivityParams().load(request.args)
     try:
         (execution_results, execution_time_average) = activity_service.get_activity(
-            date_from, date_to
+            activity_params
         )
         return render_template(
             "dashboard.html",
             execution_results=execution_results,
             execution_time_average=execution_time_average,
-            refresh_rate=refresh_rate,
-            date_from=date_from,
-            date_to=date_to,
+            refresh_rate=activity_params.get("refresh_rate"),
+            date_from=activity_params.get("date_from"),
+            date_to=activity_params.get("date_to"),
         )
     except ActivityException as activity_exception:
         logger.error(activity_exception)
