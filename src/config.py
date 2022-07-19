@@ -13,8 +13,8 @@ minio_password = os.getenv("MINIO_ROOT_PASSWORD", "password")
 secret_key = os.getenv("SECRET_KEY", "default")
 
 # Application
-dry_run = True
-fake_activity = True
+dry_run = os.getenv("DRY_RUN", True)
+fake_activity = os.getenv("FAKE_ACTIVITY", True)
 
 # Scheduler
 scheduler_database_user = os.getenv("DATABASE_USER", "user")
