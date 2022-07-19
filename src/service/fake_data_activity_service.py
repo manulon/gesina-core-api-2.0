@@ -4,11 +4,57 @@ import random
 from datetime import datetime, timedelta
 from dateutil import rrule
 from matplotlib import cm
+import seaborn
+import pandas
 
 np.random.seed(19680801)
 
 
 # FAKES
+def fake_contributions():
+    # En definitiva hay que tener una matriz de 7 x 30, donde los index son los días de la semana
+    today = datetime.now()
+    index = []
+    for i in range(7):
+        weekday = today.weekday()
+        if weekday == 0:
+            index.append('Lunes')
+        elif weekday == 1:
+            index.append('Martes')
+        elif weekday == 2:
+            index.append('Miercoles')
+        elif weekday == 3:
+            index.append('Jueves')
+        elif weekday == 4:
+            index.append('Viernes')
+        elif weekday == 5:
+            index.append('Sábado')
+        elif weekday == 6:
+            index.append('Domingo')
+
+        today
+    columns = []
+    for day in rrule.rrule(
+        rrule.WEEKLY,
+        dtstart=today - timedelta(weeks=8),
+        until=today - timedelta(days=1),
+    ):
+        from src import logger
+        if
+        logger.error("la week " + str(week))
+        logger.error("la week " + str(week.weekday()))
+        # columns.append(day.date().strftime("%d/%m"))
+
+    matrix = np.random.random((7, 31))
+    # logger.error("matrix is "+ str(matrix))
+    df = pandas.DataFrame(matrix,
+                          index=["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"])
+    ax = seaborn.heatmap(df, cmap=seaborn.cm.rocket_r)
+    c_bar = ax.collections[0].colorbar
+    c_bar.ax.tick_params(labelsize=26)
+    return ax
+
+
 def fake_execution_results():
     today = datetime.now()
     total_days = 30  # last month

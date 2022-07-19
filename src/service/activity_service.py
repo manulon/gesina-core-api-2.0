@@ -46,9 +46,7 @@ def get_activity(date_from_param, date_to_param):
         if not config.fake_activity
         else []
     )
-    return execution_results(executions, date_from, date_to), execution_time_average(
-        executions, date_from, date_to
-    )
+    return execution_results(executions, date_from, date_to), execution_time_average(executions, date_from, date_to), contributions()
 
 
 def _base_64_img(ax):
@@ -112,6 +110,37 @@ def execution_results(executions, date_from, date_to):
     plt.legend(fontsize=26)
 
     return _base_64_img(ax)
+
+
+def contributions():
+    if config.fake_activity or True:
+        from src.service import fake_data_activity_service as fake_service
+
+        return _base_64_img(fake_service.fake_contributions())
+
+    return None
+    # En definitiva hay que tener una matriz de 7 x 30, donde los index son los días de la semana
+    # today = datetime.now()
+    # columns = []
+    #
+    # for week in rrule.rrule(
+    #         rrule.WEEKLY,
+    #         dtstart=today - timedelta(weeks=8),
+    #         until=today - timedelta(days=1),
+    # ):
+    #     if day.date().weekday() == 0
+    #     columns.append(day.date().strftime("%d/%m"))
+    #
+    # matrix = np.random.random((7, 31))
+    # from src import logger
+    # logger.error("matrix is " + str(matrix))
+    # df = pandas.DataFrame(matrix,
+    #                       index=["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
+    #                       columns=columns)
+    # ax = seaborn.heatmap(df, cmap=seaborn.cm.rocket_r)
+    # c_bar = ax.collections[0].colorbar
+    # c_bar.ax.tick_params(labelsize=26)
+    # return ax
 
 
 def execution_time_average(executions, date_from, date_to):

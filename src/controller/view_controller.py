@@ -33,13 +33,14 @@ def home():
     date_to = query_params.get("date_to")
 
     try:
-        (execution_results, execution_time_average) = activity_service.get_activity(
+        (execution_results, execution_time_average, contributions) = activity_service.get_activity(
             date_from, date_to
         )
         return render_template(
             "dashboard.html",
             execution_results=execution_results,
             execution_time_average=execution_time_average,
+            contributions=contributions,
             refresh_rate=refresh_rate,
             date_from=date_from,
             date_to=date_to,
