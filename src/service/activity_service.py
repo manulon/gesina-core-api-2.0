@@ -36,10 +36,12 @@ def handle_activity_dates(date_from_param, date_to_param):
     return date_from, date_to
 
 
-def get_activity(date_from_param, date_to_param):
+def get_activity(activity_params):
     plt.close("all")
 
-    date_from, date_to = handle_activity_dates(date_from_param, date_to_param)
+    date_from, date_to = handle_activity_dates(
+        activity_params.get("date_from"), activity_params.get("date_to")
+    )
 
     executions = (
         get_execution_plans_by_dates(date_from, date_to)
