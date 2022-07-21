@@ -72,7 +72,7 @@ create table if not exists "scheduled_task"
 
 create table if not exists "initial_flow"
 (
-	id serial constraint border_condition_pk primary key,
+	id serial constraint initial_flow_pk primary key,
     scheduled_task_id integer not null constraint initial_flows_scheduled_task_id_fk references "scheduled_task",
     river text not null,
     reach text not null,

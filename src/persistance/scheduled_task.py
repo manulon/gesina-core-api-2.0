@@ -20,3 +20,6 @@ class ScheduledTask(Base):
     geometry = relationship("Geometry", lazy="joined")
     user_id = Column(Integer, ForeignKey("user.id"))
     user = relationship("User", lazy="joined")
+    start_condition_type = Column(String)
+    observation_days = Column(Integer)
+    forecast_days = Column(Integer)
