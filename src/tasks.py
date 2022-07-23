@@ -1,7 +1,7 @@
 import io
 
 from celery import Celery
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from src import logger, config
 from src.persistance.execution_plan import ExecutionPlanStatus
@@ -42,11 +42,12 @@ def simulate(execution_id, user_id):
             RC.Compute_HideComputationWindow()
             RC.Compute_CurrentPlan(None, None, True)
 
-        logger.info("Ending simulations")
-        execution_plan_service.update_execution_plan_status(
-            execution_id, ExecutionPlanStatus.FINISHED
-        )
+        end = datetime.now()
+        total_seconds = (end - begin).total_seconds()
+        logger.info(f"Ending simulations. Total runtime seconds {total_seconds}")
+        execution_plan_service.update_finished_execution_plan(execution_id, begin, end)
     except:
+        # TODO aca habria que loguear o incluso guardar en el execution plan el error..
         execution_plan_service.update_execution_plan_status(
             execution_id, ExecutionPlanStatus.ERROR
         )
@@ -58,9 +59,6 @@ def simulate(execution_id, user_id):
     file_storage_service.save_result_for_execution(base_path, execution_id)
     notification_service.post_notification(execution_id, user_id)
 
-    total_seconds = (datetime.now() - begin).total_seconds()
-
-    logger.info(f"Total runtime seconds {total_seconds}")
     return (datetime.now() - begin).total_seconds()
 
 
@@ -72,9 +70,9 @@ def fake_simulate(execution_id, user_id):
     file_storage_service.save_file(
         FileType.RESULT, fake_result_file, str(execution_id), execution_id
     )
-    execution_plan_service.update_execution_plan_status(
-        execution_id, ExecutionPlanStatus.FINISHED
-    )
+    start = datetime.now()
+    end = start + timedelta(minutes=3)
+    execution_plan_service.update_finished_execution_plan(execution_id, start, end)
 
     notification_service.post_notification(execution_id, user_id)
 

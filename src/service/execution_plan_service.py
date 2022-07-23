@@ -2,6 +2,7 @@ from src.persistance.execution_plan import ExecutionPlan, ExecutionPlanStatus
 from src.persistance.session import get_session
 from src.service import file_storage_service, user_service
 from src.service.file_storage_service import FileType
+from sqlalchemy import and_
 
 
 def create_from_form(form):
@@ -112,9 +113,33 @@ def get_execution_plan(execution_plan_id):
         )
 
 
+def get_execution_plans_by_dates(date_from, date_to):
+    with get_session() as session:
+        return (
+            session.query(ExecutionPlan)
+            .filter(
+                and_(
+                    ExecutionPlan.created_at > date_from,
+                    ExecutionPlan.created_at < date_to,
+                )
+            )
+            .all()
+        )
+
+
 def update_execution_plan_status(execution_plan_id, status: ExecutionPlanStatus):
-    ep = get_execution_plan(execution_plan_id)
+    execution_plan = get_execution_plan(execution_plan_id)
 
     with get_session() as session:
-        session.add(ep)
-        ep.status = status
+        session.add(execution_plan)
+        execution_plan.status = status
+
+
+def update_finished_execution_plan(execution_plan_id, start_datetime, end_datetime):
+    execution_plan = get_execution_plan(execution_plan_id)
+
+    with get_session() as session:
+        session.add(execution_plan)
+        execution_plan.status = ExecutionPlanStatus.FINISHED
+        execution_plan.start_datetime = start_datetime
+        execution_plan.end_datetime = end_datetime
