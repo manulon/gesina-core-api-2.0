@@ -13,4 +13,4 @@ class UserNotification(Base):
     user = relationship("User", viewonly=True)
 
     execution_plan_id = Column(Integer, ForeignKey("execution_plan.id"))
-    execution_plan = relationship("ExecutionPlan", lazy='joined')
+    execution_plan = relationship("ExecutionPlan", lazy="joined")

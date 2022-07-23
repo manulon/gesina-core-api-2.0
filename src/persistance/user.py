@@ -18,10 +18,12 @@ class User(Base, flask_login.UserMixin):
     last_name = Column(String)
     email = Column(String)
     _password = Column("password", String)
-    notifications = relationship(UserNotification,
-                                 primaryjoin='and_(User.id==UserNotification.user_id ,UserNotification.seen==False)',
-                                 lazy='joined',
-                                 order_by="desc(UserNotification.id)")
+    notifications = relationship(
+        UserNotification,
+        primaryjoin="and_(User.id==UserNotification.user_id ,UserNotification.seen==False)",
+        lazy="joined",
+        order_by="desc(UserNotification.id)",
+    )
     session_id = Column(String)
 
     @property

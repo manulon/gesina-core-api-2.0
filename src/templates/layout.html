@@ -30,7 +30,7 @@
                             <li><a class="dropdown-item" style="max-width: 1000px" href="{{url_for('view_controller.read_notification', notification_id=notification.id)}}">La simulación #{{ notification.execution_plan.id }} con nombre <b>{{notification.execution_plan.plan_name}}</b> ha finalizado</a></li>
                         {% endfor %}
                     <div class="dropdown-divider"></div>
-                    <li><a class="dropdown-item">Marcar Todas como Leidas</a> </li>
+                    <li><a class="dropdown-item" id="dropdownAllNotificationsRead">Marcar Todas como Leidas</a> </li>
                     </ul>
                 {% endif %}
 
@@ -87,6 +87,27 @@
     </div>
     </body>
     <script>
+        $("#dropdownAllNotificationsRead").on("click", function(){
+            fetch("/view/notifications/all/2",{
+                method: "PUT"
+            })
+            .then(response => response.json())
+            .then(data => {
+              $("#notificationDropdownButton").replaceWith(
+                `
+                <button class="btn btn-lg btn-link" type="button" id="notificationDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="fa-regular fa-bell"></span><span class="caret"></span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right" id="notificationsDropdown" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">No hay nuevas notificaciones</a>
+                    </div>
+                `)
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+            $("#notificationsDropdown").click()
+        })
         $(".close-error").on("click", function(){ $(".error-message").remove() })
         $(".close-success").on("click", function(){ $(".success-message").remove() })
     </script>

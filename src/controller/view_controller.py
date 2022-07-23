@@ -9,7 +9,8 @@ from src.service import (
     execution_plan_service,
     user_service,
     file_storage_service,
-    schedule_task_service, notification_service,
+    schedule_task_service,
+    notification_service,
 )
 from src.service.exception.file_exception import FileUploadError
 from src.service.file_storage_service import FileType
@@ -108,6 +109,12 @@ def execution_plan_read(execution_plan_id):
 def read_notification(notification_id):
     notification = notification_service.mark_notification_as_read(notification_id)
     return execution_plan_read(notification.execution_plan_id)
+
+
+@VIEW_BLUEPRINT.route("/notifications/all/<user_id>", methods=["PUT"])
+def read_all_notifications_for_user(user_id):
+    notification_service.read_all_user_notifications(user_id)
+    return {"result": "OK"}, 201
 
 
 @VIEW_BLUEPRINT.route("/execution_plan/list")

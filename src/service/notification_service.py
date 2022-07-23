@@ -1,4 +1,5 @@
 from src.persistance.session import get_session
+from sqlalchemy import update, and_
 from src.persistance.user_notification import UserNotification
 
 
@@ -20,12 +21,26 @@ def get_notifications_for_user(user_id):
 def mark_notification_as_read(notification_id):
     with get_session() as session:
         notification = (
-            session.query(UserNotification)
-            .filter_by(id=notification_id)
-            .one_or_none()
+            session.query(UserNotification).filter_by(id=notification_id).one_or_none()
         )
         if not notification:
             return None
         notification.seen = True
         session.add(notification)
     return notification
+
+
+def read_all_user_notifications(user_id):
+    with get_session() as session:
+        stmt = (
+            update(UserNotification)
+            .where(
+                and_(
+                    UserNotification.user_id == user_id, UserNotification.seen == False
+                )
+            )
+            .values(seen=True)
+        )
+
+        result = session.execute(stmt)
+    return result
