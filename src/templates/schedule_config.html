@@ -55,15 +55,15 @@
                         {{ form.forecast_days.label }}: {{ form.forecast_days(class_="form-control") }}
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" id="start_condition_type_container">
                         {{ form.start_condition_type.label }}: {{ form.start_condition_type(class_="form-control") }}
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" id="restart_file_container">
                         {{ form.restart_file.label }}: {{ form.restart_file(class_="form-control") }}
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" id="initial_flow_list_container">
                         {{ form.initial_flow_list.label }}
                         <table class="table" id="initial_flow_table">
                           <thead>
@@ -91,7 +91,6 @@
                         <button id="remove-row" type="button" class="btn btn-danger fa-solid fa-minus"></button>
                     </div>
 
-
                     <div class="d-flex justify-content-between pt-4">
                         <h4>Configuración de plan</h4>
                     </div>
@@ -104,7 +103,6 @@
     </div>
 
     <script>
-
         $( document ).ready(function() {
             $( "#add-row" ).on("click", function() {
                 idx = $("#initial_flow_table_body")[0].rows.length + 1
@@ -124,6 +122,20 @@
             $( "#remove-row" ).on("click", function() {
                 $('#initial_flow_table_body tr:last-child').remove();
             });
+
+            function hide_show_initial_condition_conf() {
+                if( $("#start_condition_type")[0].value === "restart_file" ) {
+                    $("#restart_file_container").show()
+                    $("#initial_flow_list_container").hide()
+                } else {
+                    $("#restart_file_container").hide()
+                    $("#initial_flow_list_container").show()
+                }
+            }
+
+            hide_show_initial_condition_conf()
+
+            $( "#start_condition_type" ).on("change", hide_show_initial_condition_conf);
         });
     </script>
 {% endblock %}
