@@ -29,6 +29,7 @@ numpy = "*"
 seaborn = "*"
 click = "==8.0.1"
 more-itertools = "*"
+python-dateutil = "*"
 "zope.interface" = "*"
 
 [dev-packages]

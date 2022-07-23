@@ -153,7 +153,15 @@ def test_list_geometries_when_there_only_one(a_client):
         "total": 2,
     }
 
-    assert json.loads(response.data) == expected_response
+    response_json = json.loads(response.data)
+    rows = response_json["rows"]
+    assert response_json["total"] == expected_response["total"]
+    assert rows[0]["description"] == expected_response["rows"][0]["description"]
+    assert rows[0]["id"] == expected_response["rows"][0]["id"]
+    assert rows[0]["user"] == expected_response["rows"][0]["user"]
+    assert rows[1]["description"] == expected_response["rows"][1]["description"]
+    assert rows[1]["id"] == expected_response["rows"][1]["id"]
+    assert rows[1]["user"] == expected_response["rows"][1]["user"]
 
 
 def test_list_geometries_when_there_two(a_client, a_geometry_file):
@@ -188,4 +196,15 @@ def test_list_geometries_when_there_two(a_client, a_geometry_file):
         "total": 3,
     }
 
-    assert json.loads(response.data) == expected_response
+    response_json = json.loads(response.data)
+    rows = response_json["rows"]
+    assert response_json["total"] == expected_response["total"]
+    assert rows[0]["description"] == expected_response["rows"][0]["description"]
+    assert rows[0]["id"] == expected_response["rows"][0]["id"]
+    assert rows[0]["user"] == expected_response["rows"][0]["user"]
+    assert rows[1]["description"] == expected_response["rows"][1]["description"]
+    assert rows[1]["id"] == expected_response["rows"][1]["id"]
+    assert rows[1]["user"] == expected_response["rows"][1]["user"]
+    assert rows[2]["description"] == expected_response["rows"][2]["description"]
+    assert rows[2]["id"] == expected_response["rows"][2]["id"]
+    assert rows[2]["user"] == expected_response["rows"][2]["user"]

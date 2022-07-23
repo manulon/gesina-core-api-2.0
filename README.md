@@ -12,7 +12,11 @@ Run unit tests with: `pipenv run pytest test`
 
 Linter check with: `pipenv run black --check .` 
 
+### Windows Installation
 
-### Vagrant
+See [INSTALL_WINDOWS](installation/INSTALL_WINDOWS.md).
 
-Para usar los servicios del host desde la virtual de Vagrant se puede acceder a travéz de la ip 10.0.2.2
+### Vagrant hint
+
+To use the host services, you can access trough 10.0.0.2.
+

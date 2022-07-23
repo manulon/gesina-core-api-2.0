@@ -1,8 +1,9 @@
 import flask_login
 import sqlalchemy
-from flask import Blueprint, render_template, url_for, redirect
+from flask import Blueprint, render_template, url_for, redirect, request
 
 from src import logger
+from src.controller.schemas import ActivityParams
 from src.login_manager import user_is_authenticated
 from src.service import (
     geometry_service,
@@ -11,7 +12,9 @@ from src.service import (
     file_storage_service,
     schedule_task_service,
     notification_service,
+    activity_service,
 )
+from src.service.exception.activity_exception import ActivityException
 from src.service.exception.file_exception import FileUploadError
 from src.service.file_storage_service import FileType
 from src.view.forms.execution_plan_form import ExecutionPlanForm
@@ -26,7 +29,41 @@ VIEW_BLUEPRINT.before_request(user_is_authenticated)
 
 @VIEW_BLUEPRINT.route("/")
 def home():
-    return render_template("execution_plan_list.html")
+    activity_params = ActivityParams().load(request.args)
+    try:
+        (execution_results, execution_time_average) = activity_service.get_activity(
+            activity_params
+        )
+        return render_template(
+            "dashboard.html",
+            execution_results=execution_results,
+            execution_time_average=execution_time_average,
+            refresh_rate=activity_params.get("refresh_rate"),
+            date_from=activity_params.get("date_from"),
+            date_to=activity_params.get("date_to"),
+        )
+    except ActivityException as activity_exception:
+        logger.error(activity_exception)
+        error_message = activity_exception.message
+
+        return render_template(
+            "dashboard.html",
+            execution_results=None,
+            execution_time_average=None,
+            refresh_rate=-1,
+            errors=[error_message],
+        )
+    except Exception as generic_exception:
+        logger.error(generic_exception)
+        error_message = "Hubo un error inesperado. Intente nuevamente."
+
+        return render_template(
+            "dashboard.html",
+            execution_results=None,
+            execution_time_average=None,
+            refresh_rate=-1,
+            errors=[error_message],
+        )
 
 
 @VIEW_BLUEPRINT.route("/geometry/<geometry_id>")
