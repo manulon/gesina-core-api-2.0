@@ -59,6 +59,38 @@
                         {{ form.start_condition_type.label }}: {{ form.start_condition_type(class_="form-control") }}
                     </div>
 
+                    <div class="form-group">
+                        {{ form.restart_file.label }}: {{ form.restart_file(class_="form-control") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.initial_flow_list.label }}
+                        <table class="table" id="initial_flow_table">
+                          <thead>
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">River</th>
+                              <th scope="col">Reach</th>
+                              <th scope="col">River stat</th>
+                              <th scope="col">Flow</th>
+                            </tr>
+                          </thead>
+                          <tbody id="initial_flow_table_body">
+                            {% for form in form.initial_flow_list %}
+                                <tr>
+                                    <th scope="row">{{loop.index}}</th>
+                                    <td>{{ form.river }}</td>
+                                    <td>{{ form.reach }}</td>
+                                    <td>{{ form.river_stat }}</td>
+                                    <td>{{ form.flow }}</td>
+                                </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                        <button id="add-row" type="button" class="btn btn-success fa-solid fa-plus"></button>
+                        <button id="remove-row" type="button" class="btn btn-danger fa-solid fa-minus"></button>
+                    </div>
+
 
                     <div class="d-flex justify-content-between pt-4">
                         <h4>Configuración de plan</h4>
@@ -70,4 +102,28 @@
                 </form>
         </div>
     </div>
+
+    <script>
+
+        $( document ).ready(function() {
+            $( "#add-row" ).on("click", function() {
+                idx = $("#initial_flow_table_body")[0].rows.length + 1
+
+                new_row = `
+                    <tr>
+                        <th scope="row">${idx}</th>
+                        <td><input id="initial_flow_list-${idx}-river" name="initial_flow_list-${idx}-river" required="" type="text" value=""></td>
+                        <td><input id="initial_flow_list-${idx}-reach" name="initial_flow_list-${idx}-reach" required="" type="text" value=""></td>
+                        <td><input id="initial_flow_list-${idx}-river_stat" name="initial_flow_list-${idx}-river_stat" required="" step="any" type="number" value=""></td>
+                        <td><input id="initial_flow_list-${idx}-flow" name="initial_flow_list-${idx}-flow" required="" step="any" type="number" value=""></td>
+                    </tr>
+                `
+                $( "#initial_flow_table_body" ).append( new_row );
+            });
+
+            $( "#remove-row" ).on("click", function() {
+                $('#initial_flow_table_body tr:last-child').remove();
+            });
+        });
+    </script>
 {% endblock %}
