@@ -36,51 +36,62 @@ class InitialFlowForm(FlaskForm):
 
 
 class IntervalForm(FlaskForm):
+    render_kw = {"style": "width: 90px"}
+
     interval_value = IntegerField(
         label="Valor",
-        validators=[DataRequired(message="Error: El intervalo no puede estar vacío")]
+        validators=[DataRequired(message="Error: El intervalo no puede estar vacío")],
+        render_kw=render_kw,
     )
     interval_unit = SelectField(
         label="Unidad",
         validators=[DataRequired(message="Error: El intervalo no puede estar vacío")],
-        choices=["MINUTE", "HOUR", "WEEK"],
+        choices=["MINUTE", "HOUR", "DAY", "WEEK"],
     )
 
 
-class BorderConditionForm(FlaskForm):
+class SeriesForm(FlaskForm):
+    render_kw = {"style": "width: 90px"}
     river = StringField(
         label="River",
         validators=[DataRequired(message="Error: El river no puede estar vacío")],
+        render_kw=render_kw,
     )
     reach = StringField(
         label="Reach",
         validators=[DataRequired(message="Error: El reach no puede estar vacío")],
+        render_kw=render_kw,
     )
     river_stat = DecimalField(
         label="River stat",
         validators=[DataRequired(message="Error: El river stat no puede estar vacío")],
+        render_kw=render_kw,
     )
 
     border_condition = SelectField(
         label="Condicion de borde",
-        validators=[DataRequired(message="Error: La condición de borde no puede estar vacía")],
-        choices=["1HOUR"],
+        validators=[
+            DataRequired(message="Error: La condición de borde no puede estar vacía")
+        ],
+        choices=["Stage Hydrograph", "Flow Hydrograph", "Lateral Inflow Hydrograph"],
     )
 
-    interval = FormField(
-        IntervalForm,
-        label="Intervalo",
-        validators=[DataRequired(message="Error: El id de observación no puede estar vacío")],
-    )
+    interval = FormField(IntervalForm, label="Intervalo", render_kw=render_kw)
 
     id_observation = IntegerField(
         label="Id de observación",
-        validators=[DataRequired(message="Error: El id de observación no puede estar vacío")],
+        validators=[
+            DataRequired(message="Error: El id de observación no puede estar vacío")
+        ],
+        render_kw=render_kw,
     )
 
     id_forecast = IntegerField(
         label="Id de pronóstico",
-        validators=[DataRequired(message="Error: El id de pronóstico no puede estar vacío")],
+        validators=[
+            DataRequired(message="Error: El id de pronóstico no puede estar vacío")
+        ],
+        render_kw=render_kw,
     )
 
 
@@ -145,4 +156,8 @@ class ScheduleConfigForm(FlaskForm, ErrorMixin):
 
     initial_flow_list = FieldList(
         FormField(InitialFlowForm), label="Lista de flujos iniciales", min_entries=1
+    )
+
+    series_list = FieldList(
+        FormField(SeriesForm), label="Lista de series iniciales", min_entries=1
     )

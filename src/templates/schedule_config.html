@@ -85,15 +85,51 @@
                             {% endfor %}
                           </tbody>
                         </table>
-                        <button id="add-row" type="button" class="btn btn-success">&#43;</button>
-                        <button id="remove-row" type="button" class="btn btn-danger">&#8722;</button>
+                        <button id="add-row-initial-flow" type="button" class="btn btn-success">&#43;</button>
+                        <button id="remove-row-initial-flow" type="button" class="btn btn-danger">&#8722;</button>
                     </div>
                     <div class="d-flex justify-content-between pt-4">
                         <h5>Configuración de series</h5>
                     </div>
+                    <div class="form-group" id="series_list_container">
+                        {{ form.series_list.label }}
+                        <table class="table" id="series_table">
+                          <thead>
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">River</th>
+                              <th scope="col">Reach</th>
+                              <th scope="col">River stat</th>
+                              <th scope="col">Intervalo</th>
+                              <th scope="col">Tipo de condicion de borde</th>
+                              <th scope="col">Id de observación</th>
+                              <th scope="col">Id de pronóstico</th>
+                            </tr>
+                          </thead>
+                          <tbody id="series_table_body">
+                            {% for form in form.series_list %}
+                                <tr>
+                                    <th scope="row">{{loop.index}}</th>
+                                    <td>{{ form.river }}</td>
+                                    <td>{{ form.reach }}</td>
+                                    <td>{{ form.river_stat }}</td>
+                                    <td class="d-flex flex-row">{{ form.interval.interval_value}}{{ form.interval.interval_unit }}</td>
+                                    <td>{{ form.border_condition }}</td>
+                                    <td>{{ form.id_observation }}</td>
+                                    <td>{{ form.id_forecast }}</td>
+                                </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                        <button id="add-row-series" type="button" class="btn btn-success">&#43;</button>
+                        <button id="remove-row-series" type="button" class="btn btn-danger">&#8722;</button>
+                    </div>
+
                     <div class="d-flex justify-content-between pt-4">
                         <h4>Configuración de plan</h4>
                     </div>
+                    <div>TODO: Ver como sacar la info</div>
+
                     <div class="form-group pt-4">
                         <button type="submit" class="btn btn-primary">Guardar</button>
                     </div>
@@ -102,12 +138,11 @@
     </div>
 
     <script>
-        $( "#add-row" ).on("click", function() {
-            idx = $("#initial_flow_table_body")[0].rows.length + 1
-
+        $( "#add-row-initial-flow" ).on("click", function() {
+            idx = $("#initial_flow_table_body")[0].rows.length
             new_row = `
                 <tr>
-                    <th scope="row">${idx}</th>
+                    <th scope="row">${idx + 1}</th>
                     <td><input id="initial_flow_list-${idx}-river" name="initial_flow_list-${idx}-river" required="" type="text" value=""></td>
                     <td><input id="initial_flow_list-${idx}-reach" name="initial_flow_list-${idx}-reach" required="" type="text" value=""></td>
                     <td><input id="initial_flow_list-${idx}-river_stat" name="initial_flow_list-${idx}-river_stat" required="" step="any" type="number" value=""></td>
@@ -117,7 +152,7 @@
             $( "#initial_flow_table_body" ).append( new_row );
         });
 
-        $( "#remove-row" ).on("click", function() {
+        $( "#remove-row-initial-flow" ).on("click", function() {
             $('#initial_flow_table_body tr:last-child').remove();
         });
 
@@ -134,5 +169,28 @@
         hide_show_initial_condition_conf()
 
         $( "#start_condition_type" ).on("change", hide_show_initial_condition_conf);
+
+        $( "#add-row-series" ).on("click", function() {
+            idx = $("#series_table_body")[0].rows.length
+
+            new_row = `
+                <tr>
+                    <th scope="row">${idx + 1}</th>
+                    <td><input id="series_list-${idx}-river" name="series_list-${idx}-river" required="" style="width: 90px" type="text" value=""></td>
+                    <td><input id="series_list-${idx}-reach" name="series_list-${idx}-reach" required="" style="width: 90px" type="text" value=""></td>
+                    <td><input id="series_list-${idx}-river_stat" name="series_list-${idx}-river_stat" required="" step="any" style="width: 90px" type="number" value=""></td>
+                    <td class="d-flex flex-row"><input id="series_list-${idx}-interval-interval_value" name="series_list-${idx}-interval-interval_value" required="" style="width: 90px" type="number" value=""><select id="series_list-${idx}-interval-interval_unit" name="series_list-${idx}-interval-interval_unit" required=""><option value="MINUTE">MINUTE</option><option value="HOUR">HOUR</option><option value="DAY">DAY</option><option value="WEEK">WEEK</option></select></td>
+                    <td><select id="series_list-${idx}-border_condition" name="series_list-${idx}-border_condition" required=""><option value="Stage Hydrograph">Stage Hydrograph</option><option value="Flow Hydrograph">Flow Hydrograph</option><option value="Lateral Inflow Hydrograph">Lateral Inflow Hydrograph</option></select></td>
+                    <td><input id="series_list-${idx}-id_observation" name="series_list-${idx}-id_observation" required="" style="width: 90px" type="number" value=""></td>
+                    <td><input id="series_list-${idx}-id_forecast" name="series_list-${idx}-id_forecast" required="" style="width: 90px" type="number" value=""></td>
+                </tr>
+            `
+            $( "#series_table_body" ).append( new_row );
+        });
+
+        $( "#remove-row-series" ).on("click", function() {
+            $('#series_table_body tr:last-child').remove();
+        });
+
     </script>
 {% endblock %}
