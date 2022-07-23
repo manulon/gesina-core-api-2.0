@@ -35,6 +35,55 @@ class InitialFlowForm(FlaskForm):
     )
 
 
+class IntervalForm(FlaskForm):
+    interval_value = IntegerField(
+        label="Valor",
+        validators=[DataRequired(message="Error: El intervalo no puede estar vacío")]
+    )
+    interval_unit = SelectField(
+        label="Unidad",
+        validators=[DataRequired(message="Error: El intervalo no puede estar vacío")],
+        choices=["MINUTE", "HOUR", "WEEK"],
+    )
+
+
+class BorderConditionForm(FlaskForm):
+    river = StringField(
+        label="River",
+        validators=[DataRequired(message="Error: El river no puede estar vacío")],
+    )
+    reach = StringField(
+        label="Reach",
+        validators=[DataRequired(message="Error: El reach no puede estar vacío")],
+    )
+    river_stat = DecimalField(
+        label="River stat",
+        validators=[DataRequired(message="Error: El river stat no puede estar vacío")],
+    )
+
+    border_condition = SelectField(
+        label="Condicion de borde",
+        validators=[DataRequired(message="Error: La condición de borde no puede estar vacía")],
+        choices=["1HOUR"],
+    )
+
+    interval = FormField(
+        IntervalForm,
+        label="Intervalo",
+        validators=[DataRequired(message="Error: El id de observación no puede estar vacío")],
+    )
+
+    id_observation = IntegerField(
+        label="Id de observación",
+        validators=[DataRequired(message="Error: El id de observación no puede estar vacío")],
+    )
+
+    id_forecast = IntegerField(
+        label="Id de pronóstico",
+        validators=[DataRequired(message="Error: El id de pronóstico no puede estar vacío")],
+    )
+
+
 class ScheduleConfigForm(FlaskForm, ErrorMixin):
     name = StringField(
         validators=[DataRequired(message="Error: El nombre no puede estar vacío")],
