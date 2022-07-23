@@ -25,13 +25,13 @@
                     <button class="btn btn-lg btn-link" type="button" id="notificationDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="fa-solid fa-bell"></span><span class="caret"></span>
                     </button>
-                    <div class="dropdown-menu dropdown-menu-right" id="notificationsDropdown" aria-labelledby="dropdownMenuButton">
+                    <ul class="dropdown-menu dropdown-menu-right" id="notificationsDropdown" style="max-height: 180px; overflow-y: auto;" aria-labelledby="dropdownMenuButton">
                         {% for notification in current_user.notifications %}
                             <li><a class="dropdown-item" style="max-width: 1000px" href="{{url_for('view_controller.read_notification', notification_id=notification.id)}}">La simulación #{{ notification.execution_plan.id }} con nombre <b>{{notification.execution_plan.plan_name}}</b> ha finalizado</a></li>
                         {% endfor %}
                     <div class="dropdown-divider"></div>
                     <li><a class="dropdown-item">Marcar Todas como Leidas</a> </li>
-                    </div>
+                    </ul>
                 {% endif %}
 
                 <button type="button" class="btn btn-danger" onClick="window.location.href = '{{url_for('view_controller.do_logout')}}'">Log Out</button>
