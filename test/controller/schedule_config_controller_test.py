@@ -148,7 +148,7 @@ def test_update_fails_on_invalid_id(a_client):
         "description": "bar",
         "start_datetime": datetime.now().strftime("%Y-%m-%dT%H:%M"),
         "geometry_id": "1",
-        **DEFAULT_DATA
+        **DEFAULT_DATA,
     }
     response = a_client.post(
         f"/view/schedule_tasks/{invalid_id}",
