@@ -5,6 +5,12 @@ from test import log_default_user
 
 DEFAULT_SCHEDULE_TASK_ID = 1
 
+DEFAULT_DATA = {
+    "observation_days": 90,
+    "forecast_days": 4,
+    "start_condition_type": "restart_file",
+}
+
 
 def test_update_only_schedule_config_frequency_success(a_client):
     log_default_user(a_client)
@@ -22,6 +28,7 @@ def test_update_only_schedule_config_frequency_success(a_client):
             "%Y-%m-%dT%H:%M"
         ),
         "geometry_id": original_schedule_task.geometry_id,
+        **DEFAULT_DATA,
     }
     response = a_client.post(
         f"/view/schedule_tasks/{original_schedule_task.id}",
@@ -55,6 +62,7 @@ def test_update_only_enabled_success(a_client):
             "%Y-%m-%dT%H:%M"
         ),
         "geometry_id": original_schedule_task.geometry_id,
+        **DEFAULT_DATA,
     }
     response = a_client.post(
         f"/view/schedule_tasks/{original_schedule_task.id}",
@@ -88,6 +96,7 @@ def test_update_both_enabled_and_frequency_success(a_client):
             "%Y-%m-%dT%H:%M"
         ),
         "geometry_id": original_schedule_task.geometry_id,
+        **DEFAULT_DATA,
     }
 
     response = a_client.post(
@@ -139,6 +148,7 @@ def test_update_fails_on_invalid_id(a_client):
         "description": "bar",
         "start_datetime": datetime.now().strftime("%Y-%m-%dT%H:%M"),
         "geometry_id": "1",
+        **DEFAULT_DATA
     }
     response = a_client.post(
         f"/view/schedule_tasks/{invalid_id}",

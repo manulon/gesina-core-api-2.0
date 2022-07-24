@@ -155,9 +155,9 @@ class ScheduleConfigForm(FlaskForm, ErrorMixin):
     restart_file = FileField(label="Restart file")
 
     initial_flow_list = FieldList(
-        FormField(InitialFlowForm), label="Lista de flujos iniciales", min_entries=1
+        FormField(InitialFlowForm), label="Lista de flujos iniciales", min_entries=0
     )
 
     series_list = FieldList(
-        FormField(SeriesForm), label="Lista de series iniciales", min_entries=1
+        FormField(SeriesForm), label="Lista de series iniciales", min_entries=0
     )
