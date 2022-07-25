@@ -7,49 +7,42 @@ from matplotlib import cm
 import seaborn
 import pandas
 
+from src.service.activity_service import get_first_sunday_date
+
 np.random.seed(19680801)
 
 
 # FAKES
 def fake_contributions():
-    # En definitiva hay que tener una matriz de 7 x 30, donde los index son los días de la semana
-    today = datetime.now()
-    index = []
-    for i in range(7):
-        weekday = today.weekday()
-        if weekday == 0:
-            index.append('Lunes')
-        elif weekday == 1:
-            index.append('Martes')
-        elif weekday == 2:
-            index.append('Miercoles')
-        elif weekday == 3:
-            index.append('Jueves')
-        elif weekday == 4:
-            index.append('Viernes')
-        elif weekday == 5:
-            index.append('Sábado')
-        elif weekday == 6:
-            index.append('Domingo')
+    today = datetime.combine(datetime.now(), datetime.min.time())
+    index = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
 
-        today
     columns = []
-    for day in rrule.rrule(
-        rrule.WEEKLY,
-        dtstart=today - timedelta(weeks=8),
-        until=today - timedelta(days=1),
-    ):
-        from src import logger
-        if
-        logger.error("la week " + str(week))
-        logger.error("la week " + str(week.weekday()))
-        # columns.append(day.date().strftime("%d/%m"))
+    matrix = np.zeros((7, 12))
 
-    matrix = np.random.random((7, 31))
-    # logger.error("matrix is "+ str(matrix))
-    df = pandas.DataFrame(matrix,
-                          index=["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"])
-    ax = seaborn.heatmap(df, cmap=seaborn.cm.rocket_r)
+    first_sunday_date = get_first_sunday_date(today)
+    i = 0
+    j = 0
+    for day in rrule.rrule(
+        rrule.DAILY,
+        dtstart=first_sunday_date + timedelta(days=1),
+        until=first_sunday_date + timedelta(weeks=12),
+    ):
+        if j == 0:
+            sunday_of_the_week = day + timedelta(days=6)
+            columns.append(
+                day.strftime("%d/%m") + "-" + sunday_of_the_week.strftime("%d/%m")
+            )
+
+        matrix[j, i] = random.randint(0, 50)
+        j = j + 1
+        if j == 7:
+            j = 0
+            i = i + 1
+
+    df = pandas.DataFrame(data=matrix, index=index, columns=columns)
+    ax = seaborn.heatmap(df, cmap=seaborn.cm._lut)
+    ax.set_xticklabels(ax.get_xmajorticklabels(), fontsize=18, rotation=65)
     c_bar = ax.collections[0].colorbar
     c_bar.ax.tick_params(labelsize=26)
     return ax

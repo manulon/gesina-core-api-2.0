@@ -30,9 +30,11 @@ VIEW_BLUEPRINT.before_request(user_is_authenticated)
 def home():
     activity_params = ActivityParams().load(request.args)
     try:
-        (execution_results, execution_time_average, contributions) = activity_service.get_activity(
-            activity_params
-        )
+        (
+            execution_results,
+            execution_time_average,
+            contributions,
+        ) = activity_service.get_activity(activity_params)
         return render_template(
             "dashboard.html",
             execution_results=execution_results,

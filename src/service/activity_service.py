@@ -4,9 +4,15 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 from dateutil import rrule
 from matplotlib import cm
+import seaborn
+import pandas
+import numpy as np
 from src import config
 from src.persistance.execution_plan import ExecutionPlanStatus
-from src.service.execution_plan_service import get_execution_plans_by_dates
+from src.service.execution_plan_service import (
+    get_execution_plans_by_dates,
+    get_execution_plans_grouped_by_interval,
+)
 from src.service.exception.activity_exception import (
     ActivityInvalidDates,
     ActivityMaxDaysReached,
@@ -48,7 +54,11 @@ def get_activity(activity_params):
         if not config.fake_activity
         else []
     )
-    return execution_results(executions, date_from, date_to), execution_time_average(executions, date_from, date_to), contributions()
+    return (
+        execution_results(executions, date_from, date_to),
+        execution_time_average(executions, date_from, date_to),
+        contributions(),
+    )
 
 
 def _base_64_img(ax):
@@ -114,35 +124,67 @@ def execution_results(executions, date_from, date_to):
     return _base_64_img(ax)
 
 
+def get_first_sunday_date(today):
+    three_months_ago = today - timedelta(weeks=12)
+    is_sunday = three_months_ago.weekday() == 6
+    while not is_sunday:
+        three_months_ago = three_months_ago + timedelta(days=1)
+        is_sunday = three_months_ago.weekday() == 6
+
+    return three_months_ago
+
+
 def contributions():
-    if config.fake_activity or True:
+    if config.fake_activity:
         from src.service import fake_data_activity_service as fake_service
 
         return _base_64_img(fake_service.fake_contributions())
 
-    return None
-    # En definitiva hay que tener una matriz de 7 x 30, donde los index son los días de la semana
-    # today = datetime.now()
-    # columns = []
-    #
-    # for week in rrule.rrule(
-    #         rrule.WEEKLY,
-    #         dtstart=today - timedelta(weeks=8),
-    #         until=today - timedelta(days=1),
-    # ):
-    #     if day.date().weekday() == 0
-    #     columns.append(day.date().strftime("%d/%m"))
-    #
-    # matrix = np.random.random((7, 31))
-    # from src import logger
-    # logger.error("matrix is " + str(matrix))
-    # df = pandas.DataFrame(matrix,
-    #                       index=["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"],
-    #                       columns=columns)
-    # ax = seaborn.heatmap(df, cmap=seaborn.cm.rocket_r)
-    # c_bar = ax.collections[0].colorbar
-    # c_bar.ax.tick_params(labelsize=26)
-    # return ax
+    today = datetime.combine(datetime.now(), datetime.min.time())
+    index = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
+
+    columns = []
+    matrix = np.zeros((7, 12))
+    result = list(get_execution_plans_grouped_by_interval("3 months"))
+
+    first_sunday_date = get_first_sunday_date(today)
+    i = 0
+    j = 0
+    for day in rrule.rrule(
+        rrule.DAILY,
+        dtstart=first_sunday_date + timedelta(days=1),
+        until=first_sunday_date + timedelta(weeks=12),
+    ):
+        if j == 0:
+            sunday_of_the_week = day + timedelta(days=6)
+            columns.append(
+                day.strftime("%d/%m") + "-" + sunday_of_the_week.strftime("%d/%m")
+            )
+
+        results_for_day = list(
+            filter(
+                lambda row: datetime(int(row[3]), int(row[2]), int(row[1])).date()
+                == day.date(),
+                result,
+            )
+        )
+        quantity = 0
+        if results_for_day:
+            quantity = results_for_day[0][0]
+
+        matrix[j, i] = quantity
+        j = j + 1
+        if j == 7:
+            j = 0
+            i = i + 1
+
+    df = pandas.DataFrame(data=matrix, index=index, columns=columns)
+    ax = seaborn.heatmap(df, cmap=seaborn.cm._lut)
+    ax.set_xticklabels(ax.get_xmajorticklabels(), fontsize=18, rotation=65)
+    c_bar = ax.collections[0].colorbar
+    c_bar.ax.tick_params(labelsize=26)
+
+    return _base_64_img(ax)
 
 
 def execution_time_average(executions, date_from, date_to):
