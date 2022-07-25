@@ -42,7 +42,7 @@ def fake_contributions():
 
     df = pandas.DataFrame(data=matrix, index=index, columns=columns)
     ax = seaborn.heatmap(df, cmap=seaborn.cm._lut)
-    ax.set_xticklabels(ax.get_xmajorticklabels(), fontsize=18, rotation=65)
+    ax.set_xticklabels(ax.get_xmajorticklabels(), fontsize=20, rotation=65)
     c_bar = ax.collections[0].colorbar
     c_bar.ax.tick_params(labelsize=26)
     return ax
