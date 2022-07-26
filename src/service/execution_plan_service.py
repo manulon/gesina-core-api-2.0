@@ -129,16 +129,16 @@ def get_execution_plans_by_dates(date_from, date_to):
 
 def get_execution_plans_grouped_by_interval(interval):
     with get_session() as session:
-        result = session.execute(
-            "SELECT COUNT(*) AS QUANTITY, extract(day from created_at) AS DAY, extract(month from created_at) AS MONTH, extract(year from created_at) AS YEAR "
-            + "FROM gesina.execution_plan WHERE created_at >= CURRENT_DATE - INTERVAL '"
-            + interval
-            + "' "
-            + "GROUP BY DAY, MONTH, YEAR "
-            + "ORDER BY YEAR, MONTH, DAY"
-        )
+        query = f"""SELECT COUNT(*) AS QUANTITY,
+                extract(day from created_at) AS DAY, 
+                extract(month from created_at) AS MONTH, 
+                extract(year from created_at) AS YEAR 
+                FROM gesina.execution_plan WHERE created_at >= CURRENT_DATE - INTERVAL '{interval}' 
+                GROUP BY DAY, MONTH, YEAR 
+                ORDER BY YEAR, MONTH, DAY
+                """
 
-        return result
+        return session.execute(query)
 
 
 def update_execution_plan_status(execution_plan_id, status: ExecutionPlanStatus):

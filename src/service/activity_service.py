@@ -126,12 +126,7 @@ def execution_results(executions, date_from, date_to):
 
 def get_first_sunday_date(today):
     three_months_ago = today - timedelta(weeks=12)
-    is_sunday = three_months_ago.weekday() == 6
-    while not is_sunday:
-        three_months_ago = three_months_ago + timedelta(days=1)
-        is_sunday = three_months_ago.weekday() == 6
-
-    return three_months_ago
+    return three_months_ago + timedelta(days=6 - three_months_ago.weekday())
 
 
 def contributions():
