@@ -130,23 +130,23 @@ def test_list_geometries_when_there_are_none(get_geometries, a_client):
     assert json.loads(response.data) == expected_response
 
 
-def test_list_geometries_when_there_only_one(a_client):
+def test_list_geometries_when_there_only_two(a_client):
     log_default_user(a_client)
     response = a_client.get("/geometry")
     expected_response = {
         "rows": [
             {
-                "created_at": "21/12/2021",
-                "description": "Ejemplo dado por el INA",
-                "id": 1,
-                "name": "Modelo1-Atucha.g01",
-                "user": "Admin Ina",
-            },
-            {
                 "created_at": datetime.now().strftime("%d/%m/%Y"),
                 "description": "Geometría Paraná",
                 "id": 2,
                 "name": "DeltaParana_2017.g23",
+                "user": "Admin Ina",
+            },
+            {
+                "created_at": "21/12/2021",
+                "description": "Ejemplo dado por el INA",
+                "id": 1,
+                "name": "Modelo1-Atucha.g01",
                 "user": "Admin Ina",
             },
         ],
@@ -156,11 +156,11 @@ def test_list_geometries_when_there_only_one(a_client):
     response_json = json.loads(response.data)
     rows = response_json["rows"]
     assert response_json["total"] == expected_response["total"]
-    assert rows[0]["description"] == expected_response["rows"][0]["description"]
     assert rows[0]["id"] == expected_response["rows"][0]["id"]
+    assert rows[0]["description"] == expected_response["rows"][0]["description"]
     assert rows[0]["user"] == expected_response["rows"][0]["user"]
-    assert rows[1]["description"] == expected_response["rows"][1]["description"]
     assert rows[1]["id"] == expected_response["rows"][1]["id"]
+    assert rows[1]["description"] == expected_response["rows"][1]["description"]
     assert rows[1]["user"] == expected_response["rows"][1]["user"]
 
 
@@ -172,10 +172,10 @@ def test_list_geometries_when_there_two(a_client, a_geometry_file):
     expected_response = {
         "rows": [
             {
-                "created_at": "21/12/2021",
-                "description": "Ejemplo dado por el INA",
-                "id": 1,
-                "name": "Modelo1-Atucha.g01",
+                "created_at": datetime.now().strftime("%d/%m/%Y"),
+                "description": "some_description",
+                "id": 3,
+                "name": "test_geometry.g01",
                 "user": "Admin Ina",
             },
             {
@@ -186,10 +186,10 @@ def test_list_geometries_when_there_two(a_client, a_geometry_file):
                 "user": "Admin Ina",
             },
             {
-                "created_at": datetime.now().strftime("%d/%m/%Y"),
-                "description": "some_description",
-                "id": 3,
-                "name": "test_geometry.g01",
+                "created_at": "21/12/2021",
+                "description": "Ejemplo dado por el INA",
+                "id": 1,
+                "name": "Modelo1-Atucha.g01",
                 "user": "Admin Ina",
             },
         ],
