@@ -63,7 +63,34 @@ create table if not exists "scheduled_task"
 	created_at timestamp default now() not null,
     enabled bool default true not null,
     geometry_id integer not null constraint scheduled_task_geometry_id_fk references geometry,
-    user_id integer not null constraint scheduled_task_user_id_fk references "user"
+    user_id integer not null constraint scheduled_task_user_id_fk references "user",
+    observation_days integer not null,
+    forecast_days integer not null,
+    start_condition_type text not null
+);
+
+
+create table if not exists "initial_flow"
+(
+	id serial constraint initial_flow_pk primary key,
+    scheduled_task_id integer not null constraint initial_flows_scheduled_task_id_fk references "scheduled_task",
+    river text not null,
+    reach text not null,
+    river_stat float not null,
+    flow float not null
+);
+
+create table if not exists "border_condition"
+(
+	id serial constraint border_condition_pk primary key,
+    scheduled_task_id integer not null constraint border_condition_scheduled_task_id_fk references "scheduled_task",
+    river text not null,
+    reach text not null,
+    river_stat float not null,
+    interval text not null,
+    type text not null,
+    observation_id integer not null,
+    forecast_id integer not null
 );
 
 create table if not exists "user_notification"
