@@ -4,11 +4,50 @@ import random
 from datetime import datetime, timedelta
 from dateutil import rrule
 from matplotlib import cm
+import seaborn
+import pandas
+
+from src.service.activity_service import get_first_sunday_date
 
 np.random.seed(19680801)
 
 
 # FAKES
+def fake_contributions():
+    today = datetime.combine(datetime.now(), datetime.min.time())
+    index = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
+
+    columns = []
+    matrix = np.zeros((7, 12))
+
+    first_sunday_date = get_first_sunday_date(today)
+    i = 0
+    j = 0
+    for day in rrule.rrule(
+        rrule.DAILY,
+        dtstart=first_sunday_date + timedelta(days=1),
+        until=first_sunday_date + timedelta(weeks=12),
+    ):
+        if j == 0:
+            sunday_of_the_week = day + timedelta(days=6)
+            columns.append(
+                day.strftime("%d/%m") + "-" + sunday_of_the_week.strftime("%d/%m")
+            )
+
+        matrix[j, i] = random.randint(0, 50)
+        j = j + 1
+        if j == 7:
+            j = 0
+            i = i + 1
+
+    df = pandas.DataFrame(data=matrix, index=index, columns=columns)
+    ax = seaborn.heatmap(df, cmap=seaborn.cm._lut)
+    ax.set_xticklabels(ax.get_xmajorticklabels(), fontsize=20, rotation=65)
+    c_bar = ax.collections[0].colorbar
+    c_bar.ax.tick_params(labelsize=26)
+    return ax
+
+
 def fake_execution_results():
     today = datetime.now()
     total_days = 30  # last month

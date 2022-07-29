@@ -37,8 +37,8 @@
         </div>
     </div>
     <div class="container-xxl">
-        <div class="d-flex column justify-content-around">
-            <div class="col-7">
+        <div class="row">
+            <div class="col-6">
                 <div class="card bg-light">
                     <div class="card-header"><h5>Cantidad de ejecuciones</h5></div>
                     <div class="card-body img-fluid w-100" style="background: white">
@@ -46,11 +46,21 @@
                     </div>
                 </div>
             </div>
-            <div class="col-7">
+            <div class="col-6">
                 <div class="card bg-light">
                     <div class="card-header"><h5>Tiempo promedio de ejecución</h5></div>
                     <div class="card-body img-fluid w-100" style="background: white">
                         <img src="data:image/png;base64, {{ execution_time_average }}" class="img-fluid w-100">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-around pt-4">
+            <div class="col-8">
+                <div class="card bg-light">
+                    <div class="card-header"><h5>Ejecuciones del último trimestre</h5></div>
+                    <div class="card-body img-fluid w-100" style="background: white">
+                        <img src="data:image/png;base64, {{ contributions }}" class="img-fluid w-100">
                     </div>
                 </div>
             </div>
