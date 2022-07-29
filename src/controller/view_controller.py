@@ -11,6 +11,7 @@ from src.service import (
     user_service,
     file_storage_service,
     schedule_task_service,
+    notification_service,
     activity_service,
 )
 from src.service.exception.activity_exception import ActivityException
@@ -122,12 +123,12 @@ def save_geometry():
 @VIEW_BLUEPRINT.route("/execution_plan/<execution_plan_id>")
 def execution_plan_read(execution_plan_id):
     execution_plan = execution_plan_service.get_execution_plan(execution_plan_id)
-
     return render_template(
         "execution_plan.html",
         form=ExecutionPlanForm(),
         readonly=True,
         execution_plan=execution_plan,
+        current_user=user_service.get_updated_user(),
         execution_files=[
             f.object_name.split("/")[-1]
             for f in file_storage_service.list_execution_files(
@@ -141,6 +142,18 @@ def execution_plan_read(execution_plan_id):
             )
         ],
     )
+
+
+@VIEW_BLUEPRINT.route("read_notification/<notification_id>")
+def read_notification(notification_id):
+    notification = notification_service.mark_notification_as_read(notification_id)
+    return execution_plan_read(notification.execution_plan_id)
+
+
+@VIEW_BLUEPRINT.route("/notifications/all/<user_id>", methods=["PUT"])
+def read_all_notifications_for_user(user_id):
+    notification_service.read_all_user_notifications(user_id)
+    return {"result": "OK"}, 201
 
 
 @VIEW_BLUEPRINT.route("/execution_plan/list")
