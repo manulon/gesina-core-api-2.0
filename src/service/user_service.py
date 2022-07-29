@@ -9,6 +9,10 @@ def get_current_user():
     return current_user
 
 
+def get_updated_user():
+    return get_user(current_user.id)
+
+
 @login_manager.user_loader
 def get_user(user_id):
     with get_session() as session:

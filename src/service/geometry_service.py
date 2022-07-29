@@ -33,7 +33,12 @@ def create(form, user):
 def get_geometries():
     geometries = []
     with get_session() as session:
-        data = session.query(Geometry).options(joinedload(Geometry.user)).all()
+        data = (
+            session.query(Geometry)
+            .order_by(Geometry.id.desc())
+            .options(joinedload(Geometry.user))
+            .all()
+        )
         if data:
             geometries = data
 

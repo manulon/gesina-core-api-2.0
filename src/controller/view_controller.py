@@ -11,6 +11,7 @@ from src.service import (
     user_service,
     file_storage_service,
     schedule_task_service,
+    notification_service,
     activity_service,
 )
 from src.service.exception.activity_exception import ActivityException
@@ -105,7 +106,9 @@ def save_geometry():
         if form.validate_on_submit():
             geometry = geometry_service.create(form, user)
             success_message = f"Geometría #{str(geometry.id)} creada con éxito."
-            return render_template("geometry_list.html", success=success_message)
+            return render_template(
+                "geometry_list.html", success_message=success_message
+            )
 
         return render_template("geometry.html", form=form, errors=form.get_errors())
     except sqlalchemy.exc.IntegrityError as database_error:
@@ -123,12 +126,12 @@ def save_geometry():
 @VIEW_BLUEPRINT.route("/execution_plan/<execution_plan_id>")
 def execution_plan_read(execution_plan_id):
     execution_plan = execution_plan_service.get_execution_plan(execution_plan_id)
-
     return render_template(
         "execution_plan.html",
         form=ExecutionPlanForm(),
         readonly=True,
         execution_plan=execution_plan,
+        current_user=user_service.get_updated_user(),
         execution_files=[
             f.object_name.split("/")[-1]
             for f in file_storage_service.list_execution_files(
@@ -142,6 +145,18 @@ def execution_plan_read(execution_plan_id):
             )
         ],
     )
+
+
+@VIEW_BLUEPRINT.route("read_notification/<notification_id>")
+def read_notification(notification_id):
+    notification = notification_service.mark_notification_as_read(notification_id)
+    return execution_plan_read(notification.execution_plan_id)
+
+
+@VIEW_BLUEPRINT.route("/notifications/all/<user_id>", methods=["PUT"])
+def read_all_notifications_for_user(user_id):
+    notification_service.read_all_user_notifications(user_id)
+    return {"result": "OK"}, 201
 
 
 @VIEW_BLUEPRINT.route("/execution_plan/list")
@@ -163,7 +178,9 @@ def save_execution_plan():
         if form.validate_on_submit():
             execution_plan = execution_plan_service.create_from_form(form)
             success_message = f"Simulación #{str(execution_plan.id)} creada con éxito."
-            return render_template("execution_plan_list.html", success=success_message)
+            return render_template(
+                "execution_plan_list.html", success_message=success_message
+            )
 
         return render_template(
             "execution_plan.html", form=form, errors=form.get_errors()
@@ -180,21 +197,42 @@ def save_execution_plan():
         return render_template("execution_plan.html", form=form, errors=[error_message])
 
 
-@VIEW_BLUEPRINT.route("/schedule_config")
-def get_schedule_task_config():
-    schedule_config = schedule_task_service.get_schedule_task_config()
-    return render_schedule_view(ScheduleConfigForm(), schedule_config, [])
+@VIEW_BLUEPRINT.route("/schedule_tasks/<schedule_task_id>", methods=["GET"])
+def get_schedule_task_config(schedule_task_id):
+    schedule_config = schedule_task_service.get_schedule_task_config(schedule_task_id)
+    return render_schedule_view(ScheduleConfigForm(), schedule_config)
 
 
-@VIEW_BLUEPRINT.route("/schedule_config/<schedule_config_id>", methods=["POST"])
-def save_schedule_config(schedule_config_id):
-    schedule_tasks_configs = schedule_task_service.get_schedule_task_config()
+@VIEW_BLUEPRINT.route("/schedule_tasks")
+def get_schedule_tasks():
+    success_message = request.args.get("success_message", None)
+    return render_template("schedule_tasks_list.html", success_message=success_message)
+
+
+@VIEW_BLUEPRINT.route("/schedule_tasks/<schedule_config_id>", methods=["POST"])
+@VIEW_BLUEPRINT.route(
+    "/schedule_tasks/", methods=["POST"], defaults={"schedule_config_id": None}
+)
+def save_or_create_schedule_config(schedule_config_id):
+    schedule_tasks_configs = schedule_task_service.get_schedule_task_config(
+        schedule_config_id
+    )
     form = ScheduleConfigForm()
     try:
         if form.validate_on_submit():
-            schedule_task_service.update(schedule_config_id, form)
+            if schedule_config_id:
+                schedule_task_service.update(schedule_config_id, form)
+            else:
+                schedule_tasks_configs = schedule_task_service.create(form)
+
             success_message = "Configuración actualizada con éxito."
-            return render_template("execution_plan_list.html", success=success_message)
+
+            return redirect(
+                url_for(
+                    "view_controller.get_schedule_tasks",
+                    success_message=success_message,
+                )
+            )
 
         return render_schedule_view(form, schedule_tasks_configs, form.get_errors())
     except Exception as exception:
@@ -204,13 +242,27 @@ def save_schedule_config(schedule_config_id):
         return render_schedule_view(form, schedule_tasks_configs, [error_message])
 
 
-def render_schedule_view(form, schedule_config, errors):
-    return render_template(
-        "schedule_config.html",
-        form=form,
-        schedule_config=schedule_config,
-        errors=errors,
-    )
+@VIEW_BLUEPRINT.route("/schedule_tasks/new", methods=["GET"])
+def schedule_task_new():
+    return render_schedule_view(ScheduleConfigForm())
+
+
+def render_schedule_view(form, schedule_config=None, errors=()):
+    _id = None
+    if schedule_config:
+        form.enabled.data = schedule_config.enabled
+        form.frequency.data = schedule_config.frequency
+        form.description.data = schedule_config.description
+        form.name.data = schedule_config.name
+        form.start_datetime.data = schedule_config.start_datetime
+        form.geometry_id.process_data(schedule_config.geometry_id)
+        form.start_condition_type.process_data(schedule_config.start_condition_type)
+        form.observation_days.data = schedule_config.observation_days
+        form.forecast_days.data = schedule_config.forecast_days
+
+        _id = schedule_config.id
+
+    return render_template("schedule_config.html", form=form, errors=errors, id=_id)
 
 
 @VIEW_BLUEPRINT.route("/user/logout", methods=["GET"])

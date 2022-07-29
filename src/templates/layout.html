@@ -14,7 +14,27 @@
                 <h5 class="d-inline pr-3">
                     {{ current_user.full_name }}
                 </h5>
-                <a href="{{ url_for('view_controller.do_logout') }}" type="button" class="btn btn-outline-danger">Log out</a>
+                {% if current_user.notifications == []  %}
+                    <button class="btn btn-lg btn-link" type="button" id="notificationDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="fa-regular fa-bell"></span><span class="caret"></span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right" id="notificationsDropdown" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">No hay nuevas notificaciones</a>
+                    </div>
+                {% else %}
+                    <button class="btn btn-lg btn-link" type="button" id="notificationDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="fa-solid fa-bell"></span><span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right" id="notificationsDropdown" style="max-height: 180px; overflow-y: auto;" aria-labelledby="dropdownMenuButton">
+                        {% for notification in current_user.notifications %}
+                            <li><a class="dropdown-item" style="max-width: 1000px" href="{{url_for('view_controller.read_notification', notification_id=notification.id)}}">La simulación #{{ notification.execution_plan.id }} con nombre <b>{{notification.execution_plan.plan_name}}</b> ha finalizado</a></li>
+                        {% endfor %}
+                    <div class="dropdown-divider"></div>
+                    <li><a class="dropdown-item" id="dropdownAllNotificationsRead">Marcar Todas como Leidas</a> </li>
+                    </ul>
+                {% endif %}
+
+                <button type="button" class="btn btn-danger" onClick="window.location.href = '{{url_for('view_controller.do_logout')}}'">Log Out</button>
             {% endif %}
         </div>
     </div>
@@ -32,7 +52,7 @@
                     <a class="list-group-item list-group-item-action bg-light"
                        href="{{ url_for('view_controller.geometry_list') }}">Geometr&iacute;as</a>
                     <a class="list-group-item list-group-item-action bg-light"
-                       href="{{ url_for('view_controller.get_schedule_task_config') }}">Configuración</a>
+                       href="{{ url_for('view_controller.get_schedule_tasks') }}">Corridas programadas</a>
                 {% endif %}
             </div>
         </div>
@@ -50,13 +70,13 @@
                     </div>
                 {% endfor %}
             {% endif %}
-            {% if success is defined %}
+            {% if success_message is defined and success_message is not none %}
             <div class="alert alert-success success-message mb-n3" role="alert">
                 <button type="button" class="close close-success" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
                 <div>
-                {{ success }}
+                {{ success_message }}
                 </div>
             </div>
             {% endif %}
@@ -69,6 +89,27 @@
     </div>
     </body>
     <script>
+        $("#dropdownAllNotificationsRead").on("click", function(){
+            fetch("/view/notifications/all/2",{
+                method: "PUT"
+            })
+            .then(response => response.json())
+            .then(data => {
+              $("#notificationDropdownButton").replaceWith(
+                `
+                <button class="btn btn-lg btn-link" type="button" id="notificationDropdownButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="fa-regular fa-bell"></span><span class="caret"></span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right" id="notificationsDropdown" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#">No hay nuevas notificaciones</a>
+                    </div>
+                `)
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+            $("#notificationsDropdown").click()
+        })
         $(".close-error").on("click", function(){ $(".error-message").remove() })
         $(".close-success").on("click", function(){ $(".success-message").remove() })
     </script>

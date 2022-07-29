@@ -10,7 +10,7 @@ class UserNotification(Base):
     seen = Column(Boolean, nullable=False, default=False)
 
     user_id = Column(Integer, ForeignKey("user.id"))
-    user = relationship("User")
+    user = relationship("User", viewonly=True)
 
     execution_plan_id = Column(Integer, ForeignKey("execution_plan.id"))
-    execution_plan = relationship("ExecutionPlan")
+    execution_plan = relationship("ExecutionPlan", lazy="joined")
