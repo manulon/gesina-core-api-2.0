@@ -17,6 +17,7 @@ app.register_blueprint(
 )
 app.register_blueprint(controller.VIEW_BLUEPRINT, url_prefix="/view")
 app.register_blueprint(controller.PUBLIC_VIEW_BLUEPRINT, url_prefix="/view")
+app.register_blueprint(controller.SCHEDULE_TASK_BLUEPRINT, url_prefix="/schedule_task")
 
 app.jinja_env.globals.update(gettext=gettext)
 app.jinja_env.globals.update(pretty_date=pretty_date)
@@ -37,4 +38,4 @@ def page_not_found(e):
 app.json_encoder = CustomJSONEncoder
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False, host="0.0.0.0", port=5000)
