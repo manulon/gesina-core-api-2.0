@@ -128,7 +128,33 @@
                     <div class="d-flex justify-content-between pt-4">
                         <h4>Configuración de plan</h4>
                     </div>
-                    <div>TODO: Ver como sacar la info</div>
+                    <div class="form-group" id="series_list_plan_container">
+                        {{ form.series_list.label }}
+                        <table class="table" id="series_plan_table">
+                          <thead>
+                            <tr>
+                              <th scope="col">#</th>
+                              <th scope="col">River</th>
+                              <th scope="col">Reach</th>
+                              <th scope="col">River stat</th>
+                              <th scope="col">Serie de id de Salida</th>
+                            </tr>
+                          </thead>
+                          <tbody id="series_plan_table_body">
+                            {% for form in form.plan_series_list %}
+                                <tr>
+                                    <th scope="row">{{loop.index}}</th>
+                                    <td>{{ form.river }}</td>
+                                    <td>{{ form.reach }}</td>
+                                    <td>{{ form.river_stat }}</td>
+                                    <td>{{ form.series_id }}</td>
+                                </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                        <button id="add-row-series-plan" type="button" class="btn btn-success">&#43;</button>
+                        <button id="remove-row-series-plan" type="button" class="btn btn-danger">&#8722;</button>
+                    </div>
 
                     <div class="form-group pt-4">
                         <button type="submit" class="btn btn-primary">Guardar</button>
@@ -190,6 +216,26 @@
 
         $( "#remove-row-series" ).on("click", function() {
             $('#series_table_body tr:last-child').remove();
+        });
+
+        $( "#add-row-series-plan" ).on("click", function() {
+            idx = $("#series_plan_table_body")[0].rows.length
+
+            new_row = `
+                <tr>
+                    <th scope="row">${idx + 1}</th>
+                    <td><input id="plan_series_list-${idx}-river" name="plan_series_list-${idx}-river" required="" type="text" value=""></td>
+                    <td><input id="plan_series_list-${idx}-reach" name="plan_series_list-${idx}-reach" required="" type="text" value=""></td>
+                    <td><input id="plan_series_list-${idx}-river_stat" name="plan_series_list-${idx}-river_stat" required="" step="any" type="number" value=""></td>
+                    <td><input id="plan_series_list-${idx}-series_id" name="plan_series_list-${idx}-series_id" required="" type="number" value=""></td>
+                </tr>
+            `
+
+            $( "#series_plan_table_body" ).append( new_row );
+        });
+
+        $( "#remove-row-series-plan" ).on("click", function() {
+            $('#series_plan_table_body tr:last-child').remove();
         });
 
     </script>
