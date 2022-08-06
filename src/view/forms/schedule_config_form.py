@@ -13,6 +13,7 @@ from wtforms import (
     Form,
 )
 
+from src.persistance.scheduled_task import BorderCondition, BorderConditionType
 from src.view.forms import ErrorMixin
 from src.service import geometry_service
 
@@ -74,12 +75,12 @@ class SeriesForm(Form):
         validators=[
             DataRequired(message="Error: La condición de borde no puede estar vacía")
         ],
-        choices=["Stage Hydrograph", "Flow Hydrograph", "Lateral Inflow Hydrograph"],
+        choices=BorderConditionType.choices(),
     )
 
     interval = FormField(IntervalForm, label="Intervalo", render_kw=render_kw)
 
-    id_observation = IntegerField(
+    observation_id = IntegerField(
         label="Id de observación",
         validators=[
             DataRequired(message="Error: El id de observación no puede estar vacío")
@@ -87,7 +88,7 @@ class SeriesForm(Form):
         render_kw=render_kw,
     )
 
-    id_forecast = IntegerField(
+    forecast_id = IntegerField(
         label="Id de pronóstico",
         validators=[
             DataRequired(message="Error: El id de pronóstico no puede estar vacío")

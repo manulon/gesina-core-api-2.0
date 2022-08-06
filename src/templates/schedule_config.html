@@ -115,8 +115,8 @@
                                     <td>{{ form.river_stat }}</td>
                                     <td class="d-flex flex-row">{{ form.interval.interval_value}}{{ form.interval.interval_unit }}</td>
                                     <td>{{ form.border_condition }}</td>
-                                    <td>{{ form.id_observation }}</td>
-                                    <td>{{ form.id_forecast }}</td>
+                                    <td>{{ form.observation_id }}</td>
+                                    <td>{{ form.forecast_id }}</td>
                                 </tr>
                             {% endfor %}
                           </tbody>
@@ -181,8 +181,8 @@
                     <td><input id="series_list-${idx}-river_stat" name="series_list-${idx}-river_stat" required="" step="any" style="width: 90px" type="number" value=""></td>
                     <td class="d-flex flex-row"><input id="series_list-${idx}-interval-interval_value" name="series_list-${idx}-interval-interval_value" required="" style="width: 90px" type="number" value=""><select id="series_list-${idx}-interval-interval_unit" name="series_list-${idx}-interval-interval_unit" required=""><option value="MINUTE">MINUTE</option><option value="HOUR">HOUR</option><option value="DAY">DAY</option><option value="WEEK">WEEK</option></select></td>
                     <td><select id="series_list-${idx}-border_condition" name="series_list-${idx}-border_condition" required=""><option value="Stage Hydrograph">Stage Hydrograph</option><option value="Flow Hydrograph">Flow Hydrograph</option><option value="Lateral Inflow Hydrograph">Lateral Inflow Hydrograph</option></select></td>
-                    <td><input id="series_list-${idx}-id_observation" name="series_list-${idx}-id_observation" required="" style="width: 90px" type="number" value=""></td>
-                    <td><input id="series_list-${idx}-id_forecast" name="series_list-${idx}-id_forecast" required="" style="width: 90px" type="number" value=""></td>
+                    <td><input id="series_list-${idx}-observation_id" name="series_list-${idx}-observation_id" required="" style="width: 90px" type="number" value=""></td>
+                    <td><input id="series_list-${idx}-forecast_id" name="series_list-${idx}-forecast_id" required="" style="width: 90px" type="number" value=""></td>
                 </tr>
             `
             $( "#series_table_body" ).append( new_row );

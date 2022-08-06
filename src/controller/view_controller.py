@@ -19,7 +19,7 @@ from src.service.exception.file_exception import FileUploadError
 from src.service.file_storage_service import FileType
 from src.view.forms.execution_plan_form import ExecutionPlanForm
 from src.view.forms.geometry_form import GeometryForm
-from src.view.forms.schedule_config_form import ScheduleConfigForm, InitialFlowForm
+from src.view.forms.schedule_config_form import ScheduleConfigForm, InitialFlowForm, SeriesForm, IntervalForm
 
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
 VIEW_BLUEPRINT.before_request(user_is_authenticated)
@@ -201,7 +201,8 @@ def save_execution_plan():
 def get_schedule_task_config(schedule_task_id):
     schedule_config = schedule_task_service.get_schedule_task_config(schedule_task_id)
     initial_flows = schedule_task_service.get_initial_flows(schedule_task_id)
-    return render_schedule_view(ScheduleConfigForm(), schedule_config, initial_flows)
+    border_condition = schedule_task_service.get_border_condition(schedule_task_id)
+    return render_schedule_view(ScheduleConfigForm(), schedule_config, initial_flows, border_condition)
 
 
 @VIEW_BLUEPRINT.route("/schedule_tasks")
@@ -235,12 +236,12 @@ def save_or_create_schedule_config(schedule_config_id):
                 )
             )
 
-        return render_schedule_view(form, schedule_tasks_configs, [], form.get_errors())
+        return render_schedule_view(form, schedule_tasks_configs, [], [], form.get_errors())
     except Exception as exception:
         logger.error(exception)
         error_message = "Error actualizando la configuración."
 
-        return render_schedule_view(form, schedule_tasks_configs, [], [error_message])
+        return render_schedule_view(form, schedule_tasks_configs, [], [], [error_message])
 
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/new", methods=["GET"])
@@ -248,7 +249,7 @@ def schedule_task_new():
     return render_schedule_view(ScheduleConfigForm())
 
 
-def render_schedule_view(form, schedule_config=None, initial_flows=None, errors=()):
+def render_schedule_view(form, schedule_config=None, initial_flows=None, border_condition=None, errors=()):
     _id = None
     if schedule_config:
         form.enabled.data = schedule_config.enabled
@@ -260,17 +261,39 @@ def render_schedule_view(form, schedule_config=None, initial_flows=None, errors=
         form.start_condition_type.process_data(schedule_config.start_condition_type)
         form.observation_days.data = schedule_config.observation_days
         form.forecast_days.data = schedule_config.forecast_days
-        for each_initial_flow in initial_flows:
-            initial_flow_form = InitialFlowForm()
-            initial_flow_form.river = each_initial_flow.river
-            initial_flow_form.reach = each_initial_flow.reach
-            initial_flow_form.river_stat = each_initial_flow.river_stat
-            initial_flow_form.flow = each_initial_flow.flow
-            form.initial_flow_list.append_entry(initial_flow_form)
+        render_initial_flows(form, initial_flows)
+        render_border_condition(border_condition, form)
 
         _id = schedule_config.id
 
     return render_template("schedule_config.html", form=form, errors=errors, id=_id)
+
+
+def render_initial_flows(form, initial_flows):
+    for each_initial_flow in initial_flows:
+        initial_flow_form = InitialFlowForm()
+        initial_flow_form.river = each_initial_flow.river
+        initial_flow_form.reach = each_initial_flow.reach
+        initial_flow_form.river_stat = each_initial_flow.river_stat
+        initial_flow_form.flow = each_initial_flow.flow
+        form.initial_flow_list.append_entry(initial_flow_form)
+
+
+def render_border_condition(border_condition, form):
+    for each_border_condition in border_condition:
+        series_form = SeriesForm()
+        series_form.river = each_border_condition.river
+        series_form.reach = each_border_condition.reach
+        series_form.river_stat = each_border_condition.river_stat
+        series_form.border_condition = each_border_condition.type
+        interval_form = IntervalForm()
+        chunks = each_border_condition.interval.split('-')
+        interval_form.interval_value = chunks[0]
+        interval_form.interval_unit = chunks[1]
+        series_form.interval = interval_form
+        series_form.observation_id = each_border_condition.observation_id
+        series_form.forecast_id = each_border_condition.forecast_id
+        form.series_list.append_entry(series_form)
 
 
 @VIEW_BLUEPRINT.route("/user/logout", methods=["GET"])
