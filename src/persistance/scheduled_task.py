@@ -1,6 +1,15 @@
 from datetime import datetime
 
-from sqlalchemy import Integer, Column, String, DateTime, JSON, Boolean, ForeignKey
+from sqlalchemy import (
+    Integer,
+    Column,
+    String,
+    DateTime,
+    JSON,
+    Boolean,
+    ForeignKey,
+    Float,
+)
 from sqlalchemy.orm import relationship
 
 from src.persistance.session import Base
@@ -23,3 +32,14 @@ class ScheduledTask(Base):
     start_condition_type = Column(String)
     observation_days = Column(Integer)
     forecast_days = Column(Integer)
+
+
+class InitialFlow(Base):
+    __tablename__ = "initial_flow"
+    id = Column(Integer, primary_key=True)
+    scheduled_task_id = Column(Integer, ForeignKey("scheduled_task.id"))
+    scheduled_task = relationship("ScheduledTask", lazy="joined")
+    river = Column(String)
+    reach = Column(String)
+    river_stat = Column(Float)
+    flow = Column(Float)

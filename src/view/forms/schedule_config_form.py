@@ -10,13 +10,14 @@ from wtforms import (
     DecimalField,
     FieldList,
     FormField,
+    Form,
 )
 
 from src.view.forms import ErrorMixin
 from src.service import geometry_service
 
 
-class InitialFlowForm(FlaskForm):
+class InitialFlowForm(Form):
     river = StringField(
         label="River",
         validators=[DataRequired(message="Error: El river no puede estar vacío")],
@@ -35,7 +36,7 @@ class InitialFlowForm(FlaskForm):
     )
 
 
-class IntervalForm(FlaskForm):
+class IntervalForm(Form):
     render_kw = {"style": "width: 90px"}
 
     interval_value = IntegerField(
@@ -50,7 +51,7 @@ class IntervalForm(FlaskForm):
     )
 
 
-class SeriesForm(FlaskForm):
+class SeriesForm(Form):
     render_kw = {"style": "width: 90px"}
     river = StringField(
         label="River",
