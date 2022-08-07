@@ -106,15 +106,14 @@ def get_schedule_task_config(schedule_config_id):
         )
 
 
-def get_initial_flows(scheduled_config_id):
+def get_complete_schedule_task_config(scheduled_config_id):
     with get_session() as session:
-        return session.query(InitialFlow).filter_by(
-            scheduled_task_id=scheduled_config_id
-        )
-
-
-def get_border_condition(scheduled_config_id):
-    with get_session() as session:
-        return session.query(BorderCondition).filter_by(
-            scheduled_task_id=scheduled_config_id
+        return (
+            session.query(ScheduledTask)
+            .filter(ScheduledTask.id == scheduled_config_id)
+            .first(),
+            session.query(InitialFlow).filter_by(scheduled_task_id=scheduled_config_id),
+            session.query(BorderCondition).filter_by(
+                scheduled_task_id=scheduled_config_id
+            ),
         )

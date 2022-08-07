@@ -204,9 +204,11 @@ def save_execution_plan():
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/<schedule_task_id>", methods=["GET"])
 def get_schedule_task_config(schedule_task_id):
-    schedule_config = schedule_task_service.get_schedule_task_config(schedule_task_id)
-    initial_flows = schedule_task_service.get_initial_flows(schedule_task_id)
-    border_condition = schedule_task_service.get_border_condition(schedule_task_id)
+    (
+        schedule_config,
+        initial_flows,
+        border_condition,
+    ) = schedule_task_service.get_complete_schedule_task_config(schedule_task_id)
     return render_schedule_view(
         ScheduleConfigForm(), schedule_config, initial_flows, border_condition
     )
@@ -223,16 +225,18 @@ def get_schedule_tasks():
     "/schedule_tasks/", methods=["POST"], defaults={"schedule_config_id": None}
 )
 def save_or_create_schedule_config(schedule_config_id):
-    schedule_tasks_configs = schedule_task_service.get_schedule_task_config(
-        schedule_config_id
-    )
+    (
+        schedule_config,
+        initial_flows,
+        border_condition,
+    ) = schedule_task_service.get_complete_schedule_task_config(schedule_config_id)
     form = ScheduleConfigForm()
     try:
         if form.validate_on_submit():
             if schedule_config_id:
                 schedule_task_service.update(schedule_config_id, form)
             else:
-                schedule_tasks_configs = schedule_task_service.create(form)
+                schedule_config = schedule_task_service.create(form)
 
             success_message = "Configuración actualizada con éxito."
 
@@ -244,15 +248,13 @@ def save_or_create_schedule_config(schedule_config_id):
             )
 
         return render_schedule_view(
-            form, schedule_tasks_configs, [], [], form.get_errors()
+            form, schedule_config, initial_flows, border_condition, form.get_errors()
         )
     except Exception as exception:
         logger.error(exception)
         error_message = "Error actualizando la configuración."
 
-        return render_schedule_view(
-            form, schedule_tasks_configs, [], [], [error_message]
-        )
+        return render_schedule_view(form, schedule_config, [], [], [error_message])
 
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/new", methods=["GET"])
