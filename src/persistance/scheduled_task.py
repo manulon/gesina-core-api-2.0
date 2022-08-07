@@ -9,7 +9,8 @@ from sqlalchemy import (
     JSON,
     Boolean,
     ForeignKey,
-    Float, Enum,
+    Float,
+    Enum,
 )
 from sqlalchemy.orm import relationship
 
