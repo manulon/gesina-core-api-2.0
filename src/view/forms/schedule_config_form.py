@@ -10,13 +10,15 @@ from wtforms import (
     DecimalField,
     FieldList,
     FormField,
+    Form,
 )
 
+from src.persistance.scheduled_task import BorderCondition, BorderConditionType
 from src.view.forms import ErrorMixin
 from src.service import geometry_service
 
 
-class InitialFlowForm(FlaskForm):
+class InitialFlowForm(Form):
     river = StringField(
         label="River",
         validators=[DataRequired(message="Error: El river no puede estar vacío")],
@@ -35,7 +37,7 @@ class InitialFlowForm(FlaskForm):
     )
 
 
-class IntervalForm(FlaskForm):
+class IntervalForm(Form):
     render_kw = {"style": "width: 90px"}
 
     interval_value = IntegerField(
@@ -50,7 +52,7 @@ class IntervalForm(FlaskForm):
     )
 
 
-class SeriesForm(FlaskForm):
+class SeriesForm(Form):
     render_kw = {"style": "width: 90px"}
     river = StringField(
         label="River",
@@ -73,12 +75,12 @@ class SeriesForm(FlaskForm):
         validators=[
             DataRequired(message="Error: La condición de borde no puede estar vacía")
         ],
-        choices=["Stage Hydrograph", "Flow Hydrograph", "Lateral Inflow Hydrograph"],
+        choices=BorderConditionType.choices(),
     )
 
     interval = FormField(IntervalForm, label="Intervalo", render_kw=render_kw)
 
-    id_observation = IntegerField(
+    observation_id = IntegerField(
         label="Id de observación",
         validators=[
             DataRequired(message="Error: El id de observación no puede estar vacío")
@@ -86,7 +88,7 @@ class SeriesForm(FlaskForm):
         render_kw=render_kw,
     )
 
-    id_forecast = IntegerField(
+    forecast_id = IntegerField(
         label="Id de pronóstico",
         validators=[
             DataRequired(message="Error: El id de pronóstico no puede estar vacío")

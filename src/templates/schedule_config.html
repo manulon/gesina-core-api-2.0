@@ -18,114 +18,119 @@
                   id="schedule-config-form"
                   action="{{ url_for('view_controller.save_or_create_schedule_config', schedule_config_id='') }}">
             {% endif %}
-                    <div class="d-flex justify-content-between">
+                    {{ form.csrf_token }}
+                    <div class="d-flex justify-content-between" data-toggle="collapse" href="#generalSection" role="button" aria-expanded="true" aria-controls="generalSection">
                         <h4>General</h4>
                     </div>
-
-                    {{ form.csrf_token }}
-                    <div class="form-group">
-                        {{ form.name.label }}: {{ form.name(class_="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.description.label }}: {{ form.description(class_="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.geometry_id.label }}: {{ form.geometry_id(class_="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.start_datetime.label }}: {{ form.start_datetime(class_="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.frequency.label }}: {{ form.frequency(class_="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        <div class="custom-control custom-switch">
-                             {{ form.enabled(class_="custom-control-input") }} {{ form.enabled.label(class_="custom-control-label") }}
+                    <div class="collapse show multi-collapse" id="generalSection">
+                        <div class="form-group">
+                            {{ form.name.label }}: {{ form.name(class_="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.description.label }}: {{ form.description(class_="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.geometry_id.label }}: {{ form.geometry_id(class_="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.start_datetime.label }}: {{ form.start_datetime(class_="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.frequency.label }}: {{ form.frequency(class_="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            <div class="custom-control custom-switch">
+                                 {{ form.enabled(class_="custom-control-input") }} {{ form.enabled.label(class_="custom-control-label") }}
+                            </div>
                         </div>
                     </div>
-                    <div class="d-flex justify-content-between pt-4">
+
+                    <div class="d-flex justify-content-between pt-4" data-toggle="collapse" href="#borderConditionSection" role="button" aria-expanded="false" aria-controls="borderConditionSection">
                         <h4>Configuración de borde</h4>
                     </div>
-                    <div class="form-group">
-                        {{ form.observation_days.label }}: {{ form.observation_days(class_="form-control") }}
-                    </div>
-                    <div class="form-group">
-                        {{ form.forecast_days.label }}: {{ form.forecast_days(class_="form-control") }}
-                    </div>
-                    <div class="d-flex justify-content-between pt-4">
-                        <h5>Condiciones iniciales</h5>
-                    </div>
-                    <div class="form-group" id="start_condition_type_container">
-                        {{ form.start_condition_type.label }}: {{ form.start_condition_type(class_="form-control") }}
-                    </div>
-                    <div class="form-group" id="restart_file_container">
-                        {{ form.restart_file.label }}: {{ form.restart_file(class_="form-control") }}
-                    </div>
-                    <div class="form-group" id="initial_flow_list_container">
-                        {{ form.initial_flow_list.label }}
-                        <table class="table" id="initial_flow_table">
-                          <thead>
-                            <tr>
-                              <th scope="col">#</th>
-                              <th scope="col">River</th>
-                              <th scope="col">Reach</th>
-                              <th scope="col">River stat</th>
-                              <th scope="col">Flow</th>
-                            </tr>
-                          </thead>
-                          <tbody id="initial_flow_table_body">
-                            {% for form in form.initial_flow_list %}
+                    <div class="collapse multi-collapse" id="borderConditionSection">
+                        <div class="form-group">
+                            {{ form.observation_days.label }}: {{ form.observation_days(class_="form-control") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.forecast_days.label }}: {{ form.forecast_days(class_="form-control") }}
+                        </div>
+                        <div class="d-flex justify-content-between pt-4">
+                            <h5>Condiciones iniciales</h5>
+                        </div>
+                        <div class="form-group" id="start_condition_type_container">
+                            {{ form.start_condition_type.label }}: {{ form.start_condition_type(class_="form-control") }}
+                        </div>
+                        <div class="form-group" id="restart_file_container">
+                            {{ form.restart_file.label }}: {{ form.restart_file(class_="form-control") }}
+                        </div>
+                        <div class="form-group" id="initial_flow_list_container">
+                            {{ form.initial_flow_list.label }}
+                            <table class="table" id="initial_flow_table">
+                              <thead>
                                 <tr>
-                                    <th scope="row">{{loop.index}}</th>
-                                    <td>{{ form.river }}</td>
-                                    <td>{{ form.reach }}</td>
-                                    <td>{{ form.river_stat }}</td>
-                                    <td>{{ form.flow }}</td>
+                                  <th scope="col">#</th>
+                                  <th scope="col">River</th>
+                                  <th scope="col">Reach</th>
+                                  <th scope="col">River stat</th>
+                                  <th scope="col">Flow</th>
                                 </tr>
-                            {% endfor %}
-                          </tbody>
-                        </table>
-                        <button id="add-row-initial-flow" type="button" class="btn btn-success">&#43;</button>
-                        <button id="remove-row-initial-flow" type="button" class="btn btn-danger">&#8722;</button>
-                    </div>
-                    <div class="d-flex justify-content-between pt-4">
-                        <h5>Configuración de series</h5>
-                    </div>
-                    <div class="form-group" id="series_list_container">
-                        {{ form.series_list.label }}
-                        <table class="table" id="series_table">
-                          <thead>
-                            <tr>
-                              <th scope="col">#</th>
-                              <th scope="col">River</th>
-                              <th scope="col">Reach</th>
-                              <th scope="col">River stat</th>
-                              <th scope="col">Intervalo</th>
-                              <th scope="col">Tipo de condicion de borde</th>
-                              <th scope="col">Id de observación</th>
-                              <th scope="col">Id de pronóstico</th>
-                            </tr>
-                          </thead>
-                          <tbody id="series_table_body">
-                            {% for form in form.series_list %}
+                              </thead>
+                              <tbody id="initial_flow_table_body">
+                                {% for form in form.initial_flow_list %}
+                                    <tr>
+                                        <th scope="row">{{loop.index}}</th>
+                                        <td>{{ form.river }}</td>
+                                        <td>{{ form.reach }}</td>
+                                        <td>{{ form.river_stat }}</td>
+                                        <td>{{ form.flow }}</td>
+                                    </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                            <button id="add-row-initial-flow" type="button" class="btn btn-success">&#43;</button>
+                            <button id="remove-row-initial-flow" type="button" class="btn btn-danger">&#8722;</button>
+                        </div>
+                        <div class="d-flex justify-content-between pt-4">
+                            <h5>Configuración de series</h5>
+                        </div>
+                        <div class="form-group" id="series_list_container">
+                            {{ form.series_list.label }}
+                            <table class="table" id="series_table">
+                              <thead>
                                 <tr>
-                                    <th scope="row">{{loop.index}}</th>
-                                    <td>{{ form.river }}</td>
-                                    <td>{{ form.reach }}</td>
-                                    <td>{{ form.river_stat }}</td>
-                                    <td class="d-flex flex-row">{{ form.interval.interval_value}}{{ form.interval.interval_unit }}</td>
-                                    <td>{{ form.border_condition }}</td>
-                                    <td>{{ form.id_observation }}</td>
-                                    <td>{{ form.id_forecast }}</td>
+                                  <th scope="col">#</th>
+                                  <th scope="col">River</th>
+                                  <th scope="col">Reach</th>
+                                  <th scope="col">River stat</th>
+                                  <th scope="col">Intervalo</th>
+                                  <th scope="col">Tipo de condicion de borde</th>
+                                  <th scope="col">Id de observación</th>
+                                  <th scope="col">Id de pronóstico</th>
                                 </tr>
-                            {% endfor %}
-                          </tbody>
-                        </table>
-                        <button id="add-row-series" type="button" class="btn btn-success">&#43;</button>
-                        <button id="remove-row-series" type="button" class="btn btn-danger">&#8722;</button>
+                              </thead>
+                              <tbody id="series_table_body">
+                                {% for form in form.series_list %}
+                                    <tr>
+                                        <th scope="row">{{loop.index}}</th>
+                                        <td>{{ form.river }}</td>
+                                        <td>{{ form.reach }}</td>
+                                        <td>{{ form.river_stat }}</td>
+                                        <td class="d-flex flex-row">{{ form.interval.interval_value}}{{ form.interval.interval_unit }}</td>
+                                        <td>{{ form.border_condition }}</td>
+                                        <td>{{ form.observation_id }}</td>
+                                        <td>{{ form.forecast_id }}</td>
+                                    </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                            <button id="add-row-series" type="button" class="btn btn-success">&#43;</button>
+                            <button id="remove-row-series" type="button" class="btn btn-danger">&#8722;</button>
                     </div>
 
-                    <div class="d-flex justify-content-between pt-4">
+                    </div>
+
+                    <div class="d-flex justify-content-between pt-4" data-toggle="collapse" href="#series_list_plan_container" role="button" aria-expanded="false" aria-controls="series_list_plan_container">
                         <h4>Configuración de plan</h4>
                     </div>
                     <div class="form-group" id="series_list_plan_container">
@@ -207,8 +212,8 @@
                     <td><input id="series_list-${idx}-river_stat" name="series_list-${idx}-river_stat" required="" step="any" style="width: 90px" type="number" value=""></td>
                     <td class="d-flex flex-row"><input id="series_list-${idx}-interval-interval_value" name="series_list-${idx}-interval-interval_value" required="" style="width: 90px" type="number" value=""><select id="series_list-${idx}-interval-interval_unit" name="series_list-${idx}-interval-interval_unit" required=""><option value="MINUTE">MINUTE</option><option value="HOUR">HOUR</option><option value="DAY">DAY</option><option value="WEEK">WEEK</option></select></td>
                     <td><select id="series_list-${idx}-border_condition" name="series_list-${idx}-border_condition" required=""><option value="Stage Hydrograph">Stage Hydrograph</option><option value="Flow Hydrograph">Flow Hydrograph</option><option value="Lateral Inflow Hydrograph">Lateral Inflow Hydrograph</option></select></td>
-                    <td><input id="series_list-${idx}-id_observation" name="series_list-${idx}-id_observation" required="" style="width: 90px" type="number" value=""></td>
-                    <td><input id="series_list-${idx}-id_forecast" name="series_list-${idx}-id_forecast" required="" style="width: 90px" type="number" value=""></td>
+                    <td><input id="series_list-${idx}-observation_id" name="series_list-${idx}-observation_id" required="" style="width: 90px" type="number" value=""></td>
+                    <td><input id="series_list-${idx}-forecast_id" name="series_list-${idx}-forecast_id" required="" style="width: 90px" type="number" value=""></td>
                 </tr>
             `
             $( "#series_table_body" ).append( new_row );
