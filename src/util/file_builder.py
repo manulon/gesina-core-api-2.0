@@ -78,6 +78,43 @@ def build_flow(end_date=datetime(2022, 5, 18), days=60):
     return BytesIO(result.encode("utf8"))
 
 
+def new_build_flow(observation_days, pronostic_days):
+    today = datetime.now().replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
+    end_date = today + timedelta(pronostic_days + 1)
+    start_date = today - timedelta(observation_days-1)
+
+    # Buscar las series al INA
+    conditions = []  # Suponer que esto es lo buscado del INA
+
+    items = []
+    with open("src/file_templates/bondary_location.txt", "r") as f:
+        src = Template(f.read())
+        for condition in conditions:
+            lines = []
+            groups = more_itertools.grouper(
+                [str(value).rjust(8, " ") for value in condition['values']], 10, fillvalue=""
+            )
+            lines += ["".join(group) for group in groups]
+
+            condition_data = {
+                "LOCATION": f"Boundary Location={condition['river']},{condition['reach']},{condition['river_stat']},        ,                ,                ,                ,                ",
+                "INTERVAL": condition['interval'],
+                "CONDITION_TYPE": condition['border_condition'],
+                "AMOUNT": len(condition['values']),
+                "SERIES": lines,
+                "START_DATE": start_date.strftime("%d%b%Y,%H:%M")
+            }
+            items.append(src.substitute(condition_data))
+
+    with open("src/file_templates/parana_flow_file.txt", "r") as f:
+        src = Template(f.read())
+    result = src.substitute({"ITEMS": items})
+
+    return BytesIO(result.encode("utf8"))
+
+
 class Item:
     def __init__(
         self, river, reach, river_stat, interval, border_condition, values, start_date
