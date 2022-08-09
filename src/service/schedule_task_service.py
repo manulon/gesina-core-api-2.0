@@ -21,13 +21,13 @@ def update(_id, form):
         schedule_config.forecast_days = form.forecast_days.data
         schedule_config.start_condition_type = form.start_condition_type.data
         session.add(schedule_config)
-        initial_flow_list = (
-            []
-            if form.start_condition_type.data == "restart_file"
-            else form.initial_flow_list
-        )
-        update_initial_flows(session, _id, initial_flow_list)
-        update_series_list(session, _id, form.series_list)
+        # initial_flow_list = (
+        #     []
+        #     if form.start_condition_type.data == "restart_file"
+        #     else form.initial_flow_list
+        # )
+        # update_initial_flows(session, _id, initial_flow_list)
+        # update_series_list(session, _id, form.series_list)
 
 
 def create(form):
