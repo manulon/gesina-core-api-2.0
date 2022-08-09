@@ -47,13 +47,13 @@ def create(form):
         session.add(scheduled_task)
         session.commit()
         session.refresh(scheduled_task)
-        initial_flow_list = (
-            []
-            if form.start_condition_type.data == "restart_file"
-            else form.initial_flow_list
-        )
-        update_initial_flows(session, scheduled_task.id, initial_flow_list)
-        update_series_list(session, scheduled_task.id, form.series_list)
+        # initial_flow_list = (
+        #     []
+        #     if form.start_condition_type.data == "restart_file"
+        #     else form.initial_flow_list
+        # )
+        # update_initial_flows(session, scheduled_task.id, initial_flow_list)
+        # update_series_list(session, scheduled_task.id, form.series_list)
         return scheduled_task
 
 
