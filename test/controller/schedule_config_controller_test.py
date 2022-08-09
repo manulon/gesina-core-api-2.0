@@ -79,6 +79,43 @@ def test_update_only_enabled_success(a_client):
     assert not schedule_task.enabled
 
 
+def test_update_both_enabled_and_frequency_success(a_client):
+    log_default_user(a_client)
+    original_schedule_task = schedule_task_service.get_schedule_task_config(
+        DEFAULT_SCHEDULE_TASK_ID
+    )
+
+    new_frequency = 200
+    new_enabled = "false"
+    update_data = {
+        "frequency": new_frequency,
+        "enabled": new_enabled,
+        "name": original_schedule_task.name,
+        "description": original_schedule_task.description,
+        "start_datetime": original_schedule_task.start_datetime.strftime(
+            "%Y-%m-%dT%H:%M"
+        ),
+        "geometry_id": original_schedule_task.geometry_id,
+        **DEFAULT_DATA,
+    }
+
+    response = a_client.post(
+        f"/view/schedule_tasks/{original_schedule_task.id}",
+        data=update_data,
+        content_type="multipart/form-data",
+    )
+
+    assert b"Configuraci%C3%B3n+actualizada+con+%C3%A9xito." in response.data
+    schedule_task = schedule_task_service.get_schedule_task_config(
+        DEFAULT_SCHEDULE_TASK_ID
+    )
+    assert schedule_task is not None
+    assert not schedule_task.frequency == original_schedule_task.frequency
+    assert schedule_task.frequency == new_frequency
+    assert not schedule_task.enabled == original_schedule_task.enabled
+    assert not schedule_task.enabled
+
+
 def test_update_fails_on_empty_schedule_frequency(a_client):
     log_default_user(a_client)
     original_schedule_task = schedule_task_service.get_schedule_task_config(
