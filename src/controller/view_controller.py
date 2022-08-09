@@ -204,14 +204,10 @@ def save_execution_plan():
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/<schedule_task_id>", methods=["GET"])
 def get_schedule_task_config(schedule_task_id):
-    (
-        schedule_config,
-        initial_flows,
-        border_condition,
-    ) = schedule_task_service.get_complete_schedule_task_config(schedule_task_id)
-    return render_schedule_view(
-        ScheduleConfigForm(), schedule_config, initial_flows, border_condition
+    schedule_config = schedule_task_service.get_complete_schedule_task_config(
+        schedule_task_id
     )
+    return render_schedule_view(ScheduleConfigForm(), schedule_config)
 
 
 @VIEW_BLUEPRINT.route("/schedule_tasks")
@@ -225,11 +221,9 @@ def get_schedule_tasks():
     "/schedule_tasks/", methods=["POST"], defaults={"schedule_config_id": None}
 )
 def save_or_create_schedule_config(schedule_config_id):
-    (
-        schedule_config,
-        initial_flows,
-        border_condition,
-    ) = schedule_task_service.get_complete_schedule_task_config(schedule_config_id)
+    schedule_config = schedule_task_service.get_complete_schedule_task_config(
+        schedule_config_id
+    )
     form = ScheduleConfigForm()
     try:
         if form.validate_on_submit():
@@ -247,14 +241,12 @@ def save_or_create_schedule_config(schedule_config_id):
                 )
             )
 
-        return render_schedule_view(
-            form, schedule_config, initial_flows, border_condition, form.get_errors()
-        )
+        return render_schedule_view(form, schedule_config, form.get_errors())
     except Exception as exception:
         logger.error(exception)
         error_message = "Error actualizando la configuración."
 
-        return render_schedule_view(form, schedule_config, [], [], [error_message])
+        return render_schedule_view(form, schedule_config, [error_message])
 
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/new", methods=["GET"])
@@ -262,11 +254,11 @@ def schedule_task_new():
     return render_schedule_view(ScheduleConfigForm())
 
 
-def render_schedule_view(
-    form, schedule_config=None, initial_flows=None, border_condition=None, errors=()
-):
+def render_schedule_view(form, schedule_config=None, errors=()):
     _id = None
     if schedule_config:
+        initial_flows = schedule_config.initial_flows
+        border_conditions = schedule_config.border_conditions
         form.enabled.data = schedule_config.enabled
         form.frequency.data = schedule_config.frequency
         form.description.data = schedule_config.description
@@ -277,7 +269,7 @@ def render_schedule_view(
         form.observation_days.data = schedule_config.observation_days
         form.forecast_days.data = schedule_config.forecast_days
         render_initial_flows(form, initial_flows)
-        render_border_condition(border_condition, form)
+        render_border_condition(border_conditions, form)
 
         _id = schedule_config.id
 
