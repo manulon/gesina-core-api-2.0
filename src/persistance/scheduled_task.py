@@ -40,6 +40,9 @@ class ScheduledTask(Base):
     border_conditions = relationship(
         "BorderCondition", lazy="joined", back_populates="scheduled_task"
     )
+    plan_series_list = relationship(
+        "PlanSeries", lazy="joined", back_populates="scheduled_task"
+    )
 
 
 class InitialFlow(Base):
@@ -78,3 +81,14 @@ class BorderCondition(Base):
     type = Column(Enum(BorderConditionType))
     observation_id = Column(Integer)
     forecast_id = Column(Integer)
+
+
+class PlanSeries(Base):
+    __tablename__ = "plan_series"
+    id = Column(Integer, primary_key=True)
+    river = Column(String)
+    reach = Column(String)
+    river_stat = Column(Float)
+    series_id = Column(Integer)
+    scheduled_task = relationship("ScheduledTask", back_populates="plan_series_list")
+    scheduled_task_id = Column(Integer, ForeignKey("scheduled_task.id"))

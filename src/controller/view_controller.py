@@ -24,6 +24,7 @@ from src.view.forms.schedule_config_form import (
     InitialFlowForm,
     SeriesForm,
     IntervalForm,
+    PlanSeriesForm,
 )
 
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
@@ -259,6 +260,8 @@ def render_schedule_view(form, schedule_config=None, errors=()):
     if schedule_config:
         initial_flows = schedule_config.initial_flows
         border_conditions = schedule_config.border_conditions
+        plan_series_list = schedule_config.plan_series_list
+
         form.enabled.data = schedule_config.enabled
         form.frequency.data = schedule_config.frequency
         form.description.data = schedule_config.description
@@ -270,6 +273,7 @@ def render_schedule_view(form, schedule_config=None, errors=()):
         form.forecast_days.data = schedule_config.forecast_days
         render_initial_flows(form, initial_flows)
         render_border_condition(border_conditions, form)
+        render_plan_series_list(plan_series_list, form)
 
         _id = schedule_config.id
 
@@ -301,6 +305,17 @@ def render_border_condition(border_condition, form):
         series_form.observation_id = each_border_condition.observation_id
         series_form.forecast_id = each_border_condition.forecast_id
         form.series_list.append_entry(series_form)
+
+
+def render_plan_series_list(plan_series_list, form):
+    for p in plan_series_list:
+        f = PlanSeriesForm()
+        f.idx = p.id
+        f.reach = p.reach
+        f.river = p.river
+        f.river_stat = p.river_stat
+        f.series_id = p.series_id
+        form.plan_series_list.append_entry(f)
 
 
 @VIEW_BLUEPRINT.route("/user/logout", methods=["GET"])

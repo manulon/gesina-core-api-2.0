@@ -148,6 +148,7 @@
                           <tbody id="series_plan_table_body">
                             {% for form in form.plan_series_list %}
                                 <tr>
+                                    {{ form.idx }}
                                     <th scope="row">{{loop.index}}</th>
                                     <td>{{ form.river }}</td>
                                     <td>{{ form.reach }}</td>

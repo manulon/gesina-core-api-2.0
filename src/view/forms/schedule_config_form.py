@@ -11,6 +11,7 @@ from wtforms import (
     FieldList,
     FormField,
     Form,
+    HiddenField,
 )
 
 from src.persistance.scheduled_task import BorderCondition, BorderConditionType
@@ -97,7 +98,8 @@ class SeriesForm(Form):
     )
 
 
-class PlanSeriesForm(FlaskForm, ErrorMixin):
+class PlanSeriesForm(Form):
+    idx = HiddenField(default=None)
     river = StringField(
         label="River",
         validators=[DataRequired(message="Error: El river no puede estar vacío")],
@@ -185,5 +187,5 @@ class ScheduleConfigForm(FlaskForm, ErrorMixin):
     )
 
     plan_series_list = FieldList(
-        FormField(PlanSeriesForm), label="Lista de series del plan", min_entries=1
+        FormField(PlanSeriesForm), label="Lista de series del plan", min_entries=0
     )
