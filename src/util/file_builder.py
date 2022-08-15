@@ -78,17 +78,43 @@ def build_flow(end_date=datetime(2022, 5, 18), days=60):
     return BytesIO(result.encode("utf8"))
 
 
-def new_build_flow(observation_days, pronostic_days):
+def create_initial_status(use_restart, restart_file, initial_flows):
+    if use_restart:
+        return build_restart_status(restart_file)
+    return build_initial_flows(initial_flows)
+
+
+def build_initial_flows(initial_flow_list):
+    list_of_items = []
+    for initial_flow in initial_flow_list:
+        list_of_items.append("Initial Flow Loc=" + ','.join([initial_flow.river,
+                                                             initial_flow.reach,
+                                                             initial_flow.river_stat,
+                                                             initial_flow.flow]))
+    initial_flows_string = "\n".join(initial_flow_list)
+    with open("src/file_templates/initial_flows.txt", "r") as f:
+        src = Template(f.read())
+    return src.substitute({"INITIAL_FLOWS": initial_flows_string})
+
+
+def build_restart_status(restart_filename):
+    with open("src/file_templates/restart_info.txt", "r") as f:
+        src = Template(f.read())
+    return src.substitute({"FILE_NAME": restart_filename})
+
+
+def new_build_flow(border_conditions, use_restart, restart_file, initial_flows, observation_days, pronostic_days):
+    initial_status = create_initial_status(use_restart, restart_file, initial_flows)
     today = datetime.now().replace(
         hour=0, minute=0, second=0, microsecond=0
     )
     end_date = today + timedelta(pronostic_days + 1)
-    start_date = today - timedelta(observation_days-1)
+    start_date = today - timedelta(observation_days - 1)
 
     # Buscar las series al INA
     conditions = []  # Suponer que esto es lo buscado del INA
 
-    items = []
+    boundary_locations = []
     with open("src/file_templates/bondary_location.txt", "r") as f:
         src = Template(f.read())
         for condition in conditions:
@@ -106,18 +132,18 @@ def new_build_flow(observation_days, pronostic_days):
                 "SERIES": lines,
                 "START_DATE": start_date.strftime("%d%b%Y,%H:%M")
             }
-            items.append(src.substitute(condition_data))
+            boundary_locations.append(src.substitute(condition_data))
 
     with open("src/file_templates/parana_flow_file.txt", "r") as f:
         src = Template(f.read())
-    result = src.substitute({"ITEMS": items})
+    result = src.substitute({"INITIAL_STATUS": initial_status, "BOUNDARY_LOCATIONS": boundary_locations})
 
     return BytesIO(result.encode("utf8"))
 
 
 class Item:
     def __init__(
-        self, river, reach, river_stat, interval, border_condition, values, start_date
+            self, river, reach, river_stat, interval, border_condition, values, start_date
     ):
         self.river = river
         self.reach = reach

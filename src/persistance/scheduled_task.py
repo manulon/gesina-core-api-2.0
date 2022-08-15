@@ -34,6 +34,8 @@ class ScheduledTask(Base):
     start_condition_type = Column(String)
     observation_days = Column(Integer)
     forecast_days = Column(Integer)
+    use_restart = Column(Boolean, default=False)
+    restart_file = Column(String)
     initial_flows = relationship(
         "InitialFlow", lazy="joined", back_populates="scheduled_task"
     )

@@ -66,7 +66,9 @@ create table if not exists "scheduled_task"
     user_id integer not null constraint scheduled_task_user_id_fk references "user",
     observation_days integer not null,
     forecast_days integer not null,
-    start_condition_type text not null
+    start_condition_type text not null,
+    use_restart boolean not null,
+    restart_file text
 );
 
 
