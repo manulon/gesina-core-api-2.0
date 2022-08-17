@@ -3,6 +3,7 @@ from src.persistance.scheduled_task import (
     InitialFlow,
     BorderCondition,
     BorderConditionType,
+    PlanSeries,
 )
 from src.persistance.session import get_session
 from src.service.user_service import get_current_user
@@ -27,6 +28,7 @@ def update(_id, form):
         )
         update_initial_flows(session, _id, initial_flow_list)
         update_series_list(session, _id, form.series_list)
+        update_plan_series_list(session, _id, form.plan_series_list)
         session.add(schedule_config)
 
 
@@ -34,6 +36,7 @@ def create(form):
     with get_session() as session:
         initial_flow_list = create_initial_flows(form)
         border_conditions = create_series_list(form.series_list)
+        plan_series_list = create_plan_series_list(form.plan_series_list)
         scheduled_task = ScheduledTask(
             frequency=form.frequency.data,
             enabled=form.enabled.data,
@@ -47,6 +50,7 @@ def create(form):
             user=get_current_user(),
             initial_flows=initial_flow_list,
             border_conditions=border_conditions,
+            plan_series_list=plan_series_list,
         )
         session.add(scheduled_task)
         return scheduled_task
@@ -126,6 +130,46 @@ def update_series_list(session, scheduled_config_id, series_list):
             forecast_id=each_series.forecast_id.data,
         )
         session.add(border_condition)
+
+
+def create_plan_series_list(plan_series_list):
+    return [
+        PlanSeries(
+            river=plan_series.river,
+            reach=plan_series.reach,
+            river_stat=plan_series.river_stat,
+            series_id=plan_series.series_id,
+        )
+        for plan_series in plan_series_list
+    ]
+
+
+def update_plan_series_list(session, scheduled_config_id, plan_series_list):
+    session.query(PlanSeries).filter(
+        PlanSeries.scheduled_task_id == scheduled_config_id
+    ).filter(
+        PlanSeries.id.not_in({p.idx.data for p in plan_series_list if p.idx.data}),
+    ).delete()
+    for series in plan_series_list:
+        if series.idx.data:
+            plan_series = (
+                session.query(PlanSeries)
+                .filter(PlanSeries.id == series.idx.data)
+                .first()
+            )
+            plan_series.river = series.river.data
+            plan_series.reach = series.reach.data
+            plan_series.river_stat = series.river_stat.data
+            plan_series.series_id = series.series_id.data
+        else:
+            plan_series = PlanSeries(
+                scheduled_task_id=scheduled_config_id,
+                river=series.river.data,
+                reach=series.reach.data,
+                river_stat=series.river_stat.data,
+                series_id=series.series_id.data,
+            )
+            session.add(plan_series)
 
 
 def get_schedule_tasks():
