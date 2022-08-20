@@ -6,7 +6,22 @@ from src.persistance.scheduled_task import (
     PlanSeries,
 )
 from src.persistance.session import get_session
+from src.service.exception.file_exception import FileUploadError
 from src.service.user_service import get_current_user
+
+
+def process_form(scheduled_config_id, initial_flow_list):
+    result = []
+    for each_initial_flow in initial_flow_list:
+        initial_flow = InitialFlow(
+            scheduled_task_id=scheduled_config_id,
+            river=each_initial_flow.river.data,
+            reach=each_initial_flow.reach.data,
+            river_stat=each_initial_flow.river_stat.data,
+            flow=each_initial_flow.flow.data,
+        )
+        result.append(initial_flow)
+    return result
 
 
 def update(_id, form):
@@ -21,12 +36,13 @@ def update(_id, form):
         schedule_config.observation_days = form.observation_days.data
         schedule_config.forecast_days = form.forecast_days.data
         schedule_config.start_condition_type = form.start_condition_type.data
-        initial_flow_list = (
-            []
-            if form.start_condition_type.data == "restart_file"
-            else form.initial_flow_list
-        )
-        update_initial_flows(session, _id, initial_flow_list)
+        if form.start_condition_type.data == "restart_file":
+            # TODO manejar logica para el restart file
+            do = "something"
+        else:
+            from_csv = process_csv_file(_id, form.initial_flow_file)
+            from_form = process_form(_id, form.initial_flow_list)
+        update_initial_flows(session, _id, from_csv + from_form)
         update_series_list(session, _id, form.series_list)
         update_plan_series_list(session, _id, form.plan_series_list)
         session.add(schedule_config)
@@ -56,12 +72,45 @@ def create(form):
         return scheduled_task
 
 
+def process_csv_file(scheduled_config_id, initial_flow_file_field):
+    import csv
+    import io
+
+    result = []
+    if initial_flow_file_field.data:
+        buffer = initial_flow_file_field.data.read()
+        content = buffer.decode()
+        file = io.StringIO(content)
+        csv_data = csv.reader(file, delimiter=",")
+        header = next(csv_data)
+        if (
+            len(header) == 4
+            and header[0] == "river"
+            and header[1] == "reach"
+            and header[2] == "river_stat"
+            and header[3] == "flow"
+        ):
+            for row in csv_data:
+                initial_flow = InitialFlow(
+                    scheduled_task_id=scheduled_config_id,
+                    river=row[0],
+                    reach=row[1],
+                    river_stat=row[2],
+                    flow=row[3],
+                )
+                result.append(initial_flow)
+        else:
+            raise FileUploadError("Error: Archivo .csv inválido")
+
+    return result
+
+
 def create_initial_flows(form):
-    list_from_form = (
-        []
-        if form.start_condition_type.data == "restart_file"
-        else form.initial_flow_list
-    )
+    if form.start_condition_type.data == "restart_file":
+        list_from_form = process_csv_file(form.restart_file)
+    else:
+        list_from_form = form.initial_flow_list
+
     result = []
     for each_initial_flow in list_from_form:
         result.append(
@@ -75,17 +124,10 @@ def create_initial_flows(form):
     return result
 
 
-def update_initial_flows(session, scheduled_config_id, initial_flow_list):
+def update_initial_flows(session, scheduled_config_id, initial_flows):
     session.query(InitialFlow).filter_by(scheduled_task_id=scheduled_config_id).delete()
-    for each_initial_flow in initial_flow_list:
-        initial_flow = InitialFlow(
-            scheduled_task_id=scheduled_config_id,
-            river=each_initial_flow.river.data,
-            reach=each_initial_flow.reach.data,
-            river_stat=each_initial_flow.river_stat.data,
-            flow=each_initial_flow.flow.data,
-        )
-        session.add(initial_flow)
+    for each_initial_flow in initial_flows:
+        session.add(each_initial_flow)
 
 
 def create_series_list(series_list):

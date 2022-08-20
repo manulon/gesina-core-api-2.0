@@ -243,10 +243,12 @@ def save_or_create_schedule_config(schedule_config_id):
             )
 
         return render_schedule_view(form, schedule_config, form.get_errors())
+    except FileUploadError as exception:
+        logger.error(exception.message)
+        return render_schedule_view(form, schedule_config, [exception.message])
     except Exception as exception:
         logger.error(exception)
         error_message = "Error actualizando la configuración."
-
         return render_schedule_view(form, schedule_config, [error_message])
 
 
