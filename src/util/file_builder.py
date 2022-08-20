@@ -16,7 +16,7 @@ def build_project(title, start_date, end_date):
         "END_DATE": end_date.strftime("%d%b%Y"),
         "END_TIME": end_date.strftime("%H:%M"),
     }
-    with open("src/file_templates/parana_prj_template.txt", "r") as f:
+    with open("file_templates/parana_prj_template.txt", "r") as f:
         src = Template(f.read())
     result = src.substitute(data)
 
@@ -29,7 +29,7 @@ def build_plan(title, start_datetime, end_datetime):
         "PLAN_ID": f"{title}-TR",
         "TIMEFRAME": f'{start_datetime.strftime("%d%b%Y,%H:%M")},{end_datetime.strftime("%d%b%Y,%H:%M")}',
     }
-    with open("src/file_templates/parana_plan_template.txt", "r") as f:
+    with open("file_templates/parana_plan_template.txt", "r") as f:
         src = Template(f.read())
     result = src.substitute(data)
 
@@ -70,7 +70,7 @@ def build_flow(end_date=datetime(2022, 5, 18), days=60):
             items.append(Item(**data, start_date=start_date, values=forecast_df[point]))
 
     # Build .u
-    with open("src/file_templates/parana_flow_template.txt", "r") as f:
+    with open("file_templates/parana_flow_template.txt", "r") as f:
         src = Template(f.read())
 
     result = src.substitute({"ITEMS": "\n".join([str(i) for i in items])})
@@ -85,58 +85,85 @@ def create_initial_status(use_restart, restart_file, initial_flows):
 
 
 def build_initial_flows(initial_flow_list):
-    list_of_items = []
+    list_of_flows = []
     for initial_flow in initial_flow_list:
-        list_of_items.append("Initial Flow Loc=" + ','.join([initial_flow.river,
-                                                             initial_flow.reach,
-                                                             initial_flow.river_stat,
-                                                             initial_flow.flow]))
-    initial_flows_string = "\n".join(initial_flow_list)
-    with open("src/file_templates/initial_flows.txt", "r") as f:
+        list_of_flows.append("Initial Flow Loc=" + ','.join([str(initial_flow.river),
+                                                             str(initial_flow.reach),
+                                                             str(initial_flow.river_stat),
+                                                             str(initial_flow.flow)]))
+    initial_flows_string = "\n".join(list_of_flows)
+    with open("file_templates/initial_flows.txt", "r") as f:
         src = Template(f.read())
     return src.substitute({"INITIAL_FLOWS": initial_flows_string})
 
 
 def build_restart_status(restart_filename):
-    with open("src/file_templates/restart_info.txt", "r") as f:
+    with open("file_templates/restart_info.txt", "r") as f:
         src = Template(f.read())
     return src.substitute({"FILE_NAME": restart_filename})
 
 
-def new_build_flow(border_conditions, use_restart, restart_file, initial_flows, observation_days, pronostic_days):
+def new_build_flow(border_conditions, use_restart, restart_file, initial_flows, observation_days, forecast_days):
     initial_status = create_initial_status(use_restart, restart_file, initial_flows)
     today = datetime.now().replace(
         hour=0, minute=0, second=0, microsecond=0
     )
-    end_date = today + timedelta(pronostic_days + 1)
+    end_date = today + timedelta(forecast_days + 1)
     start_date = today - timedelta(observation_days - 1)
 
     # Buscar las series al INA
-    conditions = []  # Suponer que esto es lo buscado del INA
+    conditions = [
+        {
+            "river": "Anacua",
+            "reach": "El reach",
+            "river_stat": "10",
+            "interval": "1HOUR",
+            "border_condition": "Stage Hydrograph",
+            "values": [10, 11, 12, 13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90]
+        },
+        {
+            "river": "Anacua2",
+            "reach": "El reach2",
+            "river_stat": "10",
+            "interval": "1DAY",
+            "border_condition": "Stage Hydrograph",
+            "values": [1, 1, 2, 1]
+        },
+        {
+            "river": "Anacua3",
+            "reach": "El reach3",
+            "river_stat": "5",
+            "interval": "1DAY",
+            "border_condition": "Stage Hydrograph",
+            "values": [10, 11, 12, 13]
+        }
+    ]  # Suponer que esto es lo buscado del INA
 
     boundary_locations = []
-    with open("src/file_templates/bondary_location.txt", "r") as f:
+    with open("file_templates/boundary_location.txt", "r") as f:
         src = Template(f.read())
         for condition in conditions:
-            lines = []
             groups = more_itertools.grouper(
                 [str(value).rjust(8, " ") for value in condition['values']], 10, fillvalue=""
             )
-            lines += ["".join(group) for group in groups]
 
             condition_data = {
-                "LOCATION": f"Boundary Location={condition['river']},{condition['reach']},{condition['river_stat']},        ,                ,                ,                ,                ",
+                "LOCATION": f"{condition['river']},{condition['reach']},{condition['river_stat']},        ,                ,                ,                ,                ",
                 "INTERVAL": condition['interval'],
                 "CONDITION_TYPE": condition['border_condition'],
                 "AMOUNT": len(condition['values']),
-                "SERIES": lines,
-                "START_DATE": start_date.strftime("%d%b%Y,%H:%M")
+                "SERIES": "\n".join(["".join(group) for group in groups]),
+                "START_DATE": start_date.strftime("%d%b%Y")
             }
             boundary_locations.append(src.substitute(condition_data))
 
-    with open("src/file_templates/parana_flow_file.txt", "r") as f:
+    with open("file_templates/parana_flow_template.txt", "r") as f:
         src = Template(f.read())
-    result = src.substitute({"INITIAL_STATUS": initial_status, "BOUNDARY_LOCATIONS": boundary_locations})
+    result = src.substitute({"INITIAL_STATUS": initial_status, "BOUNDARY_LOCATIONS": "".join(boundary_locations)})
+
+    with open("test_archivo_salida.txt", "w") as f:
+        f.write(result)
+    print(result)
 
     return BytesIO(result.encode("utf8"))
 
