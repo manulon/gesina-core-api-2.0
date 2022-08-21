@@ -54,7 +54,7 @@ class IntervalForm(Form):
 
 
 class SeriesForm(Form):
-    render_kw = {"style": "width: 90px"}
+    render_kw = {"style": "width: 80px"}
     river = StringField(
         label="River",
         validators=[DataRequired(message="Error: El river no puede estar vacío")],
@@ -77,6 +77,7 @@ class SeriesForm(Form):
             DataRequired(message="Error: La condición de borde no puede estar vacía")
         ],
         choices=BorderConditionType.choices(),
+        render_kw={"style": "width: 100px"}
     )
 
     interval = FormField(IntervalForm, label="Intervalo", render_kw=render_kw)
