@@ -104,6 +104,7 @@
                                       <th scope="col">Reach</th>
                                       <th scope="col">River stat</th>
                                       <th scope="col">Flow</th>
+                                      <th scope="col">Acciones</th>
                                     </tr>
                                   </thead>
                                   <tbody id="initial_flow_table_body">
@@ -114,12 +115,12 @@
                                             <td>{{ form.reach }}</td>
                                             <td>{{ form.river_stat }}</td>
                                             <td>{{ form.flow }}</td>
+                                            <td><button type="button" class="btn btn-danger remove-row-initial-flow">&#8722;</button></td>
                                         </tr>
                                     {% endfor %}
                                   </tbody>
                                 </table>
                                 <button id="add-row-initial-flow" type="button" class="btn btn-success">&#43;</button>
-                                <button id="remove-row-initial-flow" type="button" class="btn btn-danger">&#8722;</button>
                                 <button id="clear-row-initial-flow" type="button" class="btn btn-danger">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
@@ -140,6 +141,7 @@
                                   <th scope="col">Tipo de condicion de borde</th>
                                   <th scope="col">Id de observación</th>
                                   <th scope="col">Id de pronóstico</th>
+                                  <th scope="col">Acciones</th>
                                 </tr>
                               </thead>
                               <tbody id="series_table_body">
@@ -153,12 +155,12 @@
                                         <td>{{ form.border_condition }}</td>
                                         <td>{{ form.observation_id }}</td>
                                         <td>{{ form.forecast_id }}</td>
+                                        <td><button type="button" class="btn btn-danger remove-row-series">&#8722;</button></td>
                                     </tr>
                                 {% endfor %}
                               </tbody>
                             </table>
                             <button id="add-row-series" type="button" class="btn btn-success">&#43;</button>
-                            <button id="remove-row-series" type="button" class="btn btn-danger">&#8722;</button>
                             <button id="clear-row-series" type="button" class="btn btn-danger">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
@@ -174,6 +176,7 @@
                                   <th scope="col">Reach</th>
                                   <th scope="col">River stat</th>
                                   <th scope="col">Serie de id de Salida</th>
+                                  <th scope="col">Acciones</th>
                                 </tr>
                               </thead>
                               <tbody id="series_plan_table_body">
@@ -185,12 +188,12 @@
                                         <td>{{ form.reach }}</td>
                                         <td>{{ form.river_stat }}</td>
                                         <td>{{ form.series_id }}</td>
+                                        <td><button type="button" class="btn btn-danger remove-row-series remove-row-series-plan">&#8722;</button></td>
                                     </tr>
                                 {% endfor %}
                               </tbody>
                             </table>
                             <button id="add-row-series-plan" type="button" class="btn btn-success">&#43;</button>
-                            <button id="remove-row-series-plan" type="button" class="btn btn-danger">&#8722;</button>
                             <button id="clear-row-series-plan" type="button" class="btn btn-danger">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
@@ -205,7 +208,13 @@
 
     <script>
         $( "#add-row-initial-flow" ).on("click", function() {
-            idx = $("#initial_flow_table_body")[0].rows.length
+            let idx = 0
+            tr = $("#initial_flow_table_body tr:last-child")
+            if( tr.length ){
+                idx = $("#initial_flow_table_body tr:last-child th")[0].textContent
+                idx = parseInt(idx)
+            }
+
             new_row = `
                 <tr>
                     <th scope="row">${idx + 1}</th>
@@ -213,20 +222,27 @@
                     <td><input id="initial_flow_list-${idx}-reach" name="initial_flow_list-${idx}-reach" required="" type="text" value=""></td>
                     <td><input id="initial_flow_list-${idx}-river_stat" name="initial_flow_list-${idx}-river_stat" required="" step="any" type="number" value=""></td>
                     <td><input id="initial_flow_list-${idx}-flow" name="initial_flow_list-${idx}-flow" required="" step="any" type="number" value=""></td>
+                    <td><button type="button" class="btn btn-danger remove-row-initial-flow">&#8722;</button></td>
                 </tr>
             `
             $( "#initial_flow_table_body" ).append( new_row );
+            removeRowListener(".remove-row-initial-flow")
         });
 
-        $( "#remove-row-initial-flow" ).on("click", function() {
-            $('#initial_flow_table_body tr:last-child').remove();
-        });
+        function removeRowListener(selector) {
+            $( selector ).off("click")
+            $( selector ).on("click", function() {
+                $(this).parent().parent().remove();
+            });
+        }
+
+        removeRowListener(".remove-row-initial-flow")
 
         $( "#clear-row-initial-flow" ).on("click", function() {
             $('#initial_flow_table_body tr').remove();
         });
 
-        function hide_show_initial_condition_conf() {
+        function hideShowInitialConditionConf() {
             if( $("#start_condition_type")[0].value === "restart_file" ) {
                 $("#restart_file_container").show()
                 $("#initial_flow_list_container").hide()
@@ -236,12 +252,17 @@
             }
         }
 
-        hide_show_initial_condition_conf()
+        hideShowInitialConditionConf()
 
-        $( "#start_condition_type" ).on("change", hide_show_initial_condition_conf);
+        $( "#start_condition_type" ).on("change", hideShowInitialConditionConf);
 
         $( "#add-row-series" ).on("click", function() {
-            idx = $("#series_table_body")[0].rows.length
+            let idx = 0
+            tr = $("#series_table_body tr:last-child")
+            if( tr.length ){
+                idx = $("#series_table_body tr:last-child th")[0].textContent
+                idx = parseInt(idx)
+            }
 
             new_row = `
                 <tr>
@@ -253,21 +274,26 @@
                     <td><select id="series_list-${idx}-border_condition" name="series_list-${idx}-border_condition" required=""><option value="Stage Hydrograph">Stage Hydrograph</option><option value="Flow Hydrograph">Flow Hydrograph</option><option value="Lateral Inflow Hydrograph">Lateral Inflow Hydrograph</option></select></td>
                     <td><input id="series_list-${idx}-observation_id" name="series_list-${idx}-observation_id" required="" style="width: 90px" type="number" value=""></td>
                     <td><input id="series_list-${idx}-forecast_id" name="series_list-${idx}-forecast_id" required="" style="width: 90px" type="number" value=""></td>
+                    <td><button type="button" class="btn btn-danger remove-row-series">&#8722;</button></td>
                 </tr>
             `
             $( "#series_table_body" ).append( new_row );
+            removeRowListener(".remove-row-series")
         });
 
-        $( "#remove-row-series" ).on("click", function() {
-            $('#series_table_body tr:last-child').remove();
-        });
+        removeRowListener(".remove-row-series")
 
         $( "#clear-row-series" ).on("click", function() {
             $('#series_table_body tr').remove();
         });
 
         $( "#add-row-series-plan" ).on("click", function() {
-            idx = $("#series_plan_table_body")[0].rows.length
+            let idx = 0
+            tr = $("#series_plan_table_body tr:last-child")
+            if( tr.length ){
+                idx = $("#series_plan_table_body tr:last-child th")[0].textContent
+                idx = parseInt(idx)
+            }
 
             new_row = `
                 <tr>
@@ -276,15 +302,15 @@
                     <td><input id="plan_series_list-${idx}-reach" name="plan_series_list-${idx}-reach" required="" type="text" value=""></td>
                     <td><input id="plan_series_list-${idx}-river_stat" name="plan_series_list-${idx}-river_stat" required="" step="any" type="number" value=""></td>
                     <td><input id="plan_series_list-${idx}-series_id" name="plan_series_list-${idx}-series_id" required="" type="number" value=""></td>
+                    <td><button type="button" class="btn btn-danger remove-row-series-plan">&#8722;</button></td>
                 </tr>
             `
 
             $( "#series_plan_table_body" ).append( new_row );
+            removeRowListener(".remove-row-series-plan")
         });
 
-        $( "#remove-row-series-plan" ).on("click", function() {
-            $('#series_plan_table_body tr:last-child').remove();
-        });
+        removeRowListener(".series_plan_table_body")
 
         $( "#clear-row-series-plan" ).on("click", function() {
             $('#series_plan_table_body tr').remove();
