@@ -128,7 +128,7 @@
                                 <h5>Configuración de series</h5>
                             </div>
                             <div class="form-group" id="series_list_container">
-                            {{ form.series_list.label }}
+                            {{ form.series_list_file.label }}: {{ form.series_list_file(class_="form-control") }}
                             <table class="table" id="series_table">
                               <thead>
                                 <tr>
@@ -165,7 +165,7 @@
                     </div>
                         </div>
                         <div class="tab-pane fade card card-body" id="series_list_plan_container" role="tabpanel" aria-labelledby="series-list-tab">
-                             {{ form.series_list.label }}
+                            {{ form.plan_series_file.label }}: {{ form.plan_series_file(class_="form-control") }}
                             <table class="table" id="series_plan_table">
                               <thead>
                                 <tr>

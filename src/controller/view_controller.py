@@ -205,9 +205,7 @@ def save_execution_plan():
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/<schedule_task_id>", methods=["GET"])
 def get_schedule_task_config(schedule_task_id):
-    schedule_config = schedule_task_service.get_complete_schedule_task_config(
-        schedule_task_id
-    )
+    schedule_config = schedule_task_service.get_schedule_task_config(schedule_task_id)
     return render_schedule_view(ScheduleConfigForm(), schedule_config)
 
 
@@ -222,9 +220,7 @@ def get_schedule_tasks():
     "/schedule_tasks/", methods=["POST"], defaults={"schedule_config_id": None}
 )
 def save_or_create_schedule_config(schedule_config_id):
-    schedule_config = schedule_task_service.get_complete_schedule_task_config(
-        schedule_config_id
-    )
+    schedule_config = schedule_task_service.get_schedule_task_config(schedule_config_id)
     form = ScheduleConfigForm()
     try:
         if form.validate_on_submit():
@@ -310,14 +306,14 @@ def render_border_condition(border_condition, form):
 
 
 def render_plan_series_list(plan_series_list, form):
-    for p in plan_series_list:
-        f = PlanSeriesForm()
-        f.idx = p.id
-        f.reach = p.reach
-        f.river = p.river
-        f.river_stat = p.river_stat
-        f.series_id = p.series_id
-        form.plan_series_list.append_entry(f)
+    for plan in plan_series_list:
+        plan_form = PlanSeriesForm()
+        plan_form.idx = plan.id
+        plan_form.reach = plan.reach
+        plan_form.river = plan.river
+        plan_form.river_stat = plan.river_stat
+        plan_form.series_id = plan.series_id
+        form.plan_series_list.append_entry(plan_form)
 
 
 @VIEW_BLUEPRINT.route("/user/logout", methods=["GET"])
