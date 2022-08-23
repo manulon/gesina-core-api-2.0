@@ -167,7 +167,7 @@ def test_get_schedule_config(a_client):
 
     response = a_client.get(f"/view/schedule_tasks/{DEFAULT_SCHEDULE_TASK_ID}")
 
-    assert b"Configuraci\xc3\xb3n de simulaciones recurrentes<" in response.data
+    assert b"Configuraci\xc3\xb3n de simulaciones programadas<" in response.data
 
     frequency_info = f'<input class="form-control" id="frequency" min="5" name="frequency" required type="number" value="{schedule_task_config.frequency}">'
     assert str.encode(frequency_info) in response.data

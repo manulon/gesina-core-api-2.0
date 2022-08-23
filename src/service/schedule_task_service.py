@@ -1,11 +1,9 @@
-from src.persistance.scheduled_task import (
-    ScheduledTask,
-    InitialFlow,
-    BorderCondition,
-    BorderConditionType,
-)
+from src.persistance.scheduled_task import ScheduledTask
 from src.persistance.session import get_session
 from src.service.user_service import get_current_user
+from src.service.initial_flow_service import *
+from src.service.border_series_service import *
+from src.service.plan_series_service import *
 
 
 def update(_id, form):
@@ -20,20 +18,20 @@ def update(_id, form):
         schedule_config.observation_days = form.observation_days.data
         schedule_config.forecast_days = form.forecast_days.data
         schedule_config.start_condition_type = form.start_condition_type.data
-        initial_flow_list = (
-            []
-            if form.start_condition_type.data == "restart_file"
-            else form.initial_flow_list
-        )
-        update_initial_flows(session, _id, initial_flow_list)
-        update_series_list(session, _id, form.series_list)
+        if form.start_condition_type.data == "restart_file":
+            # TODO manejar logica para el restart file
+            do = "something"
+        update_initial_flows(session, _id, retrieve_initial_flows(form, _id))
+        update_series_list(session, _id, retrieve_series(form, _id))
+        update_plan_series_list(session, _id, retrieve_plan_series(form, _id))
         session.add(schedule_config)
 
 
 def create(form):
     with get_session() as session:
         initial_flow_list = create_initial_flows(form)
-        border_conditions = create_series_list(form.series_list)
+        border_conditions = retrieve_series(form)
+        plan_series_list = retrieve_plan_series(form)
         scheduled_task = ScheduledTask(
             frequency=form.frequency.data,
             enabled=form.enabled.data,
@@ -47,85 +45,10 @@ def create(form):
             user=get_current_user(),
             initial_flows=initial_flow_list,
             border_conditions=border_conditions,
+            plan_series_list=plan_series_list,
         )
         session.add(scheduled_task)
         return scheduled_task
-
-
-def create_initial_flows(form):
-    list_from_form = (
-        []
-        if form.start_condition_type.data == "restart_file"
-        else form.initial_flow_list
-    )
-    result = []
-    for each_initial_flow in list_from_form:
-        result.append(
-            InitialFlow(
-                river=each_initial_flow.river.data,
-                reach=each_initial_flow.reach.data,
-                river_stat=each_initial_flow.river_stat.data,
-                flow=each_initial_flow.flow.data,
-            )
-        )
-    return result
-
-
-def update_initial_flows(session, scheduled_config_id, initial_flow_list):
-    session.query(InitialFlow).filter_by(scheduled_task_id=scheduled_config_id).delete()
-    for each_initial_flow in initial_flow_list:
-        initial_flow = InitialFlow(
-            scheduled_task_id=scheduled_config_id,
-            river=each_initial_flow.river.data,
-            reach=each_initial_flow.reach.data,
-            river_stat=each_initial_flow.river_stat.data,
-            flow=each_initial_flow.flow.data,
-        )
-        session.add(initial_flow)
-
-
-def create_series_list(series_list):
-    result = []
-    for each_series in series_list:
-        interval_data = each_series.interval.data
-        interval = (
-            str(interval_data["interval_value"]) + "-" + interval_data["interval_unit"]
-        )
-        result.append(
-            BorderCondition(
-                river=each_series.river.data,
-                reach=each_series.reach.data,
-                river_stat=each_series.river_stat.data,
-                interval=interval,
-                type=BorderConditionType(each_series.border_condition.data),
-                observation_id=each_series.observation_id.data,
-                forecast_id=each_series.forecast_id.data,
-            )
-        )
-
-    return result
-
-
-def update_series_list(session, scheduled_config_id, series_list):
-    session.query(BorderCondition).filter_by(
-        scheduled_task_id=scheduled_config_id
-    ).delete()
-    for each_series in series_list:
-        interval_data = each_series.interval.data
-        interval = (
-            str(interval_data["interval_value"]) + "-" + interval_data["interval_unit"]
-        )
-        border_condition = BorderCondition(
-            scheduled_task_id=scheduled_config_id,
-            river=each_series.river.data,
-            reach=each_series.reach.data,
-            river_stat=each_series.river_stat.data,
-            interval=interval,
-            type=BorderConditionType(each_series.border_condition.data),
-            observation_id=each_series.observation_id.data,
-            forecast_id=each_series.forecast_id.data,
-        )
-        session.add(border_condition)
 
 
 def get_schedule_tasks():
@@ -138,14 +61,5 @@ def get_schedule_task_config(schedule_config_id):
         return (
             session.query(ScheduledTask)
             .filter(ScheduledTask.id == schedule_config_id)
-            .first()
-        )
-
-
-def get_complete_schedule_task_config(scheduled_config_id):
-    with get_session() as session:
-        return (
-            session.query(ScheduledTask)
-            .filter(ScheduledTask.id == scheduled_config_id)
             .first()
         )

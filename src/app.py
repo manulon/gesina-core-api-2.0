@@ -6,6 +6,9 @@ from src.translations import gettext, pretty_date
 from src import config
 from src import login_manager
 from src import controller
+import matplotlib
+
+matplotlib.use("Agg")
 
 app = Flask(__name__)
 

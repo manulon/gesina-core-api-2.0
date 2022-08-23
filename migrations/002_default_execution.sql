@@ -11,7 +11,7 @@ INSERT INTO gesina.execution_plan (plan_name,geometry_id, user_id, start_datetim
 	 ('ejemplo-ina', 1, 1, '2021-12-21 20:08:39.133122', '2021-12-21 20:08:39.133122', '2021-12-21 20:08:39.133122', 'PENDING');
 
 
-INSERT INTO gesina.scheduled_task (id, name, description, frequency, geometry_id, user_id, start_datetime, metadata,
+INSERT INTO gesina.scheduled_task (name, description, frequency, geometry_id, user_id, start_datetime, metadata,
     observation_days, forecast_days, start_condition_type) VALUES
-	 (1, 'Paraná', 'Corrida periódica del rio Paraná', 360, 2, 1, '2021-12-21 00:00:00.000000', null,
+	 ('Paraná', 'Corrida periódica del rio Paraná', 360, 2, 1, '2021-12-21 00:00:00.000000', null,
 	 90, 4, 'restart_file');

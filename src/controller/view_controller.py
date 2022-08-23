@@ -24,6 +24,7 @@ from src.view.forms.schedule_config_form import (
     InitialFlowForm,
     SeriesForm,
     IntervalForm,
+    PlanSeriesForm,
 )
 
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
@@ -204,9 +205,7 @@ def save_execution_plan():
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/<schedule_task_id>", methods=["GET"])
 def get_schedule_task_config(schedule_task_id):
-    schedule_config = schedule_task_service.get_complete_schedule_task_config(
-        schedule_task_id
-    )
+    schedule_config = schedule_task_service.get_schedule_task_config(schedule_task_id)
     return render_schedule_view(ScheduleConfigForm(), schedule_config)
 
 
@@ -221,9 +220,7 @@ def get_schedule_tasks():
     "/schedule_tasks/", methods=["POST"], defaults={"schedule_config_id": None}
 )
 def save_or_create_schedule_config(schedule_config_id):
-    schedule_config = schedule_task_service.get_complete_schedule_task_config(
-        schedule_config_id
-    )
+    schedule_config = schedule_task_service.get_schedule_task_config(schedule_config_id)
     form = ScheduleConfigForm()
     try:
         if form.validate_on_submit():
@@ -242,10 +239,12 @@ def save_or_create_schedule_config(schedule_config_id):
             )
 
         return render_schedule_view(form, schedule_config, form.get_errors())
+    except FileUploadError as exception:
+        logger.error(exception.message)
+        return render_schedule_view(form, schedule_config, [exception.message])
     except Exception as exception:
         logger.error(exception)
         error_message = "Error actualizando la configuración."
-
         return render_schedule_view(form, schedule_config, [error_message])
 
 
@@ -259,6 +258,8 @@ def render_schedule_view(form, schedule_config=None, errors=()):
     if schedule_config:
         initial_flows = schedule_config.initial_flows
         border_conditions = schedule_config.border_conditions
+        plan_series_list = schedule_config.plan_series_list
+
         form.enabled.data = schedule_config.enabled
         form.frequency.data = schedule_config.frequency
         form.description.data = schedule_config.description
@@ -270,6 +271,7 @@ def render_schedule_view(form, schedule_config=None, errors=()):
         form.forecast_days.data = schedule_config.forecast_days
         render_initial_flows(form, initial_flows)
         render_border_condition(border_conditions, form)
+        render_plan_series_list(plan_series_list, form)
 
         _id = schedule_config.id
 
@@ -301,6 +303,17 @@ def render_border_condition(border_condition, form):
         series_form.observation_id = each_border_condition.observation_id
         series_form.forecast_id = each_border_condition.forecast_id
         form.series_list.append_entry(series_form)
+
+
+def render_plan_series_list(plan_series_list, form):
+    for plan in plan_series_list:
+        plan_form = PlanSeriesForm()
+        plan_form.idx = plan.id
+        plan_form.reach = plan.reach
+        plan_form.river = plan.river
+        plan_form.river_stat = plan.river_stat
+        plan_form.series_id = plan.series_id
+        form.plan_series_list.append_entry(plan_form)
 
 
 @VIEW_BLUEPRINT.route("/user/logout", methods=["GET"])
