@@ -77,7 +77,7 @@ class SeriesForm(Form):
             DataRequired(message="Error: La condición de borde no puede estar vacía")
         ],
         choices=BorderConditionType.choices(),
-        render_kw={"style": "width: 100px"}
+        render_kw={"style": "width: 100px"},
     )
 
     interval = FormField(IntervalForm, label="Intervalo", render_kw=render_kw)

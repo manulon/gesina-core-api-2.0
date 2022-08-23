@@ -1,15 +1,20 @@
 from datetime import datetime
+import io
 
 from src.service import schedule_task_service
 from test import log_default_user
 
 DEFAULT_SCHEDULE_TASK_ID = 1
 
-DEFAULT_DATA = {
-    "observation_days": 90,
-    "forecast_days": 4,
-    "start_condition_type": "restart_file",
-}
+
+with open("test/resources/dummy_geometry.g01", "rb") as f:
+    content = f.read()
+    DEFAULT_DATA = {
+        "observation_days": 90,
+        "forecast_days": 4,
+        "start_condition_type": "restart_file",
+        "restart_file": (io.BytesIO(content), "restart_file_name"),
+    }
 
 
 def test_update_only_schedule_config_frequency_success(a_client):

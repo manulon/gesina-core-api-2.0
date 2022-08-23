@@ -25,6 +25,8 @@ EXECUTION_FOLDER = "execution-plan"
 RESULT_FOLDER = "result"
 RESULT_FILE_EXTENSION = ".dss"
 
+RESTART_FILE_NAME = "restart_file"
+
 
 class FileType(Enum):
     GEOMETRY = GEOMETRY_FOLDER
@@ -38,6 +40,10 @@ def copy_geometry_to(execution_id, geometry_filename):
         f"{EXECUTION_FOLDER}/{execution_id}/{geometry_filename}",
         CopySource(ROOT_BUCKET, f"{GEOMETRY_FOLDER}/{geometry_filename}"),
     )
+
+
+def save_restart_file(data, execution_id):
+    save_file(FileType.EXECUTION_PLAN, data, RESTART_FILE_NAME, execution_id)
 
 
 def save_file(file_type, file, filename, execution_id=None):
