@@ -2,7 +2,7 @@
 {% block content %}
     <div>
         <div class="d-flex justify-content-between">
-            <h2>Configuración de simulaciones recurrentes</h2>
+            <h2>Configuración de simulaciones programadas</h2>
         </div>
         <div class="container-xxl">
             {% if id %}
@@ -19,83 +19,116 @@
                   action="{{ url_for('view_controller.save_or_create_schedule_config', schedule_config_id='') }}">
             {% endif %}
                     {{ form.csrf_token }}
-                    <div class="d-flex justify-content-between" data-toggle="collapse" href="#generalSection" role="button" aria-expanded="true" aria-controls="generalSection">
-                        <h4>General</h4>
-                    </div>
-                    <div class="collapse show multi-collapse" id="generalSection">
-                        <div class="form-group">
-                            {{ form.name.label }}: {{ form.name(class_="form-control") }}
-                        </div>
-                        <div class="form-group">
-                            {{ form.description.label }}: {{ form.description(class_="form-control") }}
-                        </div>
-                        <div class="form-group">
-                            {{ form.geometry_id.label }}: {{ form.geometry_id(class_="form-control") }}
-                        </div>
-                        <div class="form-group">
-                            {{ form.start_datetime.label }}: {{ form.start_datetime(class_="form-control") }}
-                        </div>
-                        <div class="form-group">
-                            {{ form.frequency.label }}: {{ form.frequency(class_="form-control") }}
-                        </div>
-                        <div class="form-group">
-                            <div class="custom-control custom-switch">
-                                 {{ form.enabled(class_="custom-control-input") }} {{ form.enabled.label(class_="custom-control-label") }}
+                    <ul class="nav nav-tabs" id="schedule_tab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active"
+                               id="general-tab"
+                               data-toggle="tab"
+                               role="tab"
+                               aria-controls="generalSection"
+                               aria-selected="true"
+                               href="#generalSection">
+                                General
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               id="border-condition-tab"
+                               data-toggle="tab"
+                               role="tab"
+                               aria-controls="borderConditionSection"
+                               aria-selected="false"
+                               href="#borderConditionSection">
+                                Configuración de borde
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               id="series-list-tab"
+                               data-toggle="tab"
+                               role="tab"
+                               aria-controls="series_list_plan_container"
+                               aria-selected="false"
+                               href="#series_list_plan_container">
+                                Configuración de plan
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="schedult_tab_content">
+                        <div class="tab-pane fade show active card card-body" id="generalSection" role="tabpanel" aria-labelledby="general-tab">
+                            <div class="form-group">
+                                {{ form.name.label }}: {{ form.name(class_="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.description.label }}: {{ form.description(class_="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.geometry_id.label }}: {{ form.geometry_id(class_="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.start_datetime.label }}: {{ form.start_datetime(class_="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.frequency.label }}: {{ form.frequency(class_="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                <div class="custom-control custom-switch">
+                                     {{ form.enabled(class_="custom-control-input") }} {{ form.enabled.label(class_="custom-control-label") }}
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="d-flex justify-content-between pt-4" data-toggle="collapse" href="#borderConditionSection" role="button" aria-expanded="false" aria-controls="borderConditionSection">
-                        <h4>Configuración de borde</h4>
-                    </div>
-                    <div class="collapse multi-collapse" id="borderConditionSection">
-                        <div class="form-group">
-                            {{ form.observation_days.label }}: {{ form.observation_days(class_="form-control") }}
-                        </div>
-                        <div class="form-group">
-                            {{ form.forecast_days.label }}: {{ form.forecast_days(class_="form-control") }}
-                        </div>
-                        <div class="d-flex justify-content-between pt-4">
-                            <h5>Condiciones iniciales</h5>
-                        </div>
-                        <div class="form-group" id="start_condition_type_container">
-                            {{ form.start_condition_type.label }}: {{ form.start_condition_type(class_="form-control") }}
-                        </div>
-                        <div class="form-group" id="restart_file_container">
-                            {{ form.restart_file.label }}: {{ form.restart_file(class_="form-control") }}
-                        </div>
-                        <div class="form-group" id="initial_flow_list_container">
-                            {{ form.initial_flow_list.label }}
-                            <table class="table" id="initial_flow_table">
-                              <thead>
-                                <tr>
-                                  <th scope="col">#</th>
-                                  <th scope="col">River</th>
-                                  <th scope="col">Reach</th>
-                                  <th scope="col">River stat</th>
-                                  <th scope="col">Flow</th>
-                                </tr>
-                              </thead>
-                              <tbody id="initial_flow_table_body">
-                                {% for form in form.initial_flow_list %}
+                        <div class="tab-pane fade card card-body" id="borderConditionSection" role="tabpanel" aria-labelledby="border-condition-tab">
+                            <div class="form-group">
+                                {{ form.observation_days.label }}: {{ form.observation_days(class_="form-control") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.forecast_days.label }}: {{ form.forecast_days(class_="form-control") }}
+                            </div>
+                            <div class="d-flex justify-content-between pt-4">
+                                <h5>Condiciones iniciales</h5>
+                            </div>
+                            <div class="form-group" id="start_condition_type_container">
+                                {{ form.start_condition_type.label }}: {{ form.start_condition_type(class_="form-control") }}
+                            </div>
+                            <div class="form-group" id="restart_file_container">
+                                {{ form.restart_file.label }}: {{ form.restart_file(class_="form-control") }}
+                            </div>
+                            <div class="form-group" id="initial_flow_list_container">
+                                {{ form.initial_flow_file.label }}: {{ form.initial_flow_file(class_="form-control") }}
+                                <table class="table" id="initial_flow_table">
+                                  <thead>
                                     <tr>
-                                        <th scope="row">{{loop.index}}</th>
-                                        <td>{{ form.river }}</td>
-                                        <td>{{ form.reach }}</td>
-                                        <td>{{ form.river_stat }}</td>
-                                        <td>{{ form.flow }}</td>
+                                      <th scope="col">#</th>
+                                      <th scope="col">River</th>
+                                      <th scope="col">Reach</th>
+                                      <th scope="col">River stat</th>
+                                      <th scope="col">Flow</th>
                                     </tr>
-                                {% endfor %}
-                              </tbody>
-                            </table>
-                            <button id="add-row-initial-flow" type="button" class="btn btn-success">&#43;</button>
-                            <button id="remove-row-initial-flow" type="button" class="btn btn-danger">&#8722;</button>
-                        </div>
-                        <div class="d-flex justify-content-between pt-4">
-                            <h5>Configuración de series</h5>
-                        </div>
-                        <div class="form-group" id="series_list_container">
-                            {{ form.series_list.label }}
+                                  </thead>
+                                  <tbody id="initial_flow_table_body">
+                                    {% for form in form.initial_flow_list %}
+                                        <tr>
+                                            <th scope="row">{{loop.index}}</th>
+                                            <td>{{ form.river }}</td>
+                                            <td>{{ form.reach }}</td>
+                                            <td>{{ form.river_stat }}</td>
+                                            <td>{{ form.flow }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                  </tbody>
+                                </table>
+                                <button id="add-row-initial-flow" type="button" class="btn btn-success">&#43;</button>
+                                <button id="remove-row-initial-flow" type="button" class="btn btn-danger">&#8722;</button>
+                                <button id="clear-row-initial-flow" type="button" class="btn btn-danger">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="d-flex justify-content-between pt-4">
+                                <h5>Configuración de series</h5>
+                            </div>
+                            <div class="form-group" id="series_list_container">
+                            {{ form.series_list_file.label }}: {{ form.series_list_file(class_="form-control") }}
                             <table class="table" id="series_table">
                               <thead>
                                 <tr>
@@ -126,46 +159,47 @@
                             </table>
                             <button id="add-row-series" type="button" class="btn btn-success">&#43;</button>
                             <button id="remove-row-series" type="button" class="btn btn-danger">&#8722;</button>
+                            <button id="clear-row-series" type="button" class="btn btn-danger">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
                     </div>
-
-                    </div>
-
-                    <div class="d-flex justify-content-between pt-4" data-toggle="collapse" href="#series_list_plan_container" role="button" aria-expanded="false" aria-controls="series_list_plan_container">
-                        <h4>Configuración de plan</h4>
-                    </div>
-                    <div class="form-group" id="series_list_plan_container">
-                        {{ form.series_list.label }}
-                        <table class="table" id="series_plan_table">
-                          <thead>
-                            <tr>
-                              <th scope="col">#</th>
-                              <th scope="col">River</th>
-                              <th scope="col">Reach</th>
-                              <th scope="col">River stat</th>
-                              <th scope="col">Serie de id de Salida</th>
-                            </tr>
-                          </thead>
-                          <tbody id="series_plan_table_body">
-                            {% for form in form.plan_series_list %}
+                        </div>
+                        <div class="tab-pane fade card card-body" id="series_list_plan_container" role="tabpanel" aria-labelledby="series-list-tab">
+                            {{ form.plan_series_file.label }}: {{ form.plan_series_file(class_="form-control") }}
+                            <table class="table" id="series_plan_table">
+                              <thead>
                                 <tr>
-                                    {{ form.idx }}
-                                    <th scope="row">{{loop.index}}</th>
-                                    <td>{{ form.river }}</td>
-                                    <td>{{ form.reach }}</td>
-                                    <td>{{ form.river_stat }}</td>
-                                    <td>{{ form.series_id }}</td>
+                                  <th scope="col">#</th>
+                                  <th scope="col">River</th>
+                                  <th scope="col">Reach</th>
+                                  <th scope="col">River stat</th>
+                                  <th scope="col">Serie de id de Salida</th>
                                 </tr>
-                            {% endfor %}
-                          </tbody>
-                        </table>
-                        <button id="add-row-series-plan" type="button" class="btn btn-success">&#43;</button>
-                        <button id="remove-row-series-plan" type="button" class="btn btn-danger">&#8722;</button>
+                              </thead>
+                              <tbody id="series_plan_table_body">
+                                {% for form in form.plan_series_list %}
+                                    <tr>
+                                        {{ form.idx }}
+                                        <th scope="row">{{loop.index}}</th>
+                                        <td>{{ form.river }}</td>
+                                        <td>{{ form.reach }}</td>
+                                        <td>{{ form.river_stat }}</td>
+                                        <td>{{ form.series_id }}</td>
+                                    </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                            <button id="add-row-series-plan" type="button" class="btn btn-success">&#43;</button>
+                            <button id="remove-row-series-plan" type="button" class="btn btn-danger">&#8722;</button>
+                            <button id="clear-row-series-plan" type="button" class="btn btn-danger">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
-
-                    <div class="form-group pt-4">
+                    <div class="form-group pt-4 text-right">
                         <button type="submit" class="btn btn-primary">Guardar</button>
                     </div>
-                </form>
+            </form>
         </div>
     </div>
 
@@ -186,6 +220,10 @@
 
         $( "#remove-row-initial-flow" ).on("click", function() {
             $('#initial_flow_table_body tr:last-child').remove();
+        });
+
+        $( "#clear-row-initial-flow" ).on("click", function() {
+            $('#initial_flow_table_body tr').remove();
         });
 
         function hide_show_initial_condition_conf() {
@@ -224,6 +262,10 @@
             $('#series_table_body tr:last-child').remove();
         });
 
+        $( "#clear-row-series" ).on("click", function() {
+            $('#series_table_body tr').remove();
+        });
+
         $( "#add-row-series-plan" ).on("click", function() {
             idx = $("#series_plan_table_body")[0].rows.length
 
@@ -242,6 +284,10 @@
 
         $( "#remove-row-series-plan" ).on("click", function() {
             $('#series_plan_table_body tr:last-child').remove();
+        });
+
+        $( "#clear-row-series-plan" ).on("click", function() {
+            $('#series_plan_table_body tr').remove();
         });
 
     </script>
