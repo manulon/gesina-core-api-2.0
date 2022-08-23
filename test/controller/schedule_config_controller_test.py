@@ -7,7 +7,7 @@ from test import log_default_user
 DEFAULT_SCHEDULE_TASK_ID = 1
 
 
-with open("test/resources/dummy_geometry.g01", "rb") as f:
+with open("test/resources/dummy_reset_file.rst", "rb") as f:
     content = f.read()
     DEFAULT_DATA = {
         "observation_days": 90,

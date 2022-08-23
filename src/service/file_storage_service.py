@@ -25,7 +25,7 @@ EXECUTION_FOLDER = "execution-plan"
 RESULT_FOLDER = "result"
 RESULT_FILE_EXTENSION = ".dss"
 
-RESTART_FILE_NAME = "restart_file"
+RESTART_FILE_NAME = "restart_file.rst"
 
 
 class FileType(Enum):
