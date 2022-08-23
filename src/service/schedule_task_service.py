@@ -22,7 +22,7 @@ def update(_id, form):
         update_series_list(session, _id, retrieve_series(form, _id))
         update_plan_series_list(session, _id, retrieve_plan_series(form, _id))
 
-        if form.start_condition_type.data == "restart_file":
+        if form.start_condition_type.data == "restart_file" and form.restart_file.data:
             save_restart_file(form.restart_file.data, schedule_config.id)
         else:
             update_initial_flows(session, _id, retrieve_initial_flows(form, _id))

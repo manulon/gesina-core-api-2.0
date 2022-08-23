@@ -1,23 +1,28 @@
 from datetime import datetime
 import io
 
+import pytest
+
 from src.service import schedule_task_service
 from test import log_default_user
 
 DEFAULT_SCHEDULE_TASK_ID = 1
 
 
-with open("test/resources/dummy_reset_file.rst", "rb") as f:
-    content = f.read()
-    DEFAULT_DATA = {
-        "observation_days": 90,
-        "forecast_days": 4,
-        "start_condition_type": "restart_file",
-        "restart_file": (io.BytesIO(content), "restart_file_name"),
-    }
+@pytest.fixture
+def default_data():
+    with open("test/resources/dummy_reset_file.rst", "rb") as f:
+        content = f.read()
+        DEFAULT_DATA = {
+            "observation_days": 90,
+            "forecast_days": 4,
+            "start_condition_type": "restart_file",
+            "restart_file": (io.BytesIO(content), "restart_file_name"),
+        }
+    return DEFAULT_DATA
 
 
-def test_update_only_schedule_config_frequency_success(a_client):
+def test_update_only_schedule_config_frequency_success(a_client, default_data):
     log_default_user(a_client)
     original_schedule_task = schedule_task_service.get_schedule_task_config(
         DEFAULT_SCHEDULE_TASK_ID
@@ -33,7 +38,7 @@ def test_update_only_schedule_config_frequency_success(a_client):
             "%Y-%m-%dT%H:%M"
         ),
         "geometry_id": original_schedule_task.geometry_id,
-        **DEFAULT_DATA,
+        **default_data,
     }
     response = a_client.post(
         f"/view/schedule_tasks/{original_schedule_task.id}",
@@ -51,7 +56,7 @@ def test_update_only_schedule_config_frequency_success(a_client):
     assert schedule_task.enabled == original_schedule_task.enabled
 
 
-def test_update_only_enabled_success(a_client):
+def test_update_only_enabled_success(a_client, default_data):
     log_default_user(a_client)
     original_schedule_task = schedule_task_service.get_schedule_task_config(
         DEFAULT_SCHEDULE_TASK_ID
@@ -67,7 +72,7 @@ def test_update_only_enabled_success(a_client):
             "%Y-%m-%dT%H:%M"
         ),
         "geometry_id": original_schedule_task.geometry_id,
-        **DEFAULT_DATA,
+        **default_data,
     }
     response = a_client.post(
         f"/view/schedule_tasks/{original_schedule_task.id}",
@@ -84,7 +89,7 @@ def test_update_only_enabled_success(a_client):
     assert not schedule_task.enabled
 
 
-def test_update_both_enabled_and_frequency_success(a_client):
+def test_update_both_enabled_and_frequency_success(a_client, default_data):
     log_default_user(a_client)
     original_schedule_task = schedule_task_service.get_schedule_task_config(
         DEFAULT_SCHEDULE_TASK_ID
@@ -101,7 +106,7 @@ def test_update_both_enabled_and_frequency_success(a_client):
             "%Y-%m-%dT%H:%M"
         ),
         "geometry_id": original_schedule_task.geometry_id,
-        **DEFAULT_DATA,
+        **default_data,
     }
 
     response = a_client.post(
@@ -142,7 +147,7 @@ def test_update_fails_on_empty_schedule_frequency(a_client):
     assert schedule_task.enabled == original_schedule_task.enabled
 
 
-def test_update_fails_on_invalid_id(a_client):
+def test_update_fails_on_invalid_id(a_client, default_data):
     log_default_user(a_client)
     invalid_id = -1
 
@@ -153,7 +158,7 @@ def test_update_fails_on_invalid_id(a_client):
         "description": "bar",
         "start_datetime": datetime.now().strftime("%Y-%m-%dT%H:%M"),
         "geometry_id": "1",
-        **DEFAULT_DATA,
+        **default_data,
     }
     response = a_client.post(
         f"/view/schedule_tasks/{invalid_id}",
