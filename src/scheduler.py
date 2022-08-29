@@ -62,9 +62,14 @@ class ScheduledTaskJob:
         plan_file = build_plan(simulation_name, start_date, end_date)
         plan_name = "scheduled_task.p01"
         use_restart = scheduled_task.start_condition_type == "restart_file"
-        flow_file = new_build_flow(scheduled_task.border_conditions, use_restart, "restart.rst",
-                                   scheduled_task.initial_flows, scheduled_task.observation_days,
-                                   scheduled_task.forecast_days)
+        flow_file = new_build_flow(
+            scheduled_task.border_conditions,
+            use_restart,
+            "restart.rst",
+            scheduled_task.initial_flows,
+            scheduled_task.observation_days,
+            scheduled_task.forecast_days,
+        )
         flow_name = "scheduled_task.u01"
         return
 
