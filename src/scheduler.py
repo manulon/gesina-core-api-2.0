@@ -8,7 +8,6 @@ from apscheduler.schedulers.background import BlockingScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor
 
-from src.persistance.scheduled_task import ScheduledTask
 from src.service import execution_plan_service, user_service
 from src import config
 from src.persistance.execution_plan import ExecutionPlanStatus
@@ -71,7 +70,6 @@ class ScheduledTaskJob:
             scheduled_task.forecast_days,
         )
         flow_name = "scheduled_task.u01"
-        return
 
         execution_plan = execution_plan_service.create_from_scheduler(
             simulation_name,

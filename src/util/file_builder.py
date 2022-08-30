@@ -7,6 +7,7 @@ from src.parana.forecast import forecast
 import more_itertools
 from datetime import datetime, timedelta
 
+TEMPLATES_DIR = "src/file_templates"
 
 def build_project(title, start_date, end_date):
     data = {
@@ -16,7 +17,7 @@ def build_project(title, start_date, end_date):
         "END_DATE": end_date.strftime("%d%b%Y"),
         "END_TIME": end_date.strftime("%H:%M"),
     }
-    with open("file_templates/parana_prj_template.txt", "r") as f:
+    with open(f"{TEMPLATES_DIR}/parana_prj_template.txt", "r") as f:
         src = Template(f.read())
     result = src.substitute(data)
 
@@ -29,7 +30,7 @@ def build_plan(title, start_datetime, end_datetime):
         "PLAN_ID": f"{title}-TR",
         "TIMEFRAME": f'{start_datetime.strftime("%d%b%Y,%H:%M")},{end_datetime.strftime("%d%b%Y,%H:%M")}',
     }
-    with open("file_templates/parana_plan_template.txt", "r") as f:
+    with open(f"{TEMPLATES_DIR}/parana_plan_template.txt", "r") as f:
         src = Template(f.read())
     result = src.substitute(data)
 
@@ -70,7 +71,7 @@ def build_flow(end_date=datetime(2022, 5, 18), days=60):
             items.append(Item(**data, start_date=start_date, values=forecast_df[point]))
 
     # Build .u
-    with open("file_templates/parana_flow_template.txt", "r") as f:
+    with open(f"{TEMPLATES_DIR}/parana_flow_template.txt", "r") as f:
         src = Template(f.read())
 
     result = src.substitute({"ITEMS": "\n".join([str(i) for i in items])})
@@ -99,13 +100,13 @@ def build_initial_flows(initial_flow_list):
             )
         )
     initial_flows_string = "\n".join(list_of_flows)
-    with open("file_templates/initial_flows.txt", "r") as f:
+    with open(f"{TEMPLATES_DIR}/initial_flows.txt", "r") as f:
         src = Template(f.read())
     return src.substitute({"INITIAL_FLOWS": initial_flows_string})
 
 
 def build_restart_status(restart_filename):
-    with open("file_templates/restart_info.txt", "r") as f:
+    with open(f"{TEMPLATES_DIR}/restart_info.txt", "r") as f:
         src = Template(f.read())
     return src.substitute({"FILE_NAME": restart_filename})
 
@@ -210,7 +211,7 @@ def get_forecast_and_observation_values(border_conditions, start_date, end_date)
 
 def build_boundary_conditions(start_date, conditions):
     boundary_locations = []
-    with open("file_templates/boundary_location.txt", "r") as f:
+    with open(f"{TEMPLATES_DIR}/boundary_location.txt", "r") as f:
         src = Template(f.read())
         for condition in conditions:
             groups = more_itertools.grouper(
@@ -250,7 +251,7 @@ def new_build_flow(
     )
     boundary_locations = build_boundary_conditions(start_date, conditions)
 
-    with open("file_templates/parana_flow_template.txt", "r") as f:
+    with open(f"{TEMPLATES_DIR}/parana_flow_template.txt", "r") as f:
         src = Template(f.read())
     result = src.substitute(
         {
