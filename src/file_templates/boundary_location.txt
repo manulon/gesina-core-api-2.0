@@ -1,0 +1,10 @@
+Boundary Location=$LOCATION
+Interval=$INTERVAL
+$CONDITION_TYPE=$AMOUNT
+$SERIES
+DSS Path=
+Use DSS=False
+Use Fixed Start Time=True
+Fixed Start Date/Time=$START_DATE,
+Is Critical Boundary=False
+Critical Boundary Flow=

@@ -7,10 +7,12 @@ from datetime import timedelta
 from apscheduler.schedulers.background import BlockingScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor
-from src.service import execution_plan_service, user_service
+
+from src.service import execution_plan_service
 from src import config
 from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service.execution_plan_service import update_execution_plan_status
+from src.service.schedule_task_service import get_schedule_task_config
 from src.tasks import queue_or_fake_simulate
 
 
@@ -41,29 +43,42 @@ SIMULATION_DURATION = 60
 
 
 class ScheduledTaskJob:
-    def __init__(self, task):
-        self.scheduled_task = task
+    def __init__(self, task_id: int):
+        self.scheduled_task = task_id
 
     def simulate(self):
+        scheduled_task = get_schedule_task_config(self.scheduled_task)
         print("Starting simulation")
         start_date = datetime.now()
         end_date = start_date + timedelta(days=SIMULATION_DURATION)
 
-        simulation_name = f'{self.scheduled_task.name.replace(" ", "_")}-{start_date.strftime("%Y%m%d_%Hhs")}'
+        simulation_name = f'{scheduled_task.name.replace(" ", "_")}-{start_date.strftime("%Y%m%d_%Hhs")}'
 
-        user = user_service.get_admin_user()
-        geometry_id = self.scheduled_task.geometry_id
         project_file = build_project(simulation_name, start_date, end_date)
         project_name = "scheduled_task.prj"
+
         plan_file = build_plan(simulation_name, start_date, end_date)
         plan_name = "scheduled_task.p01"
-        flow_file = build_flow()
+
+        use_restart = scheduled_task.start_condition_type == "restart_file"
+
+        flow_file = build_flow(
+            use_restart=use_restart, initial_flows=scheduled_task.initial_flows
+        )
+        # flow_file = new_build_flow(
+        #     scheduled_task.border_conditions,
+        #     use_restart,
+        #     "restart.rst",
+        #     scheduled_task.initial_flows,
+        #     scheduled_task.observation_days,
+        #     scheduled_task.forecast_days,
+        # )
         flow_name = "scheduled_task.u01"
 
         execution_plan = execution_plan_service.create_from_scheduler(
             simulation_name,
-            geometry_id,
-            user,
+            scheduled_task.geometry_id,
+            scheduled_task.user,
             project_name,
             project_file,
             plan_name,
@@ -97,7 +112,7 @@ def check_for_scheduled_tasks():
         ):
             print(f"Adding {st.name}")
             scheduler.add_job(
-                ScheduledTaskJob(st).simulate,
+                ScheduledTaskJob(st.id).simulate,
                 "interval",
                 minutes=st.frequency,
                 id=job_id,
