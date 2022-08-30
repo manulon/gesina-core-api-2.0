@@ -35,13 +35,22 @@ class ScheduledTask(Base):
     observation_days = Column(Integer)
     forecast_days = Column(Integer)
     initial_flows = relationship(
-        "InitialFlow", lazy="joined", back_populates="scheduled_task"
+        "InitialFlow",
+        lazy="joined",
+        back_populates="scheduled_task",
+        order_by="InitialFlow.id",
     )
     border_conditions = relationship(
-        "BorderCondition", lazy="joined", back_populates="scheduled_task"
+        "BorderCondition",
+        lazy="joined",
+        back_populates="scheduled_task",
+        order_by="BorderCondition.id",
     )
     plan_series_list = relationship(
-        "PlanSeries", lazy="joined", back_populates="scheduled_task"
+        "PlanSeries",
+        lazy="joined",
+        back_populates="scheduled_task",
+        order_by="PlanSeries.id",
     )
 
 
