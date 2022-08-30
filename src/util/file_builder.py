@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 
 TEMPLATES_DIR = "src/file_templates"
 
+
 def build_project(title, start_date, end_date):
     data = {
         "PROJECT_TITLE": title,
@@ -37,7 +38,11 @@ def build_plan(title, start_datetime, end_datetime):
     return BytesIO(result.encode("utf8"))
 
 
-def build_flow(end_date=datetime(2022, 5, 18), days=60):
+def build_flow(
+    end_date=datetime(2022, 5, 18), days=60, use_restart=False, initial_flows=None
+):
+    initial_status = create_initial_status(use_restart, "restart.rst", initial_flows)
+
     end_date = (end_date + timedelta(days=1)).replace(
         hour=0, minute=0, second=0, microsecond=0
     )
@@ -74,7 +79,12 @@ def build_flow(end_date=datetime(2022, 5, 18), days=60):
     with open(f"{TEMPLATES_DIR}/parana_flow_template.txt", "r") as f:
         src = Template(f.read())
 
-    result = src.substitute({"ITEMS": "\n".join([str(i) for i in items])})
+    result = src.substitute(
+        {
+            "INITIAL_STATUS": initial_status,
+            "BOUNDARY_LOCATIONS": "\n".join([str(i) for i in items]),
+        }
+    )
 
     return BytesIO(result.encode("utf8"))
 
@@ -301,4 +311,4 @@ class Item:
 
 
 if __name__ == "__main__":
-    build_flow()
+    print(build_flow(use_restart=True).read().decode("utf8"))
