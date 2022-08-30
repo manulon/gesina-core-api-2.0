@@ -279,6 +279,8 @@ def render_schedule_view(form, schedule_config=None, errors=()):
 
 
 def render_initial_flows(form, initial_flows):
+    clean_form_list(form.initial_flow_list)
+
     for each_initial_flow in initial_flows:
         initial_flow_form = InitialFlowForm()
         initial_flow_form.river = each_initial_flow.river
@@ -289,6 +291,8 @@ def render_initial_flows(form, initial_flows):
 
 
 def render_border_condition(border_condition, form):
+    clean_form_list(form.series_list)
+
     for each_border_condition in border_condition:
         series_form = SeriesForm()
         series_form.river = each_border_condition.river
@@ -306,6 +310,8 @@ def render_border_condition(border_condition, form):
 
 
 def render_plan_series_list(plan_series_list, form):
+    clean_form_list(form.plan_series_list)
+
     for plan in plan_series_list:
         plan_form = PlanSeriesForm()
         plan_form.idx = plan.id
@@ -314,6 +320,12 @@ def render_plan_series_list(plan_series_list, form):
         plan_form.river_stat = plan.river_stat
         plan_form.series_id = plan.series_id
         form.plan_series_list.append_entry(plan_form)
+
+
+def clean_form_list(form_list):
+    if form_list:
+        for i in range(0, len(form_list)):
+            form_list.entries.pop(0)
 
 
 @VIEW_BLUEPRINT.route("/user/logout", methods=["GET"])
