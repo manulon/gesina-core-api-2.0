@@ -48,7 +48,7 @@
     <script>
         function userActions(value, row) {
             let modal_name = "deleteUserModal" + row['id'].toString()
-            debugger;
+
             let delete_user = `
                 <form>
                     <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#${modal_name}" data-tooltip="tooltip" data-placement="bottom" title="Eliminar usuario">
