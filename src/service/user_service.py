@@ -26,7 +26,7 @@ def get_users(limit):
 
 def get_all_users():
     with get_session() as session:
-        return session.query(User).all()
+        return session.query(User).order_by(User.id.desc()).all()
 
 
 def save(email, first_name, last_name, password):
