@@ -1,0 +1,93 @@
+{%  extends "layout.html" %}
+{% block content %}
+    <div>
+        <div class="d-flex justify-content-between pb-4">
+            <h2>Listado de usuarios</h2>
+            <button type="button" class="btn btn-info" onClick="window.location.href = '{{url_for("public_view_controller.sign_up")}}'">Crear Usuario</button>
+        </div>
+        <div class="container-fluid">
+            <table
+                id="table"
+                data-toggle="table"
+                data-url="{{ url_for('user_controller.list_users') }}"
+                data-side-pagination="server"
+                data-pagination="true"
+                data-filter="true"
+                data-filter-control="true"
+                data-locale="es-AR"
+                data-page-size="5"
+                data-page-list="[5, 10, 25, 50, 100, 200]"
+                data-query-params="queryParams"
+        >
+                <thead>
+                <tr>
+                    <th data-field="id">
+                        ID
+                    </th>
+                    <th data-field="first_name">
+                        Nombre
+                    </th>
+                    <th data-field="last_name">
+                        Apellido
+                    </th>
+                    <th data-field="email">
+                        Mail
+                    </th>
+                    <th data-field="admin_role" data-formatter="roleFormatter">
+                        Rol
+                    </th>
+                    <th data-formatter="userActions">
+                        Acciones
+                    </th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Eliminar Usuario</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ¿Está seguro que quiere eliminar al usuario?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dissmiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function userActions(value, row) {
+            let delete_user = `
+                <form action="${update_url}${row["id"]}" method="POST">
+                    <button type="button" class="btn btn-outline-secondary" data-toggle="modal" data-target="#deleteUserModal" data-tooltip="tooltip" data-placement="bottom" title="Eliminar">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </form>
+            `
+            return `
+                <div class="d-flex justify-content-around">
+                    ${delete_user}
+                </div>
+            `
+          }
+
+        function roleFormatter(value) {
+            if (value) {
+                return "Administrador";
+            }
+            return "Usuario";
+        }
+    </script>
+
+{% endblock %}

@@ -75,6 +75,15 @@ def home():
         )
 
 
+@VIEW_BLUEPRINT.route("/users")
+def user_list():
+    user = user_service.get_current_user()
+    if user.admin_role:
+        return render_template("user_list.html")
+    else:
+        return execution_plan_list()
+
+
 @VIEW_BLUEPRINT.route("/geometry/<geometry_id>")
 def geometry_read(geometry_id):
     geometry = geometry_service.get_geometry(geometry_id)

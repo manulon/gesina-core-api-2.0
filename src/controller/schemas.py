@@ -19,4 +19,13 @@ class ScheduleTaskSchema(Schema):
     user = fields.Str()
 
 
+class UserSchema(Schema):
+    id = fields.Int()
+    first_name = fields.Str()
+    last_name = fields.Str()
+    email = fields.Str()
+    admin_role = fields.Bool()
+
+
 SCHEDULE_TASK_SCHEMA = ScheduleTaskSchema()
+USER_SCHEMA = UserSchema()

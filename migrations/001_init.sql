@@ -10,7 +10,8 @@ create table if not exists "user"
 	last_name text not null,
 	email text not null,
 	password text not null,
-	session_id text null
+	session_id text null,
+	admin_role bool not null
 );
 
 alter table "user" owner to "user";

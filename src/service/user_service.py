@@ -24,9 +24,14 @@ def get_users(limit):
         return session.query(User).limit(limit).all()
 
 
+def get_all_users():
+    with get_session() as session:
+        return session.query(User).all()
+
+
 def save(email, first_name, last_name, password):
     user = User(
-        email=email, first_name=first_name, last_name=last_name, password=password
+        email=email, first_name=first_name, last_name=last_name, password=password, admin_role=True
     )
     with get_session() as session:
         session.add(user)
