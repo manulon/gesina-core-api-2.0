@@ -61,8 +61,8 @@ class InitialFlow(Base):
     scheduled_task = relationship("ScheduledTask", back_populates="initial_flows")
     river = Column(String)
     reach = Column(String)
-    river_stat = Column(Float)
-    flow = Column(Float)
+    river_stat = Column(String)
+    flow = Column(String)
 
 
 class BorderConditionType(str, enum.Enum):
@@ -85,7 +85,7 @@ class BorderCondition(Base):
     scheduled_task = relationship("ScheduledTask", back_populates="border_conditions")
     river = Column(String)
     reach = Column(String)
-    river_stat = Column(Float)
+    river_stat = Column(String)
     interval = Column(String)
     type = Column(Enum(BorderConditionType))
     observation_id = Column(Integer)
@@ -97,7 +97,7 @@ class PlanSeries(Base):
     id = Column(Integer, primary_key=True)
     river = Column(String)
     reach = Column(String)
-    river_stat = Column(Float)
+    river_stat = Column(String)
     series_id = Column(Integer)
     scheduled_task = relationship("ScheduledTask", back_populates="plan_series_list")
     scheduled_task_id = Column(Integer, ForeignKey("scheduled_task.id"))
