@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from flask import Blueprint, jsonify, send_file, url_for, redirect
+from flask import Blueprint, jsonify, send_file, url_for, redirect, request
 from src import logger
 
 from src.login_manager import user_is_authenticated
@@ -14,22 +14,25 @@ EXECUTION_PLAN_BLUEPRINT.before_request(user_is_authenticated)
 
 @EXECUTION_PLAN_BLUEPRINT.route("", methods=["GET"])
 def list_execution_plans():
+    args = request.args
+    offset = int(args.get("offset"))
+    limit = int(args.get("limit"))
     execution_plans = execution_plan_service.get_execution_plans()
+    total_rows = len(execution_plans)
 
     response_list = []
-    for execution_plan in execution_plans:
+    for execution_plan in execution_plans[offset : offset + limit]:
         user = execution_plan.user
-        geometry = execution_plan.geometry
         execution_plan_row = {
             "id": execution_plan.id,
-            "geometry": geometry.description,
+            "plan_name": execution_plan.plan_name,
             "user": user.full_name,
             "created_at": execution_plan.created_at.strftime("%d/%m/%Y"),
             "status": execution_plan.status,
         }
         response_list.append(execution_plan_row)
 
-    return jsonify({"rows": response_list, "total": len(response_list)})
+    return jsonify({"rows": response_list, "total": total_rows})
 
 
 @EXECUTION_PLAN_BLUEPRINT.route("/download/<_id>/<_file_type>/<_file>")

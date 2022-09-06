@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 
 from src.login_manager import user_is_authenticated
 from src.service import schedule_task_service
@@ -10,10 +10,17 @@ SCHEDULE_TASK_BLUEPRINT.before_request(user_is_authenticated)
 
 @SCHEDULE_TASK_BLUEPRINT.route("", methods=["GET"])
 def list_schedule_tasks():
+    args = request.args
+    offset = int(args.get("offset"))
+    limit = int(args.get("limit"))
     schedule_tasks = schedule_task_service.get_schedule_tasks()
+    total_rows = len(schedule_tasks)
+
     return jsonify(
         {
-            "rows": SCHEDULE_TASK_SCHEMA.dump(schedule_tasks, many=True),
-            "total": len(schedule_tasks),
+            "rows": SCHEDULE_TASK_SCHEMA.dump(
+                schedule_tasks[offset : offset + limit], many=True
+            ),
+            "total": total_rows,
         }
     )

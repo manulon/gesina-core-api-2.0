@@ -63,7 +63,7 @@ def create(form):
 
 def get_schedule_tasks():
     with get_session() as session:
-        return session.query(ScheduledTask).all()
+        return session.query(ScheduledTask).order_by(ScheduledTask.id.desc()).all()
 
 
 def get_schedule_task_config(schedule_config_id):

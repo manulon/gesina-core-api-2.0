@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from flask import Blueprint, jsonify, send_file
+from flask import Blueprint, jsonify, send_file, request
 
 from src.login_manager import user_is_authenticated
 from src.service import geometry_service, file_storage_service
@@ -12,10 +12,14 @@ GEOMETRY_BLUEPRINT.before_request(user_is_authenticated)
 
 @GEOMETRY_BLUEPRINT.route("", methods=["GET"])
 def list_geometries():
+    args = request.args
+    offset = int(args.get("offset"))
+    limit = int(args.get("limit"))
     geometries = geometry_service.get_geometries()
+    total_rows = len(geometries)
 
     response_list = []
-    for geometry in geometries:
+    for geometry in geometries[offset : offset + limit]:
         user = geometry.user
         geometry_row = {
             "id": geometry.id,
@@ -26,7 +30,7 @@ def list_geometries():
         }
         response_list.append(geometry_row)
 
-    return jsonify({"rows": response_list, "total": len(response_list)})
+    return jsonify({"rows": response_list, "total": total_rows})
 
 
 @GEOMETRY_BLUEPRINT.route("/download/<_id>")
