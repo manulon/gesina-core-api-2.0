@@ -19,6 +19,7 @@ class User(Base, flask_login.UserMixin):
     last_name = Column(String)
     email = Column(String)
     admin_role = Column(Boolean)
+    active = Column(Boolean)
     _password = Column("password", String)
     notifications = relationship(
         UserNotification,

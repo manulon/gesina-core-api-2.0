@@ -36,6 +36,9 @@
                     <th data-field="admin_role" data-formatter="roleFormatter">
                         Rol
                     </th>
+                    <th data-field="active" data-formatter="activeFormatter">
+                        Estado
+                    </th>
                     <th data-formatter="userActions">
                         Acciones
                     </th>
@@ -92,6 +95,13 @@
                 return "Administrador";
             }
             return "Usuario";
+        }
+
+        function activeFormatter(value) {
+            if (value) {
+                return "Activo";
+            }
+            return "Desactivo";
         }
     </script>
 

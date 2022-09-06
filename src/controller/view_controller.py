@@ -30,8 +30,6 @@ from src.view.forms.schedule_config_form import (
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
 VIEW_BLUEPRINT.before_request(user_is_authenticated)
 
-VIEW_BLUEPRINT.before_request(user_is_authenticated)
-
 
 @VIEW_BLUEPRINT.route("/")
 def home():

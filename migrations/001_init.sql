@@ -11,7 +11,8 @@ create table if not exists "user"
 	email text not null,
 	password text not null,
 	session_id text null,
-	admin_role bool not null
+	admin_role bool not null,
+	active bool not null
 );
 
 alter table "user" owner to "user";
