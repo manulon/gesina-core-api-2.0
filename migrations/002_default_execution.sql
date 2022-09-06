@@ -1,4 +1,4 @@
-INSERT INTO gesina."user" (first_name, last_name, email, "password", "admin_role") VALUES
+INSERT INTO gesina."user" (first_name, last_name, email, "password", "admin_role", "active") VALUES
 	 ('Admin', 'Ina', 'admin@ina.com.ar', 'pbkdf2:sha256:260000$ejlxRPQiZOMWt2o2$f856120dd2d2170c070b1648524000f6803ef28eb2ad9af96523ad900e454743', true, true);
 
 INSERT INTO gesina.geometry ("name", description, created_at, user_id) VALUES
