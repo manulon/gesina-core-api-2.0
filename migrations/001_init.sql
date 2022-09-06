@@ -77,8 +77,8 @@ create table if not exists "initial_flow"
     scheduled_task_id integer not null constraint initial_flows_scheduled_task_id_fk references "scheduled_task",
     river text not null,
     reach text not null,
-    river_stat float not null,
-    flow float not null
+    river_stat text not null,
+    flow text not null
 );
 
 create table if not exists "border_condition"
@@ -87,7 +87,7 @@ create table if not exists "border_condition"
     scheduled_task_id integer not null constraint border_condition_scheduled_task_id_fk references "scheduled_task",
     river text not null,
     reach text not null,
-    river_stat float not null,
+    river_stat text not null,
     interval text not null,
     type text not null,
     observation_id integer not null,
@@ -108,7 +108,7 @@ create table if not exists "plan_series"
     id serial constraint plan_series_pk primary key,
     river text not null,
     reach text not null,
-    river_stat float not null,
+    river_stat text not null,
     series_id integer not null,
     scheduled_task_id integer not null constraint plan_series_scheduled_task_id_fk references "scheduled_task"
 );
