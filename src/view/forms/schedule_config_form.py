@@ -28,11 +28,11 @@ class InitialFlowForm(Form):
         label="Reach",
         validators=[DataRequired(message="Error: El reach no puede estar vacío")],
     )
-    river_stat = DecimalField(
+    river_stat = StringField(
         label="River stat",
         validators=[DataRequired(message="Error: El river stat no puede estar vacío")],
     )
-    flow = DecimalField(
+    flow = StringField(
         label="Flow",
         validators=[DataRequired(message="Error: El flow no puede estar vacío")],
     )
@@ -109,7 +109,7 @@ class PlanSeriesForm(Form):
         label="Reach",
         validators=[DataRequired(message="Error: El reach no puede estar vacío")],
     )
-    river_stat = DecimalField(
+    river_stat = StringField(
         label="River stat",
         validators=[DataRequired(message="Error: El river stat no puede estar vacío")],
     )
