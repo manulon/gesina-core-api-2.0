@@ -19,6 +19,7 @@ def simulate(execution_id, user_id):
     import win32com.client as client
     from src.service import file_storage_service
 
+
     begin = datetime.now()
 
     base_path = f"C:\\gesina\\{execution_id}"
@@ -85,6 +86,7 @@ def queue_or_fake_simulate(execution_id):
         fake_simulate(execution_id, execution.user.id)
     else:
         logger.info(f"Queueing simulation for {execution_id}")
+        print({"execution_id": execution_id, "user_id": execution.user.id})
         simulate.apply_async(
             kwargs={"execution_id": execution_id, "user_id": execution.user.id},
             link_error=error_handler.s(),

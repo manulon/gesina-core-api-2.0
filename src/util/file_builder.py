@@ -272,10 +272,6 @@ def new_build_flow(
         }
     )
 
-    with open("test_archivo_salida.txt", "w") as f:
-        f.write(result)
-    print(result)
-
     return BytesIO(result.encode("utf8"))
 
 

@@ -35,8 +35,10 @@ def create_from_scheduler(
     plan_file,
     flow_name,
     flow_file,
+    use_restart,
+    schedule_task_id
 ):
-    return create(
+    execution_plan = create(
         execution_plan_name,
         geometry_id,
         user,
@@ -47,6 +49,10 @@ def create_from_scheduler(
         flow_name,
         flow_file,
     )
+    if use_restart:
+        file_storage_service.copy_restart_file_to(execution_plan.id, schedule_task_id)
+
+    return execution_plan
 
 
 def create(
