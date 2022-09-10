@@ -26,6 +26,7 @@ from src.view.forms.schedule_config_form import (
     IntervalForm,
     PlanSeriesForm,
 )
+from src.view.forms.users_forms import EditUserForm
 
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
 VIEW_BLUEPRINT.before_request(user_is_authenticated)
@@ -73,11 +74,20 @@ def home():
         )
 
 
-@VIEW_BLUEPRINT.route("/users")
+@VIEW_BLUEPRINT.route("/user")
 def user_list():
     user = user_service.get_current_user()
     if user.admin_role:
         return render_template("user_list.html")
+    else:
+        return execution_plan_list()
+
+
+@VIEW_BLUEPRINT.route("/user/<user_id>")
+def edit_user(user_id):
+    if user_service.get_current_user().admin_role:
+        user = user_service.get_user(user_id)
+        return render_template("user_login_sign-up.html", form=EditUserForm(user=user))
     else:
         return execution_plan_list()
 

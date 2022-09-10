@@ -25,6 +25,7 @@ class UserSchema(Schema):
     last_name = fields.Str()
     email = fields.Str()
     admin_role = fields.Bool()
+    active = fields.Bool()
 
 
 SCHEDULE_TASK_SCHEMA = ScheduleTaskSchema()

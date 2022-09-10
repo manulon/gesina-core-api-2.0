@@ -1,6 +1,6 @@
 from flask import url_for
 from flask_wtf import FlaskForm
-from wtforms import StringField, EmailField, PasswordField, SubmitField
+from wtforms import StringField, EmailField, PasswordField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, ValidationError
 
 from src.view.forms import ErrorMixin
@@ -54,3 +54,37 @@ class LoginForm(FlaskForm, ErrorMixin):
         "Contraseña", validators=[DataRequired(message="Ingrese una contraseña")]
     )
     submit = SubmitField("Ingresar")
+
+
+class EditUserForm(FlaskForm, ErrorMixin):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        user = kwargs['user']
+        self.title = "Edición de Usuario"
+        self.endpoint = url_for("public_view_controller.update_user")
+        self.show_register_button = False
+        self.email.data = user.email
+        self.first_name.data = user.first_name
+        self.last_name.data = user.last_name
+        self.admin_role.data = user.admin_role
+
+    email = EmailField(validators=[DataRequired(message="Ingrese un email")])
+    first_name = StringField(
+        "Nombre", validators=[DataRequired(message="Ingrese un nombre")]
+    )
+    last_name = StringField(
+        "Apellido", validators=[DataRequired(message="Ingrese un apellido")]
+    )
+    admin_role = BooleanField(
+        "Administrador", validators=[]
+    )
+    password = PasswordField(
+        "Contraseña", validators=[]
+    )
+    repeat_password = PasswordField(
+        "Confirmación",
+        validators=[
+            VerifyPasswords(message="Las contraseñas no coinciden"),
+        ],
+    )
+    submit = SubmitField("Guardar")
