@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from flask import Flask, jsonify, redirect, url_for
 
+import src
 from src.encoders import CustomJSONEncoder
 from src.translations import gettext, pretty_date
 from src import config
@@ -41,4 +42,5 @@ def page_not_found(e):
 app.json_encoder = CustomJSONEncoder
 
 if __name__ == "__main__":
+    src.migrate()
     app.run(debug=True, use_reloader=False, host="0.0.0.0", port=5000)

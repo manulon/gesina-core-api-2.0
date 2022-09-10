@@ -86,7 +86,7 @@ class ScheduledTaskJob:
             flow_name,
             flow_file,
             use_restart,
-            scheduled_task.id
+            scheduled_task.id,
         )
         update_execution_plan_status(execution_plan.id, ExecutionPlanStatus.RUNNING)
         try:

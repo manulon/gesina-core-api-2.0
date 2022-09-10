@@ -19,7 +19,6 @@ def simulate(execution_id, user_id):
     import win32com.client as client
     from src.service import file_storage_service
 
-
     begin = datetime.now()
 
     base_path = f"C:\\gesina\\{execution_id}"

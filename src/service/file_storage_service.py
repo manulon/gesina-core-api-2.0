@@ -48,7 +48,10 @@ def copy_restart_file_to(execution_id, scheduled_task_id):
     minio_client.copy_object(
         ROOT_BUCKET,
         f"{EXECUTION_FOLDER}/{execution_id}/{RESTART_FILE_NAME}",
-        CopySource(ROOT_BUCKET, f"{SCHEDULED_TASK_FOLDER}/{scheduled_task_id}/{RESTART_FILE_NAME}"),
+        CopySource(
+            ROOT_BUCKET,
+            f"{SCHEDULED_TASK_FOLDER}/{scheduled_task_id}/{RESTART_FILE_NAME}",
+        ),
     )
 
 
