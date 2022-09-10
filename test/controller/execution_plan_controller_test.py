@@ -111,7 +111,7 @@ def test_list_geometries_when_there_one(a_client):
         "rows": [
             {
                 "created_at": "21/12/2021",
-                "geometry": "Ejemplo dado por el INA",
+                "plan_name": "ejemplo-ina",
                 "id": 1,
                 "status": "PENDING",
                 "user": "Admin Ina",
@@ -132,14 +132,14 @@ def test_list_execution_plan_when_there_two(a_client, a_execution_plan):
         "rows": [
             {
                 "created_at": datetime.now().strftime("%d/%m/%Y"),
-                "geometry": "Ejemplo dado por el INA",
+                "plan_name": "some_plan",
                 "id": 2,
                 "status": "PENDING",
                 "user": "Admin Ina",
             },
             {
                 "created_at": "21/12/2021",
-                "geometry": "Ejemplo dado por el INA",
+                "plan_name": "ejemplo-ina",
                 "id": 1,
                 "status": "PENDING",
                 "user": "Admin Ina",

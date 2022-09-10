@@ -5,7 +5,7 @@ from src import logger
 
 from src.login_manager import user_is_authenticated
 from src.persistance.execution_plan import ExecutionPlanStatus
-from src.service import execution_plan_service, file_storage_service
+from src.service import execution_plan_service, file_storage_service, list_utils_service
 from src.service.file_storage_service import FileType
 
 EXECUTION_PLAN_BLUEPRINT = Blueprint("execution_plan_controller", __name__)
@@ -14,9 +14,7 @@ EXECUTION_PLAN_BLUEPRINT.before_request(user_is_authenticated)
 
 @EXECUTION_PLAN_BLUEPRINT.route("", methods=["GET"])
 def list_execution_plans():
-    args = request.args
-    offset = int(args.get("offset"))
-    limit = int(args.get("limit"))
+    offset, limit = list_utils_service.process_list_params()
     execution_plans = execution_plan_service.get_execution_plans()
     total_rows = len(execution_plans)
 
