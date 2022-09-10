@@ -13,5 +13,65 @@ INSERT INTO gesina.execution_plan (plan_name,geometry_id, user_id, start_datetim
 
 INSERT INTO gesina.scheduled_task (name, description, frequency, geometry_id, user_id, start_datetime, metadata,
     observation_days, forecast_days, start_condition_type) VALUES
-	 ('Paraná', 'Corrida periódica del rio Paraná', 360, 1, 1, '2021-12-21 00:00:00.000000', null,
+	 ('Paraná', 'Corrida periódica del rio Paraná', 360, 2, 1, '2021-12-21 00:00:00.000000', null,
 	 90, 4, 'restart_file');
+
+INSERT INTO gesina.border_condition (
+    scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
+    1, 'Parana', 'ParanaAA', '224000', '1-DAY', 'STAGE_HYDROGRAPH', 1, 1);
+
+INSERT INTO gesina.border_condition (
+    scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
+    1, 'Lujan', '1', '30.664', '1-HOUR', 'FLOW_HYDROGRAPH', 1, 1);
+
+INSERT INTO gesina.border_condition (
+    scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
+    1, 'Ibicuy', 'Ibicuy', '67.930*', '1-HOUR', 'LATERAL_INFLOW_HYDROGRAPH', 1, 1);
+
+INSERT INTO gesina.border_condition (
+    scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
+    1, 'Lujan', 'Desembocadura', '0', '1-HOUR', 'STAGE_HYDROGRAPH', 1, 1);
+
+INSERT INTO gesina.border_condition (
+    scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
+    1, 'SanAntonio', 'Desembocadura', '0', '1-HOUR', 'STAGE_HYDROGRAPH', 1, 1);
+
+INSERT INTO gesina.border_condition (
+    scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
+    1, 'CanaldelEste', 'Desembocadura', '0', '1-HOUR', 'STAGE_HYDROGRAPH', 1, 1);
+
+INSERT INTO gesina.border_condition (
+    scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
+    1, 'Palmas', 'Desembocadura', '6246.783', '1-HOUR', 'STAGE_HYDROGRAPH', 1, 1);
+
+INSERT INTO gesina.border_condition (
+    scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
+    1, 'Mini', 'Desembocadura', '0', '1-HOUR', 'STAGE_HYDROGRAPH', 1, 1);
+
+INSERT INTO gesina.border_condition (
+    scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
+    1, 'LaBarquita', 'Desembocadura', '0', '1-HOUR', 'STAGE_HYDROGRAPH', 1, 1);
+
+INSERT INTO gesina.border_condition (
+    scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
+    1, 'BarcaGrande', 'Desembocadura', '0', '1-HOUR', 'STAGE_HYDROGRAPH', 1, 1);
+
+INSERT INTO gesina.border_condition (
+    scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
+    1, 'Guazu', 'Desembocadura', '8000', '1-HOUR', 'STAGE_HYDROGRAPH', 1, 1);
+
+INSERT INTO gesina.border_condition (
+    scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
+    1, 'Sauce', 'Desembocadura', '0', '1-HOUR', 'STAGE_HYDROGRAPH', 1, 1);
+
+INSERT INTO gesina.border_condition (
+    scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
+    1, 'Bravo', 'Desembocadura', '0', '1-HOUR', 'STAGE_HYDROGRAPH', 1, 1);
+
+INSERT INTO gesina.border_condition (
+    scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
+    1, 'Gutierrez', 'Desembocadura', '1960.748', '1-HOUR', 'STAGE_HYDROGRAPH', 1, 1);
+
+INSERT INTO gesina.border_condition (
+    scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
+    1, 'Gutierrez', 'Desembocadura', '1960.748', '1-HOUR', 'STAGE_HYDROGRAPH', 1, 1);

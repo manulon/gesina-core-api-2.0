@@ -41,7 +41,9 @@ def build_plan(title, start_datetime, end_datetime):
 def build_flow(
     end_date=datetime(2022, 5, 18), days=60, use_restart=False, initial_flows=None
 ):
-    initial_status = create_initial_status(use_restart, "restart.rst", initial_flows)
+    initial_status = create_initial_status(
+        use_restart, "restart_file.rst", initial_flows
+    )
 
     end_date = (end_date + timedelta(days=1)).replace(
         hour=0, minute=0, second=0, microsecond=0

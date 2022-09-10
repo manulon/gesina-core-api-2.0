@@ -65,7 +65,7 @@ class SeriesForm(Form):
         validators=[DataRequired(message="Error: El reach no puede estar vacío")],
         render_kw=render_kw,
     )
-    river_stat = DecimalField(
+    river_stat = StringField(
         label="River stat",
         validators=[DataRequired(message="Error: El river stat no puede estar vacío")],
         render_kw=render_kw,

@@ -68,7 +68,7 @@ class ScheduledTaskJob:
         # flow_file = new_build_flow(
         #     scheduled_task.border_conditions,
         #     use_restart,
-        #     "restart.rst",
+        #     "restart_file.rst",
         #     scheduled_task.initial_flows,
         #     scheduled_task.observation_days,
         #     scheduled_task.forecast_days,

@@ -22,6 +22,7 @@ ROOT_BUCKET = config.minio_bucket
 
 GEOMETRY_FOLDER = "geometry"
 EXECUTION_FOLDER = "execution-plan"
+SCHEDULED_TASK_FOLDER = "scheduled-task"
 RESULT_FOLDER = "result"
 RESULT_FILE_EXTENSION = ".dss"
 
@@ -32,6 +33,7 @@ class FileType(Enum):
     GEOMETRY = GEOMETRY_FOLDER
     EXECUTION_PLAN = EXECUTION_FOLDER
     RESULT = RESULT_FOLDER
+    SCHEDULED_TASK = SCHEDULED_TASK_FOLDER
 
 
 def copy_geometry_to(execution_id, geometry_filename):
@@ -42,17 +44,17 @@ def copy_geometry_to(execution_id, geometry_filename):
     )
 
 
-def save_restart_file(data, execution_id):
-    save_file(FileType.EXECUTION_PLAN, data, RESTART_FILE_NAME, execution_id)
+def save_restart_file(data, scheduled_task_id):
+    save_file(FileType.SCHEDULED_TASK, data, "restart_file.rst", scheduled_task_id)
 
 
-def save_file(file_type, file, filename, execution_id=None):
+def save_file(file_type, file, filename, _id=None):
     file_bytes = file.read()
     data = io.BytesIO(file_bytes)
     try:
         minio_path = f"{file_type.value}"
-        if execution_id:
-            minio_path += f"/{execution_id}"
+        if _id:
+            minio_path += f"/{_id}"
         minio_path += f"/{secure_filename(filename)}"
 
         minio_client.put_object(
