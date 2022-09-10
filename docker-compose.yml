@@ -8,7 +8,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ['python', '-c', 'import src; src.migrate()', '&&', 'gunicorn', '--bind', '0.0.0.0:5000', '-w', '4', '--pythonpath', 'src', 'src.app:app']
+    command: ['gunicorn', '--bind', '0.0.0.0:5000', '-w', '4', '--pythonpath', 'src', 'src.app:app']
     environment:
       - BROKER_URL=redis://redis:6379/0 # para encolar
       - RESULT_BACKEND=redis://redis:6379/0 # para guardar el resultado

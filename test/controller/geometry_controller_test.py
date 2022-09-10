@@ -139,7 +139,7 @@ def test_list_geometries_when_there_only_two(a_client):
                 "created_at": datetime.now().strftime("%d/%m/%Y"),
                 "description": "Geometría Paraná",
                 "id": 2,
-                "name": "DeltaParana_2017.g23",
+                "name": "DeltaParana_2017.g01",
                 "user": "Admin Ina",
             },
             {
@@ -182,7 +182,7 @@ def test_list_geometries_when_there_two(a_client, a_geometry_file):
                 "created_at": datetime.now().strftime("%d/%m/%Y"),
                 "description": "Geometría Paraná",
                 "id": 2,
-                "name": "DeltaParana_2017.g23",
+                "name": "DeltaParana_2017.g01",
                 "user": "Admin Ina",
             },
             {

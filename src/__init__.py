@@ -23,3 +23,5 @@ def _get_backend_and_migrations():
     migrations = read_migrations("./migrations")
 
     return backend, migrations
+
+migrate()
