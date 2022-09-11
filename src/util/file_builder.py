@@ -78,7 +78,7 @@ def build_flow(
             items.append(Item(**data, start_date=start_date, values=forecast_df[point]))
 
     # Build .u
-    with open(f"{TEMPLATES_DIR}/parana_flow_template.txt", "r") as f:
+    with open(f"{TEMPLATES_DIR}/unsteady_flow_template.txt", "r") as f:
         src = Template(f.read())
 
     result = src.substitute(
@@ -263,7 +263,7 @@ def new_build_flow(
     )
     boundary_locations = build_boundary_conditions(start_date, conditions)
 
-    with open(f"{TEMPLATES_DIR}/parana_flow_template.txt", "r") as f:
+    with open(f"{TEMPLATES_DIR}/unsteady_flow_template.txt", "r") as f:
         src = Template(f.read())
     result = src.substitute(
         {
