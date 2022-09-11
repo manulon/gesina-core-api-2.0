@@ -46,7 +46,7 @@ class ScheduledTaskJob:
     def __init__(self, task_id: int):
         self.scheduled_task = task_id
 
-    def simulate(self):
+    def simulate(self, flow_file=None):
         scheduled_task = get_schedule_task_config(self.scheduled_task)
         print("Starting simulation")
         start_date = datetime.now()
@@ -62,7 +62,7 @@ class ScheduledTaskJob:
 
         use_restart = scheduled_task.start_condition_type == "restart_file"
 
-        flow_file = build_flow(
+        flow_file = flow_file or build_flow(
             use_restart=use_restart, initial_flows=scheduled_task.initial_flows
         )
         # flow_file = new_build_flow(
