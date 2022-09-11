@@ -1,7 +1,7 @@
 Flow Title=BOUNDARY_008
 Program Version=4.10
 Use Restart=-1 
-Restart Filename=DeltaParana_2016.p21.28Sep2018 2400.rst
+Restart Filename=restart_file.rst
 Keep SA Constant=-1
 Boundary Location=Bravo,Desembocadura,0,        ,                ,                ,                ,                
 Interval=1HOUR
