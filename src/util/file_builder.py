@@ -1,5 +1,8 @@
+import io
 from io import BytesIO
 from string import Template
+
+import numpy as np
 
 from src.parana import entry_points, border_conditions_points, PARANA_ID
 from src.parana.observations import obtain_observations
@@ -18,7 +21,7 @@ def build_project(title, start_date, end_date):
         "END_DATE": end_date.strftime("%d%b%Y"),
         "END_TIME": end_date.strftime("%H:%M"),
     }
-    with open(f"{TEMPLATES_DIR}/parana_prj_template.txt", "r") as f:
+    with io.open(f"{TEMPLATES_DIR}/parana_prj_template.txt", "r", newline='') as f:
         src = Template(f.read())
     result = src.substitute(data)
 
@@ -31,7 +34,7 @@ def build_plan(title, start_datetime, end_datetime):
         "PLAN_ID": f"{title}-TR",
         "TIMEFRAME": f'{start_datetime.strftime("%d%b%Y,%H:%M")},{end_datetime.strftime("%d%b%Y,%H:%M")}',
     }
-    with open(f"{TEMPLATES_DIR}/parana_plan_template.txt", "r") as f:
+    with io.open(f"{TEMPLATES_DIR}/parana_plan_template.txt", "r", newline='') as f:
         src = Template(f.read())
     result = src.substitute(data)
 
@@ -78,13 +81,13 @@ def build_flow(
             items.append(Item(**data, start_date=start_date, values=forecast_df[point]))
 
     # Build .u
-    with open(f"{TEMPLATES_DIR}/unsteady_flow_template.txt", "r") as f:
+    with io.open(f"{TEMPLATES_DIR}/unsteady_flow_template.txt", "r", newline='') as f:
         src = Template(f.read())
 
     result = src.substitute(
         {
             "INITIAL_STATUS": initial_status,
-            "BOUNDARY_LOCATIONS": "\n".join([str(i) for i in items]),
+            "BOUNDARY_LOCATIONS": "\r\n".join([str(i) for i in items]),
         }
     )
 
@@ -111,7 +114,7 @@ def build_initial_flows(initial_flow_list):
                 ]
             )
         )
-    initial_flows_string = "\n".join(list_of_flows)
+    initial_flows_string = "\r\n".join(list_of_flows)
     with open(f"{TEMPLATES_DIR}/initial_flows.txt", "r") as f:
         src = Template(f.read())
     return src.substitute({"INITIAL_FLOWS": initial_flows_string})
@@ -237,7 +240,7 @@ def build_boundary_conditions(start_date, conditions):
                 "INTERVAL": condition["interval"],
                 "CONDITION_TYPE": condition["border_condition"],
                 "AMOUNT": len(condition["values"]),
-                "SERIES": "\n".join(["".join(group) for group in groups]),
+                "SERIES": "\r\n".join(["".join(group) for group in groups]),
                 "START_DATE": start_date.strftime("%d%b%Y"),
             }
             boundary_locations.append(src.substitute(condition_data))
@@ -284,7 +287,7 @@ class Item:
         self.river_stat = river_stat
         self.interval = interval
         self.border_condition = border_condition
-        self.values = values
+        self.values = [value if not np.isnan(value) else 1 for value in values]
         self.start_date = start_date
 
     def __str__(self):
@@ -305,7 +308,7 @@ class Item:
         lines.append("Is Critical Boundary=False")
         lines.append("Critical Boundary Flow=")
 
-        return "\n".join(lines)
+        return "\r\n".join(lines)
 
 
 if __name__ == "__main__":
