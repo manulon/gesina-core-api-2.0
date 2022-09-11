@@ -117,7 +117,10 @@ def download_files_for_execution(base_path, execution_id):
         with get_file(file) as response:
             file = file.split("/")[-1]
             file_extension = file.split(".")[-1]
-            with open(f"{base_path}\\{execution_id}.{file_extension}", "wb") as f:
+            file_name = f'{execution_id}.{file_extension}'
+            if file_extension == "rst":
+                file_name = RESTART_FILE_NAME
+            with open(f"{base_path}\\{file_name}", "wb") as f:
                 f.write(response.data)
 
 
