@@ -21,7 +21,7 @@ def build_project(title, start_date, end_date):
         "END_DATE": end_date.strftime("%d%b%Y"),
         "END_TIME": end_date.strftime("%H:%M"),
     }
-    with io.open(f"{TEMPLATES_DIR}/parana_prj_template.txt", "r", newline='') as f:
+    with io.open(f"{TEMPLATES_DIR}/parana_prj_template.txt", "r", newline="") as f:
         src = Template(f.read())
     result = src.substitute(data)
 
@@ -34,7 +34,7 @@ def build_plan(title, start_datetime, end_datetime):
         "PLAN_ID": f"{title}-TR",
         "TIMEFRAME": f'{start_datetime.strftime("%d%b%Y,%H:%M")},{end_datetime.strftime("%d%b%Y,%H:%M")}',
     }
-    with io.open(f"{TEMPLATES_DIR}/parana_plan_template.txt", "r", newline='') as f:
+    with io.open(f"{TEMPLATES_DIR}/parana_plan_template.txt", "r", newline="") as f:
         src = Template(f.read())
     result = src.substitute(data)
 
@@ -81,7 +81,7 @@ def build_flow(
             items.append(Item(**data, start_date=start_date, values=forecast_df[point]))
 
     # Build .u
-    with io.open(f"{TEMPLATES_DIR}/unsteady_flow_template.txt", "r", newline='') as f:
+    with io.open(f"{TEMPLATES_DIR}/unsteady_flow_template.txt", "r", newline="") as f:
         src = Template(f.read())
 
     result = src.substitute(

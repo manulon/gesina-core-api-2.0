@@ -24,4 +24,5 @@ def _get_backend_and_migrations():
 
     return backend, migrations
 
+
 migrate()
