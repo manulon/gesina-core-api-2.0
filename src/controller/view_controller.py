@@ -16,6 +16,7 @@ from src.service import (
 )
 from src.service.exception.activity_exception import ActivityException
 from src.service.exception.file_exception import FileUploadError
+from src.service.exception.series_exception import SeriesUploadError
 from src.service.file_storage_service import FileType
 from src.view.forms.execution_plan_form import ExecutionPlanForm
 from src.view.forms.geometry_form import GeometryForm
@@ -239,7 +240,7 @@ def save_or_create_schedule_config(schedule_config_id):
             )
 
         return render_schedule_view(form, schedule_config, form.get_errors())
-    except FileUploadError as exception:
+    except (FileUploadError, SeriesUploadError) as exception:
         logger.error(exception.message)
         return render_schedule_view(form, schedule_config, [exception.message])
     except Exception as exception:

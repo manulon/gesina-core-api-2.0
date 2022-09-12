@@ -1,10 +1,14 @@
 import csv
 import io
+import re as regex
 from src.persistance.scheduled_task import (
     BorderCondition,
     BorderConditionType,
 )
 from src.service.exception.file_exception import FileUploadError
+from src.service.exception.series_exception import SeriesUploadError
+
+SERIES_INTERVAL_REGEX = "^[0-9]*-(MINUTE|HOUR|DAY|WEEK)$"
 
 CSV_HEADERS = [
     "river",
@@ -20,7 +24,11 @@ CSV_HEADERS = [
 def retrieve_series(form, scheduled_config_id=None):
     from_csv = process_series_csv_file(form.series_list_file, scheduled_config_id)
     from_form = process_series_form(form.series_list, scheduled_config_id)
-    return from_csv + from_form
+    merged_series = from_csv + from_form
+    for series in merged_series:
+        if not bool(regex.match(SERIES_INTERVAL_REGEX, series.interval)):
+            raise SeriesUploadError("Error: Interval con formato incorrecto")
+    return merged_series
 
 
 def update_series_list(session, scheduled_config_id, series):
