@@ -179,18 +179,19 @@ class ScheduleConfigForm(FlaskForm, ErrorMixin):
     )
 
     restart_file = FileField(label="Restart file")
-    initial_flow_file = FileField(label="Importar desde CSV")
+    initial_flow_file = FileField(label="Importar series iniciales desde .CSV")
 
     initial_flow_list = FieldList(
         FormField(InitialFlowForm), label="Lista de flujos iniciales", min_entries=0
     )
 
-    series_list_file = FileField(label="Importar desde CSV")
+    series_list_file = FileField(label="Importar series de borde desde .CSV")
     series_list = FieldList(
         FormField(SeriesForm), label="Lista de series iniciales", min_entries=0
     )
 
-    plan_series_file = FileField(label="Importar desde CSV")
+    plan_file = FileField(label="Plan File")
+    plan_series_file = FileField(label="Importar series de salida desde .CSV")
     plan_series_list = FieldList(
         FormField(PlanSeriesForm), label="Lista de series del plan", min_entries=0
     )

@@ -170,6 +170,9 @@
                     </div>
                         </div>
                         <div class="tab-pane fade card card-body" id="series_list_plan_container" role="tabpanel" aria-labelledby="series-list-tab">
+                            <div class="form-group">
+                                {{ form.plan_file.label }}: {{ form.plan_file(class_="form-control") }}
+                            </div>
                             {{ form.plan_series_file.label }}: {{ form.plan_series_file(class_="form-control") }}
                             <table class="table" id="series_plan_table">
                               <thead>

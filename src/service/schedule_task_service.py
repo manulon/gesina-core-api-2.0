@@ -1,6 +1,6 @@
 from src.persistance.scheduled_task import ScheduledTask
 from src.persistance.session import get_session
-from src.service import project_file_service
+from src.service import project_file_service, plan_file_service
 from src.service.file_storage_service import save_restart_file
 from src.service.user_service import get_current_user
 from src.service.initial_flow_service import *
@@ -29,6 +29,7 @@ def update(_id, form):
             update_initial_flows(session, _id, retrieve_initial_flows(form, _id))
 
         project_file_service.process_project_template(form.project_file.data, _id)
+        plan_file_service.process_plan_template(form.plan_file.data, _id)
         session.add(schedule_config)
 
 
@@ -63,6 +64,7 @@ def create(form):
         project_file_service.process_project_template(
             form.project_file.data, scheduled_task.id
         )
+        plan_file_service.process_plan_template(form.plan_file.data, scheduled_task.id)
 
         return scheduled_task
 
