@@ -10,10 +10,13 @@ from src.parana.forecast import forecast
 import more_itertools
 from datetime import datetime, timedelta
 
+from src.service import file_storage_service
+
 TEMPLATES_DIR = "src/file_templates"
+SCHEDULE_TASK_DIR = "scheduled-task"
 
 
-def build_project(title, start_date, end_date):
+def build_project(schedule_task_id, title, start_date, end_date):
     data = {
         "PROJECT_TITLE": title,
         "START_DATE": start_date.strftime("%d%b%Y"),
@@ -21,22 +24,29 @@ def build_project(title, start_date, end_date):
         "END_DATE": end_date.strftime("%d%b%Y"),
         "END_TIME": end_date.strftime("%H:%M"),
     }
-    with io.open(f"{TEMPLATES_DIR}/parana_prj_template.txt", "r", newline="") as f:
-        src = Template(f.read())
-    result = src.substitute(data)
+
+    with file_storage_service.get_file(
+        f"{SCHEDULE_TASK_DIR}/{schedule_task_id}/prj_template.txt"
+    ) as template_file:
+        decoded_file = BytesIO(template_file.data).read().decode("utf-8")
+        src = Template(decoded_file)
+        result = src.substitute(data)
 
     return BytesIO(result.encode("utf8"))
 
 
-def build_plan(title, start_datetime, end_datetime):
+def build_plan(schedule_task_id, title, start_datetime, end_datetime):
     data = {
         "PLAN_TITLE": f"{title}-TRAZA",
         "PLAN_ID": f"{title}-TR",
         "TIMEFRAME": f'{start_datetime.strftime("%d%b%Y,%H:%M")},{end_datetime.strftime("%d%b%Y,%H:%M")}',
     }
-    with io.open(f"{TEMPLATES_DIR}/parana_plan_template.txt", "r", newline="") as f:
-        src = Template(f.read())
-    result = src.substitute(data)
+    with file_storage_service.get_file(
+        f"{SCHEDULE_TASK_DIR}/{schedule_task_id}/plan_template.txt"
+    ) as template_file:
+        decoded_file = BytesIO(template_file.data).read().decode("utf-8")
+        src = Template(decoded_file)
+        result = src.substitute(data)
 
     return BytesIO(result.encode("utf8"))
 
