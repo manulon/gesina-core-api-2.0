@@ -7,7 +7,6 @@ from wtforms import (
     SelectField,
     DateTimeLocalField,
     FileField,
-    DecimalField,
     FieldList,
     FormField,
     Form,
@@ -150,6 +149,8 @@ class ScheduleConfigForm(FlaskForm, ErrorMixin):
         render_kw={"min": 5},
     )
     enabled = BooleanField(default="disabled", label="Ejecución habilitada")
+
+    project_file = FileField(label="Project File")
 
     observation_days = IntegerField(
         validators=[
