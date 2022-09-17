@@ -54,3 +54,12 @@ def get_admin_user():
             .filter(User.first_name == "Admin", User.last_name == "Ina")
             .one()
         )
+
+
+def enable_disable_user(user_id):
+    user = get_user(user_id)
+    user.active = not user.active
+    with get_session() as session:
+        session.add(user)
+
+    return user

@@ -81,7 +81,11 @@ def user_list():
     if user.admin_role:
         return render_template("user_list.html")
     else:
-        return execution_plan_list()
+        return redirect(
+            url_for(
+                "view_controller.home",
+            )
+        )
 
 
 @VIEW_BLUEPRINT.route("/user/<user_id>")

@@ -53,9 +53,7 @@
 
             return `
                 <div class="d-flex justify-content-around">
-                    <button type="button" class="btn btn-outline-secondary" data-tooltip="tooltip" data-placement="bottom" title="Editar Usuario" href="">
-                        <i class="fa-solid fa-pencil"></i>
-                    </button>
+                    ${buildEditButton(value, row)}
                     ${buildDeleteButton(value, row)}
                 </div>
             `
@@ -71,16 +69,17 @@
           }
 
           function buildDeleteButton(value, row){
+            let base_url = "{{ url_for("user_controller.enable_disable_user", user_id="")}}"
             let modal_name = "deleteUserModal" + row['id'].toString();
             let button_hint = "Desactivar Usuario"
             let modal_text = "desactivar"
-            let icon_class = "fa-toggle-on"
+            let icon_class = "fa-lock"
             let button_class = "btn-outline-success"
 
             if (!row['active']){
                 modal_text = "activar"
                 button_hint = "Activar Usuario"
-                icon_class = "fa-toggle-off"
+                icon_class = "fa-unlock"
                 button_class = "btn-outline-danger"
             }
 
@@ -106,7 +105,9 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                                <button type="button" class="btn btn-primary">Aceptar</button>
+                                <form action="${base_url}${row["id"]}" method="post">
+                                    <button type="submit" class="btn btn-primary" name="Accept">Aceptar</button>
+                                </form>
                             </div>
                         </div>
                     </div>
