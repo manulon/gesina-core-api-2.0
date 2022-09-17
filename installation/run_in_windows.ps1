@@ -7,4 +7,4 @@ $Env:DATABASE_HOST='10.0.2.2:5432'
 $Env:MINIO_URL='10.0.2.2:9000'
 $Env:C_FORCE_ROOT='true'
 $Env:PYTHONPATH='C:\gesina-core-api\'
-celery -A src.tasks worker -l info -P gevent
+celery -A src.tasks worker -l info -P gevent --concurrency 1

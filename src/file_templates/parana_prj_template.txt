@@ -25,5 +25,4 @@ DXF OffsetX= 0
 DXF OffsetY= 0
 DXF ScaleX= 1
 DXF ScaleY= 10
-GIS Export Reach=AnaCua          ,Canal_AnaCua
 GIS Export Profiles= 0

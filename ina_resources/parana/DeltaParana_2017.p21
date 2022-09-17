@@ -2,7 +2,7 @@ Plan Title=Crecida2016
 Program Version=4.10
 Short Identifier=Plan 21
 Simulation Date=01Dec2021,0000,04Apr2022,0000
-Geom File=g23
+Geom File=g01
 Flow File=u10
 Subcritical Flow
 K Sum by GR= 0

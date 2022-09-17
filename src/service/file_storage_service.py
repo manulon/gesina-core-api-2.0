@@ -22,6 +22,7 @@ ROOT_BUCKET = config.minio_bucket
 
 GEOMETRY_FOLDER = "geometry"
 EXECUTION_FOLDER = "execution-plan"
+SCHEDULED_TASK_FOLDER = "scheduled-task"
 RESULT_FOLDER = "result"
 RESULT_FILE_EXTENSION = ".dss"
 
@@ -32,6 +33,7 @@ class FileType(Enum):
     GEOMETRY = GEOMETRY_FOLDER
     EXECUTION_PLAN = EXECUTION_FOLDER
     RESULT = RESULT_FOLDER
+    SCHEDULED_TASK = SCHEDULED_TASK_FOLDER
 
 
 def copy_geometry_to(execution_id, geometry_filename):
@@ -42,17 +44,28 @@ def copy_geometry_to(execution_id, geometry_filename):
     )
 
 
-def save_restart_file(data, execution_id):
-    save_file(FileType.EXECUTION_PLAN, data, RESTART_FILE_NAME, execution_id)
+def copy_restart_file_to(execution_id, scheduled_task_id):
+    minio_client.copy_object(
+        ROOT_BUCKET,
+        f"{EXECUTION_FOLDER}/{execution_id}/{RESTART_FILE_NAME}",
+        CopySource(
+            ROOT_BUCKET,
+            f"{SCHEDULED_TASK_FOLDER}/{scheduled_task_id}/{RESTART_FILE_NAME}",
+        ),
+    )
 
 
-def save_file(file_type, file, filename, execution_id=None):
+def save_restart_file(data, scheduled_task_id):
+    save_file(FileType.SCHEDULED_TASK, data, RESTART_FILE_NAME, scheduled_task_id)
+
+
+def save_file(file_type, file, filename, _id=None):
     file_bytes = file.read()
     data = io.BytesIO(file_bytes)
     try:
         minio_path = f"{file_type.value}"
-        if execution_id:
-            minio_path += f"/{execution_id}"
+        if _id:
+            minio_path += f"/{_id}"
         minio_path += f"/{secure_filename(filename)}"
 
         minio_client.put_object(
@@ -104,7 +117,10 @@ def download_files_for_execution(base_path, execution_id):
         with get_file(file) as response:
             file = file.split("/")[-1]
             file_extension = file.split(".")[-1]
-            with open(f"{base_path}\\{execution_id}.{file_extension}", "wb") as f:
+            file_name = f"{execution_id}.{file_extension}"
+            if file_extension == "rst":
+                file_name = RESTART_FILE_NAME
+            with open(f"{base_path}\\{file_name}", "wb") as f:
                 f.write(response.data)
 
 

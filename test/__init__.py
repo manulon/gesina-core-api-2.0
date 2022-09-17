@@ -13,5 +13,5 @@ config.secret_key = config.secret_key
 
 
 def log_default_user(a_client):
-    data = {"email": "admin@ina.com.ar", "password": "123456"}
+    data = {"email": "admin@ina.com.ar", "password": "password"}
     a_client.post("/view/login", data=data, content_type="multipart/form-data")

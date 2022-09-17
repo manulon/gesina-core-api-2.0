@@ -14,8 +14,9 @@ services:
       - RESULT_BACKEND=redis://redis:6379/0 # para guardar el resultado
       - MINIO_URL=minio:9000
       - DATABASE_HOST=database:5432
+      - PYTHONPATH=/app/
     volumes:
-      - ./:/app/
+      - .:/app/
     depends_on:
       - redis
       - database
@@ -45,6 +46,21 @@ services:
         - MINIO_ROOT_PASSWORD=password
         - MINIO_STORAGE_USE_HTTPS=False
       command: server /data --console-address ":9001"
-
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ['python', 'src/scheduler.py']
+    environment:
+      - BROKER_URL=redis://redis:6379/0 # para encolar
+      - RESULT_BACKEND=redis://redis:6379/0 # para guardar el resultado
+      - MINIO_URL=minio:9000
+      - DATABASE_HOST=database:5432
+      - PYTHONPATH=/app/
+    volumes:
+      - .:/app/
+    depends_on:
+      - redis
+      - database
 volumes:
   database:
