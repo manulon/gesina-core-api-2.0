@@ -57,10 +57,10 @@ class LoginForm(FlaskForm, ErrorMixin):
 
 
 class EditUserForm(FlaskForm, ErrorMixin):
-    def __init__(self, **kwargs):
+    def __init__(self, user_id, **kwargs):
         super().__init__(**kwargs)
         self.title = "Edición de Usuario"
-        self.endpoint = url_for("public_view_controller.update_user")
+        self.endpoint = url_for("user_controller.update_user", user_id=user_id)
         self.show_register_button = False
 
     email = EmailField(validators=[DataRequired(message="Ingrese un email")])

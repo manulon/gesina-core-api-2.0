@@ -98,9 +98,14 @@ def edit_user(user_id):
                                    first_name=user.first_name,
                                    last_name=user.last_name,
                                    admin_role=user.admin_role,
+                                   user_id=user.id
                                ))
     else:
-        return execution_plan_list()
+        return redirect(
+            url_for(
+                "view_controller.home",
+            )
+        )
 
 
 @VIEW_BLUEPRINT.route("/geometry/<geometry_id>")

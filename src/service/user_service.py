@@ -39,6 +39,21 @@ def save(email, first_name, last_name, password):
     return user
 
 
+def edit(user_id, email, first_name, last_name, admin_role, password):
+    user = get_user(user_id)
+    user.email = email
+    user.first_name = first_name
+    user.last_name = last_name
+    user.admin_role = admin_role
+    if password:
+        user.password = password
+
+    with get_session() as session:
+        session.add(user)
+
+    return user
+
+
 def get_user_by_email_and_password(email, password):
     with get_session() as session:
         user = session.query(User).filter(User.email == email).first()

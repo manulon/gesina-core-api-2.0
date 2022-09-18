@@ -1,8 +1,9 @@
-from flask import Blueprint, jsonify, redirect, url_for
+from flask import Blueprint, jsonify, redirect, url_for, request
 
 from src.controller.schemas import USER_SCHEMA
 from src.login_manager import user_is_authenticated
 from src.service import user_service
+from src.view.forms.users_forms import EditUserForm
 
 USER_BLUEPRINT = Blueprint("user_controller", __name__)
 USER_BLUEPRINT.before_request(user_is_authenticated)
@@ -19,7 +20,7 @@ def list_users():
     )
 
 
-@USER_BLUEPRINT.route("<user_id>", methods=["POST"])
+@USER_BLUEPRINT.route("active/<user_id>", methods=["POST"])
 def enable_disable_user(user_id):
     if user_service.get_current_user().admin_role:
         user_service.enable_disable_user(user_id)
@@ -32,3 +33,25 @@ def enable_disable_user(user_id):
                 success_message=success_message,
             )
         )
+
+
+@USER_BLUEPRINT.route("update/<user_id>", methods=["POST"])
+def update_user(user_id):
+    form = EditUserForm(user_id)
+    if form.validate_on_submit():
+        user_service.edit(
+            user_id,
+            form.email.data,
+            form.first_name.data,
+            form.last_name.data,
+            form.admin_role.data,
+            form.password.data,
+        )
+
+    success_message = "Usuario editado exitosamente"
+    return redirect(
+        url_for(
+            "view_controller.user_list",
+            success_message=success_message,
+        )
+    )
