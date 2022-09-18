@@ -359,9 +359,3 @@ def clean_form_list(form_list):
     if form_list:
         for i in range(0, len(form_list)):
             form_list.entries.pop(0)
-
-
-@VIEW_BLUEPRINT.route("/user/logout", methods=["GET"])
-def do_logout():
-    flask_login.logout_user()
-    return redirect(url_for("public_view_controller.login"))

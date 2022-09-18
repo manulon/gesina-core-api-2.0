@@ -1,5 +1,6 @@
 import flask
-from flask import Blueprint, render_template, url_for
+import flask_login
+from flask import Blueprint, render_template, url_for, redirect
 from flask_login import login_user
 
 from src.service import user_service
@@ -37,3 +38,9 @@ def do_login():
     return render_template(
         "user_login_sign-up.html", form=form, errors=form.get_errors()
     )
+
+
+@PUBLIC_VIEW_BLUEPRINT.route("/user/logout", methods=["GET"])
+def do_logout():
+    flask_login.logout_user()
+    return redirect(url_for("public_view_controller.login"))
