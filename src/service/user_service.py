@@ -29,9 +29,9 @@ def get_all_users():
         return session.query(User).order_by(User.id.desc()).all()
 
 
-def save(email, first_name, last_name, password):
+def save(email, first_name, last_name, admin_role, password):
     user = User(
-        email=email, first_name=first_name, last_name=last_name, password=password, admin_role=True, active=True
+        email=email, first_name=first_name, last_name=last_name, admin_role=admin_role, password=password, active=True
     )
     with get_session() as session:
         session.add(user)
