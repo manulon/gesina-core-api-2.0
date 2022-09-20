@@ -1,10 +1,5 @@
 import flask_login
-from sqlalchemy import (
-    Integer,
-    Column,
-    String,
-    Boolean
-)
+from sqlalchemy import Integer, Column, String, Boolean
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 

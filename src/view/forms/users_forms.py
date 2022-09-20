@@ -41,9 +41,7 @@ class RegisterForm(FlaskForm, ErrorMixin):
     last_name = StringField(
         "Apellido", validators=[DataRequired(message="Ingrese un apellido")]
     )
-    admin_role = BooleanField(
-        "Administrador", validators=[]
-    )
+    admin_role = BooleanField("Administrador", validators=[])
     password = PasswordField(
         "Contraseña", validators=[DataRequired(message="Ingrese una contraseña")]
     )
@@ -70,12 +68,8 @@ class EditUserForm(FlaskForm, ErrorMixin):
     last_name = StringField(
         "Apellido", validators=[DataRequired(message="Ingrese un apellido")]
     )
-    admin_role = BooleanField(
-        "Administrador", validators=[]
-    )
-    password = PasswordField(
-        "Contraseña", validators=[]
-    )
+    admin_role = BooleanField("Administrador", validators=[])
+    password = PasswordField("Contraseña", validators=[])
     repeat_password = PasswordField(
         "Confirmación",
         validators=[

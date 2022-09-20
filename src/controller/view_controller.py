@@ -92,14 +92,16 @@ def user_list():
 def edit_user(user_id):
     if user_service.get_current_user().admin_role:
         user = user_service.get_user(user_id)
-        return render_template("user_login_sign-up.html",
-                               form=EditUserForm(
-                                   email=user.email,
-                                   first_name=user.first_name,
-                                   last_name=user.last_name,
-                                   admin_role=user.admin_role,
-                                   user_id=user.id
-                               ))
+        return render_template(
+            "user_login_sign-up.html",
+            form=EditUserForm(
+                email=user.email,
+                first_name=user.first_name,
+                last_name=user.last_name,
+                admin_role=user.admin_role,
+                user_id=user.id,
+            ),
+        )
     else:
         return redirect(
             url_for(

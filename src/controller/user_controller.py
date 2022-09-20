@@ -59,7 +59,9 @@ def update_user(user_id):
 
 @USER_BLUEPRINT.route("/register", methods=["GET"])
 def register_user():
-    return render_template("user_login_sign-up.html", form=RegisterForm(admin_role=False))
+    return render_template(
+        "user_login_sign-up.html", form=RegisterForm(admin_role=False)
+    )
 
 
 @USER_BLUEPRINT.route("/register-up", methods=["POST"])

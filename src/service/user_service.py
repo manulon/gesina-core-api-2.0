@@ -31,7 +31,12 @@ def get_all_users():
 
 def save(email, first_name, last_name, admin_role, password):
     user = User(
-        email=email, first_name=first_name, last_name=last_name, admin_role=admin_role, password=password, active=True
+        email=email,
+        first_name=first_name,
+        last_name=last_name,
+        admin_role=admin_role,
+        password=password,
+        active=True,
     )
     with get_session() as session:
         session.add(user)
