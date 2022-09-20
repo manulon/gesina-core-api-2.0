@@ -64,7 +64,7 @@ def register_user():
     )
 
 
-@USER_BLUEPRINT.route("/register-up", methods=["POST"])
+@USER_BLUEPRINT.route("/register", methods=["POST"])
 def do_register_user():
     form = RegisterForm()
     if form.validate_on_submit():
