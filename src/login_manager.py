@@ -10,7 +10,7 @@ def set_up_login(app):
 
 
 def user_is_authenticated():
-    if not current_user.is_authenticated or not current_user.active:
+    if not current_user.is_authenticated:
         return login_manager.unauthorized()
     if not current_user.active:
         return redirect(
