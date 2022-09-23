@@ -62,17 +62,18 @@ class ScheduledTaskJob:
 
         use_restart = scheduled_task.start_condition_type == "restart_file"
 
-        flow_file = flow_file or build_flow(
-            use_restart=use_restart, initial_flows=scheduled_task.initial_flows
-        )
-        # flow_file = new_build_flow(
-        #     scheduled_task.border_conditions,
-        #     use_restart,
-        #     "restart_file.rst",
-        #     scheduled_task.initial_flows,
-        #     scheduled_task.observation_days,
-        #     scheduled_task.forecast_days,
+        # flow_file = flow_file or build_flow(
+        #     use_restart=use_restart, initial_flows=scheduled_task.initial_flows
         # )
+
+        flow_file = new_build_flow(
+            scheduled_task.border_conditions,
+            use_restart,
+            "restart_file.rst",
+            scheduled_task.initial_flows,
+            scheduled_task.observation_days,
+            scheduled_task.forecast_days,
+        )
         flow_name = "scheduled_task.u01"
 
         execution_plan = execution_plan_service.create_from_scheduler(
