@@ -73,14 +73,14 @@
                                 {{ form.frequency.label }}: {{ form.frequency(class_="form-control") }}
                             </div>
                             <div class="form-group">
-                                {% if form.project_file_present %}
-                                     {{ form.project_file.label }}:
-                                        <div>
-                                            <a href="{{ url_for('schedule_controller.download', _id=form.idx, _file_name='prj_template.txt')}}" class="btn btn-info" role="button" aria-pressed="true" download style="font-size: smaller;"> <i class="fa-solid fa-arrow-down"></i> {{ 'prj_template.txt' }} </a>
-                                        </div>
-                                {% else %}
-                                    {{ form.project_file.label }}: {{ form.project_file(class_="form-control") }}
-                                {% endif %}
+                                 {{ form.project_file.label }}:
+                                <div id="project-template-container">
+                                    <a href="{{ url_for('schedule_controller.download', _id=form.idx, _file_name='prj_template.txt')}}" id="project-template-file" class="btn btn-info" role="button" aria-pressed="true" download style="font-size: smaller;"> <i class="fa-solid fa-arrow-down"></i> {{ 'prj_template.txt' }} </a>
+                                    <button id="clear-project-template" type="button" class="btn btn-danger" style="font-size: smaller;">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                                {{ form.project_file(class_="form-control", id_="project-template-upload") }}
                             </div>
                         </div>
                         <div class="tab-pane fade card card-body" id="borderConditionSection" role="tabpanel" aria-labelledby="border-condition-tab">
@@ -173,14 +173,14 @@
                         </div>
                         <div class="tab-pane fade card card-body" id="series_list_plan_container" role="tabpanel" aria-labelledby="series-list-tab">
                             <div class="form-group">
-                                 {% if form.plan_file_present %}
-                                     {{ form.plan_file.label }}:
-                                        <div>
-                                            <a href="{{ url_for('schedule_controller.download', _id=form.idx, _file_name='plan_template.txt')}}" class="btn btn-info" role="button" aria-pressed="true" download style="font-size: smaller;"> <i class="fa-solid fa-arrow-down"></i> {{ 'plan_template.txt' }} </a>
-                                        </div>
-                                {% else %}
-                                    {{ form.plan_file.label }}: {{ form.plan_file(class_="form-control") }}
-                                {% endif %}
+                                {{ form.plan_file.label }}:
+                                <div id="plan-template-container">
+                                    <a href="{{ url_for('schedule_controller.download', _id=form.idx, _file_name='plan_template.txt')}}" id="plan-template-file" class="btn btn-info" role="button" aria-pressed="true" download style="font-size: smaller;"> <i class="fa-solid fa-arrow-down"></i> {{ 'plan_template.txt' }} </a>
+                                    <button id="clear-plan-template" type="button" class="btn btn-danger" style="font-size: smaller;">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                                {{ form.plan_file(class_="form-control", id_="plan-template-upload") }}
                             </div>
                             {{ form.plan_series_file.label }}: {{ form.plan_series_file(class_="form-control") }}
 
@@ -275,7 +275,23 @@
 
         $( "#start_condition_type" ).on("change", hideShowInitialConditionConf);
 
-        hideShowInitialConditionConf()
+        $( "#clear-project-template" ).on("click", function() {
+            $('#project-template-container').hide();
+            $('#project-template-upload').show();
+        });
+
+        if($( "#project_file_present")) {
+            $('#project-template-upload').hide();
+        }
+
+        $( "#clear-plan-template" ).on("click", function() {
+            $('#plan-template-container').hide();
+            $('#plan-template-upload').show();
+        });
+
+        if($( "#plan_file_present")) {
+            $('#plan-template-upload').hide();
+        }
 
         $( "#add-row-series" ).on("click", function() {
             let idx = 0
