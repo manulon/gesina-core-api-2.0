@@ -66,7 +66,7 @@ class ScheduledTaskJob:
         #     use_restart=use_restart, initial_flows=scheduled_task.initial_flows
         # )
 
-        flow_file = new_build_flow(
+        flow_file = flow_file or new_build_flow(
             scheduled_task.border_conditions,
             use_restart,
             "restart_file.rst",

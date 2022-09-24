@@ -138,7 +138,9 @@ def get_forecast_and_observation_values(border_conditions, start_date, end_date)
                 "river_stat": condition.river_stat,
                 "interval": condition.interval.replace("-", ""),
                 "border_condition": condition.type,
-                "values": ina_service.obtain_curated_series(condition.observation_id, start_date, end_date),
+                "values": ina_service.obtain_curated_series(
+                    condition.observation_id, start_date, end_date
+                ),
             }
         )
     return result
