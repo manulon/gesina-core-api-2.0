@@ -49,8 +49,9 @@ class ScheduledTaskJob:
     def simulate(self, flow_file=None):
         scheduled_task = get_schedule_task_config(self.scheduled_task)
         print("Starting simulation")
-        start_date = datetime.now()
-        end_date = start_date + timedelta(days=SIMULATION_DURATION)
+        today = datetime.now().replace(minute=0)
+        start_date = today - timedelta(scheduled_task.observation_days - 1)
+        end_date = today + timedelta(scheduled_task.forecast_days + 1)
 
         simulation_name = f'{scheduled_task.name.replace(" ", "_")}-{start_date.strftime("%Y%m%d_%Hhs")}'
 
@@ -71,8 +72,8 @@ class ScheduledTaskJob:
             use_restart,
             "restart_file.rst",
             scheduled_task.initial_flows,
-            scheduled_task.observation_days,
-            scheduled_task.forecast_days,
+            start_date,
+            end_date
         )
         flow_name = "scheduled_task.u01"
 

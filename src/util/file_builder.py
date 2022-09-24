@@ -174,13 +174,10 @@ def new_build_flow(
     use_restart,
     restart_file,
     initial_flows,
-    observation_days,
-    forecast_days,
+    start_date,
+    end_date
 ):
     initial_status = create_initial_status(use_restart, restart_file, initial_flows)
-    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    end_date = today + timedelta(forecast_days + 1)
-    start_date = today - timedelta(observation_days - 1)
 
     # Buscar las series al INA
     conditions = get_forecast_and_observation_values(
