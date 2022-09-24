@@ -40,6 +40,7 @@ def build_plan(schedule_task_id, title, start_datetime, end_datetime):
         "PLAN_TITLE": f"{title}-TRAZA",
         "PLAN_ID": f"{title}-TR",
         "TIMEFRAME": f'{start_datetime.strftime("%d%b%Y,%H:%M")},{end_datetime.strftime("%d%b%Y,%H:%M")}',
+        "IC_TIME": f'{end_datetime.strftime("%d%b%Y,%H:%M")}',
     }
     with file_storage_service.get_file(
         f"{SCHEDULE_TASK_DIR}/{schedule_task_id}/plan_template.txt"

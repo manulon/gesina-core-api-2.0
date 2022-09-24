@@ -72,6 +72,9 @@
                             <div class="form-group">
                                 {{ form.frequency.label }}: {{ form.frequency(class_="form-control") }}
                             </div>
+                            {% if form.project_file_present %}
+                                <div hidden id="project_file_present"></div>
+                            {% endif %}
                             <div class="form-group">
                                  {{ form.project_file.label }}:
                                 <div id="project-template-container">
@@ -174,6 +177,9 @@
                         <div class="tab-pane fade card card-body" id="series_list_plan_container" role="tabpanel" aria-labelledby="series-list-tab">
                             <div class="form-group">
                                 {{ form.plan_file.label }}:
+                                {% if form.plan_file_present %}
+                                    <div hidden id="plan_file_present"></div>
+                                {% endif %}
                                 <div id="plan-template-container">
                                     <a href="{{ url_for('schedule_controller.download', _id=form.idx, _file_name='plan_template.txt')}}" id="plan-template-file" class="btn btn-info" role="button" aria-pressed="true" download style="font-size: smaller;"> <i class="fa-solid fa-arrow-down"></i> {{ 'plan_template.txt' }} </a>
                                     <button id="clear-plan-template" type="button" class="btn btn-danger" style="font-size: smaller;">
@@ -280,8 +286,10 @@
             $('#project-template-upload').show();
         });
 
-        if($( "#project_file_present")) {
+        if($( "#project_file_present").length) {
             $('#project-template-upload').hide();
+        } else {
+            $('#project-template-container').hide();
         }
 
         $( "#clear-plan-template" ).on("click", function() {
@@ -289,8 +297,10 @@
             $('#plan-template-upload').show();
         });
 
-        if($( "#plan_file_present")) {
+        if($( "#plan_file_present").length) {
             $('#plan-template-upload').hide();
+        }else {
+            $('#plan-template-container').hide();
         }
 
         $( "#add-row-series" ).on("click", function() {

@@ -6,7 +6,7 @@ LINES_TO_PROCESS = [
     "Plan Title",
     "Short Identifier",
     "Simulation Date",
-    "Geom File",
+    "IC Time" "Geom File",
     "Flow File",
 ]
 
@@ -14,6 +14,7 @@ LINES_CHANGES = {
     "Plan Title": "Plan Title=$PLAN_TITLE",
     "Short Identifier": "Short Identifier=$PLAN_ID",
     "Simulation Date": "Simulation Date=$TIMEFRAME",
+    "IC Time": "IC Time=,$IC_TIME,",
     "Geom File": "Geom File=g01",
     "Flow File": "Flow File=u01",
 }

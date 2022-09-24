@@ -251,6 +251,8 @@ def schedule_task_new():
 
 def render_schedule_view(form, schedule_config=None, errors=()):
     _id = None
+    form.project_file_present = False
+    form.plan_file_present = False
     if schedule_config:
         initial_flows = schedule_config.initial_flows
         border_conditions = schedule_config.border_conditions
