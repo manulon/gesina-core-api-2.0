@@ -71,7 +71,3 @@ INSERT INTO gesina.border_condition (
 INSERT INTO gesina.border_condition (
     scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
     1, 'Gutierrez', 'Desembocadura', '1960.748', '1-HOUR', 'STAGE_HYDROGRAPH', 1, 1);
-
-INSERT INTO gesina.border_condition (
-    scheduled_task_id, river, reach, river_stat, interval, type, observation_id, forecast_id) values (
-    1, 'Gutierrez', 'Desembocadura', '1960.748', '1-HOUR', 'STAGE_HYDROGRAPH', 1, 1);
