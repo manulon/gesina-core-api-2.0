@@ -7,7 +7,6 @@ from wtforms import (
     SelectField,
     DateTimeLocalField,
     FileField,
-    DecimalField,
     FieldList,
     FormField,
     Form,
@@ -121,6 +120,7 @@ class PlanSeriesForm(Form):
 
 
 class ScheduleConfigForm(FlaskForm, ErrorMixin):
+    idx = HiddenField(default=None)
     name = StringField(
         validators=[DataRequired(message="Error: El nombre no puede estar vacío")],
         label="Nombre de la corrida",
@@ -149,7 +149,10 @@ class ScheduleConfigForm(FlaskForm, ErrorMixin):
         label="Frecuencia de ejecución (en minutos)",
         render_kw={"min": 5},
     )
-    enabled = BooleanField(default="disabled", label="Ejecución habilitada")
+    enabled = BooleanField(label="Ejecución habilitada")
+
+    project_file = FileField(label="Archivo de proyecto (.prj)")
+    project_file_present = HiddenField(default=False)
 
     observation_days = IntegerField(
         validators=[
@@ -178,18 +181,20 @@ class ScheduleConfigForm(FlaskForm, ErrorMixin):
     )
 
     restart_file = FileField(label="Restart file")
-    initial_flow_file = FileField(label="Importar desde CSV")
+    initial_flow_file = FileField(label="Importar series iniciales desde .CSV")
 
     initial_flow_list = FieldList(
         FormField(InitialFlowForm), label="Lista de flujos iniciales", min_entries=0
     )
 
-    series_list_file = FileField(label="Importar desde CSV")
+    series_list_file = FileField(label="Importar series de borde desde .CSV")
     series_list = FieldList(
         FormField(SeriesForm), label="Lista de series iniciales", min_entries=0
     )
 
-    plan_series_file = FileField(label="Importar desde CSV")
+    plan_file = FileField(label="Archivo de Plan (.p)")
+    plan_file_present = HiddenField(default=False)
+    plan_series_file = FileField(label="Importar series de salida desde .CSV")
     plan_series_list = FieldList(
         FormField(PlanSeriesForm), label="Lista de series del plan", min_entries=0
     )

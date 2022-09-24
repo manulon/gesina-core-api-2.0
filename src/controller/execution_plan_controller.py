@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from flask import Blueprint, jsonify, send_file, url_for, redirect, request
+from flask import Blueprint, jsonify, send_file, url_for, redirect
 from src import logger
 
 from src.login_manager import user_is_authenticated
@@ -35,11 +35,11 @@ def list_execution_plans():
 
 @EXECUTION_PLAN_BLUEPRINT.route("/download/<_id>/<_file_type>/<_file>")
 def download(_id, _file_type, _file):
-    file = BytesIO(
-        file_storage_service.get_file_by_type(
-            FileType(_file_type), f"{_id}/{_file}"
-        ).data
-    )
+    with file_storage_service.get_file_by_type(
+        FileType(_file_type), f"{_id}/{_file}"
+    ) as file_from_storage:
+        file = BytesIO(file_from_storage.data)
+
     return send_file(file, attachment_filename=_file)
 
 
