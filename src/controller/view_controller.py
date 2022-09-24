@@ -80,11 +80,6 @@ def home():
 def geometry_read(geometry_id):
     geometry = geometry_service.get_geometry(geometry_id)
     errors = []
-    geometry_url = geometry.get_file_url()
-    if not geometry_url:
-        errors.append(
-            f"Error obteniendo archivo de geometría {geometry.name}. Intente nuevamente"
-        )
 
     return render_template(
         "geometry.html",
@@ -261,6 +256,8 @@ def render_schedule_view(form, schedule_config=None, errors=()):
         border_conditions = schedule_config.border_conditions
         plan_series_list = schedule_config.plan_series_list
 
+        form.project_file_present = schedule_config.is_project_template_present()
+        form.plan_file_present = schedule_config.is_plan_template_present()
         form.enabled.data = schedule_config.enabled
         form.frequency.data = schedule_config.frequency
         form.description.data = schedule_config.description

@@ -148,9 +148,10 @@ class ScheduleConfigForm(FlaskForm, ErrorMixin):
         label="Frecuencia de ejecución (en minutos)",
         render_kw={"min": 5},
     )
-    enabled = BooleanField(default="disabled", label="Ejecución habilitada")
+    enabled = BooleanField(label="Ejecución habilitada")
 
-    project_file = FileField(label="Project File")
+    project_file = FileField(label="Archivo de proyecto (.prj)")
+    project_file_present = HiddenField(default=False)
 
     observation_days = IntegerField(
         validators=[
@@ -190,7 +191,8 @@ class ScheduleConfigForm(FlaskForm, ErrorMixin):
         FormField(SeriesForm), label="Lista de series iniciales", min_entries=0
     )
 
-    plan_file = FileField(label="Plan File")
+    plan_file = FileField(label="Archivo de Plan (.p)")
+    plan_file_present = HiddenField(default=False)
     plan_series_file = FileField(label="Importar series de salida desde .CSV")
     plan_series_list = FieldList(
         FormField(PlanSeriesForm), label="Lista de series del plan", min_entries=0

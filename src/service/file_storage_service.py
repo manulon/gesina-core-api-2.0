@@ -103,6 +103,30 @@ def get_geometry_url(name):
         raise FilePreSignedUrlError(error_message)
 
 
+def is_project_template_present(schedule_task_id):
+    try:
+        minio_client.stat_object(
+            ROOT_BUCKET, f"{SCHEDULED_TASK_FOLDER}/{schedule_task_id}/{PROJECT_TEMPLATE_FILE_NAME}"
+        )
+        return True
+    except Exception as exception:
+        error_message = f"Project template file for {schedule_task_id} doesnt exist"
+        logger.error(error_message, exception)
+        return False
+
+
+def is_plan_template_present(schedule_task_id):
+    try:
+        minio_client.stat_object(
+            ROOT_BUCKET, f"{SCHEDULED_TASK_FOLDER}/{schedule_task_id}/{PLAN_TEMPLATE_FILE_NAME}"
+        )
+        return True
+    except Exception as exception:
+        error_message = f"Plan template file for {schedule_task_id} doesnt exist"
+        logger.error(error_message, exception)
+        return False
+
+
 def list_execution_files(file_type, execution_id):
     return minio_client.list_objects(ROOT_BUCKET, f"{file_type.value}/{execution_id}/")
 

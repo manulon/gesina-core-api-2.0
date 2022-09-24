@@ -73,12 +73,14 @@
                                 {{ form.frequency.label }}: {{ form.frequency(class_="form-control") }}
                             </div>
                             <div class="form-group">
-                                {{ form.project_file.label }}: {{ form.project_file(class_="form-control") }}
-                            </div>
-                            <div class="form-group">
-                                <div class="custom-control custom-switch">
-                                     {{ form.enabled(class_="custom-control-input") }} {{ form.enabled.label(class_="custom-control-label") }}
-                                </div>
+                                {% if form.project_file_present %}
+                                     {{ form.project_file.label }}:
+                                        <div>
+                                            <a href="{{ url_for('schedule_controller.download', _id=id, _file_name='prj_template.txt')}}" class="btn btn-info" role="button" aria-pressed="true" download style="font-size: smaller;"> <i class="fa-solid fa-arrow-down"></i> {{ 'prj_template.txt' }} </a>
+                                        </div>
+                                {% else %}
+                                    {{ form.project_file.label }}: {{ form.project_file(class_="form-control") }}
+                                {% endif %}
                             </div>
                         </div>
                         <div class="tab-pane fade card card-body" id="borderConditionSection" role="tabpanel" aria-labelledby="border-condition-tab">
@@ -171,9 +173,17 @@
                         </div>
                         <div class="tab-pane fade card card-body" id="series_list_plan_container" role="tabpanel" aria-labelledby="series-list-tab">
                             <div class="form-group">
-                                {{ form.plan_file.label }}: {{ form.plan_file(class_="form-control") }}
+                                 {% if form.plan_file_present %}
+                                     {{ form.plan_file.label }}:
+                                        <div>
+                                            <a href="{{ url_for('schedule_controller.download', _id=id, _file_name='plan_template.txt')}}" class="btn btn-info" role="button" aria-pressed="true" download style="font-size: smaller;"> <i class="fa-solid fa-arrow-down"></i> {{ 'plan_template.txt' }} </a>
+                                        </div>
+                                {% else %}
+                                    {{ form.plan_file.label }}: {{ form.plan_file(class_="form-control") }}
+                                {% endif %}
                             </div>
                             {{ form.plan_series_file.label }}: {{ form.plan_series_file(class_="form-control") }}
+
                             <table class="table" id="series_plan_table">
                               <thead>
                                 <tr>
@@ -203,6 +213,11 @@
                             <button id="clear-row-series-plan" type="button" class="btn btn-danger">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
+                        </div>
+                    </div>
+                    <div class="form-group pt-4">
+                        <div class="custom-control custom-switch">
+                             {{ form.enabled(class_="custom-control-input") }} {{ form.enabled.label(class_="custom-control-label") }}
                         </div>
                     </div>
                     <div class="form-group pt-4 text-right">
