@@ -120,6 +120,7 @@ class PlanSeriesForm(Form):
 
 
 class ScheduleConfigForm(FlaskForm, ErrorMixin):
+    idx = HiddenField(default=None)
     name = StringField(
         validators=[DataRequired(message="Error: El nombre no puede estar vacío")],
         label="Nombre de la corrida",

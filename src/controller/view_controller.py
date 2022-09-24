@@ -272,6 +272,7 @@ def render_schedule_view(form, schedule_config=None, errors=()):
         render_plan_series_list(plan_series_list, form)
 
         _id = schedule_config.id
+        form.idx = schedule_config
 
     return render_template("schedule_config.html", form=form, errors=errors, id=_id)
 

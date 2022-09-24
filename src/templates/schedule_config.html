@@ -76,7 +76,7 @@
                                 {% if form.project_file_present %}
                                      {{ form.project_file.label }}:
                                         <div>
-                                            <a href="{{ url_for('schedule_controller.download', _id=id, _file_name='prj_template.txt')}}" class="btn btn-info" role="button" aria-pressed="true" download style="font-size: smaller;"> <i class="fa-solid fa-arrow-down"></i> {{ 'prj_template.txt' }} </a>
+                                            <a href="{{ url_for('schedule_controller.download', _id=form.idx, _file_name='prj_template.txt')}}" class="btn btn-info" role="button" aria-pressed="true" download style="font-size: smaller;"> <i class="fa-solid fa-arrow-down"></i> {{ 'prj_template.txt' }} </a>
                                         </div>
                                 {% else %}
                                     {{ form.project_file.label }}: {{ form.project_file(class_="form-control") }}
@@ -176,7 +176,7 @@
                                  {% if form.plan_file_present %}
                                      {{ form.plan_file.label }}:
                                         <div>
-                                            <a href="{{ url_for('schedule_controller.download', _id=id, _file_name='plan_template.txt')}}" class="btn btn-info" role="button" aria-pressed="true" download style="font-size: smaller;"> <i class="fa-solid fa-arrow-down"></i> {{ 'plan_template.txt' }} </a>
+                                            <a href="{{ url_for('schedule_controller.download', _id=form.idx, _file_name='plan_template.txt')}}" class="btn btn-info" role="button" aria-pressed="true" download style="font-size: smaller;"> <i class="fa-solid fa-arrow-down"></i> {{ 'plan_template.txt' }} </a>
                                         </div>
                                 {% else %}
                                     {{ form.plan_file.label }}: {{ form.plan_file(class_="form-control") }}
