@@ -56,16 +56,10 @@ class ScheduledTask(Base):
     )
 
     def is_project_template_present(self):
-        try:
-            return file_storage_service.is_project_template_present(self.id)
-        except FilePreSignedUrlError:
-            return ""
+        return file_storage_service.is_project_template_present(self.id)
 
     def is_plan_template_present(self):
-        try:
-            return file_storage_service.is_plan_template_present(self.id)
-        except FilePreSignedUrlError:
-            return ""
+        return file_storage_service.is_plan_template_present(self.id)
 
 
 class InitialFlow(Base):
