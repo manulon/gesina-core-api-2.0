@@ -27,10 +27,9 @@ from src.view.forms.schedule_config_form import (
     IntervalForm,
     PlanSeriesForm,
 )
+from src.view.forms.users_forms import EditUserForm
 
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
-VIEW_BLUEPRINT.before_request(user_is_authenticated)
-
 VIEW_BLUEPRINT.before_request(user_is_authenticated)
 
 
@@ -73,6 +72,41 @@ def home():
             execution_time_average=None,
             refresh_rate=-1,
             errors=[error_message],
+        )
+
+
+@VIEW_BLUEPRINT.route("/user")
+def user_list():
+    user = user_service.get_current_user()
+    if user.admin_role:
+        return render_template("user_list.html")
+    else:
+        return redirect(
+            url_for(
+                "view_controller.home",
+            )
+        )
+
+
+@VIEW_BLUEPRINT.route("/user/<user_id>")
+def edit_user(user_id):
+    if user_service.get_current_user().admin_role:
+        user = user_service.get_user(user_id)
+        return render_template(
+            "user_login_sign-up.html",
+            form=EditUserForm(
+                email=user.email,
+                first_name=user.first_name,
+                last_name=user.last_name,
+                admin_role=user.admin_role,
+                user_id=user.id,
+            ),
+        )
+    else:
+        return redirect(
+            url_for(
+                "view_controller.home",
+            )
         )
 
 
@@ -326,9 +360,3 @@ def clean_form_list(form_list):
     if form_list:
         for i in range(0, len(form_list)):
             form_list.entries.pop(0)
-
-
-@VIEW_BLUEPRINT.route("/user/logout", methods=["GET"])
-def do_logout():
-    flask_login.logout_user()
-    return redirect(url_for("public_view_controller.login"))
