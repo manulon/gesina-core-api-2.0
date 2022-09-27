@@ -47,13 +47,14 @@ def update_user(user_id):
             form.admin_role.data,
             form.password.data,
         )
-
-    success_message = "Usuario editado exitosamente"
-    return redirect(
-        url_for(
-            "view_controller.user_list",
-            success_message=success_message,
+        success_message = "Usuario editado exitosamente"
+        return redirect(
+            url_for(
+                "view_controller.user_list",
+                success_message=success_message)
         )
+    return render_template(
+        "user_login_sign-up.html", form=form, errors=form.get_errors()
     )
 
 
