@@ -147,8 +147,7 @@
                                   <th scope="col">River stat</th>
                                   <th scope="col">Intervalo</th>
                                   <th scope="col">Tipo de condicion de borde</th>
-                                  <th scope="col">Id de observación</th>
-                                  <th scope="col">Id de pronóstico</th>
+                                  <th scope="col">Id de series</th>
                                   <th scope="col">Acciones</th>
                                 </tr>
                               </thead>
@@ -161,8 +160,7 @@
                                         <td>{{ form.river_stat }}</td>
                                         <td class="d-flex flex-row">{{ form.interval.interval_value}}{{ form.interval.interval_unit }}</td>
                                         <td>{{ form.border_condition }}</td>
-                                        <td>{{ form.observation_id }}</td>
-                                        <td>{{ form.forecast_id }}</td>
+                                        <td>{{ form.series_id }}</td>
                                         <td><button type="button" class="btn btn-danger remove-row-series">&#8722;</button></td>
                                     </tr>
                                 {% endfor %}
@@ -197,7 +195,7 @@
                                   <th scope="col">River</th>
                                   <th scope="col">Reach</th>
                                   <th scope="col">River stat</th>
-                                  <th scope="col">Serie de id de Salida</th>
+                                  <th scope="col">Id de series de salida</th>
                                   <th scope="col">Acciones</th>
                                 </tr>
                               </thead>
@@ -319,8 +317,7 @@
                     <td><input id="series_list-${idx}-river_stat" name="series_list-${idx}-river_stat" required="" step="any" style="width: 80px" type="text" value=""></td>
                     <td class="d-flex flex-row"><input id="series_list-${idx}-interval-interval_value" name="series_list-${idx}-interval-interval_value" required="" style="width: 80px" type="number" value=""><select id="series_list-${idx}-interval-interval_unit" name="series_list-${idx}-interval-interval_unit" required=""><option value="MINUTE">MINUTE</option><option value="HOUR">HOUR</option><option value="DAY">DAY</option><option value="WEEK">WEEK</option></select></td>
                     <td><select id="series_list-${idx}-border_condition" name="series_list-${idx}-border_condition" style="width: 100px" required=""><option value="Stage Hydrograph">Stage Hydrograph</option><option value="Flow Hydrograph">Flow Hydrograph</option><option value="Lateral Inflow Hydrograph">Lateral Inflow Hydrograph</option></select></td>
-                    <td><input id="series_list-${idx}-observation_id" name="series_list-${idx}-observation_id" required="" style="width: 80px" type="number" value=""></td>
-                    <td><input id="series_list-${idx}-forecast_id" name="series_list-${idx}-forecast_id" required="" style="width: 80px" type="number" value=""></td>
+                    <td><input id="series_list-${idx}-series_id" name="series_list-${idx}-series_id" required="" style="width: 80px" type="number" value=""></td>
                     <td><button type="button" class="btn btn-danger remove-row-series">&#8722;</button></td>
                 </tr>
             `

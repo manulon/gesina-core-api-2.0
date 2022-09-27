@@ -76,23 +76,14 @@ class SeriesForm(Form):
             DataRequired(message="Error: La condición de borde no puede estar vacía")
         ],
         choices=BorderConditionType.choices(),
-        render_kw={"style": "width: 100px"},
     )
 
     interval = FormField(IntervalForm, label="Intervalo", render_kw=render_kw)
 
-    observation_id = IntegerField(
-        label="Id de observación",
+    series_id = IntegerField(
+        label="Id de serie",
         validators=[
-            DataRequired(message="Error: El id de observación no puede estar vacío")
-        ],
-        render_kw=render_kw,
-    )
-
-    forecast_id = IntegerField(
-        label="Id de pronóstico",
-        validators=[
-            DataRequired(message="Error: El id de pronóstico no puede estar vacío")
+            DataRequired(message="Error: El id de series no puede estar vacío")
         ],
         render_kw=render_kw,
     )
