@@ -48,7 +48,12 @@ def test_do_sign_up_without_passwords_fails(a_client):
     log_default_user(a_client)
 
     users_size_before = len(user_service.get_users(limit=5))
-    data = {"email": "hola@mundo.com", "first_name": "John", "last_name": "Salshi", "admin_role": False,}
+    data = {
+        "email": "hola@mundo.com",
+        "first_name": "John",
+        "last_name": "Salshi",
+        "admin_role": False,
+    }
     response = a_client.post(
         "/user/register", data=data, content_type="multipart/form-data"
     )
