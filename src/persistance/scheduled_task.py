@@ -15,6 +15,8 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 
 from src.persistance.session import Base
+from src.service import file_storage_service
+from src.service.exception.file_exception import FilePreSignedUrlError
 
 
 class ScheduledTask(Base):
@@ -52,6 +54,12 @@ class ScheduledTask(Base):
         back_populates="scheduled_task",
         order_by="PlanSeries.id",
     )
+
+    def is_project_template_present(self):
+        return file_storage_service.is_project_template_present(self.id)
+
+    def is_plan_template_present(self):
+        return file_storage_service.is_plan_template_present(self.id)
 
 
 class InitialFlow(Base):

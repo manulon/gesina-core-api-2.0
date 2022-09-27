@@ -12,7 +12,7 @@ class ScheduleTaskSchema(Schema):
     name = fields.Str()
     description = fields.Str()
     frequency = fields.Int()
-    created_at = fields.DateTime()
+    created_at = fields.DateTime("%Y-%m-%dT%H:%M:%S")
     start_datetime = fields.DateTime()
     enabled = fields.Bool()
     geometry = fields.Str()

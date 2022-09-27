@@ -54,10 +54,12 @@ class ScheduledTaskJob:
 
         simulation_name = f'{scheduled_task.name.replace(" ", "_")}-{start_date.strftime("%Y%m%d_%Hhs")}'
 
-        project_file = build_project(simulation_name, start_date, end_date)
+        project_file = build_project(
+            scheduled_task.id, simulation_name, start_date, end_date
+        )
         project_name = "scheduled-task.prj"
 
-        plan_file = build_plan(simulation_name, start_date, end_date)
+        plan_file = build_plan(scheduled_task.id, simulation_name, start_date, end_date)
         plan_name = "scheduled-task.p01"
 
         use_restart = scheduled_task.start_condition_type == "restart_file"

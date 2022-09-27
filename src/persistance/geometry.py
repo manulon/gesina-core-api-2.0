@@ -7,8 +7,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from src.persistance.session import Base
-from src.service import file_storage_service
-from src.service.exception.file_exception import FilePreSignedUrlError
 
 
 class Geometry(Base):
@@ -22,9 +20,3 @@ class Geometry(Base):
 
     def __str__(self):
         return self.name
-
-    def get_file_url(self):
-        try:
-            return file_storage_service.get_geometry_url(self.name)
-        except FilePreSignedUrlError:
-            return ""

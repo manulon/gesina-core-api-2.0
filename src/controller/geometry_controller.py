@@ -34,7 +34,9 @@ def list_geometries():
 @GEOMETRY_BLUEPRINT.route("/download/<_id>")
 def download(_id):
     geometry = geometry_service.get_geometry(_id)
-    file = BytesIO(
-        file_storage_service.get_file_by_type(FileType.GEOMETRY, geometry.name).data
-    )
+    with file_storage_service.get_file_by_type(
+        FileType.GEOMETRY, geometry.name
+    ) as file_from_storage:
+        file = BytesIO(file_from_storage.data)
+
     return send_file(file, attachment_filename=geometry.name)
