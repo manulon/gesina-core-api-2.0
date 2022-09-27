@@ -77,11 +77,13 @@ def do_register_user():
             form.password.data,
         )
 
-    success_message = "Usuario creado exitosamente"
-
-    return redirect(
-        url_for(
-            "view_controller.user_list",
-            success_message=success_message,
+        success_message = "Usuario creado exitosamente"
+        return redirect(
+            url_for(
+                "view_controller.user_list",
+                success_message=success_message)
         )
+    return render_template(
+        "user_login_sign-up.html", form=form, errors=form.get_errors()
     )
+
