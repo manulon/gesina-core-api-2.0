@@ -96,8 +96,7 @@ class BorderCondition(Base):
     river_stat = Column(String)
     interval = Column(String)
     type = Column(Enum(BorderConditionType))
-    observation_id = Column(Integer)
-    forecast_id = Column(Integer)
+    series_id = Column(Integer)
 
 
 class PlanSeries(Base):

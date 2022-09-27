@@ -305,8 +305,7 @@ def render_border_condition(border_condition, form):
         interval_form.interval_value = chunks[0]
         interval_form.interval_unit = chunks[1]
         series_form.interval = interval_form
-        series_form.observation_id = each_border_condition.observation_id
-        series_form.forecast_id = each_border_condition.forecast_id
+        series_form.series_id = each_border_condition.series_id
         form.series_list.append_entry(series_form)
 
 

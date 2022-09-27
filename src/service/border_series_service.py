@@ -16,8 +16,7 @@ CSV_HEADERS = [
     "river_stat",
     "interval",
     "type",
-    "observation_id",
-    "forecast_id",
+    "series_id",
 ]
 
 
@@ -54,8 +53,7 @@ def process_series_form(series_list, scheduled_config_id=None):
                 river_stat=each_series.river_stat.data,
                 interval=interval,
                 type=BorderConditionType(each_series.border_condition.data),
-                observation_id=each_series.observation_id.data,
-                forecast_id=each_series.forecast_id.data,
+                series_id=each_series.series_id.data,
             )
         else:
             border_condition = BorderCondition(
@@ -64,8 +62,7 @@ def process_series_form(series_list, scheduled_config_id=None):
                 river_stat=each_series.river_stat.data,
                 interval=interval,
                 type=BorderConditionType(each_series.border_condition.data),
-                observation_id=each_series.observation_id.data,
-                forecast_id=each_series.forecast_id.data,
+                series_id=each_series.series_id.data,
             )
         result.append(border_condition)
 
@@ -90,8 +87,7 @@ def process_series_csv_file(series_file_field, scheduled_config_id=None):
                         river_stat=row[2],
                         interval=row[3],
                         type=row[4],
-                        observation_id=row[5],
-                        forecast_id=row[6],
+                        series_id=row[5],
                     )
                 else:
                     border_condition = BorderCondition(
@@ -100,8 +96,7 @@ def process_series_csv_file(series_file_field, scheduled_config_id=None):
                         river_stat=row[2],
                         interval=row[3],
                         type=row[4],
-                        observation_id=row[5],
-                        forecast_id=row[6],
+                        series_id=row[5],
                     )
                 result.append(border_condition)
         else:
