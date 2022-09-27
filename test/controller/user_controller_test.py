@@ -1,15 +1,19 @@
 import pytest
 
 from src.service import user_service
+from test import log_default_user
 
 
 def test_do_create_user_without_email_fails(a_client):
+    log_default_user(a_client)
+
     users_size_before = len(user_service.get_users(limit=5))
     data = {
         "first_name": "John",
         "last_name": "Salshi",
         "password": "123456",
         "repeat_password": "123456",
+        "admin_role": False,
     }
     response = a_client.post(
         "/user/register", data=data, content_type="multipart/form-data"
@@ -21,11 +25,14 @@ def test_do_create_user_without_email_fails(a_client):
 
 
 def test_do_sign_up_without_names_fails(a_client):
+    log_default_user(a_client)
+
     users_size_before = len(user_service.get_users(limit=5))
     data = {
         "email": "hola@mundo.com",
         "password": "123456",
         "repeat_password": "123456",
+        "admin_role": False,
     }
     response = a_client.post(
         "/user/register", data=data, content_type="multipart/form-data"
@@ -38,8 +45,10 @@ def test_do_sign_up_without_names_fails(a_client):
 
 
 def test_do_sign_up_without_passwords_fails(a_client):
+    log_default_user(a_client)
+
     users_size_before = len(user_service.get_users(limit=5))
-    data = {"email": "hola@mundo.com", "first_name": "John", "last_name": "Salshi"}
+    data = {"email": "hola@mundo.com", "first_name": "John", "last_name": "Salshi", "admin_role": False,}
     response = a_client.post(
         "/user/register", data=data, content_type="multipart/form-data"
     )
@@ -50,6 +59,8 @@ def test_do_sign_up_without_passwords_fails(a_client):
 
 
 def test_do_sign_up_success(a_client):
+    log_default_user(a_client)
+
     users_size_before = len(user_service.get_users(limit=5))
     data = {
         "email": "hola@mundo.com",
@@ -57,6 +68,7 @@ def test_do_sign_up_success(a_client):
         "last_name": "Salshi",
         "password": "123456",
         "repeat_password": "123456",
+        "admin_role": False,
     }
     response = a_client.post(
         "/user/register", data=data, content_type="multipart/form-data"
