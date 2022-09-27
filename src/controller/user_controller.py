@@ -49,9 +49,7 @@ def update_user(user_id):
         )
         success_message = "Usuario editado exitosamente"
         return redirect(
-            url_for(
-                "view_controller.user_list",
-                success_message=success_message)
+            url_for("view_controller.user_list", success_message=success_message)
         )
     return render_template(
         "user_login_sign-up.html", form=form, errors=form.get_errors()
@@ -79,11 +77,8 @@ def do_register_user():
 
         success_message = "Usuario creado exitosamente"
         return redirect(
-            url_for(
-                "view_controller.user_list",
-                success_message=success_message)
+            url_for("view_controller.user_list", success_message=success_message)
         )
     return render_template(
         "user_login_sign-up.html", form=form, errors=form.get_errors()
     )
-
