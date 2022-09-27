@@ -1,5 +1,5 @@
-INSERT INTO gesina."user" (first_name, last_name, email, "password") VALUES
-	 ('Admin', 'Ina', 'admin@ina.com.ar', 'pbkdf2:sha256:260000$GHfgkUcvLSdnsckm$328bead9fe19b7978903164cbeb4fdf33c1a7e506544c221ac2270b80e8bcdcd');
+INSERT INTO gesina."user" (first_name, last_name, email, "password", "admin_role", "active") VALUES
+	 ('Admin', 'Ina', 'admin@ina.com.ar', 'pbkdf2:sha256:260000$GHfgkUcvLSdnsckm$328bead9fe19b7978903164cbeb4fdf33c1a7e506544c221ac2270b80e8bcdcd', True, True);
 
 INSERT INTO gesina.geometry ("name", description, created_at, user_id) VALUES
 	 ('Modelo1-Atucha.g01', 'Ejemplo dado por el INA','2021-12-21 20:08:36.377642', 1);

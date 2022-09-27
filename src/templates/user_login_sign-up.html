@@ -11,9 +11,6 @@
                 {% if field.type == "SubmitField" %}
                     <div class="d-flex">
                         {{ form.submit(class_ = "btn btn-primary") }}
-                        {% if form.show_register_button %}
-                            <a class="btn btn-outline-secondary ml-2" href="{{ url_for('public_view_controller.sign_up') }}">Registrarse</a>
-                        {% endif%}
                     </div>
                 {% elif field.widget.input_type != 'hidden' %}
                     <div class="form-group">
