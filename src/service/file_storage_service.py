@@ -27,6 +27,8 @@ RESULT_FOLDER = "result"
 RESULT_FILE_EXTENSION = ".dss"
 
 RESTART_FILE_NAME = "restart_file.rst"
+PROJECT_TEMPLATE_FILE_NAME = "prj_template.txt"
+PLAN_TEMPLATE_FILE_NAME = "plan_template.txt"
 
 
 class FileType(Enum):
@@ -59,6 +61,16 @@ def save_restart_file(data, scheduled_task_id):
     save_file(FileType.SCHEDULED_TASK, data, RESTART_FILE_NAME, scheduled_task_id)
 
 
+def save_project_template_file(data, scheduled_task_id):
+    save_file(
+        FileType.SCHEDULED_TASK, data, PROJECT_TEMPLATE_FILE_NAME, scheduled_task_id
+    )
+
+
+def save_plan_template_file(data, scheduled_task_id):
+    save_file(FileType.SCHEDULED_TASK, data, PLAN_TEMPLATE_FILE_NAME, scheduled_task_id)
+
+
 def save_file(file_type, file, filename, _id=None):
     file_bytes = file.read()
     data = io.BytesIO(file_bytes)
@@ -89,6 +101,32 @@ def get_geometry_url(name):
         error_message = f"Error generating presigned url for {name}"
         logger.error(error_message, exception)
         raise FilePreSignedUrlError(error_message)
+
+
+def is_project_template_present(schedule_task_id):
+    try:
+        minio_client.stat_object(
+            ROOT_BUCKET,
+            f"{SCHEDULED_TASK_FOLDER}/{schedule_task_id}/{PROJECT_TEMPLATE_FILE_NAME}",
+        )
+        return True
+    except Exception as exception:
+        error_message = f"Project template file for {schedule_task_id} doesnt exist"
+        logger.error(error_message, exception)
+        return False
+
+
+def is_plan_template_present(schedule_task_id):
+    try:
+        minio_client.stat_object(
+            ROOT_BUCKET,
+            f"{SCHEDULED_TASK_FOLDER}/{schedule_task_id}/{PLAN_TEMPLATE_FILE_NAME}",
+        )
+        return True
+    except Exception as exception:
+        error_message = f"Plan template file for {schedule_task_id} doesnt exist"
+        logger.error(error_message, exception)
+        return False
 
 
 def list_execution_files(file_type, execution_id):

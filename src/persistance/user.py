@@ -1,9 +1,5 @@
 import flask_login
-from sqlalchemy import (
-    Integer,
-    Column,
-    String,
-)
+from sqlalchemy import Integer, Column, String, Boolean
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -17,6 +13,8 @@ class User(Base, flask_login.UserMixin):
     first_name = Column(String)
     last_name = Column(String)
     email = Column(String)
+    admin_role = Column(Boolean)
+    active = Column(Boolean)
     _password = Column("password", String)
     notifications = relationship(
         UserNotification,

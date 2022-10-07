@@ -22,6 +22,7 @@ app.register_blueprint(
 app.register_blueprint(controller.VIEW_BLUEPRINT, url_prefix="/view")
 app.register_blueprint(controller.PUBLIC_VIEW_BLUEPRINT, url_prefix="/view")
 app.register_blueprint(controller.SCHEDULE_TASK_BLUEPRINT, url_prefix="/schedule_task")
+app.register_blueprint(controller.USER_BLUEPRINT, url_prefix="/user")
 
 app.jinja_env.globals.update(gettext=gettext)
 app.jinja_env.globals.update(pretty_date=pretty_date)

@@ -24,10 +24,35 @@ def get_users(limit):
         return session.query(User).limit(limit).all()
 
 
-def save(email, first_name, last_name, password):
+def get_all_users():
+    with get_session() as session:
+        return session.query(User).order_by(User.id.desc()).all()
+
+
+def save(email, first_name, last_name, admin_role, password):
     user = User(
-        email=email, first_name=first_name, last_name=last_name, password=password
+        email=email,
+        first_name=first_name,
+        last_name=last_name,
+        admin_role=admin_role,
+        password=password,
+        active=True,
     )
+    with get_session() as session:
+        session.add(user)
+
+    return user
+
+
+def edit(user_id, email, first_name, last_name, admin_role, password):
+    user = get_user(user_id)
+    user.email = email
+    user.first_name = first_name
+    user.last_name = last_name
+    user.admin_role = admin_role
+    if password:
+        user.password = password
+
     with get_session() as session:
         session.add(user)
 
@@ -49,3 +74,12 @@ def get_admin_user():
             .filter(User.first_name == "Admin", User.last_name == "Ina")
             .one()
         )
+
+
+def enable_disable_user(user_id):
+    user = get_user(user_id)
+    user.active = not user.active
+    with get_session() as session:
+        session.add(user)
+
+    return user

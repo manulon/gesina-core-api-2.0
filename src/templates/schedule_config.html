@@ -72,10 +72,18 @@
                             <div class="form-group">
                                 {{ form.frequency.label }}: {{ form.frequency(class_="form-control") }}
                             </div>
+                            {% if form.project_file_present %}
+                                <div hidden id="project_file_present"></div>
+                            {% endif %}
                             <div class="form-group">
-                                <div class="custom-control custom-switch">
-                                     {{ form.enabled(class_="custom-control-input") }} {{ form.enabled.label(class_="custom-control-label") }}
+                                 {{ form.project_file.label }}:
+                                <div id="project-template-container">
+                                    <a href="{{ url_for('schedule_controller.download', _id=form.idx, _file_name='prj_template.txt')}}" id="project-template-file" class="btn btn-info" role="button" aria-pressed="true" download style="font-size: smaller;"> <i class="fa-solid fa-arrow-down"></i> {{ 'prj_template.txt' }} </a>
+                                    <button id="clear-project-template" type="button" class="btn btn-danger" style="font-size: smaller;">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
                                 </div>
+                                {{ form.project_file(class_="form-control", id_="project-template-upload") }}
                             </div>
                         </div>
                         <div class="tab-pane fade card card-body" id="borderConditionSection" role="tabpanel" aria-labelledby="border-condition-tab">
@@ -139,8 +147,7 @@
                                   <th scope="col">River stat</th>
                                   <th scope="col">Intervalo</th>
                                   <th scope="col">Tipo de condicion de borde</th>
-                                  <th scope="col">Id de observación</th>
-                                  <th scope="col">Id de pronóstico</th>
+                                  <th scope="col">Id de series</th>
                                   <th scope="col">Acciones</th>
                                 </tr>
                               </thead>
@@ -153,8 +160,7 @@
                                         <td>{{ form.river_stat }}</td>
                                         <td class="d-flex flex-row">{{ form.interval.interval_value}}{{ form.interval.interval_unit }}</td>
                                         <td>{{ form.border_condition }}</td>
-                                        <td>{{ form.observation_id }}</td>
-                                        <td>{{ form.forecast_id }}</td>
+                                        <td>{{ form.series_id }}</td>
                                         <td><button type="button" class="btn btn-danger remove-row-series">&#8722;</button></td>
                                     </tr>
                                 {% endfor %}
@@ -167,7 +173,21 @@
                     </div>
                         </div>
                         <div class="tab-pane fade card card-body" id="series_list_plan_container" role="tabpanel" aria-labelledby="series-list-tab">
+                            <div class="form-group">
+                                {{ form.plan_file.label }}:
+                                {% if form.plan_file_present %}
+                                    <div hidden id="plan_file_present"></div>
+                                {% endif %}
+                                <div id="plan-template-container">
+                                    <a href="{{ url_for('schedule_controller.download', _id=form.idx, _file_name='plan_template.txt')}}" id="plan-template-file" class="btn btn-info" role="button" aria-pressed="true" download style="font-size: smaller;"> <i class="fa-solid fa-arrow-down"></i> {{ 'plan_template.txt' }} </a>
+                                    <button id="clear-plan-template" type="button" class="btn btn-danger" style="font-size: smaller;">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                                {{ form.plan_file(class_="form-control", id_="plan-template-upload") }}
+                            </div>
                             {{ form.plan_series_file.label }}: {{ form.plan_series_file(class_="form-control") }}
+
                             <table class="table" id="series_plan_table">
                               <thead>
                                 <tr>
@@ -175,7 +195,7 @@
                                   <th scope="col">River</th>
                                   <th scope="col">Reach</th>
                                   <th scope="col">River stat</th>
-                                  <th scope="col">Serie de id de Salida</th>
+                                  <th scope="col">Id de series de salida</th>
                                   <th scope="col">Acciones</th>
                                 </tr>
                               </thead>
@@ -200,6 +220,11 @@
                         </div>
                     </div>
                     <div class="form-group pt-4 text-right">
+                        <div class="custom-control custom-switch">
+                             {{ form.enabled(class_="custom-control-input") }} {{ form.enabled.label(class_="custom-control-label") }}
+                        </div>
+                    </div>
+                    <div class="form-group pt-2 text-right">
                         <button type="submit" class="btn btn-primary">Guardar</button>
                     </div>
             </form>
@@ -254,7 +279,27 @@
 
         $( "#start_condition_type" ).on("change", hideShowInitialConditionConf);
 
-        hideShowInitialConditionConf()
+        $( "#clear-project-template" ).on("click", function() {
+            $('#project-template-container').hide();
+            $('#project-template-upload').show();
+        });
+
+        if($( "#project_file_present").length) {
+            $('#project-template-upload').hide();
+        } else {
+            $('#project-template-container').hide();
+        }
+
+        $( "#clear-plan-template" ).on("click", function() {
+            $('#plan-template-container').hide();
+            $('#plan-template-upload').show();
+        });
+
+        if($( "#plan_file_present").length) {
+            $('#plan-template-upload').hide();
+        }else {
+            $('#plan-template-container').hide();
+        }
 
         $( "#add-row-series" ).on("click", function() {
             let idx = 0
@@ -272,8 +317,7 @@
                     <td><input id="series_list-${idx}-river_stat" name="series_list-${idx}-river_stat" required="" step="any" style="width: 80px" type="text" value=""></td>
                     <td class="d-flex flex-row"><input id="series_list-${idx}-interval-interval_value" name="series_list-${idx}-interval-interval_value" required="" style="width: 80px" type="number" value=""><select id="series_list-${idx}-interval-interval_unit" name="series_list-${idx}-interval-interval_unit" required=""><option value="MINUTE">MINUTE</option><option value="HOUR">HOUR</option><option value="DAY">DAY</option><option value="WEEK">WEEK</option></select></td>
                     <td><select id="series_list-${idx}-border_condition" name="series_list-${idx}-border_condition" style="width: 100px" required=""><option value="Stage Hydrograph">Stage Hydrograph</option><option value="Flow Hydrograph">Flow Hydrograph</option><option value="Lateral Inflow Hydrograph">Lateral Inflow Hydrograph</option></select></td>
-                    <td><input id="series_list-${idx}-observation_id" name="series_list-${idx}-observation_id" required="" style="width: 80px" type="number" value=""></td>
-                    <td><input id="series_list-${idx}-forecast_id" name="series_list-${idx}-forecast_id" required="" style="width: 80px" type="number" value=""></td>
+                    <td><input id="series_list-${idx}-series_id" name="series_list-${idx}-series_id" required="" style="width: 80px" type="number" value=""></td>
                     <td><button type="button" class="btn btn-danger remove-row-series">&#8722;</button></td>
                 </tr>
             `

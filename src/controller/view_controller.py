@@ -27,10 +27,9 @@ from src.view.forms.schedule_config_form import (
     IntervalForm,
     PlanSeriesForm,
 )
+from src.view.forms.users_forms import EditUserForm
 
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
-VIEW_BLUEPRINT.before_request(user_is_authenticated)
-
 VIEW_BLUEPRINT.before_request(user_is_authenticated)
 
 
@@ -76,15 +75,45 @@ def home():
         )
 
 
+@VIEW_BLUEPRINT.route("/user")
+def user_list():
+    user = user_service.get_current_user()
+    if user.admin_role:
+        return render_template("user_list.html")
+    else:
+        return redirect(
+            url_for(
+                "view_controller.home",
+            )
+        )
+
+
+@VIEW_BLUEPRINT.route("/user/<user_id>")
+def edit_user(user_id):
+    if user_service.get_current_user().admin_role:
+        user = user_service.get_user(user_id)
+        return render_template(
+            "user_login_sign-up.html",
+            form=EditUserForm(
+                email=user.email,
+                first_name=user.first_name,
+                last_name=user.last_name,
+                admin_role=user.admin_role,
+                user_id=user.id,
+            ),
+        )
+    else:
+        return redirect(
+            url_for(
+                "view_controller.home",
+            )
+        )
+
+
 @VIEW_BLUEPRINT.route("/geometry/<geometry_id>")
 def geometry_read(geometry_id):
     geometry = geometry_service.get_geometry(geometry_id)
     errors = []
-    geometry_url = geometry.get_file_url()
-    if not geometry_url:
-        errors.append(
-            f"Error obteniendo archivo de geometría {geometry.name}. Intente nuevamente"
-        )
 
     return render_template(
         "geometry.html",
@@ -256,11 +285,15 @@ def schedule_task_new():
 
 def render_schedule_view(form, schedule_config=None, errors=()):
     _id = None
+    form.project_file_present = False
+    form.plan_file_present = False
     if schedule_config:
         initial_flows = schedule_config.initial_flows
         border_conditions = schedule_config.border_conditions
         plan_series_list = schedule_config.plan_series_list
 
+        form.project_file_present = schedule_config.is_project_template_present()
+        form.plan_file_present = schedule_config.is_plan_template_present()
         form.enabled.data = schedule_config.enabled
         form.frequency.data = schedule_config.frequency
         form.description.data = schedule_config.description
@@ -275,6 +308,7 @@ def render_schedule_view(form, schedule_config=None, errors=()):
         render_plan_series_list(plan_series_list, form)
 
         _id = schedule_config.id
+        form.idx = schedule_config.id
 
     return render_template("schedule_config.html", form=form, errors=errors, id=_id)
 
@@ -305,8 +339,7 @@ def render_border_condition(border_condition, form):
         interval_form.interval_value = chunks[0]
         interval_form.interval_unit = chunks[1]
         series_form.interval = interval_form
-        series_form.observation_id = each_border_condition.observation_id
-        series_form.forecast_id = each_border_condition.forecast_id
+        series_form.series_id = each_border_condition.series_id
         form.series_list.append_entry(series_form)
 
 
@@ -327,9 +360,3 @@ def clean_form_list(form_list):
     if form_list:
         for i in range(0, len(form_list)):
             form_list.entries.pop(0)
-
-
-@VIEW_BLUEPRINT.route("/user/logout", methods=["GET"])
-def do_logout():
-    flask_login.logout_user()
-    return redirect(url_for("public_view_controller.login"))

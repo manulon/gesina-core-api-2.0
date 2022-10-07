@@ -15,6 +15,8 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 
 from src.persistance.session import Base
+from src.service import file_storage_service
+from src.service.exception.file_exception import FilePreSignedUrlError
 
 
 class ScheduledTask(Base):
@@ -53,6 +55,12 @@ class ScheduledTask(Base):
         order_by="PlanSeries.id",
     )
 
+    def is_project_template_present(self):
+        return file_storage_service.is_project_template_present(self.id)
+
+    def is_plan_template_present(self):
+        return file_storage_service.is_plan_template_present(self.id)
+
 
 class InitialFlow(Base):
     __tablename__ = "initial_flow"
@@ -88,8 +96,7 @@ class BorderCondition(Base):
     river_stat = Column(String)
     interval = Column(String)
     type = Column(Enum(BorderConditionType))
-    observation_id = Column(Integer)
-    forecast_id = Column(Integer)
+    series_id = Column(Integer)
 
 
 class PlanSeries(Base):
