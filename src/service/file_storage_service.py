@@ -166,6 +166,5 @@ def save_result_for_execution(base_path, execution_id):
     logger.info(f"Saving result files for execution: {execution_id}")
 
     for filename in os.listdir(base_path):
-        if filename.endswith(RESULT_FILE_EXTENSION):
-            with open(f"{base_path}\\{filename}", "rb") as file:
-                save_file(FileType.RESULT, file, filename, execution_id)
+        with open(f"{base_path}\\{filename}", "rb") as file:
+            save_file(FileType.RESULT, file, filename, execution_id)
