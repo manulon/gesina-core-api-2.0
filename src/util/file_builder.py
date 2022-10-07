@@ -180,12 +180,7 @@ def build_boundary_conditions(start_date, conditions):
 
 
 def new_build_flow(
-    border_conditions,
-    use_restart,
-    restart_file,
-    initial_flows,
-    start_date,
-    end_date
+    border_conditions, use_restart, restart_file, initial_flows, start_date, end_date
 ):
     initial_status = create_initial_status(use_restart, restart_file, initial_flows)
 

@@ -40,7 +40,7 @@ scheduler = BlockingScheduler(
 
 SIMULATION_DURATION = 60
 
-logger = logging.getLogger('apscheduler')
+logger = logging.getLogger("apscheduler")
 
 
 class ScheduledTaskJob:
@@ -50,11 +50,11 @@ class ScheduledTaskJob:
     def simulate(self, flow_file=None):
         scheduled_task = get_schedule_task_config(self.scheduled_task)
         logger.error("Starting simulation")
-        locale = timezone('America/Argentina/Buenos_Aires')
+        locale = timezone("America/Argentina/Buenos_Aires")
         today = datetime.now(tz=locale).replace(minute=0)
         start_date = today - timedelta(scheduled_task.observation_days - 2)
         end_date = today + timedelta(scheduled_task.forecast_days + 2)
-        logger.error(f'Start Date: {start_date} and End Date: {end_date}')
+        logger.error(f"Start Date: {start_date} and End Date: {end_date}")
 
         simulation_name = f'{scheduled_task.name.replace(" ", "_")}-{start_date.strftime("%Y%m%d_%Hhs")}'
 
@@ -78,7 +78,7 @@ class ScheduledTaskJob:
             "restart_file.rst",
             scheduled_task.initial_flows,
             start_date,
-            end_date
+            end_date,
         )
         flow_name = "scheduled_task.u01"
 
@@ -114,9 +114,9 @@ def check_for_scheduled_tasks():
         job_id = str(st.id)
 
         if (
-                job_id not in all_jobs_ids
-                and st.start_datetime < datetime.now()
-                and st.enabled
+            job_id not in all_jobs_ids
+            and st.start_datetime < datetime.now()
+            and st.enabled
         ):
             logger.info(f"Adding {st.name}")
             scheduler.add_job(
