@@ -8,10 +8,9 @@ LINES_TO_PROCESS = [
     "DSS Start Time",
     "DSS End Date",
     "DSS End Time",
-    "Geom File",
     "Unsteady File",
     "Plan File",
-    "Current File",
+    "Current Plan",
 ]
 
 LINES_CHANGES = {
@@ -20,7 +19,6 @@ LINES_CHANGES = {
     "DSS Start Time": "DSS Start Time=$START_TIME",
     "DSS End Date": "DSS End Date=$END_DATE",
     "DSS End Time": "DSS End Time=$END_TIME",
-    "Geom File": "Geom File=g01",
     "Unsteady File": "Unsteady File=u01",
     "Plan File": "Plan File=p01",
     "Current Plan": "Current Plan=p01",
