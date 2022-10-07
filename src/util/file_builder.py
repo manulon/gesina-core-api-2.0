@@ -127,13 +127,13 @@ def build_initial_flows(initial_flow_list):
             )
         )
     initial_flows_string = "\r\n".join(list_of_flows)
-    with open(f"{TEMPLATES_DIR}/initial_flows.txt", "r") as f:
+    with io.open(f"{TEMPLATES_DIR}/initial_flows.txt", "r", newline="") as f:
         src = Template(f.read())
     return src.substitute({"INITIAL_FLOWS": initial_flows_string})
 
 
 def build_restart_status(restart_filename):
-    with open(f"{TEMPLATES_DIR}/restart_info.txt", "r") as f:
+    with io.open(f"{TEMPLATES_DIR}/restart_info.txt", "r", newline="") as f:
         src = Template(f.read())
     return src.substitute({"FILE_NAME": restart_filename})
 
@@ -158,7 +158,7 @@ def get_forecast_and_observation_values(border_conditions, start_date, end_date)
 
 def build_boundary_conditions(start_date, conditions):
     boundary_locations = []
-    with open(f"{TEMPLATES_DIR}/boundary_location.txt", "r") as f:
+    with io.open(f"{TEMPLATES_DIR}/boundary_location.txt", "r", newline="") as f:
         src = Template(f.read())
         for condition in conditions:
             groups = more_itertools.grouper(
@@ -195,7 +195,7 @@ def new_build_flow(
     )
     boundary_locations = build_boundary_conditions(start_date, conditions)
 
-    with open(f"{TEMPLATES_DIR}/unsteady_flow_template.txt", "r") as f:
+    with io.open(f"{TEMPLATES_DIR}/unsteady_flow_template.txt", "r", newline="") as f:
         src = Template(f.read())
     result = src.substitute(
         {
