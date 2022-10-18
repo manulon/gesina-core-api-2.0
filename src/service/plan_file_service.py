@@ -16,7 +16,6 @@ LINES_CHANGES = {
     "Short Identifier": "Short Identifier=$PLAN_ID",
     "Simulation Date": "Simulation Date=$TIMEFRAME",
     "IC Time": "IC Time=,$IC_TIME,",
-    "Geom File": "Geom File=g01",
     "Flow File": "Flow File=u01",
 }
 

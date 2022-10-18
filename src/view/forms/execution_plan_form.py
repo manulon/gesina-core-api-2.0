@@ -22,3 +22,4 @@ class ExecutionPlanForm(FlaskForm, ErrorMixin):
     flow_file = FileField(
         validators=[FileRequired(message="Error: Seleccione un archivo")]
     )
+    restart_file = FileField()

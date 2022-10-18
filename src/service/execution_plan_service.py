@@ -12,6 +12,7 @@ def create_from_form(form):
     project_file_data = form.project_file.data
     plan_file_data = form.plan_file.data
     flow_file_data = form.flow_file.data
+    restart_file_data = form.restart_file.data
     return create(
         plan_name,
         geometry_id,
@@ -22,6 +23,7 @@ def create_from_form(form):
         plan_file_data,
         flow_file_data.filename,
         flow_file_data,
+        restart_file_data,
     )
 
 
@@ -65,6 +67,7 @@ def create(
     plan_file,
     flow_name,
     flow_file,
+    restart_file=None,
 ):
     with get_session() as session:
         execution_plan = ExecutionPlan(
@@ -98,6 +101,14 @@ def create(
             flow_name,
             execution_plan_id,
         )
+
+        if restart_file:
+            file_storage_service.save_file(
+                FileType.EXECUTION_PLAN,
+                restart_file,
+                restart_file.filename,
+                execution_plan_id,
+            )
 
         return execution_plan
 
