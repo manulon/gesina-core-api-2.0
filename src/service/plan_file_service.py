@@ -6,7 +6,8 @@ LINES_TO_PROCESS = [
     "Plan Title",
     "Short Identifier",
     "Simulation Date",
-    "IC Time" "Geom File",
+    "IC Time",
+    "Geom File",
     "Flow File",
 ]
 
