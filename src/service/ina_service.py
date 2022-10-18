@@ -130,7 +130,7 @@ def obtain_curated_series(series_id, timestart, timeend):
     logging.info(
         f"Getting data for series id: {series_id} from {timestart} to {timeend} with url: {url}"
     )
-    response = requests.get(url)
+    response = requests.get(url, headers={"Authorization": f"Bearer {os.getenv('INA_TOKEN')}"})
 
     data = sorted(response.json(), key=lambda i: i["timestart"], reverse=False)
     data = [i for i in data if i["valor"]]
