@@ -10,6 +10,7 @@ from src.parana.forecast import forecast
 import more_itertools
 from datetime import datetime, timedelta
 
+from src.service import ina_service
 from src.service import file_storage_service
 
 TEMPLATES_DIR = "src/file_templates"
@@ -126,13 +127,13 @@ def build_initial_flows(initial_flow_list):
             )
         )
     initial_flows_string = "\r\n".join(list_of_flows)
-    with open(f"{TEMPLATES_DIR}/initial_flows.txt", "r") as f:
+    with io.open(f"{TEMPLATES_DIR}/initial_flows.txt", "r", newline="") as f:
         src = Template(f.read())
     return src.substitute({"INITIAL_FLOWS": initial_flows_string})
 
 
 def build_restart_status(restart_filename):
-    with open(f"{TEMPLATES_DIR}/restart_info.txt", "r") as f:
+    with io.open(f"{TEMPLATES_DIR}/restart_info.txt", "r", newline="") as f:
         src = Template(f.read())
     return src.substitute({"FILE_NAME": restart_filename})
 
@@ -147,89 +148,9 @@ def get_forecast_and_observation_values(border_conditions, start_date, end_date)
                 "river_stat": condition.river_stat,
                 "interval": condition.interval.replace("-", ""),
                 "border_condition": condition.type,
-                "values": [
-                    10,
-                    11,
-                    12,
-                    13,
-                    14,
-                    15,
-                    16,
-                    17,
-                    18,
-                    19,
-                    20,
-                    21,
-                    22,
-                    23,
-                    24,
-                    25,
-                    26,
-                    27,
-                    28,
-                    29,
-                    30,
-                    31,
-                    32,
-                    33,
-                    34,
-                    35,
-                    36,
-                    37,
-                    38,
-                    39,
-                    40,
-                    41,
-                    42,
-                    43,
-                    44,
-                    45,
-                    46,
-                    47,
-                    48,
-                    49,
-                    50,
-                    51,
-                    52,
-                    53,
-                    54,
-                    55,
-                    56,
-                    57,
-                    58,
-                    59,
-                    60,
-                    61,
-                    62,
-                    63,
-                    64,
-                    65,
-                    66,
-                    67,
-                    68,
-                    69,
-                    70,
-                    71,
-                    72,
-                    73,
-                    74,
-                    75,
-                    76,
-                    77,
-                    78,
-                    79,
-                    80,
-                    81,
-                    82,
-                    83,
-                    84,
-                    85,
-                    86,
-                    87,
-                    88,
-                    89,
-                    90,
-                ],
+                "values": ina_service.obtain_curated_series(
+                    condition.series_id, start_date, end_date
+                ),
             }
         )
     return result
@@ -237,7 +158,7 @@ def get_forecast_and_observation_values(border_conditions, start_date, end_date)
 
 def build_boundary_conditions(start_date, conditions):
     boundary_locations = []
-    with open(f"{TEMPLATES_DIR}/boundary_location.txt", "r") as f:
+    with io.open(f"{TEMPLATES_DIR}/boundary_location.txt", "r", newline="") as f:
         src = Template(f.read())
         for condition in conditions:
             groups = more_itertools.grouper(
@@ -259,17 +180,9 @@ def build_boundary_conditions(start_date, conditions):
 
 
 def new_build_flow(
-    border_conditions,
-    use_restart,
-    restart_file,
-    initial_flows,
-    observation_days,
-    forecast_days,
+    border_conditions, use_restart, restart_file, initial_flows, start_date, end_date
 ):
     initial_status = create_initial_status(use_restart, restart_file, initial_flows)
-    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    end_date = today + timedelta(forecast_days + 1)
-    start_date = today - timedelta(observation_days - 1)
 
     # Buscar las series al INA
     conditions = get_forecast_and_observation_values(
@@ -277,7 +190,7 @@ def new_build_flow(
     )
     boundary_locations = build_boundary_conditions(start_date, conditions)
 
-    with open(f"{TEMPLATES_DIR}/unsteady_flow_template.txt", "r") as f:
+    with io.open(f"{TEMPLATES_DIR}/unsteady_flow_template.txt", "r", newline="") as f:
         src = Template(f.read())
     result = src.substitute(
         {
