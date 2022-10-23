@@ -42,6 +42,9 @@ def simulate(execution_id, user_id):
             RC.Compute_HideComputationWindow()
             RC.Compute_CurrentPlan(None, None, True)
 
+        execution_plan = execution_plan_service.get_execution_plan(execution_id)
+        execution_plan_output_list = execution_plan.execution_plan_output_list
+
         end = datetime.now()
         total_seconds = (end - begin).total_seconds()
         logger.info(f"Ending simulations. Total runtime seconds {total_seconds}")

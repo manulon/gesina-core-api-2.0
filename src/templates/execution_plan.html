@@ -54,6 +54,29 @@
                         <label for="createdAt"><h5>Fecha de creación</h5></label>
                         <label class="form-control" name="createdAt" id="createdAt" readonly>{{ pretty_date(execution_plan.created_at) }}</label>
                     </div>
+                    <div class="form-group">
+                        <table class="table" id="execution_plan_output_table">
+                              <thead>
+                                <tr>
+                                  <th scope="col">#</th>
+                                  <th scope="col">River</th>
+                                  <th scope="col">Reach</th>
+                                  <th scope="col">River stat</th>
+                                </tr>
+                              </thead>
+                              <tbody id="execution_plan_output_table_body">
+                                {% for form in form.execution_plan_output_list %}
+                                    <tr>
+                                        {{ form.idx }}
+                                        <th scope="row">{{loop.index}}</th>
+                                        <td>{{ form.river }}</td>
+                                        <td>{{ form.reach }}</td>
+                                        <td>{{ form.river_stat }}</td>
+                                    </tr>
+                                {% endfor %}
+                              </tbody>
+                        </table>
+                    </div>
                     <div class="text-right">
                         <a class="btn btn-secondary" href={{ url_for("view_controller.execution_plan_list") }}>Volver</a>
                     </div>
@@ -87,6 +110,35 @@
                         <label for="restartFileUpload"><h5>Restart File</h5></label>
                         <input type="file" name="restart_file" class="form-control-file" id="restartFileUpload">
                     </div>
+                    <div class="form-group">
+                        <table class="table" id="execution_plan_output_table">
+                              <thead>
+                                <tr>
+                                  <th scope="col">#</th>
+                                  <th scope="col">River</th>
+                                  <th scope="col">Reach</th>
+                                  <th scope="col">River stat</th>
+                                  <th scope="col">Acciones</th>
+                                </tr>
+                              </thead>
+                              <tbody id="execution_plan_output_table_body">
+                                {% for form in form.execution_plan_output_list %}
+                                    <tr>
+                                        {{ form.idx }}
+                                        <th scope="row">{{loop.index}}</th>
+                                        <td>{{ form.river }}</td>
+                                        <td>{{ form.reach }}</td>
+                                        <td>{{ form.river_stat }}</td>
+                                        <td><button type="button" class="btn btn-danger remove-row-execution-plan-output">&#8722;</button></td>
+                                    </tr>
+                                {% endfor %}
+                              </tbody>
+                        </table>
+                        <button id="add-row-execution-plan" type="button" class="btn btn-success">&#43;</button>
+                        <button id="clear-row-execution-plan" type="button" class="btn btn-danger">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
                     <div class="text-right">
                         <button type="submit" class="btn btn-primary">Guardar</button>
                     </div>
@@ -107,6 +159,37 @@
             startDate: new Date(2021, 0, 0),
             endDate: "0d"
         });
+
+        function removeRowListener(selector) {
+            $( selector ).off("click")
+            $( selector ).on("click", function() {
+                $(this).parent().parent().remove();
+            });
+        }
+
+
+        $( "#add-row-execution-plan" ).on("click", function() {
+            let idx = 0
+            tr = $("#execution_plan_output_table_body tr:last-child")
+            if( tr.length ){
+                idx = $("#execution_plan_output_table_body tr:last-child th")[0].textContent
+                idx = parseInt(idx)
+            }
+
+            new_row = `
+                <tr>
+                    <th scope="row">${idx + 1}</th>
+                    <td><input id="execution_plan_output_list-${idx}-river" name="execution_plan_output_list-${idx}-river" required="" type="text" value=""></td>
+                    <td><input id="execution_plan_output_list-${idx}-reach" name="execution_plan_output_list-${idx}-reach" required="" type="text" value=""></td>
+                    <td><input id="execution_plan_output_list-${idx}-river_stat" name="execution_plan_output_list-${idx}-river_stat" required="" type="text" value=""></td>
+                    <td><button type="button" class="btn btn-danger remove-row-execution-plan-output">−</button></td>
+                </tr>
+            `
+
+            $( "#execution_plan_output_table_body" ).append( new_row );
+            removeRowListener(".remove-row-execution-plan-output")
+        });
+
     </script>
     <style>
         .datepicker {

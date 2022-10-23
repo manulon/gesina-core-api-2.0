@@ -49,6 +49,15 @@ create table if not exists execution_plan
 	status text not null
 );
 
+create table if not exists execution_plan_output
+(
+    river text not null,
+    reach text not null,
+    river_stat text not null,
+    execution_plan_id integer not null constraint execution_plan_output_execution_plan_fk references "execution_plan",
+    primary key (river, reach, river_stat, execution_plan_id)
+);
+
 alter table execution_plan owner to "user";
 
 create unique index if not exists execution_plan_id_uindex on execution_plan (id);

@@ -9,14 +9,12 @@ from sqlalchemy import (
     JSON,
     Boolean,
     ForeignKey,
-    Float,
     Enum,
 )
 from sqlalchemy.orm import relationship
 
 from src.persistance.session import Base
 from src.service import file_storage_service
-from src.service.exception.file_exception import FilePreSignedUrlError
 
 
 class ScheduledTask(Base):

@@ -1,4 +1,8 @@
-from src.persistance.execution_plan import ExecutionPlan, ExecutionPlanStatus
+from src.persistance.execution_plan import (
+    ExecutionPlan,
+    ExecutionPlanStatus,
+    ExecutionPlanOutput,
+)
 from src.persistance.session import get_session
 from src.service import file_storage_service, user_service
 from src.service.file_storage_service import FileType
@@ -13,6 +17,7 @@ def create_from_form(form):
     plan_file_data = form.plan_file.data
     flow_file_data = form.flow_file.data
     restart_file_data = form.restart_file.data
+    execution_plan_output_list_data = form.execution_plan_output_list.data
     return create(
         plan_name,
         geometry_id,
@@ -24,6 +29,10 @@ def create_from_form(form):
         flow_file_data.filename,
         flow_file_data,
         restart_file_data,
+        [
+            ExecutionPlanOutput(river=d.river, reach=d.reach, river_statps=d.river_stat)
+            for d in execution_plan_data
+        ],
     )
 
 
@@ -39,6 +48,7 @@ def create_from_scheduler(
     flow_file,
     use_restart,
     schedule_task_id,
+    plan_series_list,
 ):
     execution_plan = create(
         execution_plan_name,
@@ -50,6 +60,12 @@ def create_from_scheduler(
         plan_file,
         flow_name,
         flow_file,
+        [
+            ExecutionPlanOutput(
+                river=ps.river, reach=ps.reach, river_statps=ps.river_stat
+            )
+            for ps in plan_series_list
+        ],
     )
     if use_restart:
         file_storage_service.copy_restart_file_to(execution_plan.id, schedule_task_id)
@@ -68,10 +84,14 @@ def create(
     flow_name,
     flow_file,
     restart_file=None,
+    execution_plan_output_list=None,
 ):
     with get_session() as session:
         execution_plan = ExecutionPlan(
-            plan_name=execution_plan_name, geometry_id=geometry_id, user_id=user.id
+            plan_name=execution_plan_name,
+            geometry_id=geometry_id,
+            user_id=user.id,
+            execution_plan_output_list=execution_plan_output_list,
         )
         session.add(execution_plan)
         session.commit()
