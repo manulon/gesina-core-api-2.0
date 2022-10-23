@@ -40,6 +40,6 @@ class ExecutionPlanForm(FlaskForm, ErrorMixin):
     restart_file = FileField()
     execution_plan_output_list = FieldList(
         FormField(ExecutionPlanOutputForm),
-        label="Lista de los puntos para obtener los resultados",
-        min_entries=1,
+        label="Lista de resultados a exportar a CSV",
+        min_entries=0,
     )
