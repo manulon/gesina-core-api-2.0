@@ -1,6 +1,6 @@
 import logging
 
-from pytz import utc
+from pytz import utc, timezone
 from datetime import datetime
 from datetime import timedelta
 
@@ -14,7 +14,6 @@ from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service.execution_plan_service import update_execution_plan_status
 from src.service.schedule_task_service import get_schedule_task_config
 from src.tasks import queue_or_fake_simulate
-
 
 from src.util.file_builder import build_project, build_plan, build_flow, new_build_flow
 
@@ -41,6 +40,8 @@ scheduler = BlockingScheduler(
 
 SIMULATION_DURATION = 60
 
+logger = logging.getLogger("apscheduler")
+
 
 class ScheduledTaskJob:
     def __init__(self, task_id: int):
@@ -48,9 +49,12 @@ class ScheduledTaskJob:
 
     def simulate(self, flow_file=None):
         scheduled_task = get_schedule_task_config(self.scheduled_task)
-        print("Starting simulation")
-        start_date = datetime.now()
-        end_date = start_date + timedelta(days=SIMULATION_DURATION)
+        logger.error("Starting simulation")
+        locale = timezone("America/Argentina/Buenos_Aires")
+        today = datetime.now(tz=locale).replace(minute=0)
+        start_date = today - timedelta(scheduled_task.observation_days - 2)
+        end_date = today + timedelta(scheduled_task.forecast_days + 2)
+        logger.error(f"Start Date: {start_date} and End Date: {end_date}")
 
         simulation_name = f'{scheduled_task.name.replace(" ", "_")}-{start_date.strftime("%Y%m%d_%Hhs")}'
 
@@ -64,17 +68,18 @@ class ScheduledTaskJob:
 
         use_restart = scheduled_task.start_condition_type == "restart_file"
 
-        flow_file = flow_file or build_flow(
-            use_restart=use_restart, initial_flows=scheduled_task.initial_flows
-        )
-        # flow_file = new_build_flow(
-        #     scheduled_task.border_conditions,
-        #     use_restart,
-        #     "restart_file.rst",
-        #     scheduled_task.initial_flows,
-        #     scheduled_task.observation_days,
-        #     scheduled_task.forecast_days,
+        # flow_file = flow_file or build_flow(
+        #     use_restart=use_restart, initial_flows=scheduled_task.initial_flows
         # )
+
+        flow_file = flow_file or new_build_flow(
+            scheduled_task.border_conditions,
+            use_restart,
+            "restart_file.rst",
+            scheduled_task.initial_flows,
+            start_date,
+            end_date,
+        )
         flow_name = "scheduled_task.u01"
 
         execution_plan = execution_plan_service.create_from_scheduler(
@@ -95,7 +100,7 @@ class ScheduledTaskJob:
         try:
             queue_or_fake_simulate(execution_plan.id)
         except Exception as e:
-            logging.error(f"Error: {e}")
+            logger.error(f"Error: {e}")
 
 
 def check_for_scheduled_tasks():
@@ -114,7 +119,7 @@ def check_for_scheduled_tasks():
             and st.start_datetime < datetime.now()
             and st.enabled
         ):
-            logging.info(f"Adding {st.name}")
+            logger.info(f"Adding {st.name}")
             scheduler.add_job(
                 ScheduledTaskJob(st.id).simulate,
                 "interval",
@@ -134,7 +139,7 @@ def check_for_scheduled_tasks():
                 )
 
             if not st.enabled:
-                logging.info(f"Removing {st.name}")
+                logger.info(f"Removing {st.name}")
                 scheduler.remove_job(job_id)
 
 

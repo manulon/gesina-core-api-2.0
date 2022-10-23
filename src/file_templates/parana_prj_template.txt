@@ -5,8 +5,8 @@ SI Units
 Geom File=g01
 Unsteady File=u01
 Plan File=p01
-Y Axis Title=Nivel
-X Axis Title(PF)=Prog
+Y Axis Title=Elevation
+X Axis Title(PF)=Main Channel Distance
 X Axis Title(XS)=Station
 BEGIN DESCRIPTION:
 
@@ -15,12 +15,11 @@ DSS Start Date=$START_DATE
 DSS Start Time=$START_TIME
 DSS End Date=$END_DATE
 DSS End Time=$END_TIME
-DSS File=dss
 DSS Export Filename=
 DSS Export Rating Curves= 0
 DSS Export Rating Curve Sorted= 0
 DSS Export Volume Flow Curves= 0
-DXF Filename=
+DXF Filename=..\HIDRODELTA\Modelo-DeltaParana_2017_pre\DeltaParana_2016.
 DXF OffsetX= 0
 DXF OffsetY= 0
 DXF ScaleX= 1
