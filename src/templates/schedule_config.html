@@ -195,7 +195,8 @@
                                   <th scope="col">River</th>
                                   <th scope="col">Reach</th>
                                   <th scope="col">River stat</th>
-                                  <th scope="col">Id de series de salida</th>
+                                  <th scope="col">Id de series de altura</th>
+                                  <th scope="col">Id de series de flujo</th>
                                   <th scope="col">Acciones</th>
                                 </tr>
                               </thead>
@@ -207,7 +208,8 @@
                                         <td>{{ form.river }}</td>
                                         <td>{{ form.reach }}</td>
                                         <td>{{ form.river_stat }}</td>
-                                        <td>{{ form.series_id }}</td>
+                                        <td>{{ form.stage_series_id }}</td>
+                                        <td>{{ form.flow_series_id }}</td>
                                         <td><button type="button" class="btn btn-danger remove-row-series remove-row-series-plan">&#8722;</button></td>
                                     </tr>
                                 {% endfor %}
@@ -342,10 +344,11 @@
             new_row = `
                 <tr>
                     <th scope="row">${idx + 1}</th>
-                    <td><input id="plan_series_list-${idx}-river" name="plan_series_list-${idx}-river" required="" type="text" value=""></td>
-                    <td><input id="plan_series_list-${idx}-reach" name="plan_series_list-${idx}-reach" required="" type="text" value=""></td>
-                    <td><input id="plan_series_list-${idx}-river_stat" name="plan_series_list-${idx}-river_stat" required="" step="any" type="text" value=""></td>
-                    <td><input id="plan_series_list-${idx}-series_id" name="plan_series_list-${idx}-series_id" required="" type="number" value=""></td>
+                    <td><input id="plan_series_list-${idx}-river" name="plan_series_list-${idx}-river" required="" type="text" value="" style="width: 120px"></td>
+                    <td><input id="plan_series_list-${idx}-reach" name="plan_series_list-${idx}-reach" required="" type="text" value="" style="width: 120px"></td>
+                    <td><input id="plan_series_list-${idx}-river_stat" name="plan_series_list-${idx}-river_stat" required="" step="any" type="text" value="" style="width: 120px"></td>
+                    <td><input id="plan_series_list-${idx}-stage_series_id" name="plan_series_list-${idx}-stage_series_id" required="" type="number" value="" style="width: 120px"></td>
+                    <td><input id="plan_series_list-${idx}-flow_series_id" name="plan_series_list-${idx}-flow_series_id" required="" type="number" value="" style="width: 120px"></td>
                     <td><button type="button" class="btn btn-danger remove-row-series-plan">&#8722;</button></td>
                 </tr>
             `

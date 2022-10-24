@@ -90,23 +90,34 @@ class SeriesForm(Form):
 
 
 class PlanSeriesForm(Form):
+    render_kw = {"style": "width: 120px"}
     idx = HiddenField(default=None)
     river = StringField(
         label="River",
         validators=[DataRequired(message="Error: El river no puede estar vacío")],
+        render_kw=render_kw,
     )
     reach = StringField(
         label="Reach",
         validators=[DataRequired(message="Error: El reach no puede estar vacío")],
+        render_kw=render_kw,
     )
     river_stat = StringField(
         label="River stat",
         validators=[DataRequired(message="Error: El river stat no puede estar vacío")],
+        render_kw=render_kw,
     )
 
-    series_id = IntegerField(
-        label="Id de serie de salida",
+    stage_series_id = IntegerField(
+        label="Id de serie de altura",
         validators=[DataRequired(message="Error: El id no puede estar vacío")],
+        render_kw=render_kw,
+    )
+
+    flow_series_id = IntegerField(
+        label="Id de serie de flujo",
+        validators=[DataRequired(message="Error: El id no puede estar vacío")],
+        render_kw=render_kw,
     )
 
 

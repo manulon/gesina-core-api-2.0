@@ -61,3 +61,5 @@ class ExecutionPlanOutput(Base):
     execution_plan = relationship(
         "ExecutionPlan", back_populates="execution_plan_output_list"
     )
+    stage_series_id = Column(Integer)
+    flow_series_id = Column(Integer)

@@ -64,7 +64,11 @@ def create_from_scheduler(
         flow_file,
         execution_plan_output_list=[
             ExecutionPlanOutput(
-                river=ps.river, reach=ps.reach, river_stat=ps.river_stat
+                river=ps.river,
+                reach=ps.reach,
+                river_stat=ps.river_stat,
+                stage_series_id=ps.stage_series_id,
+                flow_series_id=ps.stage_series_id,
             )
             for ps in plan_series_list
         ],

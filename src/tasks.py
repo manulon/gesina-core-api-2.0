@@ -53,7 +53,18 @@ def simulate(execution_id, user_id):
                 res = RC.OutputDSS_GetStageFlow(epo.river, epo.reach, epo.river_stat)
                 res = list(res)
                 dfs.append(
-                    pd.DataFrame({"fecha": res[1], "altura": res[2], "caudal": res[3]})
+                    pd.DataFrame(
+                        {
+                            "river": epo.river,
+                            "reach": epo.reach,
+                            "river_stat": epo.river_stat,
+                            "datetime": res[1],
+                            "stage": res[2],
+                            "flow": res[3],
+                            "stage_series_id": epo.stage_series_id,
+                            "flow_series_id": epo.flow_series_id,
+                        }
+                    )
                 )
 
             pd.concat(dfs).to_csv("results.csv")

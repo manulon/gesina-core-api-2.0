@@ -30,14 +30,16 @@ def process_plan_series_form(series_list, scheduled_config_id=None):
                 river=each_plan_series.river.data,
                 reach=each_plan_series.reach.data,
                 river_stat=each_plan_series.river_stat.data,
-                series_id=each_plan_series.series_id.data,
+                stage_series_id=each_plan_series.stage_series_id.data,
+                flow_series_id=each_plan_series.flow_series_id.data,
             )
         else:
-            plan_series = BorderCondition(
+            plan_series = PlanSeries(
                 river=each_plan_series.river.data,
                 reach=each_plan_series.reach.data,
                 river_stat=each_plan_series.river_stat.data,
-                series_id=each_plan_series.series_id.data,
+                stage_series_id=each_plan_series.stage_series_id.data,
+                flow_series_id=each_plan_series.flow_series_id.data,
             )
         result.append(plan_series)
 
@@ -60,26 +62,19 @@ def process_plan_series_csv_file(plan_series_file_field, scheduled_config_id=Non
                         river=row[0],
                         reach=row[1],
                         river_stat=row[2],
-                        series_id=row[3],
+                        stage_series_id=row[3],
+                        flow_series_id=row[4],
                     )
                 else:
                     plan_series = PlanSeries(
-                        river=row[0], reach=row[1], river_stat=row[2], series_id=row[3]
+                        river=row[0],
+                        reach=row[1],
+                        river_stat=row[2],
+                        stage_series_id=row[3],
+                        flow_series_id=row[4],
                     )
                 result.append(plan_series)
         else:
             raise FileUploadError("Error: Archivo .csv inválido")
 
     return result
-
-
-def create_plan_series_list(plan_series_list):
-    return [
-        PlanSeries(
-            river=plan_series.river,
-            reach=plan_series.reach,
-            river_stat=plan_series.river_stat,
-            series_id=plan_series.series_id,
-        )
-        for plan_series in plan_series_list
-    ]
