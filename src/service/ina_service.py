@@ -3,7 +3,8 @@ import logging
 import requests
 import pandas as pd
 from datetime import timedelta
-import os
+
+from src import config
 
 
 def obtain_obeservations_for_stations(stations, timestart, timeend):
@@ -25,7 +26,7 @@ def obtain_observations(serie_id, timestart, timeend):
         + str(serie_id)
         + "/observaciones",
         params={"timestart": timestart, "timeend": timeend},
-        headers={"Authorization": f"Bearer {os.getenv('INA_TOKEN')}"},
+        headers={"Authorization": f"Bearer {config.ina_token}"},
     )
     json_response = response.json()
 
@@ -51,7 +52,7 @@ def C_id_corr_guar(id_Mod, est_id):
         + str(id_Mod)
         + "/corridas_guardadas",
         params={"var_id": "2", "estacion_id": str(est_id), "includeProno": False},
-        headers={"Authorization": f"Bearer {os.getenv('INA_TOKEN')}"},
+        headers={"Authorization": f"Bearer {config.ina_token}"},
     )
     json_response = response.json()
     return json_response
@@ -65,7 +66,7 @@ def C_corr_guar(id_Mod, corrida_id):
         + "/corridas_guardadas/"
         + str(corrida_id),
         params={"includeProno": True},
-        headers={"Authorization": f"Bearer {os.getenv('INA_TOKEN')}"},
+        headers={"Authorization": f"Bearer {config.ina_token}"},
     )
     json_response = response.json()
     df_sim = pd.DataFrame.from_dict(
@@ -90,7 +91,7 @@ def C_id_corr_ultimas(id_Mod, est_id):
     response = requests.get(
         "https://alerta.ina.gob.ar/a5/sim/calibrados/" + str(id_Mod) + "/corridas",
         params={"var_id": "2", "estacion_id": str(est_id), "includeProno": False},
-        headers={"Authorization": f"Bearer {os.getenv('INA_TOKEN')}"},
+        headers={"Authorization": f"Bearer {config.ina_token}"},
     )
     json_res = response.json()
     return json_res
@@ -103,7 +104,7 @@ def C_corr_ultimas(id_Mod, corrida_id, est_id):
         + "/corridas/"
         + str(corrida_id),
         params={"var_id": "2", "estacion_id": str(est_id), "includeProno": True},
-        headers={"Authorization": f"Bearer {os.getenv('INA_TOKEN')}"},
+        headers={"Authorization": f"Bearer {config.ina_token}"},
     )
     json_response = response.json()
     df_sim = pd.DataFrame.from_dict(
@@ -130,8 +131,11 @@ def obtain_curated_series(series_id, timestart, timeend):
     logging.info(
         f"Getting data for series id: {series_id} from {timestart} to {timeend} with url: {url}"
     )
+
+    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Imdlc2luYSIsImlhdCI6MTUxNjIzOTAyMn0.OaYf4LiEegSuD--xIXIb0Aocbf-mhiNvnUJXlfo7Ovc"
+
     response = requests.get(
-        url, headers={"Authorization": f"Bearer {os.getenv('INA_TOKEN')}"}
+        url, headers={"Authorization": f"Bearer {config.ina_token}"}
     )
 
     data = sorted(response.json(), key=lambda i: i["timestart"], reverse=False)
