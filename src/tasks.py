@@ -17,6 +17,7 @@ celery_app.config_from_envvar("CELERY_CONFIG_MODULE")
 @celery_app.task
 def simulate(execution_id, user_id):
     import win32com.client as client
+    import pandas as pd
     from src.service import file_storage_service
 
     begin = datetime.now()
@@ -44,6 +45,16 @@ def simulate(execution_id, user_id):
 
         execution_plan = execution_plan_service.get_execution_plan(execution_id)
         execution_plan_output_list = execution_plan.execution_plan_output_list
+
+        dfs = []
+
+        if execution_plan_output_list:
+            for epo in execution_plan_output_list:
+                res = RC.OutputDSS_GetStageFlow(epo.river, epo.reach, epo.river_stat)
+                res = list(res)
+                dfs.append(pd.DataFrame({"fecha": res[1], "altura": res[2], "caudal": res[3]}))
+
+            pd.concat(dfs).to_csv("results.csv")
 
         end = datetime.now()
         total_seconds = (end - begin).total_seconds()
