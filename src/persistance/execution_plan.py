@@ -33,6 +33,9 @@ class ExecutionPlan(Base):
     end_datetime = Column(DateTime, default=datetime.now)
     created_at = Column(DateTime, default=datetime.now)
     status = Column(Enum(ExecutionPlanStatus), default=ExecutionPlanStatus.PENDING)
+    execution_plan_output_list = relationship(
+        "ExecutionPlanOutput", lazy="joined", back_populates="execution_plan"
+    )
 
     def get_geometry_file_url(self):
         # TODO recuperar desde la carpeta del exe_plan
@@ -45,3 +48,18 @@ class ExecutionPlan(Base):
         if self.id:
             return ""
         return ""
+
+
+class ExecutionPlanOutput(Base):
+    __tablename__ = "execution_plan_output"
+    river = Column(String, primary_key=True)
+    reach = Column(String, primary_key=True)
+    river_stat = Column(String, primary_key=True)
+    execution_plan_id = Column(
+        Integer, ForeignKey("execution_plan.id"), primary_key=True
+    )
+    execution_plan = relationship(
+        "ExecutionPlan", back_populates="execution_plan_output_list"
+    )
+    stage_series_id = Column(Integer)
+    flow_series_id = Column(Integer)

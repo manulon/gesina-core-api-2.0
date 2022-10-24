@@ -15,6 +15,7 @@ secret_key = os.getenv("SECRET_KEY", "default")
 # Application
 dry_run = os.getenv("DRY_RUN", False)
 fake_activity = os.getenv("FAKE_ACTIVITY", True)
+ina_token = os.getenv("INA_TOKEN")
 
 # Scheduler
 scheduler_database_user = os.getenv("DATABASE_USER", "user")

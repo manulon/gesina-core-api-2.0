@@ -1,4 +1,3 @@
-import flask_login
 import sqlalchemy
 from flask import Blueprint, render_template, url_for, redirect, request
 
@@ -352,7 +351,8 @@ def render_plan_series_list(plan_series_list, form):
         plan_form.reach = plan.reach
         plan_form.river = plan.river
         plan_form.river_stat = plan.river_stat
-        plan_form.series_id = plan.series_id
+        plan_form.stage_series_id = plan.stage_series_id
+        plan_form.flow_series_id = plan.flow_series_id
         form.plan_series_list.append_entry(plan_form)
 
 

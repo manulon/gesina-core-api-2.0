@@ -9,14 +9,12 @@ from sqlalchemy import (
     JSON,
     Boolean,
     ForeignKey,
-    Float,
     Enum,
 )
 from sqlalchemy.orm import relationship
 
 from src.persistance.session import Base
 from src.service import file_storage_service
-from src.service.exception.file_exception import FilePreSignedUrlError
 
 
 class ScheduledTask(Base):
@@ -105,6 +103,7 @@ class PlanSeries(Base):
     river = Column(String)
     reach = Column(String)
     river_stat = Column(String)
-    series_id = Column(Integer)
+    stage_series_id = Column(Integer)
+    flow_series_id = Column(Integer)
     scheduled_task = relationship("ScheduledTask", back_populates="plan_series_list")
     scheduled_task_id = Column(Integer, ForeignKey("scheduled_task.id"))
