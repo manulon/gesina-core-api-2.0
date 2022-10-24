@@ -30,7 +30,9 @@ def create_from_form(form):
         flow_file_data,
         restart_file_data,
         [
-            ExecutionPlanOutput(river=d['river'], reach=d['reach'], river_stat=d['river_stat'])
+            ExecutionPlanOutput(
+                river=d["river"], reach=d["reach"], river_stat=d["river_stat"]
+            )
             for d in execution_plan_output_list_data
         ],
     )
