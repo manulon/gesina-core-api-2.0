@@ -127,29 +127,29 @@ def C_corr_ultimas(id_Mod, corrida_id, est_id):
 def obtain_curated_series(series_id, timestart, timeend):
     format_time = lambda d: d.strftime("%Y-%m-%d")
 
-    url = f"https://alerta.ina.gob.ar/a5/obs/puntual/series/{series_id}/observaciones?&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
+    url = f"https://alerta.ina.gob.ar/a5/sim/calibrados/487/corridas/last?series_id={series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
     logging.info(
         f"Getting data for series id: {series_id} from {timestart} to {timeend} with url: {url}"
     )
-
-    token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Imdlc2luYSIsImlhdCI6MTUxNjIzOTAyMn0.OaYf4LiEegSuD--xIXIb0Aocbf-mhiNvnUJXlfo7Ovc"
 
     response = requests.get(
         url, headers={"Authorization": f"Bearer {config.ina_token}"}
     )
 
-    data = sorted(response.json(), key=lambda i: i["timestart"], reverse=False)
-    data = [i for i in data if i["valor"]]
+    data = response.json()["series"][0]["pronosticos"]
+
+    data = sorted(data, key=lambda i: i[0], reverse=False)
+    data = [i for i in data if i[2]]
 
     logging.info(
-        f"Obtained {len(data)} values. First value is from {data[0]['timestart']}. Last value is from {data[-1]['timestart']}"
+        f"Obtained {len(data)} values. First value is from {data[0][0]}. Last value is from {data[-1][0]}"
     )
 
-    return [i["valor"] for i in data]
+    return [float(i[2]) for i in data]
 
 
 if __name__ == "__main__":
     from datetime import date
 
     logging.info = print
-    print(obtain_curated_series(31554, date(2022, 6, 17), date(2022, 9, 30)))
+    print(obtain_curated_series(31564, date(2022, 9, 17), date(2022, 11, 1)))
