@@ -6,7 +6,7 @@ from src.persistance.scheduled_task import (
 )
 from src.service.exception.file_exception import FileUploadError
 
-CSV_HEADERS = ["river", "reach", "river_stat", "series_id"]
+CSV_HEADERS = ["river", "reach", "river_stat", "stage_series_id", "flow_series_id"]
 
 
 def retrieve_plan_series(form, scheduled_config_id=None):
