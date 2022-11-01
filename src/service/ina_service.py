@@ -4,7 +4,7 @@ import requests
 import pandas as pd
 from datetime import timedelta
 
-from src import config
+from src import config, logger
 
 
 def obtain_obeservations_for_stations(stations, timestart, timeend):
@@ -126,26 +126,28 @@ def C_corr_ultimas(id_Mod, corrida_id, est_id):
 
 def obtain_curated_series(series_id, timestart, timeend):
     format_time = lambda d: d.strftime("%Y-%m-%d")
+    timestart = timestart - timedelta(1)
+    timeend = timeend + timedelta(1)
 
     url = f"https://alerta.ina.gob.ar/a5/sim/calibrados/487/corridas/last?series_id={series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
-    logging.info(
+    logger.error(
         f"Getting data for series id: {series_id} from {timestart} to {timeend} with url: {url}"
     )
+    response = requests.get(url,
+                            headers={"Authorization": f"Bearer {config.ina_token}"})
 
-    response = requests.get(
-        url, headers={"Authorization": f"Bearer {config.ina_token}"}
-    )
+    logger.error(f"Answered: {response.json()}")
 
     data = response.json()["series"][0]["pronosticos"]
 
     data = sorted(data, key=lambda i: i[0], reverse=False)
     data = [i for i in data if i[2]]
 
-    logging.info(
+    logger.error(
         f"Obtained {len(data)} values. First value is from {data[0][0]}. Last value is from {data[-1][0]}"
     )
 
-    return [float(i[2]) for i in data]
+    return [round(float(i[2]), 3) for i in data]
 
 
 if __name__ == "__main__":

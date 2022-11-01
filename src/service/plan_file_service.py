@@ -7,7 +7,6 @@ LINES_TO_PROCESS = [
     "Short Identifier",
     "Simulation Date",
     "IC Time",
-    "Geom File",
     "Flow File",
 ]
 

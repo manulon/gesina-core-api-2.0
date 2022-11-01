@@ -52,8 +52,8 @@ class ScheduledTaskJob:
         logger.error("Starting simulation")
         locale = timezone("America/Argentina/Buenos_Aires")
         today = datetime.now(tz=locale).replace(minute=0)
-        start_date = today - timedelta(scheduled_task.observation_days - 2)
-        end_date = today + timedelta(scheduled_task.forecast_days + 2)
+        start_date = today - timedelta(scheduled_task.observation_days)
+        end_date = today + timedelta(scheduled_task.forecast_days)
         logger.error(f"Start Date: {start_date} and End Date: {end_date}")
 
         simulation_name = f'{scheduled_task.name.replace(" ", "_")}-{start_date.strftime("%Y%m%d_%Hhs")}'

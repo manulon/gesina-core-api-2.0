@@ -43,6 +43,7 @@ def simulate(execution_id, user_id):
             RC.Compute_HideComputationWindow()
             RC.Compute_CurrentPlan(None, None, True)
 
+        logger.info(f"End of simulation")
         execution_plan = execution_plan_service.get_execution_plan(execution_id)
         execution_plan_output_list = execution_plan.execution_plan_output_list
 
@@ -50,31 +51,36 @@ def simulate(execution_id, user_id):
 
         if execution_plan_output_list:
             for epo in execution_plan_output_list:
+                logger.info(f"Getting Stage Flow for {epo.river}, {epo.reach}, {epo.river_stat}")
                 res = RC.OutputDSS_GetStageFlow(epo.river, epo.reach, epo.river_stat)
                 res = list(res)
+                dates = res[5][1:]
                 dfs.append(
                     pd.DataFrame(
                         {
                             "river": epo.river,
                             "reach": epo.reach,
                             "river_stat": epo.river_stat,
-                            "datetime": res[1],
-                            "stage": res[2],
-                            "flow": res[3],
+                            "excel_datetime": dates,
+                            "datetime": [get_date_from_excel_format(d) for d in dates],
+                            "stage": res[6],
+                            "flow": res[7],
                             "stage_series_id": epo.stage_series_id,
                             "flow_series_id": epo.flow_series_id,
                         }
                     )
                 )
 
-            pd.concat(dfs).to_csv("results.csv")
+            pd.concat(dfs).to_csv(f"{base_path}\\results.csv")
 
+        logger.info("Saved results to CSV")
         end = datetime.now()
         total_seconds = (end - begin).total_seconds()
-        logger.info(f"Ending simulations. Total runtime seconds {total_seconds}")
+        logger.info(f"End of simulation. Total runtime seconds {total_seconds}")
         execution_plan_service.update_finished_execution_plan(execution_id, begin, end)
-    except:
+    except Exception as e:
         # TODO aca habria que loguear o incluso guardar en el execution plan el error..
+        logger.error(f"[ERROR] - {e}")
         execution_plan_service.update_execution_plan_status(
             execution_id, ExecutionPlanStatus.ERROR
         )
@@ -122,3 +128,20 @@ def queue_or_fake_simulate(execution_id):
 @celery_app.task
 def error_handler(request, exc, traceback):
     print("Task {0} raised exception: {1!r}\n{2!r}".format(request.id, exc, traceback))
+
+
+def floatHourToTime(fh):
+    hours, hourSeconds = divmod(fh, 1)
+    minutes, seconds = divmod(hourSeconds * 60, 1)
+    return (
+        int(hours),
+        int(minutes),
+        int(seconds * 60),
+    )
+
+
+def get_date_from_excel_format(excel_date):
+    dt = datetime.fromordinal(datetime(1900, 1, 1).toordinal() + int(excel_date) - 2)
+    hour, minute, second = floatHourToTime(excel_date % 1)
+    dt = dt.replace(hour=hour, minute=minute, second=second)
+    return dt
