@@ -15,7 +15,7 @@ from src.service.execution_plan_service import update_execution_plan_status
 from src.service.schedule_task_service import get_schedule_task_config
 from src.tasks import queue_or_fake_simulate
 
-from src.util.file_builder import build_project, build_plan, build_flow, new_build_flow
+from src.util.file_builder import build_project, build_plan, new_build_flow
 
 jobstores = {
     "default": SQLAlchemyJobStore(
@@ -77,6 +77,7 @@ class ScheduledTaskJob:
             use_restart,
             "restart_file.rst",
             scheduled_task.initial_flows,
+            scheduled_task.calibration_id,
             start_date,
             end_date,
         )

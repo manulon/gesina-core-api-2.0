@@ -124,17 +124,18 @@ def C_corr_ultimas(id_Mod, corrida_id, est_id):
     return df_sim
 
 
-def obtain_curated_series(series_id, timestart, timeend):
+def obtain_curated_series(series_id, calibration_id, timestart, timeend):
     format_time = lambda d: d.strftime("%Y-%m-%d")
     timestart = timestart - timedelta(1)
     timeend = timeend + timedelta(1)
 
-    url = f"https://alerta.ina.gob.ar/a5/sim/calibrados/487/corridas/last?series_id={series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
+    url = f"https://alerta.ina.gob.ar/a5/sim/calibrados/{calibration_id}/corridas/last?series_id={series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
     logger.error(
         f"Getting data for series id: {series_id} from {timestart} to {timeend} with url: {url}"
     )
-    response = requests.get(url,
-                            headers={"Authorization": f"Bearer {config.ina_token}"})
+    response = requests.get(
+        url, headers={"Authorization": f"Bearer {config.ina_token}"}
+    )
 
     logger.error(f"Answered: {response.json()}")
 
@@ -154,4 +155,4 @@ if __name__ == "__main__":
     from datetime import date
 
     logging.info = print
-    print(obtain_curated_series(31564, date(2022, 9, 17), date(2022, 11, 1)))
+    print(obtain_curated_series(31564, 487, date(2022, 9, 17), date(2022, 11, 1)))
