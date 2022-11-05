@@ -51,7 +51,9 @@ def simulate(execution_id, user_id):
 
         if execution_plan_output_list:
             for epo in execution_plan_output_list:
-                logger.info(f"Getting Stage Flow for {epo.river}, {epo.reach}, {epo.river_stat}")
+                logger.info(
+                    f"Getting Stage Flow for {epo.river}, {epo.reach}, {epo.river_stat}"
+                )
                 res = RC.OutputDSS_GetStageFlow(epo.river, epo.reach, epo.river_stat)
                 res = list(res)
                 dates = res[5][1:]

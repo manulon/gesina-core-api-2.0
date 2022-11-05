@@ -151,6 +151,12 @@ class ScheduleConfigForm(FlaskForm, ErrorMixin):
         label="Frecuencia de ejecución (en minutos)",
         render_kw={"min": 5},
     )
+    calibration_id = IntegerField(
+        validators=[
+            DataRequired(message="Error: El ID de calibrados no puede estar vacío")
+        ],
+        label="ID de calibrados",
+    )
     enabled = BooleanField(label="Ejecución habilitada")
 
     project_file = FileField(label="Archivo de proyecto (.prj)")

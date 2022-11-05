@@ -138,7 +138,9 @@ def build_restart_status(restart_filename):
     return src.substitute({"FILE_NAME": restart_filename})
 
 
-def get_forecast_and_observation_values(border_conditions, start_date, end_date):
+def get_forecast_and_observation_values(
+    border_conditions, calibration_id, start_date, end_date
+):
     result = []
     for condition in border_conditions:
         result.append(
@@ -149,7 +151,7 @@ def get_forecast_and_observation_values(border_conditions, start_date, end_date)
                 "interval": condition.interval.replace("-", ""),
                 "border_condition": condition.type,
                 "values": ina_service.obtain_curated_series(
-                    condition.series_id, start_date, end_date
+                    condition.series_id, calibration_id, start_date, end_date
                 ),
             }
         )
@@ -180,13 +182,19 @@ def build_boundary_conditions(start_date, conditions):
 
 
 def new_build_flow(
-    border_conditions, use_restart, restart_file, initial_flows, start_date, end_date
+    border_conditions,
+    use_restart,
+    restart_file,
+    initial_flows,
+    calibration_id,
+    start_date,
+    end_date,
 ):
     initial_status = create_initial_status(use_restart, restart_file, initial_flows)
 
     # Buscar las series al INA
     conditions = get_forecast_and_observation_values(
-        border_conditions, start_date, end_date
+        border_conditions, calibration_id, start_date, end_date
     )
     boundary_locations = build_boundary_conditions(start_date, conditions)
 

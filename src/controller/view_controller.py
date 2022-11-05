@@ -295,6 +295,7 @@ def render_schedule_view(form, schedule_config=None, errors=()):
         form.plan_file_present = schedule_config.is_plan_template_present()
         form.enabled.data = schedule_config.enabled
         form.frequency.data = schedule_config.frequency
+        form.calibration_id.data = schedule_config.calibration_id
         form.description.data = schedule_config.description
         form.name.data = schedule_config.name
         form.start_datetime.data = schedule_config.start_datetime

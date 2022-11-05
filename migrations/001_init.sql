@@ -80,7 +80,8 @@ create table if not exists "scheduled_task"
     observation_days integer not null,
     forecast_days integer not null,
     start_condition_type text not null,
-    restart_file text
+    restart_file text,
+    calibration_id integer not null
 );
 
 
