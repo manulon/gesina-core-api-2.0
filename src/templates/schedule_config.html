@@ -60,11 +60,15 @@
                             <div class="form-group">
                                 {{ form.name.label }}: {{ form.name(class_="form-control") }}
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" data-toggle="tooltip" data-placement="top" title="Tooltip on top">
                                 {{ form.description.label }}: {{ form.description(class_="form-control") }}
                             </div>
                             <div class="form-group">
-                                {{ form.geometry_id.label }}: {{ form.geometry_id(class_="form-control") }}
+                                {{ form.geometry_id.label }}:
+                                <div class="font-italic" style="font-size:small;padding-bottom:6px">
+                                    * Debe ser la misma que se incluya en el plan y en el proyecto.
+                                </div>
+                                {{ form.geometry_id(class_="form-control") }}
                             </div>
                             <div class="form-group">
                                 {{ form.start_datetime.label }}: {{ form.start_datetime(class_="form-control") }}
