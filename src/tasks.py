@@ -15,11 +15,13 @@ os.environ.setdefault("CELERY_CONFIG_MODULE", "src.celery_config")
 celery_app = Celery()
 celery_app.config_from_envvar("CELERY_CONFIG_MODULE")
 
+
 @celery_app.task
 def simulate(execution_id, user_id):
     import win32com.client as client
     import pandas as pd
     from src.service import file_storage_service
+
     begin = datetime.now()
 
     base_path = f"C:\\gesina\\{execution_id}"
@@ -101,7 +103,9 @@ def simulate(execution_id, user_id):
 
 def get_logger(base_path):
     logging_level = logging.INFO
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
 
     std_out_handler = logging.StreamHandler(sys.stdout)
     std_out_handler.setLevel(logging_level)
@@ -156,7 +160,9 @@ def queue_or_fake_simulate(execution_id):
 def error_handler(request, exc, traceback):
     logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
-    logging.error("Task {0} raised exception: {1!r}\n{2!r}".format(request.id, exc, traceback))
+    logging.error(
+        "Task {0} raised exception: {1!r}\n{2!r}".format(request.id, exc, traceback)
+    )
 
 
 def floatHourToTime(fh):
