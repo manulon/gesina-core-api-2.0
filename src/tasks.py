@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import os
 from src import config
 from src.persistance.execution_plan import ExecutionPlanStatus
-from src.service import execution_plan_service, notification_service
+from src.service import execution_plan_service, notification_service, ina_service
 from src.service.file_storage_service import FileType
 import sys
 
@@ -17,7 +17,7 @@ celery_app.config_from_envvar("CELERY_CONFIG_MODULE")
 
 
 @celery_app.task
-def simulate(execution_id, user_id):
+def simulate(execution_id, user_id, calibration_id):
     import win32com.client as client
     import pandas as pd
     from src.service import file_storage_service
@@ -61,6 +61,8 @@ def simulate(execution_id, user_id):
                 res = RC.OutputDSS_GetStageFlow(epo.river, epo.reach, epo.river_stat)
                 res = list(res)
                 dates = res[5][1:]
+                stage = res[6]
+                flow = res[7]
                 dfs.append(
                     pd.DataFrame(
                         {
@@ -69,13 +71,33 @@ def simulate(execution_id, user_id):
                             "river_stat": epo.river_stat,
                             "excel_datetime": dates,
                             "datetime": [get_date_from_excel_format(d) for d in dates],
-                            "stage": res[6],
-                            "flow": res[7],
+                            "stage": stage,
+                            "flow": flow,
                             "stage_series_id": epo.stage_series_id,
                             "flow_series_id": epo.flow_series_id,
                         }
                     )
                 )
+
+                if epo.flow_series_id:
+                    ina_service.send_info_to_ina(
+                        begin.isoformat(),
+                        dates,
+                        flow,
+                        epo.flow_series_id,
+                        calibration_id,
+                        win_logger,
+                    )
+
+                if epo.stage_series_id:
+                    ina_service.send_info_to_ina(
+                        begin.isoformat(),
+                        dates,
+                        stage,
+                        epo.stage_series_id,
+                        calibration_id,
+                        win_logger,
+                    )
 
             pd.concat(dfs).to_csv(f"{base_path}\\results.csv")
 
@@ -139,7 +161,7 @@ def fake_simulate(execution_id, user_id):
     notification_service.post_notification(execution_id, user_id)
 
 
-def queue_or_fake_simulate(execution_id):
+def queue_or_fake_simulate(execution_id, calibration_id=None):
     from src import logger
 
     execution = execution_plan_service.get_execution_plan(execution_id)
@@ -151,7 +173,11 @@ def queue_or_fake_simulate(execution_id):
         logger.info(f"Queueing simulation for {execution_id}")
         logger.info({"execution_id": execution_id, "user_id": execution.user.id})
         simulate.apply_async(
-            kwargs={"execution_id": execution_id, "user_id": execution.user.id},
+            kwargs={
+                "execution_id": execution_id,
+                "user_id": execution.user.id,
+                "calibration_id": calibration_id,
+            },
             link_error=error_handler.s(),
         )
 

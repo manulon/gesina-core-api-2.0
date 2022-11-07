@@ -151,6 +151,38 @@ def obtain_curated_series(series_id, calibration_id, timestart, timeend):
     return [round(float(i[2]), 3) for i in data]
 
 
+def send_info_to_ina(
+    forecast_date, dates, values, series_id, calibration_id, win_logger
+):
+    url = f"https://alerta.ina.gob.ar/a5/sim/calibrados/{calibration_id}/corridas/{series_id}"
+    win_logger.info(f"Sending series to INA. URL: {url}")
+
+    pronosticos = [
+        {"timestart": t, "timeend": t, "valor": v} for t, v in zip(dates, values)
+    ]
+
+    data = {
+        "forecast_date": forecast_date,
+        "series": [
+            {
+                "series_table": "series",
+                "series_id": series_id,
+                "pronosticos": pronosticos,
+            }
+        ],
+    }
+
+    headers = {"Authorization": f"Bearer {config.ina_token}"}
+
+    try:
+        response = requests.put(url, headers=headers, json=data)
+        win_logger.info(
+            f"Successfully sent info to INA. Response status: {response.status_code}"
+        )
+    except Exception as e:
+        win_logger.error(f"Error sending info to INA: {e}")
+
+
 if __name__ == "__main__":
     from datetime import date
 
