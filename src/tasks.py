@@ -1,12 +1,14 @@
 import io
+import logging
 
 from celery import Celery
 from datetime import datetime, timedelta
 import os
-from src import logger, config
+from src import config
 from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service import execution_plan_service, notification_service
 from src.service.file_storage_service import FileType
+import sys
 
 os.environ.setdefault("CELERY_CONFIG_MODULE", "src.celery_config")
 
@@ -24,26 +26,28 @@ def simulate(execution_id, user_id):
 
     base_path = f"C:\\gesina\\{execution_id}"
 
+    win_logger = get_logger(base_path)
+
     file_storage_service.download_files_for_execution(base_path, execution_id)
 
-    logger.info("Loading hec ras")
+    win_logger.info("Loading hec ras")
     RC = None
     try:
         RC = client.Dispatch("RAS507.HECRASCONTROLLER")
         hec_prj = f"{base_path}\\{execution_id}.prj"
-        logger.info("Opening project")
+        win_logger.info("Opening project")
         RC.Project_Open(hec_prj)
-        logger.info("Obtaining projects names")
+        win_logger.info("Obtaining projects names")
         blnIncludeBasePlansOnly = True
         plan_names = RC.Plan_Names(None, None, blnIncludeBasePlansOnly)[1]
 
         for name in plan_names:
-            logger.info(f"Running plan {name}")
+            win_logger.info(f"Running plan {name}")
             RC.Plan_SetCurrent(name)
             RC.Compute_HideComputationWindow()
             RC.Compute_CurrentPlan(None, None, True)
 
-        logger.info(f"End of simulation")
+        win_logger.info(f"End of simulation")
         execution_plan = execution_plan_service.get_execution_plan(execution_id)
         execution_plan_output_list = execution_plan.execution_plan_output_list
 
@@ -51,7 +55,7 @@ def simulate(execution_id, user_id):
 
         if execution_plan_output_list:
             for epo in execution_plan_output_list:
-                logger.info(
+                win_logger.info(
                     f"Getting Stage Flow for {epo.river}, {epo.reach}, {epo.river_stat}"
                 )
                 res = RC.OutputDSS_GetStageFlow(epo.river, epo.reach, epo.river_stat)
@@ -75,14 +79,14 @@ def simulate(execution_id, user_id):
 
             pd.concat(dfs).to_csv(f"{base_path}\\results.csv")
 
-        logger.info("Saved results to CSV")
+        win_logger.info("Saved results to CSV")
         end = datetime.now()
         total_seconds = (end - begin).total_seconds()
-        logger.info(f"End of simulation. Total runtime seconds {total_seconds}")
+        win_logger.info(f"End of simulation. Total runtime seconds {total_seconds}")
         execution_plan_service.update_finished_execution_plan(execution_id, begin, end)
     except Exception as e:
         # TODO aca habria que loguear o incluso guardar en el execution plan el error..
-        logger.error(f"[ERROR] - {e}")
+        win_logger.error(f"[ERROR] - {e}")
         execution_plan_service.update_execution_plan_status(
             execution_id, ExecutionPlanStatus.ERROR
         )
@@ -95,6 +99,29 @@ def simulate(execution_id, user_id):
     notification_service.post_notification(execution_id, user_id)
 
     return (datetime.now() - begin).total_seconds()
+
+
+def get_logger(base_path):
+    logging_level = logging.INFO
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+
+    std_out_handler = logging.StreamHandler(sys.stdout)
+    std_out_handler.setLevel(logging_level)
+    std_out_handler.setFormatter(formatter)
+
+    file_handler = logging.FileHandler(f"{base_path}/log.txt")
+    file_handler.setLevel(logging_level)
+    file_handler.setFormatter(formatter)
+
+    win_logger = logging.getLogger("win_logger")
+
+    win_logger.setLevel(logging_level)
+    win_logger.addHandler(std_out_handler)
+    win_logger.addHandler(file_handler)
+
+    return win_logger
 
 
 # ONLY FOR TEST PURPOSE
@@ -113,6 +140,8 @@ def fake_simulate(execution_id, user_id):
 
 
 def queue_or_fake_simulate(execution_id):
+    from src import logger
+
     execution = execution_plan_service.get_execution_plan(execution_id)
     if not execution:
         raise Exception
@@ -120,7 +149,7 @@ def queue_or_fake_simulate(execution_id):
         fake_simulate(execution_id, execution.user.id)
     else:
         logger.info(f"Queueing simulation for {execution_id}")
-        print({"execution_id": execution_id, "user_id": execution.user.id})
+        logger.info({"execution_id": execution_id, "user_id": execution.user.id})
         simulate.apply_async(
             kwargs={"execution_id": execution_id, "user_id": execution.user.id},
             link_error=error_handler.s(),
@@ -129,7 +158,11 @@ def queue_or_fake_simulate(execution_id):
 
 @celery_app.task
 def error_handler(request, exc, traceback):
-    print("Task {0} raised exception: {1!r}\n{2!r}".format(request.id, exc, traceback))
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+
+    logging.error(
+        "Task {0} raised exception: {1!r}\n{2!r}".format(request.id, exc, traceback)
+    )
 
 
 def floatHourToTime(fh):
