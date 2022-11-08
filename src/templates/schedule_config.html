@@ -5,6 +5,11 @@
             <h2>Configuración de simulaciones programadas</h2>
         </div>
         <div class="container-xxl">
+            <form method=post
+                  enctype=multipart/form-data
+                  class="p-4 container needs-validation"
+                  id="schedule-test-border-series"
+                  action="{{ url_for('view_controller.validate_connection_to_schedule_conditions') }}">
             {% if id %}
                 <form method=post
                       enctype=multipart/form-data
@@ -76,7 +81,7 @@
                             <div class="form-group">
                                 {{ form.frequency.label }}: {{ form.frequency(class_="form-control") }}
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" id="calibration_id_container">
                                 {{ form.calibration_id.label }}: {{ form.calibration_id(class_="form-control") }}
                             </div>
                             {% if form.project_file_present %}
@@ -165,10 +170,15 @@
                                         <td>{{ form.river }}</td>
                                         <td>{{ form.reach }}</td>
                                         <td>{{ form.river_stat }}</td>
-                                        <td class="d-flex flex-row">{{ form.interval.interval_value}}{{ form.interval.interval_unit }}</td>
+                                        <td><div class="d-flex flex-row">{{ form.interval.interval_value}}{{ form.interval.interval_unit }}</div></td>
                                         <td>{{ form.border_condition }}</td>
                                         <td>{{ form.series_id }}</td>
-                                        <td><button type="button" class="btn btn-danger remove-row-series">&#8722;</button></td>
+                                        <td class="d-flex justify-content-around">
+                                            <button type="button" class="btn btn-danger remove-row-series">&#8722;</button>
+                                            <button type="button" class="btn btn-success test-connection">
+                                                <i class="fa fa-refresh" aria-hidden="true"></i>
+                                            </button>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                               </tbody>
@@ -234,6 +244,7 @@
                         </div>
                     </div>
                     <div class="form-group pt-2 text-right">
+                        <button class="btn btn-success">Probar Condiciones de Borde</button>
                         <button type="submit" class="btn btn-primary">Guardar</button>
                     </div>
             </form>
@@ -241,6 +252,7 @@
     </div>
 
     <script>
+        $("")
         $( "#add-row-initial-flow" ).on("click", function() {
             let idx = 0
             tr = $("#initial_flow_table_body tr:last-child")
@@ -264,9 +276,33 @@
         });
 
         function removeRowListener(selector) {
+
             $( selector ).off("click")
             $( selector ).on("click", function() {
+                debugger
                 $(this).parent().parent().remove();
+            });
+        }
+
+         function testConnection(selector) {
+            $( selector ).off("click")
+            $( selector ).on("click", async function () {
+                var cal_id = $("#calibration_id")[0].value
+                var serie_id = $(this).parent().parent().children()[6].children[0].value;
+                const response = await fetch('/view/schedule_tasks/validate_border_conditions', {
+                    method: "POST",
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        calibration_id: parseInt(cal_id),
+                        series_id: parseInt(serie_id)
+                    })
+                });
+                const content = await response.json();
+
+                window.alert(content['result']);
             });
         }
 
@@ -325,17 +361,24 @@
                     <td><input id="series_list-${idx}-river" name="series_list-${idx}-river" required="" style="width: 80px" type="text" value=""></td>
                     <td><input id="series_list-${idx}-reach" name="series_list-${idx}-reach" required="" style="width: 80px" type="text" value=""></td>
                     <td><input id="series_list-${idx}-river_stat" name="series_list-${idx}-river_stat" required="" step="any" style="width: 80px" type="text" value=""></td>
-                    <td class="d-flex flex-row"><input id="series_list-${idx}-interval-interval_value" name="series_list-${idx}-interval-interval_value" required="" style="width: 80px" type="number" value=""><select id="series_list-${idx}-interval-interval_unit" name="series_list-${idx}-interval-interval_unit" required=""><option value="MINUTE">MINUTE</option><option value="HOUR">HOUR</option><option value="DAY">DAY</option><option value="WEEK">WEEK</option></select></td>
-                    <td><select id="series_list-${idx}-border_condition" name="series_list-${idx}-border_condition" style="width: 100px" required=""><option value="Stage Hydrograph">Stage Hydrograph</option><option value="Flow Hydrograph">Flow Hydrograph</option><option value="Lateral Inflow Hydrograph">Lateral Inflow Hydrograph</option></select></td>
+                    <td><div class="d-flex flex-row"><input id="series_list-${idx}-interval-interval_value" name="series_list-${idx}-interval-interval_value" required="" style="width: 80px" type="number" value=""><select id="series_list-${idx}-interval-interval_unit" name="series_list-${idx}-interval-interval_unit" required=""><option value="MINUTE">MINUTE</option><option value="HOUR">HOUR</option><option value="DAY">DAY</option><option value="WEEK">WEEK</option></select></div></td>
+                    <td><select id="series_list-${idx}-border_condition" name="series_list-${idx}-border_condition" required=""><option value="Stage Hydrograph">Stage Hydrograph</option><option value="Flow Hydrograph">Flow Hydrograph</option><option value="Lateral Inflow Hydrograph">Lateral Inflow Hydrograph</option></select></td>
                     <td><input id="series_list-${idx}-series_id" name="series_list-${idx}-series_id" required="" style="width: 80px" type="number" value=""></td>
-                    <td><button type="button" class="btn btn-danger remove-row-series">&#8722;</button></td>
+                    <td class="d-flex justify-content-around">
+                        <button type="button" class="btn btn-danger remove-row-series">&#8722;</button>
+                        <button type="button" class="btn btn-success test-connection">
+                            <i class="fa fa-refresh" aria-hidden="true"></i>
+                        </button>
+                    </td>
                 </tr>
             `
             $( "#series_table_body" ).append( new_row );
             removeRowListener(".remove-row-series")
+            testConnection(".test-connection")
         });
 
         removeRowListener(".remove-row-series")
+        testConnection(".test-connection")
 
         $( "#clear-row-series" ).on("click", function() {
             $('#series_table_body tr').remove();
