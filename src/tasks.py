@@ -79,9 +79,9 @@ def simulate(execution_id, user_id, calibration_id):
                     )
                 )
 
-                if epo.flow_series_id:
+                if epo.flow_series_id and calibration_id:
                     ina_service.send_info_to_ina(
-                        begin.isoformat(),
+                        begin,
                         dates,
                         flow,
                         epo.flow_series_id,
@@ -89,9 +89,9 @@ def simulate(execution_id, user_id, calibration_id):
                         win_logger,
                     )
 
-                if epo.stage_series_id:
+                if epo.stage_series_id and calibration_id:
                     ina_service.send_info_to_ina(
-                        begin.isoformat(),
+                        begin,
                         dates,
                         stage,
                         epo.stage_series_id,
