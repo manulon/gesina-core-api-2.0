@@ -281,10 +281,26 @@ def save_or_create_schedule_config(schedule_config_id):
 @VIEW_BLUEPRINT.route("/schedule_tasks/validate_border_conditions", methods=["POST"])
 def validate_connection_to_schedule_conditions():
     body = request.get_json()
-    validation_result = validate_connection_to_service(body['calibration_id'], body['series_id'])
+    validation_result = validate_connection_to_service(
+        body["calibration_id"], body["series_id"]
+    )
     if validation_result:
-        return jsonify({"result": f"Se logró correctamente la conexión a la Api del INA para el id de serie {body['series_id']} y id de calibrado {body['calibration_id']}"}), 200
-    return jsonify({"result": f"No se logró la conexión a la Api del INA para el id de serie {body['series_id']} y id de calibrado {body['calibration_id']}"}), 200
+        return (
+            jsonify(
+                {
+                    "result": f"Se logró correctamente la conexión a la Api del INA para el id de serie {body['series_id']} y id de calibrado {body['calibration_id']}"
+                }
+            ),
+            200,
+        )
+    return (
+        jsonify(
+            {
+                "result": f"No se logró la conexión a la Api del INA para el id de serie {body['series_id']} y id de calibrado {body['calibration_id']}"
+            }
+        ),
+        200,
+    )
 
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/new", methods=["GET"])
