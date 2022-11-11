@@ -1,5 +1,5 @@
 import sqlalchemy
-from flask import Blueprint, render_template, url_for, redirect, request
+from flask import Blueprint, render_template, url_for, redirect, request, jsonify
 
 from src import logger
 from src.controller.schemas import ActivityParams
@@ -17,6 +17,7 @@ from src.service.exception.activity_exception import ActivityException
 from src.service.exception.file_exception import FileUploadError
 from src.service.exception.series_exception import SeriesUploadError
 from src.service.file_storage_service import FileType
+from src.service.ina_service import validate_connection_to_service
 from src.view.forms.execution_plan_form import ExecutionPlanForm
 from src.view.forms.geometry_form import GeometryForm
 from src.view.forms.schedule_config_form import (
@@ -188,9 +189,10 @@ def read_notification(notification_id):
     return execution_plan_read(notification.execution_plan_id)
 
 
-@VIEW_BLUEPRINT.route("/notifications/all/<user_id>", methods=["PUT"])
-def read_all_notifications_for_user(user_id):
-    notification_service.read_all_user_notifications(user_id)
+@VIEW_BLUEPRINT.route("/notifications/all", methods=["PUT"])
+def read_all_notifications_for_user():
+    user = user_service.get_current_user()
+    notification_service.read_all_user_notifications(user.id)
     return {"result": "OK"}, 201
 
 
@@ -275,6 +277,31 @@ def save_or_create_schedule_config(schedule_config_id):
         logger.error(exception)
         error_message = "Error actualizando la configuración."
         return render_schedule_view(form, schedule_config, [error_message])
+
+
+@VIEW_BLUEPRINT.route("/schedule_tasks/validate_border_conditions", methods=["POST"])
+def validate_connection_to_schedule_conditions():
+    body = request.get_json()
+    validation_result = validate_connection_to_service(
+        body["calibration_id"], body["series_id"]
+    )
+    if validation_result:
+        return (
+            jsonify(
+                {
+                    "result": f"Se logró correctamente la conexión a la Api del INA para el id de serie {body['series_id']} y id de calibrado {body['calibration_id']}"
+                }
+            ),
+            200,
+        )
+    return (
+        jsonify(
+            {
+                "result": f"No se logró la conexión a la Api del INA para el id de serie {body['series_id']} y id de calibrado {body['calibration_id']}"
+            }
+        ),
+        200,
+    )
 
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/new", methods=["GET"])
