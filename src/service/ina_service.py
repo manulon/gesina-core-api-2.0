@@ -194,6 +194,7 @@ def send_info_to_ina(
     except Exception as e:
         win_logger.error(f"Error sending info to INA: {e}")
 
+
 def validate_connection_to_service(calibration_id, serie_id):
     format_time = lambda d: d.strftime("%Y-%m-%d")
     timestart = datetime.now() - timedelta(2)
