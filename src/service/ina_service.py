@@ -24,9 +24,7 @@ def obtain_obeservations_for_stations(stations, timestart, timeend):
 
 def obtain_observations(serie_id, timestart, timeend):
     response = requests.get(
-        "{config.ina_url/obs/puntual/series/"
-        + str(serie_id)
-        + "/observaciones",
+        "{config.ina_url/obs/puntual/series/" + str(serie_id) + "/observaciones",
         params={"timestart": timestart, "timeend": timeend},
         headers={"Authorization": f"Bearer {config.ina_token}"},
     )
@@ -50,9 +48,7 @@ def obtain_observations(serie_id, timestart, timeend):
 def C_id_corr_guar(id_Mod, est_id):
     ## Carga Simulados
     response = requests.get(
-        f"{config.ina_url}/sim/calibrados/"
-        + str(id_Mod)
-        + "/corridas_guardadas",
+        f"{config.ina_url}/sim/calibrados/" + str(id_Mod) + "/corridas_guardadas",
         params={"var_id": "2", "estacion_id": str(est_id), "includeProno": False},
         headers={"Authorization": f"Bearer {config.ina_token}"},
     )
@@ -164,7 +160,8 @@ def send_info_to_ina(
     win_logger.info(f"Sending series to INA. URL: {url}")
 
     pronosticos = [
-        {"timestart": t.isoformat(), "timeend": t.isoformat(), "valor": v} for t, v in zip(dates, values)
+        {"timestart": t.isoformat(), "timeend": t.isoformat(), "valor": v}
+        for t, v in zip(dates, values)
     ]
 
     data = {
@@ -200,7 +197,7 @@ if __name__ == "__main__":
     from datetime import date
 
     logging.info = print
-    #print(obtain_curated_series(31564, 487, date(2022, 9, 17), date(2022, 11, 1)))
+    # print(obtain_curated_series(31564, 487, date(2022, 9, 17), date(2022, 11, 1)))
 
     forecast_date = datetime.datetime.now()
     dates = [datetime.datetime.now() - timedelta(i) for i in range(10)]
