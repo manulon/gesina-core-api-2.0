@@ -2,7 +2,7 @@ import logging
 
 import requests
 import pandas as pd
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from src import config, logger
 
@@ -133,9 +133,12 @@ def obtain_curated_series(series_id, calibration_id, timestart, timeend):
     logger.error(
         f"Getting data for series id: {series_id} from {timestart} to {timeend} with url: {url}"
     )
-    response = requests.get(
-        url, headers={"Authorization": f"Bearer {config.ina_token}"}
-    )
+    response = request_with_retries(url)
+
+    if not response.status_code == 200:
+        logger.error(
+            f"Error obtaining values for the serie with id {series_id} and the calibration id {calibration_id}"
+        )
 
     logger.error(f"Answered: {response.json()}")
 
@@ -149,6 +152,29 @@ def obtain_curated_series(series_id, calibration_id, timestart, timeend):
     )
 
     return [round(float(i[2]), 3) for i in data]
+
+
+def validate_connection_to_service(calibration_id, serie_id):
+    format_time = lambda d: d.strftime("%Y-%m-%d")
+    timestart = datetime.now() - timedelta(2)
+    timeend = datetime.now() + timedelta(1)
+
+    url = f"https://alerta.ina.gob.ar/a5/sim/calibrados/{calibration_id}/corridas/last?series_id={serie_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
+    response = request_with_retries(url)
+    if not response.status_code == 200 or not response.json()["series"]:
+        return False
+    return True
+
+
+def request_with_retries(url):
+    response = None
+    for i in range(config.max_retries):
+        response = requests.get(
+            url, headers={"Authorization": f"Bearer {config.ina_token}"}
+        )
+        if response.status_code == 200:
+            break
+    return response
 
 
 if __name__ == "__main__":
