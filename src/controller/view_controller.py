@@ -189,9 +189,10 @@ def read_notification(notification_id):
     return execution_plan_read(notification.execution_plan_id)
 
 
-@VIEW_BLUEPRINT.route("/notifications/all/<user_id>", methods=["PUT"])
-def read_all_notifications_for_user(user_id):
-    notification_service.read_all_user_notifications(user_id)
+@VIEW_BLUEPRINT.route("/notifications/all", methods=["PUT"])
+def read_all_notifications_for_user():
+    user = user_service.get_current_user()
+    notification_service.read_all_user_notifications(user.id)
     return {"result": "OK"}, 201
 
 

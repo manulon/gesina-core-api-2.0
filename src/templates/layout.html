@@ -94,7 +94,7 @@
     </body>
     <script>
         $("#dropdownAllNotificationsRead").on("click", function(){
-            fetch("/view/notifications/all/2",{
+            fetch("/view/notifications/all",{
                 method: "PUT"
             })
             .then(response => response.json())
