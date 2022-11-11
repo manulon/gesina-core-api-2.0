@@ -15,8 +15,9 @@ secret_key = os.getenv("SECRET_KEY", "default")
 # Application
 dry_run = os.getenv("DRY_RUN", False)
 fake_activity = os.getenv("FAKE_ACTIVITY", True)
-ina_token = os.getenv("INA_TOKEN")
+ina_token = os.getenv("INA_TOKEN", None)
 ina_url = os.getenv("INA_URL", "https://alerta.ina.gob.ar/a5")
+ina_token_envio = os.getenv("INA_TOKEN_ENVIO", None)
 ina_url_envio = os.getenv("INA_URL_ENVIO", "https://alerta.ina.gob.ar/test")
 max_retries = 3
 

@@ -26,10 +26,9 @@ def simulate(execution_id, user_id, calibration_id):
 
     base_path = f"C:\\gesina\\{execution_id}"
 
-    win_logger = get_logger(base_path)
-
     file_storage_service.download_files_for_execution(base_path, execution_id)
 
+    win_logger = get_logger(execution_id)
     win_logger.info("Loading hec ras")
     RC = None
     try:
@@ -61,6 +60,7 @@ def simulate(execution_id, user_id, calibration_id):
                 res = RC.OutputDSS_GetStageFlow(epo.river, epo.reach, epo.river_stat)
                 res = list(res)
                 dates = res[5][1:]
+                date_in_datetime = [get_date_from_excel_format(d) for d in dates]
                 stage = res[6]
                 flow = res[7]
                 dfs.append(
@@ -70,7 +70,7 @@ def simulate(execution_id, user_id, calibration_id):
                             "reach": epo.reach,
                             "river_stat": epo.river_stat,
                             "excel_datetime": dates,
-                            "datetime": [get_date_from_excel_format(d) for d in dates],
+                            "datetime": date_in_datetime,
                             "stage": stage,
                             "flow": flow,
                             "stage_series_id": epo.stage_series_id,
@@ -82,7 +82,7 @@ def simulate(execution_id, user_id, calibration_id):
                 if epo.flow_series_id and calibration_id:
                     ina_service.send_info_to_ina(
                         begin,
-                        dates,
+                        date_in_datetime,
                         flow,
                         epo.flow_series_id,
                         calibration_id,
@@ -92,7 +92,7 @@ def simulate(execution_id, user_id, calibration_id):
                 if epo.stage_series_id and calibration_id:
                     ina_service.send_info_to_ina(
                         begin,
-                        dates,
+                        date_in_datetime,
                         stage,
                         epo.stage_series_id,
                         calibration_id,
@@ -123,7 +123,7 @@ def simulate(execution_id, user_id, calibration_id):
     return (datetime.now() - begin).total_seconds()
 
 
-def get_logger(base_path):
+def get_logger(execution_id):
     logging_level = logging.INFO
     formatter = logging.Formatter(
         "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -133,12 +133,12 @@ def get_logger(base_path):
     std_out_handler.setLevel(logging_level)
     std_out_handler.setFormatter(formatter)
 
-    file_handler = logging.FileHandler(f"{base_path}/log.txt")
+    file_handler = logging.FileHandler(f"C:\gesina\{execution_id}\log.txt")
     file_handler.setLevel(logging_level)
     file_handler.setFormatter(formatter)
 
     win_logger = logging.getLogger("win_logger")
-
+    win_logger.handlers.clear()
     win_logger.setLevel(logging_level)
     win_logger.addHandler(std_out_handler)
     win_logger.addHandler(file_handler)

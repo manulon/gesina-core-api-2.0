@@ -157,7 +157,6 @@ def send_info_to_ina(
 ):
     if "test" in config.ina_url_envio:
         calibration_id = 288
-        config.ina_token = "test-token"
 
     url = f"{config.ina_url_envio}/sim/calibrados/{calibration_id}/corridas"
     win_logger.info(f"Sending series to INA. URL: {url}")
@@ -178,7 +177,7 @@ def send_info_to_ina(
         ],
     }
 
-    headers = {"Authorization": f"Bearer {config.ina_token}"}
+    headers = {"Authorization": f"Bearer {config.ina_token_envio}"}
 
     print(json.dumps(data))
 

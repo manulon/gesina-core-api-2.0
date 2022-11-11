@@ -4,12 +4,6 @@
         <div class="d-flex justify-content-between">
             <h2>Configuración de simulaciones programadas</h2>
         </div>
-        <div class="container-xxl">
-            <form method=post
-                  enctype=multipart/form-data
-                  class="p-4 container needs-validation"
-                  id="schedule-test-border-series"
-                  action="{{ url_for('view_controller.validate_connection_to_schedule_conditions') }}">
             {% if id %}
                 <form method=post
                       enctype=multipart/form-data
@@ -244,7 +238,6 @@
                         </div>
                     </div>
                     <div class="form-group pt-2 text-right">
-                        <button class="btn btn-success">Probar Condiciones de Borde</button>
                         <button type="submit" class="btn btn-primary">Guardar</button>
                     </div>
             </form>
