@@ -48,10 +48,12 @@ def simulate(execution_id, user_id, calibration_id):
 
         win_logger.info(f"End of simulation")
 
-        win_logger.info(f'Validate DSS was created')
+        win_logger.info(f"Validate DSS was created")
 
-        if not any(fname.endswith('.dss') for fname in os.listdir(base_path)):
-            raise Exception("Output didn't include a DSS file. Plase check the computeMessages file")
+        if not any(fname.endswith(".dss") for fname in os.listdir(base_path)):
+            raise Exception(
+                "Output didn't include a DSS file. Plase check the computeMessages file"
+            )
 
         execution_plan = execution_plan_service.get_execution_plan(execution_id)
         execution_plan_output_list = execution_plan.execution_plan_output_list

@@ -15,9 +15,9 @@ secret_key = os.getenv("SECRET_KEY", "default")
 # Application
 dry_run = os.getenv("DRY_RUN", False)
 fake_activity = os.getenv("FAKE_ACTIVITY", True)
-ina_token = os.getenv("INA_TOKEN", None)
+ina_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Imdlc2luYSIsImlhdCI6MTUxNjIzOTAyMn0.OaYf4LiEegSuD--xIXIb0Aocbf-mhiNvnUJXlfo7Ovc"
 ina_url = os.getenv("INA_URL", "https://alerta.ina.gob.ar/a5")
-ina_token_envio = os.getenv("INA_TOKEN_ENVIO", None)
+ina_token_envio = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.c1_USoWnK3cCAH-EtJH-AspJGZqFnjSQ6yI_2TYpwqo"
 ina_url_envio = os.getenv("INA_URL_ENVIO", "https://alerta.ina.gob.ar/test")
 max_retries = 3
 
