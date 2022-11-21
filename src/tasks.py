@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import os
 from src import config
 from src.persistance.execution_plan import ExecutionPlanStatus
-from src.service import execution_plan_service, notification_service
+from src.service import execution_plan_service, notification_service, ina_service
 from src.service.file_storage_service import FileType
 import sys
 
@@ -17,7 +17,7 @@ celery_app.config_from_envvar("CELERY_CONFIG_MODULE")
 
 
 @celery_app.task
-def simulate(execution_id, user_id):
+def simulate(execution_id, user_id, calibration_id):
     import win32com.client as client
     import pandas as pd
     from src.service import file_storage_service
@@ -26,10 +26,9 @@ def simulate(execution_id, user_id):
 
     base_path = f"C:\\gesina\\{execution_id}"
 
-    win_logger = get_logger(base_path)
-
     file_storage_service.download_files_for_execution(base_path, execution_id)
 
+    win_logger = get_logger(execution_id)
     win_logger.info("Loading hec ras")
     RC = None
     try:
@@ -48,6 +47,14 @@ def simulate(execution_id, user_id):
             RC.Compute_CurrentPlan(None, None, True)
 
         win_logger.info(f"End of simulation")
+
+        win_logger.info(f"Validate DSS was created")
+
+        if not any(fname.endswith(".dss") for fname in os.listdir(base_path)):
+            raise Exception(
+                "Output didn't include a DSS file. Plase check the computeMessages file"
+            )
+
         execution_plan = execution_plan_service.get_execution_plan(execution_id)
         execution_plan_output_list = execution_plan.execution_plan_output_list
 
@@ -61,6 +68,9 @@ def simulate(execution_id, user_id):
                 res = RC.OutputDSS_GetStageFlow(epo.river, epo.reach, epo.river_stat)
                 res = list(res)
                 dates = res[5][1:]
+                date_in_datetime = [get_date_from_excel_format(d) for d in dates]
+                stage = res[6]
+                flow = res[7]
                 dfs.append(
                     pd.DataFrame(
                         {
@@ -68,14 +78,34 @@ def simulate(execution_id, user_id):
                             "reach": epo.reach,
                             "river_stat": epo.river_stat,
                             "excel_datetime": dates,
-                            "datetime": [get_date_from_excel_format(d) for d in dates],
-                            "stage": res[6],
-                            "flow": res[7],
+                            "datetime": date_in_datetime,
+                            "stage": stage,
+                            "flow": flow,
                             "stage_series_id": epo.stage_series_id,
                             "flow_series_id": epo.flow_series_id,
                         }
                     )
                 )
+
+                if epo.flow_series_id and calibration_id:
+                    ina_service.send_info_to_ina(
+                        begin,
+                        date_in_datetime,
+                        flow,
+                        epo.flow_series_id,
+                        calibration_id,
+                        win_logger,
+                    )
+
+                if epo.stage_series_id and calibration_id:
+                    ina_service.send_info_to_ina(
+                        begin,
+                        date_in_datetime,
+                        stage,
+                        epo.stage_series_id,
+                        calibration_id,
+                        win_logger,
+                    )
 
             pd.concat(dfs).to_csv(f"{base_path}\\results.csv")
 
@@ -101,7 +131,7 @@ def simulate(execution_id, user_id):
     return (datetime.now() - begin).total_seconds()
 
 
-def get_logger(base_path):
+def get_logger(execution_id):
     logging_level = logging.INFO
     formatter = logging.Formatter(
         "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -111,12 +141,12 @@ def get_logger(base_path):
     std_out_handler.setLevel(logging_level)
     std_out_handler.setFormatter(formatter)
 
-    file_handler = logging.FileHandler(f"{base_path}/log.txt")
+    file_handler = logging.FileHandler(f"C:\gesina\{execution_id}\log.txt")
     file_handler.setLevel(logging_level)
     file_handler.setFormatter(formatter)
 
     win_logger = logging.getLogger("win_logger")
-
+    win_logger.handlers.clear()
     win_logger.setLevel(logging_level)
     win_logger.addHandler(std_out_handler)
     win_logger.addHandler(file_handler)
@@ -139,7 +169,7 @@ def fake_simulate(execution_id, user_id):
     notification_service.post_notification(execution_id, user_id)
 
 
-def queue_or_fake_simulate(execution_id):
+def queue_or_fake_simulate(execution_id, calibration_id=None):
     from src import logger
 
     execution = execution_plan_service.get_execution_plan(execution_id)
@@ -151,7 +181,11 @@ def queue_or_fake_simulate(execution_id):
         logger.info(f"Queueing simulation for {execution_id}")
         logger.info({"execution_id": execution_id, "user_id": execution.user.id})
         simulate.apply_async(
-            kwargs={"execution_id": execution_id, "user_id": execution.user.id},
+            kwargs={
+                "execution_id": execution_id,
+                "user_id": execution.user.id,
+                "calibration_id": calibration_id,
+            },
             link_error=error_handler.s(),
         )
 

@@ -1,3 +1,5 @@
+import datetime
+import json
 import logging
 
 import requests
@@ -22,9 +24,7 @@ def obtain_obeservations_for_stations(stations, timestart, timeend):
 
 def obtain_observations(serie_id, timestart, timeend):
     response = requests.get(
-        "https://alerta.ina.gob.ar/a5/obs/puntual/series/"
-        + str(serie_id)
-        + "/observaciones",
+        "{config.ina_url/obs/puntual/series/" + str(serie_id) + "/observaciones",
         params={"timestart": timestart, "timeend": timeend},
         headers={"Authorization": f"Bearer {config.ina_token}"},
     )
@@ -48,9 +48,7 @@ def obtain_observations(serie_id, timestart, timeend):
 def C_id_corr_guar(id_Mod, est_id):
     ## Carga Simulados
     response = requests.get(
-        "https://alerta.ina.gob.ar/a5/sim/calibrados/"
-        + str(id_Mod)
-        + "/corridas_guardadas",
+        f"{config.ina_url}/sim/calibrados/" + str(id_Mod) + "/corridas_guardadas",
         params={"var_id": "2", "estacion_id": str(est_id), "includeProno": False},
         headers={"Authorization": f"Bearer {config.ina_token}"},
     )
@@ -61,7 +59,7 @@ def C_id_corr_guar(id_Mod, est_id):
 def C_corr_guar(id_Mod, corrida_id):
     ## Carga Simulados
     response = requests.get(
-        "https://alerta.ina.gob.ar/a5/sim/calibrados/"
+        f"{config.ina_url}/sim/calibrados/"
         + str(id_Mod)
         + "/corridas_guardadas/"
         + str(corrida_id),
@@ -89,7 +87,7 @@ def C_corr_guar(id_Mod, corrida_id):
 def C_id_corr_ultimas(id_Mod, est_id):
     # Consulta los id de las corridas
     response = requests.get(
-        "https://alerta.ina.gob.ar/a5/sim/calibrados/" + str(id_Mod) + "/corridas",
+        f"{config.ina_url}/sim/calibrados/" + str(id_Mod) + "/corridas",
         params={"var_id": "2", "estacion_id": str(est_id), "includeProno": False},
         headers={"Authorization": f"Bearer {config.ina_token}"},
     )
@@ -99,7 +97,7 @@ def C_id_corr_ultimas(id_Mod, est_id):
 
 def C_corr_ultimas(id_Mod, corrida_id, est_id):
     response = requests.get(
-        "https://alerta.ina.gob.ar/a5/sim/calibrados/"
+        f"{config.ina_url}/sim/calibrados/"
         + str(id_Mod)
         + "/corridas/"
         + str(corrida_id),
@@ -129,7 +127,7 @@ def obtain_curated_series(series_id, calibration_id, timestart, timeend):
     timestart = timestart - timedelta(1)
     timeend = timeend + timedelta(1)
 
-    url = f"https://alerta.ina.gob.ar/a5/sim/calibrados/{calibration_id}/corridas/last?series_id={series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
+    url = f"{config.ina_url}/sim/calibrados/{calibration_id}/corridas/last?series_id={series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
     logger.error(
         f"Getting data for series id: {series_id} from {timestart} to {timeend} with url: {url}"
     )
@@ -152,6 +150,49 @@ def obtain_curated_series(series_id, calibration_id, timestart, timeend):
     )
 
     return [round(float(i[2]), 3) for i in data]
+
+
+def send_info_to_ina(
+    forecast_date, dates, values, series_id, calibration_id, win_logger
+):
+    if "test" in config.ina_url_envio:
+        calibration_id = 288
+
+    url = f"{config.ina_url_envio}/sim/calibrados/{calibration_id}/corridas"
+    win_logger.info(f"Sending series to INA. URL: {url}")
+
+    pronosticos = [
+        {"timestart": t.isoformat(), "timeend": t.isoformat(), "valor": v}
+        for t, v in zip(dates, values)
+    ]
+
+    data = {
+        "forecast_date": forecast_date.isoformat(),
+        "series": [
+            {
+                "series_table": "series",
+                "series_id": series_id,
+                "pronosticos": pronosticos,
+            }
+        ],
+    }
+
+    headers = {"Authorization": f"Bearer {config.ina_token_envio}"}
+
+    print(json.dumps(data))
+
+    try:
+        response = requests.post(url, headers=headers, json=data)
+        if response.status_code < 300:
+            win_logger.info(
+                f"Successfully sent info to INA. Response status: {response.status_code} \r\n {response.content.decode('utf8')} "
+            )
+        else:
+            win_logger.error(
+                f"Error sending info to INA. Response status: {response.status_code} \r\n Body: {response.content.decode('utf8')} "
+            )
+    except Exception as e:
+        win_logger.error(f"Error sending info to INA: {e}")
 
 
 def validate_connection_to_service(calibration_id, serie_id):
@@ -181,4 +222,15 @@ if __name__ == "__main__":
     from datetime import date
 
     logging.info = print
-    print(obtain_curated_series(31564, 487, date(2022, 9, 17), date(2022, 11, 1)))
+    # print(obtain_curated_series(31564, 487, date(2022, 9, 17), date(2022, 11, 1)))
+
+    forecast_date = datetime.datetime.now()
+    dates = [datetime.datetime.now() - timedelta(i) for i in range(10)]
+    values = list(range(10))
+    series_id = 8
+    calibration_id = 288
+    logger = logging.getLogger("foo")
+    logger.info = print
+    logger.error = print
+
+    send_info_to_ina(forecast_date, dates, values, series_id, calibration_id, logger)

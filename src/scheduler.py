@@ -99,7 +99,7 @@ class ScheduledTaskJob:
         )
         update_execution_plan_status(execution_plan.id, ExecutionPlanStatus.RUNNING)
         try:
-            queue_or_fake_simulate(execution_plan.id)
+            queue_or_fake_simulate(execution_plan.id, scheduled_task.calibration_id)
         except Exception as e:
             logger.error(f"Error: {e}")
 
