@@ -14,7 +14,7 @@ secret_key = os.getenv("SECRET_KEY", "default")
 
 # Application
 dry_run = os.getenv("DRY_RUN", False)
-fake_activity = os.getenv("FAKE_ACTIVITY", True)
+fake_activity = os.getenv("FAKE_ACTIVITY", False)
 ina_token = os.getenv("INA_TOKEN", "")
 ina_url = os.getenv("INA_URL", "https://alerta.ina.gob.ar/a6")
 ina_token_envio = os.getenv("INA_TOKEN_ENVIO", "")
