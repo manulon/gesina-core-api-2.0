@@ -200,7 +200,7 @@ def validate_connection_to_service(calibration_id, serie_id):
     timestart = datetime.now() - timedelta(2)
     timeend = datetime.now() + timedelta(1)
 
-    url = f"https://alerta.ina.gob.ar/a5/sim/calibrados/{calibration_id}/corridas/last?series_id={serie_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
+    url = f"{config.ina_url}/sim/calibrados/{calibration_id}/corridas/last?series_id={serie_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
     response = request_with_retries(url)
     if not response.status_code == 200 or not response.json()["series"]:
         return False
