@@ -14,12 +14,12 @@ secret_key = os.getenv("SECRET_KEY", "default")
 
 # Application
 dry_run = os.getenv("DRY_RUN", False)
-fake_activity = os.getenv("FAKE_ACTIVITY", True)
+fake_activity = os.getenv("FAKE_ACTIVITY", False)
 ina_token = os.getenv("INA_TOKEN", "")
-ina_url = os.getenv("INA_URL", "https://alerta.ina.gob.ar/a5")
+ina_url = os.getenv("INA_URL", "https://alerta.ina.gob.ar/a6")
 ina_token_envio = os.getenv("INA_TOKEN_ENVIO", "")
 ina_url_envio = os.getenv("INA_URL_ENVIO", "https://alerta.ina.gob.ar/test")
-max_retries = 3
+max_retries = int(os.getenv("MAX_RETRIES", "3"))
 
 # Scheduler
 scheduler_database_user = os.getenv("DATABASE_USER", "user")
