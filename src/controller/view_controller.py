@@ -313,6 +313,7 @@ def render_schedule_view(form, schedule_config=None, errors=()):
     _id = None
     form.project_file_present = False
     form.plan_file_present = False
+    form.restart_file_present = False
     if schedule_config:
         initial_flows = schedule_config.initial_flows
         border_conditions = schedule_config.border_conditions
@@ -320,6 +321,7 @@ def render_schedule_view(form, schedule_config=None, errors=()):
 
         form.project_file_present = schedule_config.is_project_template_present()
         form.plan_file_present = schedule_config.is_plan_template_present()
+        form.restart_file_present = schedule_config.is_restart_file_present()
         form.enabled.data = schedule_config.enabled
         form.frequency.data = schedule_config.frequency
         form.calibration_id.data = schedule_config.calibration_id

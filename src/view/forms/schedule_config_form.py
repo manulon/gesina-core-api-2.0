@@ -189,6 +189,7 @@ class ScheduleConfigForm(FlaskForm, ErrorMixin):
     )
 
     restart_file = FileField(label="Restart file")
+    restart_file_present = HiddenField(default=False)
     initial_flow_file = FileField(label="Importar series iniciales desde .CSV")
 
     initial_flow_list = FieldList(

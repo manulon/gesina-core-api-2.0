@@ -106,8 +106,19 @@
                                 {{ form.start_condition_type.label }}: {{ form.start_condition_type(class_="form-control") }}
                             </div>
                             <div class="form-group" id="restart_file_container">
-                                {{ form.restart_file.label }}: {{ form.restart_file(class_="form-control") }}
+                                {{ form.restart_file.label }}:
+                                {% if form.restart_file_present %}
+                                    <div hidden id="restart_file_present"></div>
+                                {% endif %}
+                                <div id="restart-file-upload-container">
+                                    <a href="{{ url_for('schedule_controller.download', _id=form.idx, _file_name='restart_file.rst')}}" id="restart_file" class="btn btn-info" role="button" aria-pressed="true" download style="font-size: smaller;"> <i class="fa-solid fa-arrow-down"></i> {{ 'restart_file.rst' }} </a>
+                                    <button id="clear-restart-file" type="button" class="btn btn-danger" style="font-size: smaller;">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                                {{ form.restart_file(class_="form-control", id_="restart-file-upload") }}
                             </div>
+
                             <div class="form-group" id="initial_flow_list_container">
                                 {{ form.initial_flow_file.label }}: {{ form.initial_flow_file(class_="form-control") }}
                                 <table class="table" id="initial_flow_table">
@@ -338,6 +349,17 @@
             $('#plan-template-upload').hide();
         }else {
             $('#plan-template-container').hide();
+        }
+
+        $( "#clear-restart-file" ).on("click", function() {
+            $('#restart-file-upload-container').hide();
+            $('#restart-file-upload').show();
+        });
+
+        if($( "#restart_file_present").length) {
+            $('#restart-file-upload').hide();
+        }else {
+            $('#restart-file-upload-container').hide();
         }
 
         $( "#add-row-series" ).on("click", function() {
