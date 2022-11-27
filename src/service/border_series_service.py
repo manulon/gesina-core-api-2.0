@@ -24,14 +24,9 @@ def retrieve_series(form, scheduled_config_id=None):
     from_csv = process_series_csv_file(form.series_list_file, scheduled_config_id)
     from_form = process_series_form(form.series_list, scheduled_config_id)
     merged_series = from_csv + from_form
-    series_id_to_validate = []
     for series in merged_series:
         if not bool(regex.match(SERIES_INTERVAL_REGEX, series.interval)):
             raise SeriesUploadError("Error: Interval con formato incorrecto")
-        series_id_to_validate.append(series.series_id)
-    if len(series_id_to_validate) != len(set(series_id_to_validate)):
-        raise SeriesUploadError("Error: No puede repetirse un Id de serie")
-
     return merged_series
 
 

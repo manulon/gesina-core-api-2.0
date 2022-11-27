@@ -1,8 +1,10 @@
 import csv
 import io
-from src.persistance.scheduled_task import PlanSeries
+from src.persistance.scheduled_task import (
+    BorderCondition,
+    PlanSeries,
+)
 from src.service.exception.file_exception import FileUploadError
-from src.service.exception.series_exception import SeriesUploadError
 
 CSV_HEADERS = ["river", "reach", "river_stat", "stage_series_id", "flow_series_id"]
 
@@ -10,13 +12,6 @@ CSV_HEADERS = ["river", "reach", "river_stat", "stage_series_id", "flow_series_i
 def retrieve_plan_series(form, scheduled_config_id=None):
     from_csv = process_plan_series_csv_file(form.plan_series_file, scheduled_config_id)
     from_form = process_plan_series_form(form.plan_series_list, scheduled_config_id)
-    merged_series = from_csv + from_form
-    stage_series_to_validate = [series.stage_series_id for series in merged_series]
-    flow_series_to_validate = [series.flow_series_id for series in merged_series]
-    if len(stage_series_to_validate) != len(set(stage_series_to_validate)):
-        raise SeriesUploadError("Error: No puede repetirse un Id de serie de altura")
-    if len(flow_series_to_validate) != len(set(flow_series_to_validate)):
-        raise SeriesUploadError("Error: No puede repetirse un Id de serie de flujo")
     return from_csv + from_form
 
 
