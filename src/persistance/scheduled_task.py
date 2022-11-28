@@ -60,6 +60,9 @@ class ScheduledTask(Base):
     def is_plan_template_present(self):
         return file_storage_service.is_plan_template_present(self.id)
 
+    def is_restart_file_present(self):
+        return file_storage_service.is_restart_file_present(self.id)
+
 
 class InitialFlow(Base):
     __tablename__ = "initial_flow"
