@@ -48,8 +48,7 @@ services:
   scheduler:
     build:
       context: .
-      dockerfile: Dockerfile
-    command: ['python', 'src/scheduler.py']
+      dockerfile: Dockerfile-Scheduler
     environment:
       - BROKER_URL=redis://redis:6379/0 # para encolar
       - RESULT_BACKEND=redis://redis:6379/0 # para guardar el resultado
