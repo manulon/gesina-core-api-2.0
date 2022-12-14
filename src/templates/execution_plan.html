@@ -43,14 +43,6 @@
                         <label class="form-control" id="userInput" name="user" readonly>{{ execution_plan.user.full_name }}</label>
                     </div>
                     <div class="form-group">
-                        <label for="startDateInput"><h5>Fecha desde</h5></label>
-                        <label class="form-control" name="startDate" id="startDateInput" readonly>{{ pretty_date(execution_plan.start_datetime) }}</label>
-                    </div>
-                    <div class="form-group">
-                        <label for="endDateInput"><h5>Fecha hasta</h5></label>
-                        <label class="form-control" name="endDate" id="endDateInput" readonly>{{ pretty_date(execution_plan.end_datetime) }}</label>
-                    </div>
-                    <div class="form-group">
                         <label for="createdAt"><h5>Fecha de creación</h5></label>
                         <label class="form-control" name="createdAt" id="createdAt" readonly>{{ pretty_date(execution_plan.created_at) }}</label>
                     </div>
