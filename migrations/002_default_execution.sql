@@ -14,7 +14,7 @@ INSERT INTO gesina.execution_plan (plan_name,geometry_id, user_id, start_datetim
 INSERT INTO gesina.scheduled_task (name, description, frequency, geometry_id, user_id, start_datetime, metadata,
     observation_days, forecast_days, start_condition_type, calibration_id) VALUES
 	 ('Paraná', 'Corrida periódica del rio Paraná', 360, 2, 1, '2021-12-21 00:00:00.000000', null,
-	 30, 1, 'restart_file', 487);
+	 30, 1, 'restart_file', 487, 288);
 
 INSERT INTO gesina.border_condition (
     scheduled_task_id, river, reach, river_stat, interval, type, series_id) values (
