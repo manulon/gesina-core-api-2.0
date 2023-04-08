@@ -210,8 +210,9 @@ class ScheduleConfigForm(FlaskForm, ErrorMixin):
 
     calibration_id_for_simulations = IntegerField(
         validators=[
-            DataRequired(message="Error: El ID de calibrados para las simulaciones no puede estar vacío")
+            DataRequired(
+                message="Error: El ID de calibrados para las simulaciones no puede estar vacío"
+            )
         ],
         label="ID de calibrados para las simulaciones",
     )
-

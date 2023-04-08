@@ -13,7 +13,9 @@ def update(_id, form):
         schedule_config = session.query(ScheduledTask).filter_by(id=_id).one_or_none()
         schedule_config.frequency = form.frequency.data
         schedule_config.calibration_id = form.calibration_id.data
-        schedule_config.calibration_id_for_simulations = form.calibration_id_for_simulations.data
+        schedule_config.calibration_id_for_simulations = (
+            form.calibration_id_for_simulations.data
+        )
         schedule_config.name = form.name.data
         schedule_config.description = form.description.data
         schedule_config.geometry_id = form.geometry_id.data

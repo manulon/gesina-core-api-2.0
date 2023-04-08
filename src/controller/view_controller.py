@@ -325,7 +325,9 @@ def render_schedule_view(form, schedule_config=None, errors=()):
         form.enabled.data = schedule_config.enabled
         form.frequency.data = schedule_config.frequency
         form.calibration_id.data = schedule_config.calibration_id
-        form.calibration_id_for_simulations.data = schedule_config.calibration_id_for_simulations
+        form.calibration_id_for_simulations.data = (
+            schedule_config.calibration_id_for_simulations
+        )
         form.description.data = schedule_config.description
         form.name.data = schedule_config.name
         form.start_datetime.data = schedule_config.start_datetime
