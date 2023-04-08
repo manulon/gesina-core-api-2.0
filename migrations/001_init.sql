@@ -82,6 +82,7 @@ create table if not exists "scheduled_task"
     start_condition_type text not null,
     restart_file text,
     calibration_id integer not null
+    calibration_id_for_simulations integer not null
 );
 
 

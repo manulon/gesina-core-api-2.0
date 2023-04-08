@@ -207,3 +207,11 @@ class ScheduleConfigForm(FlaskForm, ErrorMixin):
     plan_series_list = FieldList(
         FormField(PlanSeriesForm), label="Lista de series del plan", min_entries=0
     )
+
+    calibration_id_for_simulations = IntegerField(
+        validators=[
+            DataRequired(message="Error: El ID de calibrados para las simulaciones no puede estar vacío")
+        ],
+        label="ID de calibrados para las simulaciones",
+    )
+

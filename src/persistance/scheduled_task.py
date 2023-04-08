@@ -53,6 +53,7 @@ class ScheduledTask(Base):
         order_by="PlanSeries.id",
     )
     calibration_id = Column(Integer)
+    calibration_id_for_simulations = Column(Integer)
 
     def is_project_template_present(self):
         return file_storage_service.is_project_template_present(self.id)
