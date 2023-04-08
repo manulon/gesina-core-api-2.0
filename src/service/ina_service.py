@@ -153,12 +153,12 @@ def obtain_curated_series(series_id, calibration_id, timestart, timeend):
 
 
 def send_info_to_ina(
-    forecast_date, dates, values, series_id, calibration_id, win_logger
+    forecast_date, dates, values, series_id, calibration_id_for_simulations, win_logger
 ):
     if "test" in config.ina_url_envio:
-        calibration_id = 288
+        calibration_id_for_simulations = 288
 
-    url = f"{config.ina_url_envio}/sim/calibrados/{calibration_id}/corridas"
+    url = f"{config.ina_url_envio}/sim/calibrados/{calibration_id_for_simulations}/corridas"
     win_logger.info(f"Sending series to INA. URL: {url}")
 
     pronosticos = [

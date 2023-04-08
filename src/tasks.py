@@ -17,7 +17,7 @@ celery_app.config_from_envvar("CELERY_CONFIG_MODULE")
 
 
 @celery_app.task
-def simulate(execution_id, user_id, calibration_id):
+def simulate(execution_id, user_id, calibration_id_for_simulations):
     import win32com.client as client
     import pandas as pd
     from src.service import file_storage_service
@@ -87,23 +87,23 @@ def simulate(execution_id, user_id, calibration_id):
                     )
                 )
 
-                if epo.flow_series_id and calibration_id:
+                if epo.flow_series_id and calibration_id_for_simulations:
                     ina_service.send_info_to_ina(
                         begin,
                         date_in_datetime,
                         flow,
                         epo.flow_series_id,
-                        calibration_id,
+                        calibration_id_for_simulations,
                         win_logger,
                     )
 
-                if epo.stage_series_id and calibration_id:
+                if epo.stage_series_id and calibration_id_for_simulations:
                     ina_service.send_info_to_ina(
                         begin,
                         date_in_datetime,
                         stage,
                         epo.stage_series_id,
-                        calibration_id,
+                        calibration_id_for_simulations,
                         win_logger,
                     )
 
@@ -169,7 +169,7 @@ def fake_simulate(execution_id, user_id):
     notification_service.post_notification(execution_id, user_id)
 
 
-def queue_or_fake_simulate(execution_id, calibration_id=None):
+def queue_or_fake_simulate(execution_id, calibration_id_for_simulations=None):
     from src import logger
 
     execution = execution_plan_service.get_execution_plan(execution_id)
@@ -184,7 +184,7 @@ def queue_or_fake_simulate(execution_id, calibration_id=None):
             kwargs={
                 "execution_id": execution_id,
                 "user_id": execution.user.id,
-                "calibration_id": calibration_id,
+                "calibration_id_for_simulations": calibration_id_for_simulations,
             },
             link_error=error_handler.s(),
         )
