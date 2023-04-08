@@ -32,6 +32,7 @@ def test_update_only_schedule_config_frequency_success(a_client, default_data):
     update_data = {
         "frequency": new_frequency,
         "calibration_id": original_schedule_task.calibration_id,
+        "calibration_id_for_simulations": original_schedule_task.calibration_id_for_simulations,
         "enabled": original_schedule_task.enabled,
         "name": original_schedule_task.name,
         "description": original_schedule_task.description,
@@ -67,6 +68,7 @@ def test_update_only_enabled_success(a_client, default_data):
     update_data = {
         "frequency": original_schedule_task.frequency,
         "calibration_id": original_schedule_task.calibration_id,
+        "calibration_id_for_simulations": original_schedule_task.calibration_id_for_simulations,
         "enabled": new_enabled,
         "name": original_schedule_task.name,
         "description": original_schedule_task.description,
@@ -103,6 +105,7 @@ def test_update_both_enabled_and_frequency_success(a_client, default_data):
     update_data = {
         "frequency": new_frequency,
         "calibration_id": new_calibration_id,
+        "calibration_id_for_simulations": original_schedule_task.calibration_id_for_simulations,
         "enabled": new_enabled,
         "name": original_schedule_task.name,
         "description": original_schedule_task.description,
@@ -158,6 +161,7 @@ def test_update_fails_on_invalid_id(a_client, default_data):
     update_data = {
         "frequency": 200,
         "calibration_id": 123,
+        "calibration_id_for_simulations": 456,
         "enabled": True,
         "name": "foo",
         "description": "bar",
