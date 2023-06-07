@@ -39,6 +39,7 @@ scheduler = BlockingScheduler(
 )
 
 SIMULATION_DURATION = 60
+FORECAST_LAG_HOURS = 12
 
 logger = logging.getLogger("apscheduler")
 
@@ -51,7 +52,7 @@ class ScheduledTaskJob:
         scheduled_task = get_schedule_task_config(self.scheduled_task)
         logger.error("Starting simulation")
         locale = timezone("America/Argentina/Buenos_Aires")
-        today = datetime.now(tz=locale).replace(minute=0)
+        today = datetime.now(tz=locale).replace(minute=0,second=0,microsecond=0) - timedelta(hours=FORECAST_LAG_HOURS) # .replace(minute=0)
         start_date = today - timedelta(scheduled_task.observation_days)
         end_date = today + timedelta(scheduled_task.forecast_days)
         logger.error(f"Start Date: {start_date} and End Date: {end_date}")
