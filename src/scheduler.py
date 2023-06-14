@@ -65,18 +65,19 @@ class ScheduledTaskJob:
 
         use_restart = scheduled_task.start_condition_type == "restart_file"
 
-        flow_file, max_start_date, min_end_date = flow_file or new_build_flow(
-            scheduled_task.border_conditions,
-            use_restart,
-            "restart_file.rst",
-            scheduled_task.initial_flows,
-            scheduled_task.calibration_id,
-            start_date,
-            end_date,
-        )
-        if adjust_dates and min_end_date < end_date:
-            logger.error("Adjusting end date to %s" % min_end_date.isoformat())
-            end_date = min_end_date.astimezone(locale)
+        if flow_file is None:
+            flow_file, max_start_date, min_end_date = flow_file or new_build_flow(
+                scheduled_task.border_conditions,
+                use_restart,
+                "restart_file.rst",
+                scheduled_task.initial_flows,
+                scheduled_task.calibration_id,
+                start_date,
+                end_date,
+            )
+            if adjust_dates and min_end_date < end_date:
+                logger.error("Adjusting end date to %s" % min_end_date.isoformat())
+                end_date = min_end_date.astimezone(locale)
         flow_name = "scheduled_task.u01"
         
         project_file = build_project(
