@@ -39,7 +39,7 @@ scheduler = BlockingScheduler(
 )
 
 SIMULATION_DURATION = 60
-FORECAST_LAG_HOURS = 12
+FORECAST_LAG_HOURS = 3
 
 logger = logging.getLogger("apscheduler")
 
@@ -48,7 +48,7 @@ class ScheduledTaskJob:
     def __init__(self, task_id: int):
         self.scheduled_task = task_id
 
-    def simulate(self, flow_file=None):
+    def simulate(self, flow_file=None,adjust_dates=True):
         scheduled_task = get_schedule_task_config(self.scheduled_task)
         logger.error("Starting simulation")
         locale = timezone("America/Argentina/Buenos_Aires")
@@ -59,21 +59,13 @@ class ScheduledTaskJob:
 
         simulation_name = f'{scheduled_task.name.replace(" ", "_")}-{start_date.strftime("%Y%m%d_%Hhs")}'
 
-        project_file = build_project(
-            scheduled_task.id, simulation_name, start_date, end_date
-        )
-        project_name = "scheduled-task.prj"
-
-        plan_file = build_plan(scheduled_task.id, simulation_name, start_date, end_date)
-        plan_name = "scheduled-task.p01"
-
-        use_restart = scheduled_task.start_condition_type == "restart_file"
-
         # flow_file = flow_file or build_flow(
         #     use_restart=use_restart, initial_flows=scheduled_task.initial_flows
         # )
 
-        flow_file = flow_file or new_build_flow(
+        use_restart = scheduled_task.start_condition_type == "restart_file"
+
+        flow_file, max_start_date, min_end_date = flow_file or new_build_flow(
             scheduled_task.border_conditions,
             use_restart,
             "restart_file.rst",
@@ -82,7 +74,18 @@ class ScheduledTaskJob:
             start_date,
             end_date,
         )
+        if adjust_dates and min_end_date < end_date:
+            logger.error("Adjusting end date to %s" % min_end_date.isoformat())
+            end_date = min_end_date.astimezone(locale)
         flow_name = "scheduled_task.u01"
+        
+        project_file = build_project(
+            scheduled_task.id, simulation_name, start_date, end_date
+        )
+        project_name = "scheduled-task.prj"
+
+        plan_file = build_plan(scheduled_task.id, simulation_name, start_date, end_date)
+        plan_name = "scheduled-task.p01"
 
         execution_plan = execution_plan_service.create_from_scheduler(
             simulation_name,

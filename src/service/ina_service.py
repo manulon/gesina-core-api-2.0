@@ -6,6 +6,7 @@ import requests
 import pandas as pd
 from datetime import timedelta, datetime
 from pytz import utc
+import dateutil.parser
 
 from src import config, logger
 
@@ -150,8 +151,11 @@ def obtain_curated_series(series_id, calibration_id, timestart, timeend):
         f"Obtained {len(data)} values. First value is from {data[0][0]}. Last value is from {data[-1][0]}"
     )
 
-    return [round(float(i[2]), 3) for i in data]
-
+    return {
+        "values": [round(float(i[2]), 3) for i in data],
+        "timestart": dateutil.parser.isoparse(data[0][0]),
+        "timeend": dateutil.parser.isoparse(data[-1][0])
+    }
 
 def send_info_to_ina(
     forecast_date, dates, values, series_id, calibration_id_for_simulations, win_logger
