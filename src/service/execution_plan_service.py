@@ -69,6 +69,7 @@ def create_from_scheduler(
                 river_stat=ps.river_stat,
                 stage_series_id=ps.stage_series_id,
                 flow_series_id=ps.flow_series_id,
+                stage_datum=ps.stage_datum
             )
             for ps in plan_series_list
         ],

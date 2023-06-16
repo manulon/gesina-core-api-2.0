@@ -7,6 +7,7 @@ from sqlalchemy import (
     Enum,
     DateTime,
     String,
+    Numeric
 )
 import enum
 from sqlalchemy.orm import relationship
@@ -63,3 +64,4 @@ class ExecutionPlanOutput(Base):
     )
     stage_series_id = Column(Integer)
     flow_series_id = Column(Integer)
+    stage_datum = Column(Numeric)

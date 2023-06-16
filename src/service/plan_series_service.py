@@ -6,7 +6,7 @@ from src.persistance.scheduled_task import (
 )
 from src.service.exception.file_exception import FileUploadError
 
-CSV_HEADERS = ["river", "reach", "river_stat", "stage_series_id", "flow_series_id"]
+CSV_HEADERS = ["river", "reach", "river_stat", "stage_series_id", "flow_series_id", "stage_datum"]
 
 
 def retrieve_plan_series(form, scheduled_config_id=None):
@@ -32,6 +32,7 @@ def process_plan_series_form(series_list, scheduled_config_id=None):
                 river_stat=each_plan_series.river_stat.data,
                 stage_series_id=each_plan_series.stage_series_id.data,
                 flow_series_id=each_plan_series.flow_series_id.data,
+                stage_datum=each_plan_series.stage_datum
             )
         else:
             plan_series = PlanSeries(
@@ -40,6 +41,7 @@ def process_plan_series_form(series_list, scheduled_config_id=None):
                 river_stat=each_plan_series.river_stat.data,
                 stage_series_id=each_plan_series.stage_series_id.data,
                 flow_series_id=each_plan_series.flow_series_id.data,
+                stage_datum=each_plan_series.stage_datum
             )
         result.append(plan_series)
 
@@ -47,6 +49,7 @@ def process_plan_series_form(series_list, scheduled_config_id=None):
 
 
 def process_plan_series_csv_file(plan_series_file_field, scheduled_config_id=None):
+    print("<<<<<<<<<<<<<< Import PLAN SERIES CSV >>>>>>>>>>>>>>>>>>>")
     result = []
     if plan_series_file_field.data:
         buffer = plan_series_file_field.data.read()
@@ -64,6 +67,7 @@ def process_plan_series_csv_file(plan_series_file_field, scheduled_config_id=Non
                         river_stat=row[2],
                         stage_series_id=row[3],
                         flow_series_id=row[4],
+                        stage_datum=row[5] if len(row[5]) else None
                     )
                 else:
                     plan_series = PlanSeries(
@@ -72,6 +76,7 @@ def process_plan_series_csv_file(plan_series_file_field, scheduled_config_id=Non
                         river_stat=row[2],
                         stage_series_id=row[3],
                         flow_series_id=row[4],
+                        stage_datum=row[5] if len(row[5]) else None
                     )
                 result.append(plan_series)
         else:

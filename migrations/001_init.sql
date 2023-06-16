@@ -60,6 +60,8 @@ create table if not exists execution_plan_output
     primary key (river, reach, river_stat, execution_plan_id)
 );
 
+alter table execution_plan_output add column if not exists stage_datum float default null;
+
 alter table execution_plan owner to "user";
 
 create unique index if not exists execution_plan_id_uindex on execution_plan (id);
@@ -127,3 +129,5 @@ create table if not exists "plan_series"
     flow_series_id integer default null,
     scheduled_task_id integer not null constraint plan_series_scheduled_task_id_fk references "scheduled_task"
 );
+
+alter table plan_series add column if not exists stage_datum float default null;

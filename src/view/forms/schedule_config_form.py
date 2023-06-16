@@ -11,6 +11,7 @@ from wtforms import (
     FormField,
     Form,
     HiddenField,
+    DecimalField
 )
 
 from src.persistance.scheduled_task import BorderConditionType
@@ -118,6 +119,12 @@ class PlanSeriesForm(Form):
         label="Id de serie de flujo",
         validators=[DataRequired(message="Error: El id no puede estar vacío")],
         render_kw=render_kw,
+    )
+
+    stage_datum = DecimalField(
+        label="Cero de escala de la serie de altura",
+        render_kw=render_kw,
+        places=6
     )
 
 

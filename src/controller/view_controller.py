@@ -386,6 +386,7 @@ def render_plan_series_list(plan_series_list, form):
         plan_form.river_stat = plan.river_stat
         plan_form.stage_series_id = plan.stage_series_id
         plan_form.flow_series_id = plan.flow_series_id
+        plan_form.stage_datum = plan.stage_datum
         form.plan_series_list.append_entry(plan_form)
 
 
