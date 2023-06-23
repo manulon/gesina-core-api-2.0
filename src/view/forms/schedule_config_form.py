@@ -1,5 +1,5 @@
 from flask_wtf.form import FlaskForm
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 from wtforms import (
     IntegerField,
     BooleanField,
@@ -123,6 +123,7 @@ class PlanSeriesForm(Form):
 
     stage_datum = DecimalField(
         label="Cero de escala de la serie de altura",
+        validators=[Optional()],
         render_kw=render_kw,
         places=6
     )

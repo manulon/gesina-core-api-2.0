@@ -32,7 +32,7 @@ def process_plan_series_form(series_list, scheduled_config_id=None):
                 river_stat=each_plan_series.river_stat.data,
                 stage_series_id=each_plan_series.stage_series_id.data,
                 flow_series_id=each_plan_series.flow_series_id.data,
-                stage_datum=each_plan_series.stage_datum
+                stage_datum=each_plan_series.stage_datum.data
             )
         else:
             plan_series = PlanSeries(
@@ -41,7 +41,7 @@ def process_plan_series_form(series_list, scheduled_config_id=None):
                 river_stat=each_plan_series.river_stat.data,
                 stage_series_id=each_plan_series.stage_series_id.data,
                 flow_series_id=each_plan_series.flow_series_id.data,
-                stage_datum=each_plan_series.stage_datum
+                stage_datum=each_plan_series.stage_datum.data
             )
         result.append(plan_series)
 
