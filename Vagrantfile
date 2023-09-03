@@ -7,6 +7,7 @@
 # you're doing.
 Vagrant.configure("2") do |config|
   config.vm.communicator = "winrm"
+  config.vm.boot_timeout = 2000
   config.winrm.max_tries = 300
   config.winrm.retry_delay = 10
   config.winrm.username = "vagrant"
@@ -17,8 +18,8 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
-  config.vm.box = "gusztavvargadr/windows-10-enterprise"
-  config.vm.box_version = "2102.0.2112"
+  config.vm.box = "gusztavvargadr/windows-10"
+  config.vm.box_version = "2202.0.2308"
 
 
   # Disable automatic box update checking. If you disable this, then
