@@ -19,7 +19,7 @@ sqlalchemy = "==1.4.39"
 psycopg2-binary = "==2.9.3"
 minio = "==7.1.2"
 pywin32 = {version = "*", sys_platform = "== 'win32'"}
-gevent = {version = "21.12.0", sys_platform = "== 'win32'"}
+gevent = {version = "~=21.12", sys_platform = "== 'win32'"}
 flask-wtf = "==1.0.1"
 yoyo-migrations = "==7.3.2"
 werkzeug = "==2.0.3"
