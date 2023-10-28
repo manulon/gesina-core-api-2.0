@@ -50,6 +50,23 @@ class ExecutionPlan(Base):
         return ""
 
 
+
+    def to_dict(self):
+        # Create a dictionary containing the object's attributes
+        attributes = {
+            "id": self.id,
+            "plan_name": self.plan_name,
+            "geometry_id": self.geometry_id,
+            "user_id": self.user_id,
+            "start_datetime": str(self.start_datetime),
+            "end_datetime": str(self.end_datetime),
+            "created_at": str(self.created_at),
+            "status": self.status.value if self.status else None,
+            # Include other attributes as needed
+        }
+
+        return attributes
+
 class ExecutionPlanOutput(Base):
     __tablename__ = "execution_plan_output"
     river = Column(String, primary_key=True)
