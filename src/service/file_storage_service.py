@@ -181,3 +181,14 @@ def save_result_for_execution(base_path, execution_id):
     for filename in os.listdir(base_path):
         with open(f"{base_path}\\{filename}", "rb") as file:
             save_file(FileType.RESULT, file, filename, execution_id)
+
+
+def copy_execution_files(id_copy_from, id_copy_to):
+    execution_files = [f.object_name for f in list_execution_files(FileType.EXECUTION_PLAN, id_copy_from)]
+    for file in execution_files:
+        minio_path = f"{FileType.EXECUTION_PLAN.value}"
+        minio_path += f"/{id_copy_to}"
+        minio_path += f"/{secure_filename(file.split('/')[-1])}"
+        minio_client.copy_object(ROOT_BUCKET, minio_path, CopySource(ROOT_BUCKET,file))
+
+    return list_execution_files(FileType.EXECUTION_PLAN, id_copy_to)

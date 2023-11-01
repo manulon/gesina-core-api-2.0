@@ -38,6 +38,14 @@ def create_from_form(form):
     )
 
 
+def copy_execution_plan(execution_plan_id):
+    e = get_execution_plan(execution_plan_id)
+    execution_plan = create_copy(e.plan_name, e.geometry, e.user, e.execution_plan_output_list)
+    file_storage_service.copy_execution_files(execution_plan_id, execution_plan.id)
+    return execution_plan
+
+
+
 def create_from_scheduler(
     execution_plan_name,
     geometry_id,
@@ -137,6 +145,29 @@ def create(
             )
 
         return execution_plan
+
+
+def create_copy(execution_plan_name,
+                geometry_id,
+                user,
+                execution_plan_output_list):
+    with get_session() as session:
+        print(execution_plan_output_list)
+        execution_plan = ExecutionPlan(
+            plan_name=execution_plan_name,
+            geometry_id=geometry_id.id,
+            user_id=user.id,
+            execution_plan_output_list=execution_plan_output_list,
+        )
+        session.add(execution_plan)
+        session.commit()
+        session.refresh(execution_plan)
+        execution_plan_id = execution_plan.id
+        geometry = execution_plan.geometry
+
+        file_storage_service.copy_geometry_to(execution_plan_id, geometry.name)
+        return execution_plan
+
 
 
 def get_execution_plans():
