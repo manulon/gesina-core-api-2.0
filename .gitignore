@@ -143,3 +143,6 @@ cython_debug/
 
 minio_data
 package.box
+
+Pipfile
+Pipfile.lock
