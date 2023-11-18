@@ -72,8 +72,13 @@ def save_plan_template_file(data, scheduled_task_id):
 
 
 def save_file(file_type, file, filename, _id=None):
-    file_bytes = file.read()
-    data = io.BytesIO(file_bytes)
+    if isinstance(file, io.BytesIO):
+        data = file
+        lent = len(data.getvalue())
+    else:
+        file_bytes = file.read()
+        lent = len(file_bytes)
+        data = io.BytesIO(file_bytes)
     try:
         minio_path = f"{file_type.value}"
         if _id:
@@ -84,7 +89,7 @@ def save_file(file_type, file, filename, _id=None):
             ROOT_BUCKET,
             minio_path,
             data,
-            len(file_bytes),
+            lent,
         )
     except Exception as exception:
         error_message = "Error uploading file"

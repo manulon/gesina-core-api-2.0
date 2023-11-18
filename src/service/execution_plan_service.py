@@ -7,6 +7,7 @@ from src.persistance.session import get_session
 from src.service import file_storage_service, user_service
 from src.service.file_storage_service import FileType
 from sqlalchemy import and_
+import io
 
 
 def create_from_form(form):
@@ -21,7 +22,7 @@ def create_from_form(form):
     return create(
         plan_name,
         geometry_id,
-        user,
+        user.id,
         project_file_data.filename,
         project_file_data,
         plan_file_data.filename,
@@ -46,24 +47,47 @@ def copy_execution_plan(execution_plan_id):
 
 
 
+def create_from_json(execution_plan):
+    return create(
+        execution_plan.get('plan_name'),
+        execution_plan.get('geometry_id'),
+        execution_plan.get('user_id'),
+        execution_plan.get('project_file', {}).get('filename'),
+        io.BytesIO(execution_plan.get('project_file', {}).get('data').encode('utf-8')),
+        execution_plan.get('plan_file', {}).get('filename'),
+        io.BytesIO(execution_plan.get('plan_file', {}).get('data').encode('utf-8')),
+        execution_plan.get('flow_file', {}).get('filename'),
+        io.BytesIO(execution_plan.get('flow_file', {}).get('data').encode('utf-8')),
+        io.BytesIO(execution_plan.get('restart_file', {}).get('data').encode('utf-8')),
+        [
+            ExecutionPlanOutput(
+                river=d.get("river"),
+                reach=d.get("reach"),
+                river_stat=d.get("river_stat")
+            )
+            for d in execution_plan.get('output_list_data', [])
+        ]
+    )
+
+
 def create_from_scheduler(
-    execution_plan_name,
-    geometry_id,
-    user,
-    project_name,
-    project_file,
-    plan_name,
-    plan_file,
-    flow_name,
-    flow_file,
-    use_restart,
-    schedule_task_id,
-    plan_series_list,
+        execution_plan_name,
+        geometry_id,
+        user,
+        project_name,
+        project_file,
+        plan_name,
+        plan_file,
+        flow_name,
+        flow_file,
+        use_restart,
+        schedule_task_id,
+        plan_series_list,
 ):
     execution_plan = create(
         execution_plan_name,
         geometry_id,
-        user,
+        user.id,
         project_name,
         project_file,
         plan_name,
@@ -88,23 +112,23 @@ def create_from_scheduler(
 
 
 def create(
-    execution_plan_name,
-    geometry_id,
-    user,
-    project_name,
-    project_file,
-    plan_name,
-    plan_file,
-    flow_name,
-    flow_file,
-    restart_file=None,
-    execution_plan_output_list=None,
+        execution_plan_name,
+        geometry_id,
+        user_id,
+        project_name,
+        project_file,
+        plan_name,
+        plan_file,
+        flow_name,
+        flow_file,
+        restart_file=None,
+        execution_plan_output_list=None,
 ):
     with get_session() as session:
         execution_plan = ExecutionPlan(
             plan_name=execution_plan_name,
             geometry_id=geometry_id,
-            user_id=user.id,
+            user_id=user_id,
             execution_plan_output_list=execution_plan_output_list,
         )
         session.add(execution_plan)
@@ -135,12 +159,16 @@ def create(
             flow_name,
             execution_plan_id,
         )
+        restart_file_name = "restart_file.rst"
+        if not isinstance(restart_file, io.BytesIO):
+            restart_file_name = restart_file.filename
+
 
         if restart_file:
             file_storage_service.save_file(
                 FileType.EXECUTION_PLAN,
                 restart_file,
-                restart_file.filename,
+                restart_file_name,
                 execution_plan_id,
             )
 
@@ -152,7 +180,6 @@ def create_copy(execution_plan_name,
                 user,
                 execution_plan_output_list):
     with get_session() as session:
-        print(execution_plan_output_list)
         execution_plan = ExecutionPlan(
             plan_name=execution_plan_name,
             geometry_id=geometry_id.id,
@@ -167,7 +194,6 @@ def create_copy(execution_plan_name,
 
         file_storage_service.copy_geometry_to(execution_plan_id, geometry.name)
         return execution_plan
-
 
 
 def get_execution_plans():

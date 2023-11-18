@@ -5,6 +5,8 @@ from flask import Blueprint, render_template, url_for, redirect, request, jsonif
 
 from src import logger
 from src.controller.schemas import ActivityParams
+import traceback
+
 from src.login_manager import user_is_authenticated
 from src.service import (
     geometry_service,
@@ -40,7 +42,7 @@ def home():
     return {"status": "ok"}
 
 
-@API_BLUEPRINT.get("/<execution_plan_id>")
+@API_BLUEPRINT.get("/execution_plan/<execution_plan_id>")
 def get_execution_plan(execution_plan_id):
     execution_plan = execution_plan_service.get_execution_plan(execution_plan_id)
     execution_plan_dict = execution_plan.to_dict()
@@ -62,18 +64,34 @@ def get_execution_plan(execution_plan_id):
         # return a list of file names.
         execution_plan_dict["files"] = [i.split("/")[-1] for i in execution_files]
 
-    # exec_json = json.dumps(execution_plan_dict, indent=4)
     return jsonify(execution_plan_dict)
 
 
-@API_BLUEPRINT.post("/execution_plan")
-def create_execution_plan():
+@API_BLUEPRINT.post("/execution_plan/copy")
+def copy_execution_plan():
     try:
         copy_from = request.args.get('copyFrom', '')
         execution_plan = execution_plan_service.copy_execution_plan(copy_from)
         return {"new_execution_plan_id": execution_plan.id}
     except Exception as e:
+        print(e.with_traceback())
         response = jsonify({"error": str(e)})
         response.status_code = 400
         return response
+
+
+@API_BLUEPRINT.post("/execution_plan")
+def create_execution_plan():
+    print(request.get_json())
+    try:
+        execution_plan = execution_plan_service.create_from_json(request.get_json())
+        return {"new_execution_plan_id": execution_plan.id}
+    except Exception as e:
+        response = jsonify({"error": str(e)})
+        response.status_code = 400
+        return response
+
+
+
+
 
