@@ -198,14 +198,16 @@ def cancel_simulation(execution_id):
     from src import logger
 
     task_id = get_task_id_by_execution_id(execution_id)
-    if task_id != None:
+    
+    if task_id is not None:
         logger.info(f"Stopping simulation for {execution_id}")
         AsyncResult(task_id).revoke(terminate=True)
+        logger.info(f"Simulation stopped for {execution_id}")
     else:
-        logger.info(f"Canceling simulation for {execution_id}")
+        logger.info(f"No task found for {execution_id}")
 
+    logger.info(f"Canceling simulation for {execution_id}")
     logger.info(f"Canceled simulation for {execution_id}")
-    logger.info({"execution_id": execution_id, "user_id": execution.user.id})
         
 
 @celery_app.task
