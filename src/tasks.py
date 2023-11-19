@@ -190,6 +190,7 @@ def queue_or_fake_simulate(execution_id, calibration_id_for_simulations=None):
             link_error=error_handler.s(),
         )
         task_id = result.id
+        logger.info(f"SAVING TASK ID: {task_id}")
         execution_task_service.save_task_id_in_database(execution_id, task_id)
 
 
@@ -197,7 +198,7 @@ def cancel_simulation(execution_id):
     from src import logger
 
     task_id = get_task_id_by_execution_id(execution_id)
-    if task_id:
+    if task_id != None:
         logger.info(f"Stopping simulation for {execution_id}")
         AsyncResult(task_id).revoke(terminate=True)
     else:

@@ -1,8 +1,6 @@
 from sqlalchemy import Column, String, Integer
 from src.persistance.session import Base
 
-Base = declarative_base()
-
 class ExecutionTask(Base):
     __tablename__ = 'execution_tasks'
 
