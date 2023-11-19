@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import os
 from src import config
 from src.persistance.execution_plan import ExecutionPlanStatus
-from src.service import execution_plan_service, notification_service, ina_service
+from src.service import execution_plan_service, notification_service, ina_service, execution_task_service
 from src.service.file_storage_service import FileType
 import sys
 
@@ -189,18 +189,22 @@ def queue_or_fake_simulate(execution_id, calibration_id_for_simulations=None):
             },
             link_error=error_handler.s(),
         )
-        execution_plan_service.update_execution_plan_async_result_id(execution_id, result.id)
+        task_id = result.id
+        execution_task_service.save_task_id_in_database(execution_id, task_id)
 
-def cancel_simulation(execution_id, calibration_id_for_simulations=None):
+
+def cancel_simulation(execution_id):
     from src import logger
 
-    execution = execution_plan_service.get_execution_plan(execution_id)
-    if not execution:
-        raise Exception
+    task_id = get_task_id_by_execution_id(execution_id)
+    if task_id:
+        logger.info(f"Stopping simulation for {execution_id}")
+        AsyncResult(task_id).revoke(terminate=True)
     else:
-        AsyncResult(execution.async_result_id).revoke(terminate=True)
-        logger.info(f"Canceled simulation for {execution_id}")
-        logger.info({"execution_id": execution_id, "user_id": execution.user.id})
+        logger.info(f"Canceling simulation for {execution_id}")
+
+    logger.info(f"Canceled simulation for {execution_id}")
+    logger.info({"execution_id": execution_id, "user_id": execution.user.id})
         
 
 @celery_app.task

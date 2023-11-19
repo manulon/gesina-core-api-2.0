@@ -43,10 +43,10 @@
     </div>
 
     <script>
-        update_url = {{url_for('execution_plan_controller.update', execution_id='')}}
-        cancel_url = {{url_for('execution_plan_controller.cancel', execution_id='')}}
+        let update_url = "{{ url_for('execution_plan_controller.update', execution_id='')|urlencode }}";
+        let cancel_url = "{{ url_for('execution_plan_controller.cancel', execution_id='')|urlencode }}";
         function executionPlanActionFormatter(value, row) {
-            let base_url = "{{ url_for("view_controller.execution_plan_read", execution_plan_id="")}}"
+            let base_url = "{{ url_for('view_controller.execution_plan_read', execution_plan_id='')|urlencode }}";
             form = `
                 <form action="${update_url}${row["id"]}" method="POST">
                     <button type="submit" class="btn btn-outline-secondary" ${row['status'] == "PENDING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Finalizada"'}>
