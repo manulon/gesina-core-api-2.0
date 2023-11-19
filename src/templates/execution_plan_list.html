@@ -44,6 +44,7 @@
 
     <script>
         update_url = {{url_for('execution_plan_controller.update', execution_id='')}}
+        cancel_url = {{url_for('execution_plan_controller.cancel', execution_id='')}}
         function executionPlanActionFormatter(value, row) {
             let base_url = "{{ url_for("view_controller.execution_plan_read", execution_plan_id="")}}"
             form = `
@@ -59,6 +60,11 @@
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </a>
                     ${form}
+                    <form action="${cancel_url}${row["id"]}" method="POST">
+                        <button type="submit" class="btn btn-outline-danger" ${row['status'] == "CANCELED"}>
+                            <i class="fa-solid fa-times"></i>
+                        </button>
+                    </form>
                 </div>
             `
           }

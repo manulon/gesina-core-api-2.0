@@ -29,6 +29,7 @@ class ExecutionPlan(Base):
     geometry = relationship("Geometry", lazy="joined")
     user_id = Column(Integer, ForeignKey("user.id"))
     user = relationship("User", lazy="joined")
+    async_result_id = Column(String, nullable=True)
     start_datetime = Column(DateTime, default=datetime.now)
     end_datetime = Column(DateTime, default=datetime.now)
     created_at = Column(DateTime, default=datetime.now)

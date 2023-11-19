@@ -2,6 +2,7 @@ import io
 import logging
 
 from celery import Celery
+from celery.result import AsyncResult
 from datetime import datetime, timedelta
 import os
 from src import config
@@ -180,7 +181,7 @@ def queue_or_fake_simulate(execution_id, calibration_id_for_simulations=None):
     else:
         logger.info(f"Queueing simulation for {execution_id}")
         logger.info({"execution_id": execution_id, "user_id": execution.user.id})
-        simulate.apply_async(
+        result = simulate.apply_async(
             kwargs={
                 "execution_id": execution_id,
                 "user_id": execution.user.id,
@@ -188,7 +189,19 @@ def queue_or_fake_simulate(execution_id, calibration_id_for_simulations=None):
             },
             link_error=error_handler.s(),
         )
+        execution_plan_service.update_execution_plan_async_result_id(execution_id, result.id)
 
+def cancel_simulation(execution_id, calibration_id_for_simulations=None):
+    from src import logger
+
+    execution = execution_plan_service.get_execution_plan(execution_id)
+    if not execution:
+        raise Exception
+    else:
+        AsyncResult(execution.async_result_id).revoke(terminate=True)
+        logger.info(f"Canceled simulation for {execution_id}")
+        logger.info({"execution_id": execution_id, "user_id": execution.user.id})
+        
 
 @celery_app.task
 def error_handler(request, exc, traceback):

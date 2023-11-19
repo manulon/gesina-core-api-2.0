@@ -191,6 +191,9 @@ def update_execution_plan_status(execution_plan_id, status: ExecutionPlanStatus)
         session.add(execution_plan)
         execution_plan.status = status
 
+def update_execution_plan_async_result_id(execution_plan_id, async_result_id: String):
+    execution_plan = get_execution_plan(execution_plan_id)
+    execution_plan.async_result_id = async_result_id
 
 def update_finished_execution_plan(execution_plan_id, start_datetime, end_datetime):
     execution_plan = get_execution_plan(execution_plan_id)
