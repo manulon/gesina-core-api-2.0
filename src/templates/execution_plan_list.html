@@ -61,7 +61,7 @@
                     </a>
                     ${form}
                     <form action="${cancel_url}${row["id"]}" method="POST">
-                        <button type="submit" class="btn btn-outline-danger" ${row['status'] == "CANCELED"}>
+                        <button type="submit" class="btn btn-outline-danger" ${row['status'] == "PENDING" || row['status'] == "RUNNING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Cancelada"'}>
                             <i class="fa-solid fa-times"></i>
                         </button>
                     </form>
