@@ -1,6 +1,6 @@
 ### Comandos para windows ###
 
-(Anteriormente correr 'sudo docker-compose up -d')
+(Anteriormente correr 'sudo docker-compose up -d' en linux)
 
 cd /gesina-core-api
 pipenv shell
