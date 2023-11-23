@@ -43,30 +43,44 @@
     </div>
 
     <script>
-        update_url = {{url_for('execution_plan_controller.update', execution_id='')}}
         function executionPlanActionFormatter(value, row) {
-            let base_url = "{{ url_for("view_controller.execution_plan_read", execution_plan_id="")}}"
-            form = `
-                <form action="${update_url}${row["id"]}" method="POST">
-                    <button type="submit" class="btn btn-outline-secondary" ${row['status'] == "PENDING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Finalizada"'}>
-                        <i class="fa-solid fa-play"></i>
-                    </button>
-                </form>
-            `
+            let update_url = "{{ url_for("view_controller.execution_plan_read", execution_plan_id="")}}"
+            let duplicate_url = "{{ url_for("api_controller.copy_execution_plan", copyFrom="")}}"
+
+
+            let update_button = `
+                <a class="btn btn-outline-secondary mr-2" href="${update_url}${row["id"]}">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </a>
+            `;
+
+            let start_button = `
+                <a class="btn btn-outline-secondary mr-2" ${row['status'] == "PENDING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Finalizada"'}>
+                    <i class="fa-solid fa-play"></i>
+                </a>
+            `;
+           
+            let duplicate_button = `
+                <a class="btn btn-outline-secondary" href="${duplicate_url}${row["id"]}" title="Duplicar Simulacion">
+                    <i class="fa-solid fa-clipboard"></i>
+                </a>
+            `;                
+
             return `
                 <div class="d-flex justify-content-around">
-                    <a class="btn btn-outline-secondary" href="${base_url}${row["id"]}">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </a>
-                    ${form}
+                    ${update_button}
+                    ${start_button}
+                    ${duplicate_button}
                 </div>
             `
-          }
+        }
+
         function planNameFormatter(value) {
             if (value.length > 20)
                 return value.substr(0, 20).concat('[...]');
             return value;
         }
+        
         function statusFormatter(value) {
             const status_map = {
                 PENDING: 'Pendiente',
