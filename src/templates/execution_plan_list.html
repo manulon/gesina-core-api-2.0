@@ -65,7 +65,7 @@
             `;
 
             let derivate_button = `
-                <button type="button" class="btn btn-outline-secondary" title="Derivar simulacion" onclick="derivateSimulation()">
+                <button type="button" class="btn btn-outline-secondary" title="Derivar simulacion" onclick="derivateSimulation(${row['id']})">
                     <i class="fa-solid fa-code-compare"></i>
                 </button>
             `;
@@ -110,8 +110,17 @@
             });
         }
     
-        function derivateSimulation(nombre, id) {
-            window.location.href = `{{ url_for("view_controller.execution_plan_new", nombre='', id='') }}${nombre}&id=${id}`;
+        function derivateSimulation(id) {
+            let derivate_url = `{{ url_for('api_controller.get_execution_plan', execution_plan_id='') }}${id}`;
+
+            fetch(derivate_url, {method: 'GET'})
+            .then(response => {
+                console.log('Derivación exitosa');
+                console.log(response)
+            })
+            .catch(error => {
+                console.error('Error al derivar la simulación', error);
+            });    
         }
 
     </script>
