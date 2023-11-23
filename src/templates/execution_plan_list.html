@@ -95,10 +95,8 @@
 
             fetch(duplicate_url, {method: 'POST'})
             .then(response => {
-                // Manejar la respuesta aquí, por ejemplo, puedes actualizar la tabla después de la duplicación.
                 console.log('Duplicación exitosa');
                 window.location.reload();
-                // Agregar código para actualizar la tabla u otra lógica según sea necesario.
             })
             .catch(error => {
                 console.error('Error al duplicar la simulación', error);
