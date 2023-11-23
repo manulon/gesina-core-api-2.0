@@ -47,13 +47,13 @@
             let update_url = "{{ url_for("view_controller.execution_plan_read", execution_plan_id="")}}"
             
             let update_button = `
-                <a class="btn btn-outline-secondary mr-2" href="${update_url}${row["id"]}">
+                <a class="btn btn-outline-secondary mr-2" title="Inspeccionar Simulacion" href="${update_url}${row["id"]}">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </a>
             `;
 
             let start_button = `
-                <a class="btn btn-outline-secondary mr-2" ${row['status'] == "PENDING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Finalizada"'}>
+                <a class="btn btn-outline-secondary mr-2" title="Encolar Simulacion" ${row['status'] == "PENDING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Finalizada"'}>
                     <i class="fa-solid fa-play"></i>
                 </a>
             `;
