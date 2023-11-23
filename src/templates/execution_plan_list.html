@@ -59,16 +59,23 @@
             `;
            
             let duplicate_button = `
-                <button type="button" class="btn btn-outline-secondary" onclick="duplicateSimulation(${row['id']})" title="Duplicar Simulación">
+                <button type="button" class="btn btn-outline-secondary mr-2" onclick="duplicateSimulation(${row['id']})" title="Duplicar Simulación">
                     <i class="fa-solid fa-clipboard"></i>
                 </button>
             `;
 
+            let derivate_button = `
+                <button type="button" class="btn btn-outline-secondary" title="Derivar simulacion" onclick="derivateSimulation()">
+                    <i class="fa-solid fa-code-compare"></i>
+                </button>
+            `;
+            
             return `
                 <div class="d-flex justify-content-around">
                     ${update_button}
                     ${start_button}
                     ${duplicate_button}
+                    ${derivate_button}
                 </div>
             `
         }
@@ -102,6 +109,11 @@
                 console.error('Error al duplicar la simulación', error);
             });
         }
+    
+        function derivateSimulation(nombre, id) {
+            window.location.href = `{{ url_for("view_controller.execution_plan_new", nombre='', id='') }}${nombre}&id=${id}`;
+        }
+
     </script>
 
 {% endblock %}
