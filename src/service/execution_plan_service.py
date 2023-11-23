@@ -202,10 +202,13 @@ def delete_execution_plan(execution_plan_id):
         with get_session() as session:
             session.delete(execution_plan)
             session.commit()
+        file_storage_service.delete_execution_files(execution_plan_id)
         return True
+    
+
     except Exception as e:
         print(e)
-        return False
+        raise e
 
 def get_execution_plans():
     execution_plans = []

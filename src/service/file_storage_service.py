@@ -5,6 +5,8 @@ from enum import Enum
 
 from minio import Minio
 from minio.commonconfig import CopySource
+from minio.error import S3Error
+import shutil
 
 from src import logger, config
 
@@ -197,3 +199,15 @@ def copy_execution_files(id_copy_from, id_copy_to):
         minio_client.copy_object(ROOT_BUCKET, minio_path, CopySource(ROOT_BUCKET,file))
 
     return list_execution_files(FileType.EXECUTION_PLAN, id_copy_to)
+
+def delete_execution_files(local_directory_path):
+    try:
+        local_files = list_execution_files(FileType.EXECUTION_PLAN,local_directory_path)
+        for file in local_files:
+            minio_object_name = file.object_name
+            minio_client.remove_object(ROOT_BUCKET, minio_object_name)
+
+    except Exception as e:
+        print(f"Error deleting objects from Minio bucket: {e}")
+        raise e
+

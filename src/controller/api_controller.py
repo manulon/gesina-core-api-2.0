@@ -100,7 +100,7 @@ def delete_execution_plan(execution_plan_id):
         response.status_code = 200
         return response
     except Exception as e:
-        print(e)
-        response = jsonify({"error": str(e)})
+        response = jsonify({"message": "error deleting execution plan " + execution_plan_id,
+                            "error": str(e)})
         response.status_code = 400
         return response
