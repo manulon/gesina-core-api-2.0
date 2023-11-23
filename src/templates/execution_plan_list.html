@@ -45,9 +45,7 @@
     <script>
         function executionPlanActionFormatter(value, row) {
             let update_url = "{{ url_for("view_controller.execution_plan_read", execution_plan_id="")}}"
-            let duplicate_url = "{{ url_for("api_controller.copy_execution_plan", copyFrom="")}}"
-
-
+            
             let update_button = `
                 <a class="btn btn-outline-secondary mr-2" href="${update_url}${row["id"]}">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -61,10 +59,10 @@
             `;
            
             let duplicate_button = `
-                <a class="btn btn-outline-secondary" href="${duplicate_url}${row["id"]}" title="Duplicar Simulacion">
+                <button type="button" class="btn btn-outline-secondary" onclick="duplicateSimulation(${row['id']})" title="Duplicar Simulación">
                     <i class="fa-solid fa-clipboard"></i>
-                </a>
-            `;                
+                </button>
+            `;
 
             return `
                 <div class="d-flex justify-content-around">
@@ -90,6 +88,21 @@
                 ERROR: 'Fallida'
             };
             return status_map[value];
+        }
+
+        function duplicateSimulation(id) {
+            let duplicate_url = `{{ url_for('api_controller.copy_execution_plan', copyFrom='') }}${id}`;
+
+            fetch(duplicate_url, {method: 'POST'})
+            .then(response => {
+                // Manejar la respuesta aquí, por ejemplo, puedes actualizar la tabla después de la duplicación.
+                console.log('Duplicación exitosa');
+                window.location.reload();
+                // Agregar código para actualizar la tabla u otra lógica según sea necesario.
+            })
+            .catch(error => {
+                console.error('Error al duplicar la simulación', error);
+            });
         }
     </script>
 
