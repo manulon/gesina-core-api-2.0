@@ -11,7 +11,6 @@ from apscheduler.executors.pool import ThreadPoolExecutor
 from src.service import execution_plan_service
 from src import config
 from src.persistance.execution_plan import ExecutionPlanStatus
-from src.service.execution_plan_service import update_execution_plan_status
 from src.service.schedule_task_service import get_schedule_task_config
 from src.tasks import queue_or_fake_simulate
 
@@ -97,7 +96,10 @@ class ScheduledTaskJob:
             scheduled_task.id,
             scheduled_task.plan_series_list,
         )
-        update_execution_plan_status(execution_plan.id, ExecutionPlanStatus.RUNNING)
+
+        execitexecution_plan_service.get_execution_plan(execution_plan.id)
+
+        update_execution_plan_status.update_execution_plan_status(execution_plan.id, ExecutionPlanStatus.RUNNING)
         try:
             queue_or_fake_simulate(
                 execution_plan.id, 

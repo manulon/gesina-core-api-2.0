@@ -49,13 +49,6 @@ create table if not exists execution_plan
 	status text not null
 );
 
-create table if not exists execution_tasks
-(
-	id serial constraint execution_tasks_pk primary key,
-	execution_id integer not null constraint execution_plan__id_fk references "execution_plan",
-    task_id varchar not null
-);
-
 create table if not exists execution_plan_output
 (
     river text not null,
@@ -68,8 +61,6 @@ create table if not exists execution_plan_output
 );
 
 alter table execution_plan owner to "user";
-
-alter table execution_tasks owner to "user";
 
 create unique index if not exists execution_plan_id_uindex on execution_plan (id);
 

@@ -62,11 +62,8 @@ def cancel(execution_id):
     from src.tasks import cancel_simulation
 
     try:
-        execution_plan_service.update_execution_plan_status(
-            execution_id, ExecutionPlanStatus.CANCELED
-        )
         cancel_simulation(execution_id)
-        #return redirect(url_for("view_controller.execution_plan_list"))
+        return redirect(url_for("view_controller.execution_plan_list"))
     except Exception as e:
         logger.error(e)
         raise e

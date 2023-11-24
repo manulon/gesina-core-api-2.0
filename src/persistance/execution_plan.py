@@ -36,6 +36,7 @@ class ExecutionPlan(Base):
     execution_plan_output_list = relationship(
         "ExecutionPlanOutput", lazy="joined", back_populates="execution_plan"
     )
+    schedule_task_id = Column(Integer)
 
     def get_geometry_file_url(self):
         # TODO recuperar desde la carpeta del exe_plan

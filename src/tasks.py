@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import os
 from src import config
 from src.persistance.execution_plan import ExecutionPlanStatus
-from src.service import execution_plan_service, notification_service, ina_service, execution_task_service
+from src.service import execution_plan_service, notification_service, ina_service
 from src.service.file_storage_service import FileType
 import sys
 
@@ -191,23 +191,33 @@ def queue_or_fake_simulate(execution_id, calibration_id_for_simulations=None):
         )
         task_id = result.id
         logger.info(f"SAVING TASK ID: {task_id}")
-        execution_task_service.save_task_id_in_database(execution_id, task_id)
+        #execution_task_service.save_task_id_in_database(execution_id, task_id)
 
 
 def cancel_simulation(execution_id):
     from src import logger
 
-    task_id = execution_task_service.get_task_id_by_execution_id(execution_id)
-    
-    if task_id is not None:
-        logger.info(f"Stopping simulation for {execution_id}")
-        AsyncResult(task_id).revoke(terminate=True)
-        logger.info(f"Simulation stopped for {execution_id}")
-    else:
-        logger.info(f"No task found for {execution_id}")
+    execution_plan = execution_plan_service.get_execution_plan(execution_id)
+    if execution_plan.status == ExecutionPlanStatus.PENDING: 
+        execution_plan_service.update_execution_plan_status(
+            execution_id, ExecutionPlanStatus.CANCELED
+        )
+        logger.info(f"Canceled simulation for {execution_id}")
+        return
+    else: 
+        task_id = execution_plan.schedule_task_id
+        logger.info(f"TASK ID {task_id}")
+        #task_id = execution_task_service.get_task_id_by_execution_id(execution_id)
+        
+        #if task_id is not None:
+        #    logger.info(f"Stopping simulation for {execution_id}")
+        #    AsyncResult(task_id).revoke(terminate=True)
+        #    logger.info(f"Simulation stopped for {execution_id}")
+        #else:
+        #   logger.info(f"No task found for {execution_id}")
 
-    logger.info(f"Canceling simulation for {execution_id}")
-    logger.info(f"Canceled simulation for {execution_id}")
+        logger.info(f"Canceling simulation for {execution_id}")
+        logger.info(f"Canceled simulation for {execution_id}")
         
 
 @celery_app.task
