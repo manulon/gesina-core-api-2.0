@@ -92,6 +92,15 @@ def create_execution_plan():
         return response
 
 
-
-
-
+@API_BLUEPRINT.delete("execution_plan/<execution_plan_id>")
+def delete_execution_plan(execution_plan_id):
+    try:
+        execution_plan_service.delete_execution_plan(execution_plan_id)
+        response = jsonify({"message": "Execution plan with id " + execution_plan_id + " deleted successfully"})
+        response.status_code = 200
+        return response
+    except Exception as e:
+        response = jsonify({"message": "error deleting execution plan " + execution_plan_id,
+                            "error": str(e)})
+        response.status_code = 400
+        return response
