@@ -7,8 +7,8 @@ INSERT INTO gesina.geometry ("name", description, created_at, user_id) VALUES
 INSERT INTO gesina.geometry ("name", description, created_at, user_id) VALUES
 	 ('DeltaParana_2017.g01', 'Geometría Paraná','NOW()', 1);
 
-INSERT INTO gesina.execution_plan (plan_name,geometry_id, user_id, start_datetime, end_datetime, created_at, status) VALUES
-	 ('ejemplo-ina', 1, 1, '2021-12-21 20:08:39.133122', '2021-12-21 20:08:39.133122', '2021-12-21 20:08:39.133122', 'PENDING');
+INSERT INTO gesina.execution_plan (plan_name,geometry_id, user_id, start_datetime, end_datetime, created_at, status,scheduled_task_id) VALUES
+	 ('ejemplo-ina', 1, 1, '2021-12-21 20:08:39.133122', '2021-12-21 20:08:39.133122', '2021-12-21 20:08:39.133122', 'PENDING',1);
 
 
 INSERT INTO gesina.scheduled_task (name, description, frequency, geometry_id, user_id, start_datetime, metadata,

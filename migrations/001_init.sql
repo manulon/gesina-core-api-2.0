@@ -46,8 +46,8 @@ create table if not exists execution_plan
 	start_datetime timestamp not null,
 	end_datetime timestamp not null,
 	created_at timestamp not null,
-    scheduled_task_id integer,
-	status text not null
+	status text not null,
+    scheduled_task_id integer
 );
 
 create table if not exists execution_plan_output
