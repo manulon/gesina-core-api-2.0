@@ -116,11 +116,81 @@
             fetch(derivate_url, {method: 'GET'})
             .then(response => {
                 console.log('Derivación exitosa');
-                console.log(response)
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+                
+                plan_name = data.plan_name
+                console.log('El nombre del plan es:', plan_name)
+
+                files = getFileNames(data)
+                console.log('La geometrias son:', files)
+
+                new_url = getDerivateSimulationUrl(files)
+                console.log(new_url)
+
+                let new_simulation_url = '{{url_for("view_controller.execution_plan_new")}}' + new_url
+
+                window.location.href = new_simulation_url
             })
             .catch(error => {
                 console.error('Error al derivar la simulación', error);
             });    
+        }
+
+        function getFileNames(data){
+            var extension = new Array();
+            var extensionesPorTipo = {};
+
+            var planes = new Array();
+            var condicionesDeBorde = new Array();
+
+            extensionesPorTipo['Plan'] = planes
+            extensionesPorTipo['Condicion de Borde'] = condicionesDeBorde
+
+            for (var clave in data.files) {
+                valor = data.files[clave]
+                
+                var palabras = valor.split('.');
+
+                if (palabras[1][0] == 'g'){
+                    extensionesPorTipo['Geometria'] = valor;
+                } else if (palabras[1] == 'prj'){
+                    extensionesPorTipo['Proyecto'] = valor;
+                } else if (palabras[1][0] == 'p'){
+                    extensionesPorTipo['Plan'].push(valor);
+                } else if (palabras[1][0] == 'u'){
+                    extensionesPorTipo['Condicion de Borde'].push(valor);
+                } else if (palabras[1] == 'rst'){
+                    extensionesPorTipo['Restart File'] = valor;
+                }
+            }
+
+            return extensionesPorTipo
+        }
+
+        function getDerivateSimulationUrl(files){
+            condicionesDeBordeParametro = "?condicionesDeBorde="
+            for (var i in files['Condicion de Borde']) {
+                condicionesDeBordeParametro += (files['Condicion de Borde'][i] + '-')
+            }
+
+            geometriaParametro = "?geometria=" + files['Geometria']
+
+            planParametro = "?plan="
+            for (var i in files['Plan']) {
+                planParametro += (files['Plan'][i] + '-')
+            }
+
+            proyectoParametro = "proyecto?=" + files['Proyecto']
+
+            restartFileParametro = "?restartFile=" + files['Restart File']
+
+            final_url = condicionesDeBordeParametro + geometriaParametro + 
+                        planParametro + proyectoParametro + restartFileParametro
+
+            return final_url
         }
 
     </script>
