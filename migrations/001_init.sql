@@ -46,8 +46,7 @@ create table if not exists execution_plan
 	start_datetime timestamp not null,
 	end_datetime timestamp not null,
 	created_at timestamp not null,
-	status text not null,
-    scheduled_task_id integer
+	status text not null
 );
 
 create table if not exists execution_plan_output
@@ -128,3 +127,12 @@ create table if not exists "plan_series"
     flow_series_id integer default null,
     scheduled_task_id integer not null constraint plan_series_scheduled_task_id_fk references "scheduled_task"
 );
+
+create table if not exists execution_tasks
+(
+	id serial constraint execution_tasks_pk primary key,
+	execution_id integer not null constraint execution_plan__id_fk references "execution_plan",
+    task_id varchar
+);
+
+alter table execution_tasks owner to "user";

@@ -49,7 +49,6 @@ def create_from_scheduler(
     flow_name,
     flow_file,
     use_restart,
-    schedule_task_id,
     plan_series_list,
 ):
     execution_plan = create(
