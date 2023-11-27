@@ -121,6 +121,8 @@ def simulate(execution_id, user_id, calibration_id_for_simulations):
         execution_plan_service.update_execution_plan_status(
             execution_id, ExecutionPlanStatus.ERROR
         )
+    except NotImplementedError as e:
+        print(f"Termination requested")
     finally:
         if RC:
             RC.Project_Close()
@@ -195,30 +197,34 @@ def queue_or_fake_simulate(execution_id, calibration_id_for_simulations=None):
 
 
 def cancel_simulation(execution_id):
-    from src import logger
+    win_logger = get_logger(execution_id)
 
     execution_plan = execution_plan_service.get_execution_plan(execution_id)
+
     if execution_plan.status == ExecutionPlanStatus.PENDING: 
+
         execution_plan_service.update_execution_plan_status(
             execution_id, ExecutionPlanStatus.CANCELED
         )
-        logger.info(f"Canceled simulation for {execution_id}")
-        return
+        win_logger.info(f"status: PENDING - Canceled simulation with execution id: {execution_id}")
+
     else: 
-        #task_id = execution_plan.schedule_task_id
-        #logger.info(f"TASK ID {task_id}")
 
         task_id = execution_task_service.get_task_id_by_execution_id(execution_id)
+        win_logger.info(f"status: RUNNING - TASK ID to be canceled: {task_id}")
         
         if task_id is not None:
-            logger.info(f"Stopping simulation for {execution_id}")
-        #    AsyncResult(task_id).revoke(terminate=True)
-        #    logger.info(f"Simulation stopped for {execution_id}")
-        #else:
-        #   logger.info(f"No task found for {execution_id}")
+            try:
+                AsyncResult(task_id).revoke(terminate=True)
+                execution_plan_service.update_execution_plan_status(
+                    execution_id, ExecutionPlanStatus.CANCELED
+                )
+                win_logger.info(f"status: CANCELED - Canceled simulation with execution id: {execution_id}")
+            except NotImplementedError as e:
+                print(f"Termination requested")
+        else:
+           logger.info(f"No task found for execution id: {execution_id}")
 
-        logger.info(f"Canceling simulation for {execution_id}")
-        logger.info(f"Canceled simulation for {execution_id}")
         return
         
 
