@@ -207,6 +207,7 @@ def delete_execution_plan(execution_plan_id):
     
 
     except Exception as e:
+        print("error while deleting execution plan: " + execution_plan_id)
         print(e)
         raise e
 
