@@ -82,7 +82,6 @@ def copy_execution_plan():
 
 @API_BLUEPRINT.post("/execution_plan")
 def create_execution_plan():
-    print(request.get_json())
     try:
         execution_plan = execution_plan_service.create_from_json(request.get_json())
         return {"new_execution_plan_id": execution_plan.id}
@@ -101,6 +100,19 @@ def delete_execution_plan(execution_plan_id):
         return response
     except Exception as e:
         response = jsonify({"message": "error deleting execution plan " + execution_plan_id,
+                            "error": str(e)})
+        response.status_code = 400
+        return response
+    
+@API_BLUEPRINT.patch("execution_plan/edit/<execution_plan_id>")
+def edit_execution_plan(execution_plan_id):
+    try:
+        body = request.get_json()
+        plan_name = body.get("plan_name")
+        execution_plan_service.edit_execution_plan(execution_plan_id,plan_name)
+        return jsonify({"message":f"successfully edited execution plan with id: {execution_plan_id}"})
+    except Exception as e:
+        response = jsonify({"message": "error deleting editing plan " + execution_plan_id,
                             "error": str(e)})
         response.status_code = 400
         return response

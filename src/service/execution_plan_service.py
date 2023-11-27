@@ -272,3 +272,10 @@ def update_finished_execution_plan(execution_plan_id, start_datetime, end_dateti
         execution_plan.status = ExecutionPlanStatus.FINISHED
         execution_plan.start_datetime = start_datetime
         execution_plan.end_datetime = end_datetime
+
+def edit_execution_plan(execution_plan_id, execution_plan_name=None, geometry_id=None,project_file=None,plan_file=None,flow_file=None,restart_file=None,execution_plan_output=None):
+    execution_plan = get_execution_plan(execution_plan_id)
+    with get_session() as session:
+        session.add(execution_plan)
+        execution_plan.plan_name = execution_plan_name
+    
