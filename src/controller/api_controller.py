@@ -109,7 +109,13 @@ def edit_execution_plan(execution_plan_id):
     try:
         body = request.get_json()
         plan_name = body.get("plan_name")
-        execution_plan_service.edit_execution_plan(execution_plan_id,plan_name)
+        geometry_id = body.get("geometry_id")
+        plan_file = body.get("plan_file")
+        flow_file = body.get("flow_file")
+        restart_file = body.get("restart_file")
+        execution_plan_output = body.get("execution_output_list")
+        project_file = body.get("project_file")    
+        execution_plan_service.edit_execution_plan(execution_plan_id,plan_name,geometry_id,project_file,plan_file,flow_file,restart_file, execution_plan_output)
         return jsonify({"message":f"successfully edited execution plan with id: {execution_plan_id}"})
     except Exception as e:
         response = jsonify({"message": "error deleting editing plan " + execution_plan_id,
