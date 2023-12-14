@@ -204,6 +204,9 @@ def execution_plan_list():
 @VIEW_BLUEPRINT.route("/execution_plan")
 def execution_plan_new():
     geometries = geometry_service.get_geometries()
+    copy_from = request.args.get('copyFrom', '')
+    execution_plan = execution_plan_service.get_execution_plan(copy_from)
+    form = ExecutionPlanForm(execution_plan.name)
     data = {"form": ExecutionPlanForm(), "geometries": geometries}
     return render_template("execution_plan.html", **data)
 
