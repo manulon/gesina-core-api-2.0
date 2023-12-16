@@ -124,7 +124,7 @@ def edit_execution_plan(execution_plan_id):
         return response
     
 
-@API_BLUEPRINT.post("execution_plan/file")
+@API_BLUEPRINT.post("execution_plan/upload_file")
 def upload_execution_file():
     try:
         body = request.get_json()
