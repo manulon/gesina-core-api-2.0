@@ -310,8 +310,8 @@ def schedule_task_new():
 
 
 @VIEW_BLUEPRINT.route("/execution_plan_derivate")
-def derivate_execution_plan():
-    return render_template("derivated_execution_plan.html")
+def edit_execution_plan():
+    return render_template("edit_execution_plan.html")
 
 
 def render_schedule_view(form, schedule_config=None, errors=()):

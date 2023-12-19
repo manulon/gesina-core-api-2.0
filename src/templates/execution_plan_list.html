@@ -64,8 +64,8 @@
                 </button>
             `;
 
-            let derivate_button = `
-                <button type="button" class="btn btn-outline-secondary" title="Derivar simulacion" onclick="derivateSimulation(${row['id']})">
+            let edit_button = `
+                <button type="button" class="btn btn-outline-secondary" title="Editar simulacion" onclick="editSimulation(${row['id']})">
                     <i class="fa-solid fa-code-compare"></i>
                 </button>
             `;
@@ -75,7 +75,7 @@
                     ${update_button}
                     ${start_button}
                     ${duplicate_button}
-                    ${derivate_button}
+                    ${edit_button}
                 </div>
             `
         }
@@ -110,12 +110,11 @@
             });
         }
     
-        function derivateSimulation(id) {
-            let derivate_url = `{{ url_for('api_controller.get_execution_plan', execution_plan_id='') }}${id}`;
+        function editSimulation(id) {
+            let edit_url = `{{ url_for('api_controller.get_execution_plan', execution_plan_id='') }}${id}`;
 
-            fetch(derivate_url, {method: 'GET'})
+            fetch(edit_url, {method: 'GET'})
             .then(response => {
-                console.log('Derivación exitosa');
                 return response.json();
             })
             .then(data => {
@@ -127,14 +126,14 @@
                 files = getFileNames(data)
                 console.log('La geometrias son:', files)
 
-                new_url = getDerivateSimulationUrl(files)
+                new_url = getEditSimulationUrl(files)
 
-                let new_simulation_url = '{{url_for("view_controller.derivate_execution_plan")}}' + new_url
+                let new_simulation_url = '{{url_for("view_controller.edit_execution_plan")}}' + new_url
 
                 window.location.href = new_simulation_url
             })
             .catch(error => {
-                console.error('Error al derivar la simulación', error);
+                console.error('Error al intentar el comienzo de edicion de la simulación', error);
             });    
         }
 
@@ -170,7 +169,7 @@
             return extensionesPorTipo
         }
 
-        function getDerivateSimulationUrl(files){
+        function getEditSimulationUrl(files){
             nombreDePlanParametro = "?plan_name=" + files['Nombre de plan']
 
             condicionesDeBordeParametro = "?condicionesDeBorde="
