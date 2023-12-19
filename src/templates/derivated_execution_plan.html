@@ -1,0 +1,185 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div>
+        <div class="d-flex justify-content-between pb-4">
+                <h2>Nueva simulación para derivar papito</h2>
+        </div>
+        <div class="container-xxl">
+            <form method=post
+                  enctype=multipart/form-data
+                  class="p-4 container needs-validation"
+                  id="execution-plan-form"
+                  action="{{ url_for("view_controller.save_execution_plan") }}">
+                <!-- Ojo con esto por favor -->
+                <div class="form-group" style="display: flex; flex-direction: column; align-items: flex-start;">
+                    <label for="plan_name" style="margin-bottom: 5px;"><h5>Nombre del plan</h5></label>
+                    <input class="form-control" id="plan_name" name="plan_name">
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <label id="no_changes_label" style="color: green; display: none;">Se actualizará el campo</label>
+                        <label id="reset_label" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
+                    </div>
+                </div>
+                
+                    <div class="form-group">
+                        <label for="status-select"><h5>Geometría</h5></label>
+                        <select class="custom-select" id="status-select" name="geometry_option">
+                            <option value="default">Seleccione una categoría..</option>
+                            {% for geometry in geometries %}
+                                <option value="{{ geometry.id }}">{{ geometry.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectFileUpload"><h5>Proyecto</h5></label>
+                        <input type="file" name="project_file" class="form-control-file" id="projectFileUpload">
+                    </div>
+                    <div class="form-group">
+                        <label for="planFileUpload"><h5>Plan</h5></label>
+                        <input type="file" name="plan_file" class="form-control-file" id="planFileUpload">
+                    </div>
+                    <div class="form-group">
+                        <label for="flowFileUpload"><h5>Condiciones de borde</h5></label>
+                        <input type="file" name="flow_file" class="form-control-file" id="flowFileUpload">
+                    </div>
+                    <div class="form-group">
+                        <label for="restartFileUpload"><h5>Restart File</h5></label>
+                        <input type="file" name="restart_file" class="form-control-file" id="restartFileUpload">
+                    </div>
+                    <div class="form-group">
+                        <h5>ACA HABIA UN FORM</h5>
+                        <table class="table" id="execution_plan_output_table">
+                              <thead>
+                                <tr>
+                                  <th scope="col">#</th>
+                                  <th scope="col">River</th>
+                                  <th scope="col">Reach</th>
+                                  <th scope="col">River stat</th>
+                                  <th scope="col">Acciones</th>
+                                </tr>
+                              </thead>
+                              <tbody id="execution_plan_output_table_body">
+                                    <tr>
+                                        <th scope="row">aca habia otra cosa</th>
+                                        <td>aca habia un form</td>
+                                        <td>aca habia un form</td>
+                                        <td>aca habia un form</td>
+                                        <td><button type="button" class="btn btn-danger remove-row-execution-plan-output">&#8722;</button></td>
+                                    </tr>
+                              </tbody>
+                        </table>
+                        <button id="add-row-execution-plan" type="button" class="btn btn-success">&#43;</button>
+                        <button id="clear-row-execution-plan" type="button" class="btn btn-danger">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                    <!-- Ojo con esto por favor -->
+            </form>display = 'none'
+        </div>
+    </div>
+    <script>
+        $('#startDateInput').datepicker({
+            language: 'es',
+            clearBtn: true,
+            startDate: new Date(2021, 0, 0),
+            endDate: "0d"
+        });
+        $('#endDateInput').datepicker({
+            language: 'es',
+            clearBtn: true,
+            startDate: new Date(2021, 0, 0),
+            endDate: "0d"
+        });
+
+        function removeRowListener(selector) {
+            $( selector ).off("click")
+            $( selector ).on("click", function() {
+                $(this).parent().parent().remove();
+            });
+        }
+
+
+        $( "#add-row-execution-plan" ).on("click", function() {
+            let idx = 0
+            tr = $("#execution_plan_output_table_body tr:last-child")
+            if( tr.length ){
+                idx = $("#execution_plan_output_table_body tr:last-child th")[0].textContent
+                idx = parseInt(idx)
+            }
+
+            new_row = `
+                <tr>
+                    <th scope="row">${idx + 1}</th>
+                    <td><input id="execution_plan_output_list-${idx}-river" name="execution_plan_output_list-${idx}-river" required="" type="text" value=""></td>
+                    <td><input id="execution_plan_output_list-${idx}-reach" name="execution_plan_output_list-${idx}-reach" required="" type="text" value=""></td>
+                    <td><input id="execution_plan_output_list-${idx}-river_stat" name="execution_plan_output_list-${idx}-river_stat" required="" type="text" value=""></td>
+                    <td><button type="button" class="btn btn-danger remove-row-execution-plan-output">−</button></td>
+                </tr>
+            `
+
+            $( "#execution_plan_output_table_body" ).append( new_row );
+            removeRowListener(".remove-row-execution-plan-output")
+        });
+
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+
+            var queryString = url.split('?')[1];
+
+            if (queryString) {
+                var params = queryString.split('&');
+
+                for (var i = 0; i < params.length; i++) {
+                    var param = params[i].split('=');
+                    if (param[0] === name) {
+                        return decodeURIComponent(param[1].replace(/\+/g, ' '));
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        var planNameFromUrl = getParameterByName('plan_name');
+        var planNameInput = document.getElementById('plan_name');
+
+        if (planNameInput) {
+            planNameInput.value = planNameFromUrl || '';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var initialValue = document.getElementById('plan_name').value;
+            var noChangesLabel = document.getElementById('no_changes_label');
+            var resetLabel = document.getElementById('reset_label');
+
+            document.getElementById('plan_name').addEventListener('input', function () {
+                var currentValue = this.value;
+
+                if (currentValue === initialValue) {
+                    noChangesLabel.style.display = 'none';
+                    resetLabel.style.display = 'none';
+                } else {
+                    noChangesLabel.style.display = 'inline-block';
+                    resetLabel.style.display = 'inline-block';
+                }
+            });
+
+            resetLabel.addEventListener('click', function () {
+                planNameInput.value = initialValue;
+                noChangesLabel.style.display = 'none'; 
+                resetLabel.style.display = 'none'; 
+            });
+
+        });
+
+    </script>
+    <style>
+        .datepicker {
+            border-radius: 0.25rem;
+            border-color: lightgray;
+        }
+    </style>
+
+{% endblock %}

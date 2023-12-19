@@ -309,6 +309,11 @@ def schedule_task_new():
     return render_schedule_view(ScheduleConfigForm())
 
 
+@VIEW_BLUEPRINT.route("/execution_plan_derivate")
+def derivate_execution_plan():
+    return render_template("derivated_execution_plan.html")
+
+
 def render_schedule_view(form, schedule_config=None, errors=()):
     _id = None
     form.project_file_present = False
@@ -393,3 +398,5 @@ def clean_form_list(form_list):
     if form_list:
         for i in range(0, len(form_list)):
             form_list.entries.pop(0)
+
+
