@@ -11,24 +11,34 @@
                   id="execution-plan-form"
                   action="{{ url_for("view_controller.save_execution_plan") }}">
                 <!-- Ojo con esto por favor -->
-                <div class="form-group" style="display: flex; flex-direction: column; align-items: flex-start;">
-                    <label for="plan_name" style="margin-bottom: 5px;"><h5>Nombre del plan</h5></label>
-                    <input class="form-control" id="plan_name" name="plan_name">
-                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                        <label id="no_changes_label" style="color: green; display: none;">Se actualizará el campo</label>
-                        <label id="reset_label" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
+                    <!-- Nombre del plan -->
+                    <div class="form-group" style="display: flex; flex-direction: column; align-items: flex-start;">
+                        <label for="plan_name" style="margin-bottom: 5px;"><h5>Nombre del plan</h5></label>
+                        <input class="form-control" id="plan_name" name="plan_name">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <label id="no_changes_label" style="color: green; display: none;">Se actualizará el campo</label>
+                            <label id="reset_label" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
+                        </div>
                     </div>
-                </div>
-                
+                    <!-- Geometría del plan -->
+                    <!----------------------------------------------------------------------- 
+                        Acá el objeto geometry tiene que tener todas las geometrias cargadas 
+                        como en la linea 205 del archivo view_controller.py
+                    ------------------------------------------------------------------------>
                     <div class="form-group">
                         <label for="status-select"><h5>Geometría</h5></label>
                         <select class="custom-select" id="status-select" name="geometry_option">
-                            <option value="default">Seleccione una categoría..</option>
-                            {% for geometry in geometries %}
-                                <option value="{{ geometry.id }}">{{ geometry.name }}</option>
-                            {% endfor %}
+                            <option value="opcion1">Opcin 1</option>
+                            <option value="opcion2">Opcin 2</option>
+                            <option value="opcion3">Opcin 3</option>
+                            <option value="opcion4">Opcin 4</option>
                         </select>
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <label id="no_changes_label_geometry" style="color: green; display: none;">Se actualizará el campo</label>
+                            <label id="reset_label_geometry" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
+                        </div>
                     </div>
+
                     <div class="form-group">
                         <label for="projectFileUpload"><h5>Proyecto</h5></label>
                         <input type="file" name="project_file" class="form-control-file" id="projectFileUpload">
@@ -100,7 +110,6 @@
             });
         }
 
-
         $( "#add-row-execution-plan" ).on("click", function() {
             let idx = 0
             tr = $("#execution_plan_output_table_body tr:last-child")
@@ -123,41 +132,58 @@
             removeRowListener(".remove-row-execution-plan-output")
         });
 
-        function getParameterByName(name, url) {
-            if (!url) url = window.location.href;
+        function getParameterByName(name) {
+            url = window.location.href;
 
-            var queryString = url.split('?')[1];
+            var queryString = url.split('?');
+
+            dictFields = {}
 
             if (queryString) {
-                var params = queryString.split('&');
-
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i].split('=');
-                    if (param[0] === name) {
-                        return decodeURIComponent(param[1].replace(/\+/g, ' '));
-                    }
+                for (var j = 0; j < queryString.length; j++){
+                    field = queryString[j].split('=');
+                    dictFields[field[0]] = field[1]
                 }
             }
 
-            return null;
+            return dictFields[name];
         }
 
-        var planNameFromUrl = getParameterByName('plan_name');
+        // -----------------Plan name----------------- //
         var planNameInput = document.getElementById('plan_name');
-
+        var planNameFromUrl = getParameterByName('plan_name');
+        
         if (planNameInput) {
             planNameInput.value = planNameFromUrl || '';
         }
 
+        // -----------------Geometria----------------- //
+        var geometryInput = document.getElementById('status-select');
+        var geometryFromUrl = getParameterByName('geometria');
+        var geometryFromUrlOption = document.createElement("option");
+        geometryFromUrlOption.text = geometryFromUrl;
+        geometryFromUrlOption.value = geometryFromUrl;
+        
+        geometryInput.add(geometryFromUrlOption);
+
+        if (geometryInput) {
+            geometryInput.value = geometryFromUrl || '';
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
-            var initialValue = document.getElementById('plan_name').value;
+            var initialValuePlanValue = document.getElementById('plan_name').value;
             var noChangesLabel = document.getElementById('no_changes_label');
             var resetLabel = document.getElementById('reset_label');
+            
+            var geometrySelector = document.getElementById('status-select');
+            var geometrySelectorInitialValue = document.getElementById('status-select').value;
+            var noChangesLabelGeometry = document.getElementById('no_changes_label_geometry');
+            var resetLabelGeometry = document.getElementById('reset_label_geometry');
 
             document.getElementById('plan_name').addEventListener('input', function () {
                 var currentValue = this.value;
 
-                if (currentValue === initialValue) {
+                if (currentValue === initialValuePlanValue) {
                     noChangesLabel.style.display = 'none';
                     resetLabel.style.display = 'none';
                 } else {
@@ -167,11 +193,28 @@
             });
 
             resetLabel.addEventListener('click', function () {
-                planNameInput.value = initialValue;
+                planNameInput.value = initialValuePlanValue;
                 noChangesLabel.style.display = 'none'; 
                 resetLabel.style.display = 'none'; 
             });
 
+            geometrySelector.addEventListener('change', function () {
+                var currentValue = this.value;
+
+                if (currentValue === geometrySelectorInitialValue) {
+                    noChangesLabelGeometry.style.display = 'none';
+                    resetLabelGeometry.style.display = 'none';
+                } else {
+                    noChangesLabelGeometry.style.display = 'inline-block';
+                    resetLabelGeometry.style.display = 'inline-block';
+                }
+            });
+
+            resetLabelGeometry.addEventListener('click', function () {
+                geometrySelector.value = geometrySelectorInitialValue;
+                noChangesLabelGeometry.style.display = 'none'; 
+                resetLabelGeometry.style.display = 'none'; 
+            });
         });
 
     </script>
