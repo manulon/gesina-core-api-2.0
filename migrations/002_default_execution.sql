@@ -10,6 +10,8 @@ INSERT INTO gesina.geometry ("name", description, created_at, user_id) VALUES
 INSERT INTO gesina.execution_plan (plan_name,geometry_id, user_id, start_datetime, end_datetime, created_at, status) VALUES
 	 ('ejemplo-ina', 1, 1, '2021-12-21 20:08:39.133122', '2021-12-21 20:08:39.133122', '2021-12-21 20:08:39.133122', 'PENDING');
 
+INSERT INTO gesina.execution_tasks (execution_id, task_id) VALUES
+	 (1, null);
 
 INSERT INTO gesina.scheduled_task (name, description, frequency, geometry_id, user_id, start_datetime, metadata,
     observation_days, forecast_days, start_condition_type, calibration_id, calibration_id_for_simulations) VALUES

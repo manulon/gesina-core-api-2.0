@@ -263,7 +263,6 @@ def update_execution_plan_status(execution_plan_id, status: ExecutionPlanStatus)
         session.add(execution_plan)
         execution_plan.status = status
 
-
 def update_finished_execution_plan(execution_plan_id, start_datetime, end_datetime):
     execution_plan = get_execution_plan(execution_plan_id)
 
