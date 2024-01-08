@@ -5,6 +5,8 @@ from enum import Enum
 
 from minio import Minio
 from minio.commonconfig import CopySource
+from minio.error import S3Error
+import shutil
 
 from src import logger, config
 
@@ -72,8 +74,13 @@ def save_plan_template_file(data, scheduled_task_id):
 
 
 def save_file(file_type, file, filename, _id=None):
-    file_bytes = file.read()
-    data = io.BytesIO(file_bytes)
+    if isinstance(file, io.BytesIO):
+        data = file
+        lent = len(data.getvalue())
+    else:
+        file_bytes = file.read()
+        lent = len(file_bytes)
+        data = io.BytesIO(file_bytes)
     try:
         minio_path = f"{file_type.value}"
         if _id:
@@ -84,7 +91,7 @@ def save_file(file_type, file, filename, _id=None):
             ROOT_BUCKET,
             minio_path,
             data,
-            len(file_bytes),
+            lent,
         )
     except Exception as exception:
         error_message = "Error uploading file"
@@ -181,3 +188,26 @@ def save_result_for_execution(base_path, execution_id):
     for filename in os.listdir(base_path):
         with open(f"{base_path}\\{filename}", "rb") as file:
             save_file(FileType.RESULT, file, filename, execution_id)
+
+
+def copy_execution_files(id_copy_from, id_copy_to):
+    execution_files = [f.object_name for f in list_execution_files(FileType.EXECUTION_PLAN, id_copy_from)]
+    for file in execution_files:
+        minio_path = f"{FileType.EXECUTION_PLAN.value}"
+        minio_path += f"/{id_copy_to}"
+        minio_path += f"/{secure_filename(file.split('/')[-1])}"
+        minio_client.copy_object(ROOT_BUCKET, minio_path, CopySource(ROOT_BUCKET,file))
+
+    return list_execution_files(FileType.EXECUTION_PLAN, id_copy_to)
+
+def delete_execution_files(local_directory_path):
+    try:
+        local_files = list_execution_files(FileType.EXECUTION_PLAN,local_directory_path)
+        for file in local_files:
+            minio_object_name = file.object_name
+            minio_client.remove_object(ROOT_BUCKET, minio_object_name)
+
+    except Exception as e:
+        print(f"Error deleting objects from Minio bucket: {e}")
+        raise e
+

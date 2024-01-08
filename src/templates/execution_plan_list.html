@@ -67,12 +67,14 @@
                     </form>
                 </div>
             `
-          }
+        }
+
         function planNameFormatter(value) {
             if (value.length > 20)
                 return value.substr(0, 20).concat('[...]');
             return value;
         }
+        
         function statusFormatter(value) {
             const status_map = {
                 PENDING: 'Pendiente',
@@ -82,6 +84,19 @@
                 ERROR: 'Fallida'
             };
             return status_map[value];
+        }
+
+        function duplicateSimulation(id) {
+            let duplicate_url = `{{ url_for('api_controller.copy_execution_plan', copyFrom='') }}${id}`;
+
+            fetch(duplicate_url, {method: 'POST'})
+            .then(response => {
+                console.log('Duplicación exitosa');
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error al duplicar la simulación', error);
+            });
         }
     </script>
 
