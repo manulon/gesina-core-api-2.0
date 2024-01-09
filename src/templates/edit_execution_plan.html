@@ -91,6 +91,7 @@
     </div>
     <script>            
         var initialValuePlanValue = '';
+        var geometrySelectorInitialValue = '';
 
         window.onload = function() {
             // -----------------Plan name----------------- //
@@ -109,16 +110,23 @@
 
             // -----------------Geometria----------------- //
             var geometryInput = document.getElementById('status-select');
-            var geometryFromUrl = getParameterByName('geometria');
-            var geometryFromUrlOption = document.createElement("option");
-            geometryFromUrlOption.text = geometryFromUrl;
-            geometryFromUrlOption.value = geometryFromUrl;
-        
-            geometryInput.add(geometryFromUrlOption);
 
-            if (geometryInput) {
-                geometryInput.value = geometryFromUrl || '';
-            }
+            getParameterByName('Geometria')
+                .then(function (geometryFromUrl) {
+                    var geometryFromUrlOption = document.createElement("option");
+                    geometryFromUrlOption.text = geometryFromUrl;
+                    geometryFromUrlOption.value = geometryFromUrl;
+
+                    geometryInput.add(geometryFromUrlOption);
+
+                    if (geometryInput) {
+                        geometryInput.value = geometryFromUrl || '';
+                    }
+                    geometrySelectorInitialValue = geometryInput.value;
+            })
+            .catch(function (error) {
+                console.error('Error al obtener el parámetro del nombre del plan:', error);
+            });            
         }
 
         $('#startDateInput').datepicker({
@@ -177,7 +185,8 @@
                         plan_name = data.plan_name;
         
                         files = getFileNames(data);
-        
+                        
+
                         if (name == 'plan_name') {
                             resolve(plan_name);
                         } else {
@@ -229,7 +238,6 @@
             var resetLabel = document.getElementById('reset_label');
             
             var geometrySelector = document.getElementById('status-select');
-            var geometrySelectorInitialValue = document.getElementById('status-select').value;
             var noChangesLabelGeometry = document.getElementById('no_changes_label_geometry');
             var resetLabelGeometry = document.getElementById('reset_label_geometry');
 
