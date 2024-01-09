@@ -93,6 +93,7 @@ def save_file(file_type, file, filename, _id=None):
             data,
             lent,
         )
+        return minio_path
     except Exception as exception:
         error_message = "Error uploading file"
         logger.error(error_message, exception)
@@ -193,12 +194,16 @@ def save_result_for_execution(base_path, execution_id):
 def copy_execution_files(id_copy_from, id_copy_to):
     execution_files = [f.object_name for f in list_execution_files(FileType.EXECUTION_PLAN, id_copy_from)]
     for file in execution_files:
-        minio_path = f"{FileType.EXECUTION_PLAN.value}"
-        minio_path += f"/{id_copy_to}"
-        minio_path += f"/{secure_filename(file.split('/')[-1])}"
-        minio_client.copy_object(ROOT_BUCKET, minio_path, CopySource(ROOT_BUCKET,file))
+        copy_execution_file(file, id_copy_to)
 
     return list_execution_files(FileType.EXECUTION_PLAN, id_copy_to)
+
+def copy_execution_file(file_to_copy, id_copy_to):
+    minio_path = f"{FileType.EXECUTION_PLAN.value}"
+    minio_path += f"/{id_copy_to}"
+    minio_path += f"/{secure_filename(file_to_copy.split('/')[-1])}"
+    minio_client.copy_object(ROOT_BUCKET, minio_path, CopySource(ROOT_BUCKET,file_to_copy))
+    return minio_path
 
 def delete_execution_files(local_directory_path):
     try:
@@ -208,6 +213,20 @@ def delete_execution_files(local_directory_path):
             minio_client.remove_object(ROOT_BUCKET, minio_object_name)
 
     except Exception as e:
-        print(f"Error deleting objects from Minio bucket: {e}")
-        raise e
+        error_message = f"Error deleting objects from Minio bucket: {e}"
+        print(error_message)
+        raise Exception(error_message) from e
+    
+def delete_file(execution_plan_id, file_to_delete):
+    minio_client.remove_object(ROOT_BUCKET, f"{execution_plan_id}/{file_to_delete}")
 
+def delete_execution_file_for_type(execution_plan_id,file_to_delete):
+    try:
+        execution_files = list_execution_files(FileType.EXECUTION_PLAN,execution_plan_id)
+        file_type = file_to_delete.split('.')[-1]
+        for file in execution_files:
+            if file.object_name.split('.')[-1] == file_type:
+                minio_client.remove_object(ROOT_BUCKET, file.object_name)
+    except Exception as e:
+        error_message = f"Error while deleting execution file {file_to_delete}"
+        raise Exception(error_message) from e
