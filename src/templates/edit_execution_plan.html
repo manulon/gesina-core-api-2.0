@@ -89,7 +89,38 @@
             </form>
         </div>
     </div>
-    <script>
+    <script>            
+        var initialValuePlanValue = '';
+
+        window.onload = function() {
+            // -----------------Plan name----------------- //
+            var planNameInput = document.getElementById('plan_name');
+
+            getParameterByName('plan_name')
+                .then(function (planNameFromUrl) {
+                    if (planNameInput) {
+                        planNameInput.value = planNameFromUrl || '';
+                    }
+                    initialValuePlanValue = planNameInput.value;
+            })
+            .catch(function (error) {
+                console.error('Error al obtener el parámetro del nombre del plan:', error);
+            });
+
+            // -----------------Geometria----------------- //
+            var geometryInput = document.getElementById('status-select');
+            var geometryFromUrl = getParameterByName('geometria');
+            var geometryFromUrlOption = document.createElement("option");
+            geometryFromUrlOption.text = geometryFromUrl;
+            geometryFromUrlOption.value = geometryFromUrl;
+        
+            geometryInput.add(geometryFromUrlOption);
+
+            if (geometryInput) {
+                geometryInput.value = geometryFromUrl || '';
+            }
+        }
+
         $('#startDateInput').datepicker({
             language: 'es',
             clearBtn: true,
@@ -133,45 +164,67 @@
         });
 
         function getParameterByName(name) {
-            url = window.location.href;
+            return new Promise(function (resolve, reject) {
+                url = window.location.href;
+        
+                var queryString = url.split('=');
+        
+                let edit_url = `{{ url_for('api_controller.get_execution_plan', execution_plan_id='') }}${queryString[1]}`;
+        
+                fetch(edit_url, { method: 'GET' })
+                    .then(response => response.json())
+                    .then(data => {
+                        plan_name = data.plan_name;
+        
+                        files = getFileNames(data);
+        
+                        if (name == 'plan_name') {
+                            resolve(plan_name);
+                        } else {
+                            resolve(files[name]);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al intentar el comienzo de edición de la simulación', error);
+                        reject(error);
+                    });
+            });
+        }
 
-            var queryString = url.split('?');
+        function getFileNames(data){
+            var extension = new Array();
+            var extensionesPorTipo = {};
 
-            dictFields = {}
+            var planes = new Array();
+            var condicionesDeBorde = new Array();
 
-            if (queryString) {
-                for (var j = 0; j < queryString.length; j++){
-                    field = queryString[j].split('=');
-                    dictFields[field[0]] = field[1]
+            extensionesPorTipo['Nombre de plan'] = data.plan_name
+            extensionesPorTipo['Plan'] = planes
+            extensionesPorTipo['Condicion de Borde'] = condicionesDeBorde
+
+            for (var clave in data.files) {
+                valor = data.files[clave]
+                
+                var palabras = valor.split('.');
+
+                if (palabras[1][0] == 'g'){
+                    extensionesPorTipo['Geometria'] = valor;
+                } else if (palabras[1] == 'prj'){
+                    extensionesPorTipo['Proyecto'] = valor;
+                } else if (palabras[1][0] == 'p'){
+                    extensionesPorTipo['Plan'].push(valor);
+                } else if (palabras[1][0] == 'u'){
+                    extensionesPorTipo['Condicion de Borde'].push(valor);
+                } else if (palabras[1] == 'rst'){
+                    extensionesPorTipo['Restart File'] = valor;
                 }
             }
 
-            return dictFields[name];
-        }
-
-        // -----------------Plan name----------------- //
-        var planNameInput = document.getElementById('plan_name');
-        var planNameFromUrl = getParameterByName('plan_name');
-        
-        if (planNameInput) {
-            planNameInput.value = planNameFromUrl || '';
-        }
-
-        // -----------------Geometria----------------- //
-        var geometryInput = document.getElementById('status-select');
-        var geometryFromUrl = getParameterByName('geometria');
-        var geometryFromUrlOption = document.createElement("option");
-        geometryFromUrlOption.text = geometryFromUrl;
-        geometryFromUrlOption.value = geometryFromUrl;
-        
-        geometryInput.add(geometryFromUrlOption);
-
-        if (geometryInput) {
-            geometryInput.value = geometryFromUrl || '';
+            return extensionesPorTipo
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            var initialValuePlanValue = document.getElementById('plan_name').value;
+            var planNameInput = document.getElementById('plan_name');
             var noChangesLabel = document.getElementById('no_changes_label');
             var resetLabel = document.getElementById('reset_label');
             
@@ -193,7 +246,7 @@
             });
 
             resetLabel.addEventListener('click', function () {
-                planNameInput.value = initialValuePlanValue;
+                document.getElementById('plan_name').value = initialValuePlanValue;
                 noChangesLabel.style.display = 'none'; 
                 resetLabel.style.display = 'none'; 
             });
