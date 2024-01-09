@@ -196,6 +196,19 @@ def create_copy(execution_plan_name,
         return execution_plan
 
 
+def delete_execution_plan(execution_plan_id):
+    try:
+        execution_plan = get_execution_plan(execution_plan_id)
+        with get_session() as session:
+            session.delete(execution_plan)
+            session.commit()
+        file_storage_service.delete_execution_files(execution_plan_id)
+        return True
+    except Exception as e:
+        print("error while deleting execution plan: " + execution_plan_id)
+        print(e)
+        raise e
+
 def get_execution_plans():
     execution_plans = []
     with get_session() as session:
@@ -248,7 +261,6 @@ def update_execution_plan_status(execution_plan_id, status: ExecutionPlanStatus)
         session.add(execution_plan)
         execution_plan.status = status
 
-
 def update_finished_execution_plan(execution_plan_id, start_datetime, end_datetime):
     execution_plan = get_execution_plan(execution_plan_id)
 
@@ -257,3 +269,38 @@ def update_finished_execution_plan(execution_plan_id, start_datetime, end_dateti
         execution_plan.status = ExecutionPlanStatus.FINISHED
         execution_plan.start_datetime = start_datetime
         execution_plan.end_datetime = end_datetime
+
+def edit_execution_plan(execution_plan_id, plan_name=None, geometry_id=None,project_file=None,plan_file=None,flow_file=None,restart_file=None,execution_plan_output=None, status=None):
+    execution_plan = get_execution_plan(execution_plan_id)
+    with get_session() as session:
+        session.add(execution_plan)
+        if execution_plan_output is not None:
+            new_output_list = []
+            for d in execution_plan_output:
+                if d.get("river") is None or d.get("river") is None or d.get("river_stat") is None:
+                    raise Exception("Execution plan output does not contain river, river_stat or reach")
+                
+                new_output_list.append(
+                    ExecutionPlanOutput(
+                        river=d.get("river"), reach=d.get("reach"), river_stat=d.get("river_stat"),execution_plan_id=execution_plan_id
+                    )
+                )
+            session.query(ExecutionPlanOutput).filter_by(execution_plan_id=execution_plan_id).delete()
+            session.commit()
+            session.refresh(execution_plan)
+            execution_plan.execution_plan_output_list = new_output_list
+        execution_plan.plan_name = plan_name if plan_name is not None else execution_plan.plan_name
+        execution_plan.geometry_id = geometry_id if geometry_id is not None else execution_plan.geometry_id
+        execution_plan.status = status if status is not None else execution_plan.status
+        session.commit()
+    if geometry_id is not None:
+        file_storage_service.copy_geometry_to(execution_plan_id, execution_plan.geometry) 
+    for file in [project_file, plan_file, flow_file, restart_file]:
+        if file is not None:
+            try:
+                file_storage_service.delete_execution_file_for_type(execution_plan_id,file)
+                file_storage_service.copy_execution_file(file, execution_plan_id)
+            except Exception as e:
+                print(f"error while copying execution file: {file}  to folder: {execution_plan_id}")
+                raise e
+    return get_execution_plan(execution_plan_id)

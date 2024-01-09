@@ -43,6 +43,7 @@
     </div>
 
     <script>
+        let cancel_url = "{{ url_for('execution_plan_controller.cancel', execution_id='')|urlencode }}";
         function executionPlanActionFormatter(value, row) {
             let update_url = "{{ url_for("view_controller.execution_plan_read", execution_plan_id="")}}"
             
@@ -69,6 +70,12 @@
                     <i class="fa-solid fa-code-compare"></i>
                 </button>
             `;
+
+            let cancel_button = `
+                <button type="submit" class="btn btn-outline-danger" onclick="cancelSimulation(${row['id']}) ${row['status'] == "PENDING" || row['status'] == "RUNNING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Cancelada"'}>
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            `;
             
             return `
                 <div class="d-flex justify-content-around">
@@ -76,7 +83,7 @@
                     ${start_button}
                     ${duplicate_button}
                     ${edit_button}
-                </div>
+                    ${cancel_button}
             `
         }
 
@@ -113,6 +120,18 @@
         function editSimulation(id) {
             let new_simulation_url = `{{ url_for('view_controller.edit_execution_plan', execution_plan_id='') }}${id}`
             window.location.href = new_simulation_url
+        }
+
+        function cancelSimulation(id) {
+            let cancel_url = `{{ url_for('execution_plan_controller.cancel', execution_id='') }}${id}`;
+
+            fetch(cancel_url, {method: 'POST'})
+            .then(response => {
+                console.log('Cancelacion exitosa');
+            })
+            .catch(error => {
+                console.error('Error al cancelar la simulación', error);
+            });
         }
 
     </script>
