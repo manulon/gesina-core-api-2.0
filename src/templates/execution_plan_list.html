@@ -43,7 +43,6 @@
     </div>
 
     <script>
-        let cancel_url = "{{ url_for('execution_plan_controller.cancel', execution_id='')|urlencode }}";
         function executionPlanActionFormatter(value, row) {
             let update_url = "{{ url_for("view_controller.execution_plan_read", execution_plan_id="")}}"
             
@@ -54,9 +53,9 @@
             `;
 
             let start_button = `
-                <a class="btn btn-outline-secondary mr-2" title="Encolar Simulacion" ${row['status'] == "PENDING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Finalizada"'}>
+                <button class="btn btn-outline-secondary mr-2" title="Encolar Simulacion" ${row['status'] == "PENDING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Finalizada"'} onclick="startSimulation(${row['id']})">
                     <i class="fa-solid fa-play"></i>
-                </a>
+                </button>
             `;
            
             let duplicate_button = `
@@ -72,7 +71,7 @@
             `;
 
             let cancel_button = `
-                <button type="submit" class="btn btn-outline-danger" onclick="cancelSimulation(${row['id']}) ${row['status'] == "PENDING" || row['status'] == "RUNNING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Cancelada"'}>
+                <button type="button" class="btn btn-outline-danger"  ${row['status'] == "PENDING" || row['status'] == "RUNNING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Cancelada"'} onclick="cancelSimulation(${row['id']})">
                     <i class="fa-solid fa-times"></i>
                 </button>
             `;
@@ -104,6 +103,20 @@
             return status_map[value];
         }
 
+        function startSimulation(id) {
+            let start_url = `{{ url_for('execution_plan_controller.update', execution_id='') }}${id}`;
+
+            fetch(start_url, {method: 'POST'})
+            .then(response => {
+                console.log('Enconlado exitoso');
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error al encolar la simulación', error);
+            });
+        }
+    
+
         function duplicateSimulation(id) {
             let duplicate_url = `{{ url_for('api_controller.copy_execution_plan', copyFrom='') }}${id}`;
 
@@ -128,6 +141,7 @@
             fetch(cancel_url, {method: 'POST'})
             .then(response => {
                 console.log('Cancelacion exitosa');
+                window.location.reload();
             })
             .catch(error => {
                 console.error('Error al cancelar la simulación', error);
