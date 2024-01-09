@@ -223,7 +223,7 @@ def cancel_simulation(execution_id):
             except NotImplementedError as e:
                 print(f"Termination requested")
         else:
-           logger.info(f"No task found for execution id: {execution_id}")
+           win_logger.info(f"No task found for execution id: {execution_id}")
 
         return
         
