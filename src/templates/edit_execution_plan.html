@@ -51,15 +51,29 @@
                             <label id="reset_label_project_file" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
                         </div>
                     </div>
-
+                    <!-- Carga del plan file -->
                     <div class="form-group">
                         <label for="planFileUpload"><h5>Plan</h5></label>
                         <input type="file" name="plan_file" class="form-control-file" id="planFileUpload">
+                        <input type="hidden" name="plan_file_name" id="planFileName">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <label id="no_changes_label_plan_file" style="color: green; display: none;">Se actualizará el campo</label>
+                            <label id="file_info_label_plan" style="color: blue; display: inline-block;">El valor inicial del campo esta seleccionado, para modificarlo por favor seleccione un archivo.</label>
+                            <label id="reset_label_plan_file" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
+                        </div>
                     </div>
+                    <!-- Carga de Condiciones de borde file -->
                     <div class="form-group">
                         <label for="flowFileUpload"><h5>Condiciones de borde</h5></label>
                         <input type="file" name="flow_file" class="form-control-file" id="flowFileUpload">
+                        <input type="hidden" name="plan_file_name" id="cdbFileName">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <label id="no_changes_label_cdb_file" style="color: green; display: none;">Se actualizará el campo</label>
+                            <label id="file_info_label_cdb" style="color: blue; display: inline-block;">El valor inicial del campo esta seleccionado, para modificarlo por favor seleccione un archivo.</label>
+                            <label id="reset_label_cdb_file" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
+                        </div>
                     </div>
+
                     <div class="form-group">
                         <label for="restartFileUpload"><h5>Restart File</h5></label>
                         <input type="file" name="restart_file" class="form-control-file" id="restartFileUpload">
@@ -102,6 +116,8 @@
         var initialValuePlanValue = '';
         var geometrySelectorInitialValue = '';
         var projectFileInitialValue = '';
+        var planFileInitialValue = '';
+        var cdbFileInitialValue = '';
 
         window.onload = function() {
             // -----------------Plan name----------------- //
@@ -152,6 +168,36 @@
             .catch(function (error) {
                 console.error('Error al obtener el parámetro del nombre de archivo del proyecto:', error);
             });          
+
+            // -----------------Plan File----------------- //
+            var planFile = document.getElementById('planFileUpload');
+            var planFileName = document.getElementById('planFileName');
+
+            getParameterByName('Plan')
+                .then(function (planFileFromUrl) {
+                    if (planFile) {
+                        planFileName.value = planFileFromUrl[0] || ''; 
+                    }
+                    planFileInitialValue = planFileFromUrl[0] || '';
+            })
+            .catch(function (error) {
+                console.error('Error al obtener el parámetro del nombre de archivo del plan:', error);
+            }); 
+
+            // -----------------Condiciones de Borde File----------------- //
+            var cdbFile = document.getElementById('flowFileUpload');
+            var cdbFileName = document.getElementById('cdbFileName');
+
+            getParameterByName('Condicion de Borde')
+                .then(function (cdbFileFromUrl) {
+                    if (planFile) {
+                        cdbFileName.value = cdbFileFromUrl[0] || ''; 
+                    }
+                    cdbFileInitialValue = cdbFileFromUrl[0] || '';
+            })
+            .catch(function (error) {
+                console.error('Error al obtener el parámetro del nombre de archivo de las condiciones de borde:', error);
+            }); 
         }
 
         $('#startDateInput').datepicker({
@@ -214,7 +260,6 @@
                         if (name == 'plan_name') {
                             resolve(plan_name);
                         } else {
-                            console.log(files[name])
                             resolve(files[name]);
                         }
                     })
@@ -271,6 +316,18 @@
             var noChangesLabelProjectFile = document.getElementById('no_changes_label_project_file');
             var resetLabelProjectFile = document.getElementById('reset_label_project_file');
             var fileInfoLabel = document.getElementById('file_info_label');
+
+            var planFileUpload = document.getElementById('planFileUpload');
+            var planFileName = document.getElementById('planFileName');
+            var noChangesLabelPlanFile = document.getElementById('no_changes_label_plan_file');
+            var resetLabelPlanFile = document.getElementById('reset_label_plan_file');
+            var filePlanInfoLabel = document.getElementById('file_info_label_plan');
+
+            var cdbFileUpload = document.getElementById('flowFileUpload');
+            var cdbFileName = document.getElementById('cdbFileName');
+            var noChangesLabelCdbFile = document.getElementById('no_changes_label_cdb_file');
+            var resetLabelCdbFile = document.getElementById('reset_label_cdb_file');
+            var fileCdbInfoLabel = document.getElementById('file_info_label_cdb');
             
             document.getElementById('plan_name').addEventListener('input', function () {
                 var currentValue = this.value;
@@ -328,6 +385,50 @@
                 noChangesLabelProjectFile.style.display = 'none'; 
                 resetLabelProjectFile.style.display = 'none'; 
                 fileInfoLabel.style.display = 'inline-block';
+            });
+
+            planFileUpload.addEventListener('input', function () {
+                var currentValue = this.files[0].name;
+
+                if (currentValue === planFileInitialValue) {
+                    noChangesLabelPlanFile.style.display = 'none';
+                    resetLabelPlanFile.style.display = 'none';
+                    filePlanInfoLabel.style.display = 'inline-block';
+                } else {
+                    filePlanInfoLabel.style.display = 'none';
+                    noChangesLabelPlanFile.style.display = 'inline-block';
+                    resetLabelPlanFile.style.display = 'inline-block';
+                    
+                }
+            });
+
+            resetLabelPlanFile.addEventListener('click', function () {
+                planFileName.value = planFileInitialValue;
+                noChangesLabelPlanFile.style.display = 'none'; 
+                resetLabelPlanFile.style.display = 'none'; 
+                filePlanInfoLabel.style.display = 'inline-block';
+            });            
+
+            cdbFileUpload.addEventListener('input', function () {
+                var currentValue = this.files[0].name;
+
+                if (currentValue === cdbFileInitialValue) {
+                    noChangesLabelCdbFile.style.display = 'none';
+                    resetLabelCdbFile.style.display = 'none';
+                    fileCdbInfoLabel.style.display = 'inline-block';
+                } else {
+                    fileCdbInfoLabel.style.display = 'none';
+                    noChangesLabelCdbFile.style.display = 'inline-block';
+                    resetLabelCdbFile.style.display = 'inline-block';
+                    
+                }
+            });
+
+            resetLabelCdbFile.addEventListener('click', function () {
+                cdbFileName.value = cdbFileInitialValue;
+                noChangesLabelCdbFile.style.display = 'none'; 
+                resetLabelCdbFile.style.display = 'none'; 
+                fileCdbInfoLabel.style.display = 'inline-block';
             });
         });
 
