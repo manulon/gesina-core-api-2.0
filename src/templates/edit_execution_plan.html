@@ -28,21 +28,30 @@
                     <div class="form-group">
                         <label for="status-select"><h5>Geometría</h5></label>
                         <select class="custom-select" id="status-select" name="geometry_option">
+                            <!-- Only for testing -->
                             <option value="opcion1">Opcin 1</option>
                             <option value="opcion2">Opcin 2</option>
                             <option value="opcion3">Opcin 3</option>
                             <option value="opcion4">Opcin 4</option>
+                            <!---------------------->
                         </select>
                         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                             <label id="no_changes_label_geometry" style="color: green; display: none;">Se actualizará el campo</label>
                             <label id="reset_label_geometry" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
                         </div>
                     </div>
-
+                    <!-- Carga del project file -->
                     <div class="form-group">
                         <label for="projectFileUpload"><h5>Proyecto</h5></label>
                         <input type="file" name="project_file" class="form-control-file" id="projectFileUpload">
+                        <input type="hidden" name="project_file_name" id="projectFileName">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <label id="no_changes_label_project_file" style="color: green; display: none;">Se actualizará el campo</label>
+                            <label id="file_info_label" style="color: blue; display: inline-block;">El valor inicial del campo esta seleccionado, para modificarlo por favor seleccione un archivo.</label>
+                            <label id="reset_label_project_file" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
+                        </div>
                     </div>
+
                     <div class="form-group">
                         <label for="planFileUpload"><h5>Plan</h5></label>
                         <input type="file" name="plan_file" class="form-control-file" id="planFileUpload">
@@ -92,6 +101,7 @@
     <script>            
         var initialValuePlanValue = '';
         var geometrySelectorInitialValue = '';
+        var projectFileInitialValue = '';
 
         window.onload = function() {
             // -----------------Plan name----------------- //
@@ -125,8 +135,23 @@
                     geometrySelectorInitialValue = geometryInput.value;
             })
             .catch(function (error) {
-                console.error('Error al obtener el parámetro del nombre del plan:', error);
-            });            
+                console.error('Error al obtener el parámetro de la geometria:', error);
+            });
+
+            // -----------------Project File----------------- //
+            var projectFile = document.getElementById('projectFileUpload');
+            var projectFileName = document.getElementById('projectFileName');
+
+            getParameterByName('Proyecto')
+                .then(function (projectFileFromUrl) {
+                    if (projectFile) {
+                        projectFileName.value = projectFileFromUrl || ''; 
+                    }
+                    projectFileInitialValue = projectFileFromUrl || '';
+            })
+            .catch(function (error) {
+                console.error('Error al obtener el parámetro del nombre de archivo del proyecto:', error);
+            });          
         }
 
         $('#startDateInput').datepicker({
@@ -186,10 +211,10 @@
         
                         files = getFileNames(data);
                         
-
                         if (name == 'plan_name') {
                             resolve(plan_name);
                         } else {
+                            console.log(files[name])
                             resolve(files[name]);
                         }
                     })
@@ -241,6 +266,12 @@
             var noChangesLabelGeometry = document.getElementById('no_changes_label_geometry');
             var resetLabelGeometry = document.getElementById('reset_label_geometry');
 
+            var projectFileUpload = document.getElementById('projectFileUpload');
+            var projectFileName = document.getElementById('projectFileName');
+            var noChangesLabelProjectFile = document.getElementById('no_changes_label_project_file');
+            var resetLabelProjectFile = document.getElementById('reset_label_project_file');
+            var fileInfoLabel = document.getElementById('file_info_label');
+            
             document.getElementById('plan_name').addEventListener('input', function () {
                 var currentValue = this.value;
 
@@ -275,6 +306,28 @@
                 geometrySelector.value = geometrySelectorInitialValue;
                 noChangesLabelGeometry.style.display = 'none'; 
                 resetLabelGeometry.style.display = 'none'; 
+            });
+
+            projectFileUpload.addEventListener('input', function () {
+                var currentValue = this.files[0].name;
+
+                if (currentValue === projectFileInitialValue) {
+                    noChangesLabelProjectFile.style.display = 'none';
+                    resetLabelProjectFile.style.display = 'none';
+                    fileInfoLabel.style.display = 'inline-block';
+                } else {
+                    fileInfoLabel.style.display = 'none';
+                    noChangesLabelProjectFile.style.display = 'inline-block';
+                    resetLabelProjectFile.style.display = 'inline-block';
+                    
+                }
+            });
+
+            resetLabelProjectFile.addEventListener('click', function () {
+                projectFileName.value = projectFileInitialValue;
+                noChangesLabelProjectFile.style.display = 'none'; 
+                resetLabelProjectFile.style.display = 'none'; 
+                fileInfoLabel.style.display = 'inline-block';
             });
         });
 
