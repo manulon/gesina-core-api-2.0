@@ -56,3 +56,14 @@ def update(execution_id):
     except Exception as e:
         logger.error(e)
         raise e
+
+@EXECUTION_PLAN_BLUEPRINT.route("cancel/<execution_id>", methods=["POST"])
+def cancel(execution_id):
+    from src.tasks import cancel_simulation
+
+    try:
+        cancel_simulation(execution_id)
+        return redirect(url_for("view_controller.execution_plan_list"))
+    except Exception as e:
+        logger.error(e)
+        raise e

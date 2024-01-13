@@ -12,5 +12,5 @@ set DATABASE_HOST=10.0.2.2:5432
 set MINIO_URL=10.0.2.2:9000
 set C_FORCE_ROOT=true
 set PYTHONPATH=C:\gesina-core-api\
-celery -A src.tasks worker -l info -P gevent --concurrency 1
+celery -A src.tasks worker -l info -P eventlet --concurrency 1
 

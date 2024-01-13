@@ -43,32 +43,28 @@
     </div>
 
     <script>
+        let update_url = "{{ url_for('execution_plan_controller.update', execution_id='')|urlencode }}";
+        let cancel_url = "{{ url_for('execution_plan_controller.cancel', execution_id='')|urlencode }}";
         function executionPlanActionFormatter(value, row) {
-            let update_url = "{{ url_for("view_controller.execution_plan_read", execution_plan_id="")}}"
-            
-            let update_button = `
-                <a class="btn btn-outline-secondary mr-2" href="${update_url}${row["id"]}">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </a>
-            `;
-
-            let start_button = `
-                <a class="btn btn-outline-secondary mr-2" ${row['status'] == "PENDING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Finalizada"'}>
-                    <i class="fa-solid fa-play"></i>
-                </a>
-            `;
-           
-            let duplicate_button = `
-                <button type="button" class="btn btn-outline-secondary" onclick="duplicateSimulation(${row['id']})" title="Duplicar Simulación">
-                    <i class="fa-solid fa-clipboard"></i>
-                </button>
-            `;
-
+            let base_url = "{{ url_for('view_controller.execution_plan_read', execution_plan_id='')|urlencode }}";
+            form = `
+                <form action="${update_url}${row["id"]}" method="POST">
+                    <button type="submit" class="btn btn-outline-secondary" ${row['status'] == "PENDING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Finalizada"'}>
+                        <i class="fa-solid fa-play"></i>
+                    </button>
+                </form>
+            `
             return `
                 <div class="d-flex justify-content-around">
-                    ${update_button}
-                    ${start_button}
-                    ${duplicate_button}
+                    <a class="btn btn-outline-secondary" href="${base_url}${row["id"]}">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </a>
+                    ${form}
+                    <form action="${cancel_url}${row["id"]}" method="POST">
+                        <button type="submit" class="btn btn-outline-danger" ${row['status'] == "PENDING" || row['status'] == "RUNNING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Cancelada"'}>
+                            <i class="fa-solid fa-times"></i>
+                        </button>
+                    </form>
                 </div>
             `
         }
