@@ -16,6 +16,8 @@ from src.service import (
     schedule_task_service,
     notification_service,
     activity_service,
+    list_utils_service
+
 )
 from src.service.exception.activity_exception import ActivityException
 from src.service.exception.file_exception import FileUploadError
@@ -140,5 +142,15 @@ def upload_execution_file():
                                     "error": str(e)})
         response.status_code = 400
         return response
+    
+
+@API_BLUEPRINT.get("/execution_plans")
+def list_execution_plans():
+    offset, limit = list_utils_service.process_list_params()
+    execution_plans = execution_plan_service.get_execution_plans_json(name=request.args.get('plan_name', None))
+    
+    return jsonify(execution_plans)
+
+    
 
         

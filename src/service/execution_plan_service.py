@@ -209,10 +209,14 @@ def delete_execution_plan(execution_plan_id):
         print(e)
         raise e
 
-def get_execution_plans():
+def get_execution_plans(plan_name_filter=None):
     execution_plans = []
     with get_session() as session:
-        data = session.query(ExecutionPlan).order_by(ExecutionPlan.id.desc()).all()
+        
+        query = session.query(ExecutionPlan).order_by(ExecutionPlan.id.desc())
+        if plan_name_filter is not None:
+            query = query.filter(ExecutionPlan.plan_name.like(f"%{plan_name_filter}%"))
+        data = query.all()
         if data:
             execution_plans = data
 
@@ -238,6 +242,30 @@ def get_execution_plans_by_dates(date_from, date_to):
             )
             .all()
         )
+    
+def get_execution_plans_json(offset=0, limit=9999,date_from=None, date_to=None, name=None,user=None, state=None):
+    execution_plans = get_execution_plans(plan_name_filter=name)
+    total_rows = len(execution_plans)
+
+    response_list = []
+    for execution_plan in execution_plans[offset : offset + limit]:
+        user = execution_plan.user
+        execution_files = [
+        f.object_name
+        for f in file_storage_service.list_execution_files(
+            FileType.EXECUTION_PLAN, execution_plan.id
+        )
+    ] 
+        execution_plan_row = {
+            "id": execution_plan.id,
+            "plan_name": execution_plan.plan_name,
+            "user": user.full_name,
+            "created_at": execution_plan.created_at.strftime("%d/%m/%Y"),
+            "status": execution_plan.status,
+            "execution_files": execution_files
+        }
+        response_list.append(execution_plan_row)
+    return response_list
 
 
 def get_execution_plans_grouped_by_interval(interval):
