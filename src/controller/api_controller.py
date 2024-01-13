@@ -146,10 +146,21 @@ def upload_execution_file():
 
 @API_BLUEPRINT.get("/execution_plans")
 def list_execution_plans():
-    offset, limit = list_utils_service.process_list_params()
-    execution_plans = execution_plan_service.get_execution_plans_json(name=request.args.get('plan_name', None))
-    
-    return jsonify(execution_plans)
+    try:
+        execution_plans = execution_plan_service.get_execution_plans_json(name=request.args.get('plan_name', None), 
+                                                                        user_last_name=request.args.get('user_last_name', None),
+                                                                        user_first_name=request.args.get('user_first_name', None),
+                                                                        status=request.args.get('status', None),
+                                                                        date_from=request.args.get('date_from', None),
+                                                                        date_to=request.args.get('date_to',None)
+                                                                        )
+        
+        return jsonify(execution_plans)
+    except Exception as e:
+        response = jsonify({"message": "error retrieving execution plans ",
+                                    "error": str(e)})
+        response.status_code = 400
+        return response
 
     
 

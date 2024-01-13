@@ -4,9 +4,12 @@ from src.persistance.execution_plan import (
     ExecutionPlanOutput,
 )
 from src.persistance.session import get_session
+from src.persistance.user import User
 from src.service import file_storage_service, user_service
 from src.service.file_storage_service import FileType
-from sqlalchemy import and_
+from sqlalchemy import and_,func
+
+
 import io
 
 
@@ -209,13 +212,29 @@ def delete_execution_plan(execution_plan_id):
         print(e)
         raise e
 
-def get_execution_plans(plan_name_filter=None):
+from datetime import datetime
+
+def get_execution_plans(plan_name=None, user_first_name=None, user_last_name=None, status=None, date_from=None, date_to=None):
     execution_plans = []
     with get_session() as session:
         
         query = session.query(ExecutionPlan).order_by(ExecutionPlan.id.desc())
-        if plan_name_filter is not None:
-            query = query.filter(ExecutionPlan.plan_name.like(f"%{plan_name_filter}%"))
+        
+        if plan_name is not None:
+            query = query.filter(ExecutionPlan.plan_name.like(f"%{plan_name}%"))
+        if user_first_name is not None or user_last_name is not None:
+            query = query.join(User, aliased=True)
+            if user_first_name is not None:
+                query = query.filter(func.lower(User.first_name).like(func.lower(f"%{user_first_name}%")))
+            if user_last_name is not None:
+                query = query.filter(func.lower(User.last_name).like(func.lower(f"%{user_last_name}%")))
+        if status is not None and status != "":
+            query = query.filter(ExecutionPlan.status == status)
+        if date_from is not None:
+            query = query.filter(ExecutionPlan.start_datetime >= date_from)
+        if date_to is not None:
+            query = query.filter(ExecutionPlan.start_datetime <= date_to)
+        
         data = query.all()
         if data:
             execution_plans = data
@@ -243,8 +262,8 @@ def get_execution_plans_by_dates(date_from, date_to):
             .all()
         )
     
-def get_execution_plans_json(offset=0, limit=9999,date_from=None, date_to=None, name=None,user=None, state=None):
-    execution_plans = get_execution_plans(plan_name_filter=name)
+def get_execution_plans_json(offset=0, limit=9999,date_from=None, date_to=None, user_first_name=None,user_last_name=None,name=None, status=None):
+    execution_plans = get_execution_plans(plan_name=name,user_first_name=user_first_name,user_last_name=user_last_name , status=status, date_from=date_from, date_to=date_to)
     total_rows = len(execution_plans)
 
     response_list = []
