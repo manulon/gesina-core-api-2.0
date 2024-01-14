@@ -8,6 +8,7 @@ from src.controller.schemas import ActivityParams
 import traceback
 import io
 from src.login_manager import user_is_authenticated
+from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service import (
     geometry_service,
     execution_plan_service,
@@ -161,6 +162,21 @@ def list_execution_plans():
                                     "error": str(e)})
         response.status_code = 400
         return response
+    
+
+@API_BLUEPRINT.post("/execution_plan/<execution_id>")
+def execute_plan(execution_id):
+    from src.tasks import queue_or_fake_simulate
+
+    try:
+        execution_plan_service.update_execution_plan_status(
+            execution_id, ExecutionPlanStatus.RUNNING
+        )
+        queue_or_fake_simulate(execution_id)
+        return get_execution_plan(execution_id)
+    except Exception as e:
+        logger.error(e)
+        raise e
 
     
 
