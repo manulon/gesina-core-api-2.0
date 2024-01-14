@@ -34,15 +34,22 @@ from src.view.forms.schedule_config_form import (
     PlanSeriesForm,
 )
 from src.view.forms.users_forms import EditUserForm
+from src.service.api_authentication_service import before_api_request
 
 API_BLUEPRINT = Blueprint("api_controller", __name__)
-API_BLUEPRINT.before_request(user_is_authenticated)
+API_BLUEPRINT.before_request(before_api_request)
 
 
 @API_BLUEPRINT.get("/")
 def home():
     return {"status": "ok"}
 
+
+@API_BLUEPRINT.post("/login")
+def login():
+    current_user = auth.current_user()
+
+    return jsonify({'message': 'Login successful', 'user_id': current_user.id})
 
 @API_BLUEPRINT.get("/execution_plan/<execution_plan_id>")
 def get_execution_plan(execution_plan_id):
