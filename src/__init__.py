@@ -16,7 +16,6 @@ def rollback():
 
 def _get_backend_and_migrations():
     from src import config
-
     backend = get_backend(
         f"postgresql://{config.database_user}:{config.database_password}@{config.database_host}/{config.database_name}"
     )
