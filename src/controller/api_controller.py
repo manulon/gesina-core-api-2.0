@@ -1,22 +1,19 @@
 import json
 
 import sqlalchemy
-from flask import Blueprint, render_template, url_for, redirect, request, jsonify
+from flask import Blueprint, request, jsonify
 
 from src import logger
 from src.controller.schemas import ActivityParams
 import traceback
 import io
 from src.login_manager import user_is_authenticated
+from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service import (
     geometry_service,
     execution_plan_service,
     user_service,
     file_storage_service,
-    schedule_task_service,
-    notification_service,
-    activity_service,
-    list_utils_service
 
 )
 from src.service.exception.activity_exception import ActivityException
@@ -45,11 +42,6 @@ def home():
     return {"status": "ok"}
 
 
-@API_BLUEPRINT.post("/login")
-def login():
-    current_user = auth.current_user()
-
-    return jsonify({'message': 'Login successful', 'user_id': current_user.id})
 
 @API_BLUEPRINT.get("/execution_plan/<execution_plan_id>")
 def get_execution_plan(execution_plan_id):
@@ -69,8 +61,6 @@ def get_execution_plan(execution_plan_id):
             file = {"name": i.split("/")[-1], "content": str(data)}
             execution_plan_dict["files"].append(file)
     else:
-        # If full_content query param is not set or set to anything other than 'true',
-        # return a list of file names.
         execution_plan_dict["files"] = [i.split("/")[-1] for i in execution_files]
 
     return jsonify(execution_plan_dict)
@@ -168,6 +158,25 @@ def list_execution_plans():
                                     "error": str(e)})
         response.status_code = 400
         return response
+    
+
+@API_BLUEPRINT.post("/execution_plan/<execution_id>")
+def execute_plan(execution_id):
+    from src.tasks import queue_or_fake_simulate
+
+    try:
+        queue_or_fake_simulate(execution_id)
+        execution_plan_service.update_execution_plan_status(
+            execution_id, ExecutionPlanStatus.RUNNING
+        )
+        return get_execution_plan(execution_id)
+    except Exception as e:
+        logger.error(e)
+        response = jsonify({"message": "error while running execution plan " + execution_id ,
+                                    "error": str(e)})
+        response.status_code = 400
+        return response
+        
 
     
 
