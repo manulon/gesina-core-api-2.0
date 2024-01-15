@@ -324,7 +324,7 @@ def edit_execution_plan(execution_plan_id, plan_name=None, geometry_id=None,proj
         if execution_plan_output is not None:
             new_output_list = []
             for d in execution_plan_output:
-                if d.get("river") is None or d.get("river") is None or d.get("river_stat") is None:
+                if d.get("river") is None or d.get("reach") is None or d.get("river_stat") is None:
                     raise Exception("Execution plan output does not contain river, river_stat or reach")
                 
                 new_output_list.append(
