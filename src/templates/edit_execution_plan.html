@@ -5,11 +5,11 @@
                 <h2>Editar plan de ejecucion</h2>
         </div>
         <div class="container-xxl">
-            <form method=post
+            <form method=patch
                   enctype=multipart/form-data
                   class="p-4 container needs-validation"
                   id="execution-plan-form"
-                  action="{{ url_for("view_controller.save_execution_plan") }}">
+                  action="{{ url_for("view_controller.edit_execution_plan") }}">
                 <!-- Ojo con esto por favor -->
                     <!-- Nombre del plan -->
                     <div class="form-group" style="display: flex; flex-direction: column; align-items: flex-start;">

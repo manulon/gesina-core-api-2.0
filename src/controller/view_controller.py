@@ -399,4 +399,30 @@ def clean_form_list(form_list):
         for i in range(0, len(form_list)):
             form_list.entries.pop(0)
 
+@VIEW_BLUEPRINT.route("/execution_plan", methods=["PATCH"])
+def edit_execution_plan():
+    form = ExecutionPlanForm()
+    try:
+        if form.validate_on_submit():
+            # Aca antes tengo que ver el tema archivos
+                #usar save_file para cargar
+            # El create from form lo vuelo y pongo el edit execution plan
+            execution_plan = execution_plan_service.create_from_form(form)
+            success_message = f"Simulación #{str(execution_plan.id)} creada con éxito."
+            return render_template(
+                "execution_plan_list.html", success_message=success_message
+            )
 
+        return render_template(
+            "execution_plan.html", form=form, errors=form.get_errors()
+        )
+    except sqlalchemy.exc.IntegrityError as database_error:
+        logger.error(database_error)
+        error_message = "Error guardando información en la base de datos."
+
+        return render_template("execution_plan.html", form=form, errors=[error_message])
+    except FileUploadError as file_error:
+        logger.error(file_error.message, file_error)
+        error_message = "Error cargando archivo. Intente nuevamente."
+
+        return render_template("execution_plan.html", form=form, errors=[error_message])
