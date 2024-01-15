@@ -310,7 +310,7 @@ def schedule_task_new():
 
 
 @VIEW_BLUEPRINT.route("/execution_plan_derivate")
-def edit_execution_plan():
+def execution_plan_edit():
     return render_template("edit_execution_plan.html")
 
 

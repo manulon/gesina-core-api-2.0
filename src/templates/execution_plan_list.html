@@ -131,7 +131,7 @@
         }
     
         function editSimulation(id) {
-            let new_simulation_url = `{{ url_for('view_controller.edit_execution_plan', execution_plan_id='') }}${id}`
+            let new_simulation_url = `{{ url_for('view_controller.execution_plan_edit', execution_plan_id='') }}${id}`
             window.location.href = new_simulation_url
         }
 
