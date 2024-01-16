@@ -247,6 +247,7 @@ def get_schedule_tasks():
 
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/<schedule_config_id>", methods=["POST"])
+
 @VIEW_BLUEPRINT.route(
     "/schedule_tasks/", methods=["POST"], defaults={"schedule_config_id": None}
 )
@@ -401,7 +402,11 @@ def clean_form_list(form_list):
 
 @VIEW_BLUEPRINT.route("/execution_plan", methods=["PATCH"])
 def edit_execution_plan():
+    print('Estoy aca!!!')
     form = ExecutionPlanForm()
+    print('-------')
+    print(form)
+    print('-------')
     try:
         if form.validate_on_submit():
             # Aca antes tengo que ver el tema archivos

@@ -10,7 +10,6 @@
                   class="p-4 container needs-validation"
                   id="execution-plan-form"
                   action="{{ url_for("view_controller.edit_execution_plan") }}">
-                <!-- Ojo con esto por favor -->
                     <!-- Nombre del plan -->
                     <div class="form-group" style="display: flex; flex-direction: column; align-items: flex-start;">
                         <label for="plan_name" style="margin-bottom: 5px;"><h5>Nombre del plan</h5></label>
@@ -73,13 +72,18 @@
                             <label id="reset_label_cdb_file" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
                         </div>
                     </div>
-
+                    <!-- Carga de Restart file -->
                     <div class="form-group">
                         <label for="restartFileUpload"><h5>Restart File</h5></label>
                         <input type="file" name="restart_file" class="form-control-file" id="restartFileUpload">
+                        <input type="hidden" name="restart_name" id="restartFileName">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <label id="no_changes_label_restart_file" style="color: green; display: none;">Se actualizará el campo</label>
+                            <label id="file_info_label_restart" style="color: blue; display: inline-block;">El valor inicial del campo esta seleccionado, para modificarlo por favor seleccione un archivo.</label>
+                            <label id="reset_label_restart_file" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <h5>ACA HABIA UN FORM</h5>
                         <table class="table" id="execution_plan_output_table">
                               <thead>
                                 <tr>
@@ -108,7 +112,6 @@
                     <div class="text-right">
                         <button type="submit" class="btn btn-primary">Guardar</button>
                     </div>
-                    <!-- Ojo con esto por favor -->
             </form>
         </div>
     </div>
@@ -118,6 +121,7 @@
         var projectFileInitialValue = '';
         var planFileInitialValue = '';
         var cdbFileInitialValue = '';
+        var restartFileInitialValue = '';
 
         window.onload = function() {
             // -----------------Plan name----------------- //
@@ -197,6 +201,21 @@
             })
             .catch(function (error) {
                 console.error('Error al obtener el parámetro del nombre de archivo de las condiciones de borde:', error);
+            }); 
+
+            // -----------------Restart File----------------- //
+            var restartFile = document.getElementById('restartFileUpload');
+            var restartFileName = document.getElementById('restartFileName');
+
+            getParameterByName('Restart File')
+                .then(function (restartFileFromUrl) {
+                    if (restartFile) {
+                        restartFileName.value = restartFileFromUrl[0] || ''; 
+                    }
+                    restartFileInitialValue = restartFileFromUrl[0] || '';
+            })
+            .catch(function (error) {
+                console.error('Error al obtener el parámetro del nombre de archivo del restart:', error);
             }); 
         }
 
@@ -328,6 +347,12 @@
             var noChangesLabelCdbFile = document.getElementById('no_changes_label_cdb_file');
             var resetLabelCdbFile = document.getElementById('reset_label_cdb_file');
             var fileCdbInfoLabel = document.getElementById('file_info_label_cdb');
+
+            var restartFileUpload = document.getElementById('restartFileUpload');
+            var restartFileName = document.getElementById('restartFileName');
+            var noChangesLabelRestartFile = document.getElementById('no_changes_label_restart_file');
+            var resetLabelRestartFile = document.getElementById('reset_label_restart_file');
+            var fileRestartInfoLabel = document.getElementById('file_info_label_restart');
             
             document.getElementById('plan_name').addEventListener('input', function () {
                 var currentValue = this.value;
@@ -429,6 +454,28 @@
                 noChangesLabelCdbFile.style.display = 'none'; 
                 resetLabelCdbFile.style.display = 'none'; 
                 fileCdbInfoLabel.style.display = 'inline-block';
+            });
+
+            restartFileUpload.addEventListener('input', function () {
+                var currentValue = this.files[0].name;
+
+                if (currentValue === restartFileInitialValue) {
+                    noChangesLabelRestartFile.style.display = 'none';
+                    resetLabelRestartFile.style.display = 'none';
+                    fileRestartInfoLabel.style.display = 'inline-block';
+                } else {
+                    fileRestartInfoLabel.style.display = 'none';
+                    noChangesLabelRestartFile.style.display = 'inline-block';
+                    resetLabelRestartFile.style.display = 'inline-block';
+                    
+                }
+            });
+
+            resetLabelRestartFile.addEventListener('click', function () {
+                restartFileName.value = restartFileInitialValue;
+                noChangesLabelRestartFile.style.display = 'none'; 
+                resetLabelRestartFile.style.display = 'none'; 
+                fileRestartInfoLabel.style.display = 'inline-block';
             });
         });
 
