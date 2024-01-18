@@ -5,13 +5,15 @@
                 <h2>Editar plan de ejecucion</h2>
         </div>
         <div class="container-xxl">
-            <form method=patch
+            <form method=post
                   enctype=multipart/form-data
                   class="p-4 container needs-validation"
-                  id="execution-plan-form"
-                  action="{{ url_for("view_controller.edit_execution_plan") }}">
+                  id="edit-execution-plan-form"
+                  action="{{ url_for('view_controller.edit_execution_plan', execution_plan_id=execution_plan_id) }}">
+                {{ form.csrf_token }}
                     <!-- Nombre del plan -->
                     <div class="form-group" style="display: flex; flex-direction: column; align-items: flex-start;">
+                        <input type="hidden" name="execution_plan_id" value="1">
                         <label for="plan_name" style="margin-bottom: 5px;"><h5>Nombre del plan</h5></label>
                         <input class="form-control" id="plan_name" name="plan_name">
                         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
@@ -265,9 +267,10 @@
             return new Promise(function (resolve, reject) {
                 url = window.location.href;
         
-                var queryString = url.split('=');
+                var queryString = url.split('/');
+                console.log(queryString)
         
-                let edit_url = `{{ url_for('api_controller.get_execution_plan', execution_plan_id='') }}${queryString[1]}`;
+                let edit_url = `{{ url_for('api_controller.get_execution_plan', execution_plan_id='') }}${queryString[5]}`;
         
                 fetch(edit_url, { method: 'GET' })
                     .then(response => response.json())

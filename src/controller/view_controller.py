@@ -16,9 +16,9 @@ from src.service import (
 from src.service.exception.activity_exception import ActivityException
 from src.service.exception.file_exception import FileUploadError
 from src.service.exception.series_exception import SeriesUploadError
-from src.service.file_storage_service import FileType
+from src.service.file_storage_service import FileType, save_file
 from src.service.ina_service import validate_connection_to_service
-from src.view.forms.execution_plan_form import ExecutionPlanForm
+from src.view.forms.execution_plan_form import ExecutionPlanForm, EditedExecutionPlanForm
 from src.view.forms.geometry_form import GeometryForm
 from src.view.forms.schedule_config_form import (
     ScheduleConfigForm,
@@ -310,9 +310,12 @@ def schedule_task_new():
     return render_schedule_view(ScheduleConfigForm())
 
 
-@VIEW_BLUEPRINT.route("/execution_plan_derivate")
-def execution_plan_edit():
-    return render_template("edit_execution_plan.html")
+@VIEW_BLUEPRINT.route("/execution_plan_edit/<execution_plan_id>")
+def execution_plan_edit_view(execution_plan_id):
+    # Esto va a tener que agregarse, fijarse en execution_plan.
+    # geometries = geometry_service.get_geometries()
+    data = {"form": EditedExecutionPlanForm(), "execution_plan_id": execution_plan_id}
+    return render_template("edit_execution_plan.html", **data)
 
 
 def render_schedule_view(form, schedule_config=None, errors=()):
@@ -394,38 +397,58 @@ def render_plan_series_list(plan_series_list, form):
         plan_form.flow_series_id = plan.flow_series_id
         form.plan_series_list.append_entry(plan_form)
 
-
 def clean_form_list(form_list):
     if form_list:
         for i in range(0, len(form_list)):
             form_list.entries.pop(0)
 
-@VIEW_BLUEPRINT.route("/execution_plan", methods=["PATCH"])
-def edit_execution_plan():
-    print('Estoy aca!!!')
-    form = ExecutionPlanForm()
-    print('-------')
-    print(form)
-    print('-------')
+@VIEW_BLUEPRINT.route("/execution_plan/edit/<execution_plan_id>", methods=["POST"])
+def edit_execution_plan(execution_plan_id):
+    form = EditedExecutionPlanForm()
     try:
         if form.validate_on_submit():
-            # Aca antes tengo que ver el tema archivos
-                #usar save_file para cargar
-            # El create from form lo vuelo y pongo el edit execution plan
-            execution_plan = execution_plan_service.create_from_form(form)
-            success_message = f"Simulación #{str(execution_plan.id)} creada con éxito."
+            
+            project_file_to_upload = None
+            plan_file_to_upload = None
+            flow_file_to_upload = None
+            restart_file_to_upload = None
+
+            if form.project_file.data != None:
+                project_file_to_upload = save_file(FileType.EXECUTION_PLAN, form.project_file.data, 
+                                                   form.project_file.data.filename)
+                
+                
+            if form.plan_file.data != None:
+                plan_file_to_upload = save_file(FileType.EXECUTION_PLAN, form.plan_file.data, 
+                                                form.plan_file.data.filename)
+                
+            if form.flow_file.data != None:
+                flow_file_to_upload = save_file(FileType.EXECUTION_PLAN, form.flow_file.data, 
+                                                form.flow_file.data.filename)
+                
+            if form.restart_file.data != None:
+                restart_file_to_upload = save_file(FileType.EXECUTION_PLAN, form.restart_file.data, 
+                                                    form.restart_file.data.filename)
+
+            # No estoy pasando el geometry, ni el execution plan output
+            execution_plan = execution_plan_service.edit_execution_plan(execution_plan_id, 
+                                                                        plan_name = form.plan_name.data,
+                                                                        project_file = project_file_to_upload,
+                                                                        plan_file = plan_file_to_upload,
+                                                                        flow_file = flow_file_to_upload,
+                                                                        restart_file= restart_file_to_upload)
+            
+            success_message = f"Simulación #{str(execution_plan.id)} editada con éxito."
             return render_template(
                 "execution_plan_list.html", success_message=success_message
             )
 
-        return render_template(
-            "execution_plan.html", form=form, errors=form.get_errors()
-        )
     except sqlalchemy.exc.IntegrityError as database_error:
         logger.error(database_error)
         error_message = "Error guardando información en la base de datos."
 
         return render_template("execution_plan.html", form=form, errors=[error_message])
+    
     except FileUploadError as file_error:
         logger.error(file_error.message, file_error)
         error_message = "Error cargando archivo. Intente nuevamente."

@@ -217,8 +217,8 @@ def delete_execution_files(local_directory_path):
         print(error_message)
         raise Exception(error_message) from e
     
-def delete_file(execution_plan_id, file_to_delete):
-    minio_client.remove_object(ROOT_BUCKET, f"{execution_plan_id}/{file_to_delete}")
+def delete_file(file_to_delete):
+    minio_client.remove_object(ROOT_BUCKET, f"{file_to_delete}")    
 
 def delete_execution_file_for_type(execution_plan_id,file_to_delete):
     try:

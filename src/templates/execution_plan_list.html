@@ -44,7 +44,7 @@
 
     <script>
         function executionPlanActionFormatter(value, row) {
-            let update_url = "{{ url_for("view_controller.execution_plan_read", execution_plan_id="")}}"
+            let update_url = "{{ url_for('view_controller.execution_plan_read', execution_plan_id='')}}"
             
             let update_button = `
                 <a class="btn btn-outline-secondary mr-2" title="Inspeccionar Simulacion" href="${update_url}${row["id"]}">
@@ -131,7 +131,7 @@
         }
     
         function editSimulation(id) {
-            let new_simulation_url = `{{ url_for('view_controller.execution_plan_edit', execution_plan_id='') }}${id}`
+            let new_simulation_url = `{{ url_for('view_controller.execution_plan_edit_view', execution_plan_id='')}}${id}`
             window.location.href = new_simulation_url
         }
 

@@ -300,6 +300,7 @@ def edit_execution_plan(execution_plan_id, plan_name=None, geometry_id=None,proj
             try:
                 file_storage_service.delete_execution_file_for_type(execution_plan_id,file)
                 file_storage_service.copy_execution_file(file, execution_plan_id)
+                file_storage_service.delete_file(file)
             except Exception as e:
                 print(f"error while copying execution file: {file}  to folder: {execution_plan_id}")
                 raise e
