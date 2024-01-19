@@ -312,9 +312,9 @@ def schedule_task_new():
 
 @VIEW_BLUEPRINT.route("/execution_plan_edit/<execution_plan_id>")
 def execution_plan_edit_view(execution_plan_id):
-    # Esto va a tener que agregarse, fijarse en execution_plan.
-    # geometries = geometry_service.get_geometries()
-    data = {"form": EditedExecutionPlanForm(), "execution_plan_id": execution_plan_id}
+    geometries = geometry_service.get_geometries()
+    data = {"form": EditedExecutionPlanForm(), "execution_plan_id": execution_plan_id,
+            "geometries": geometries}
     return render_template("edit_execution_plan.html", **data)
 
 
@@ -408,10 +408,17 @@ def edit_execution_plan(execution_plan_id):
     try:
         if form.validate_on_submit():
             
+            geometry_to_upload = None
             project_file_to_upload = None
             plan_file_to_upload = None
             flow_file_to_upload = None
             restart_file_to_upload = None
+
+            if form.geometry_option.data != "default":
+                print('Se cambiara la geometría')
+                geometry_to_upload = form.geometry_option.data
+                print(geometry_to_upload)
+
 
             if form.project_file.data != None:
                 project_file_to_upload = save_file(FileType.EXECUTION_PLAN, form.project_file.data, 
@@ -430,8 +437,9 @@ def edit_execution_plan(execution_plan_id):
                 restart_file_to_upload = save_file(FileType.EXECUTION_PLAN, form.restart_file.data, 
                                                     form.restart_file.data.filename)
 
-            # No estoy pasando el geometry, ni el execution plan output
+            # No estoy pasando el execution plan output
             execution_plan = execution_plan_service.edit_execution_plan(execution_plan_id, 
+                                                                        geometry_id = geometry_to_upload,
                                                                         plan_name = form.plan_name.data,
                                                                         project_file = project_file_to_upload,
                                                                         plan_file = plan_file_to_upload,

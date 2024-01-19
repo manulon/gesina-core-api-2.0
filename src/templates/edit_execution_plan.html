@@ -22,19 +22,13 @@
                         </div>
                     </div>
                     <!-- Geometría del plan -->
-                    <!----------------------------------------------------------------------- 
-                        Acá el objeto geometry tiene que tener todas las geometrias cargadas 
-                        como en la linea 205 del archivo view_controller.py
-                    ------------------------------------------------------------------------>
                     <div class="form-group">
                         <label for="status-select"><h5>Geometría</h5></label>
                         <select class="custom-select" id="status-select" name="geometry_option">
-                            <!-- Only for testing -->
-                            <option value="opcion1">Opcin 1</option>
-                            <option value="opcion2">Opcin 2</option>
-                            <option value="opcion3">Opcin 3</option>
-                            <option value="opcion4">Opcin 4</option>
-                            <!---------------------->
+                            <option value="default">Seleccione una geometria..</option>
+                            {% for geometry in geometries %}
+                                <option value="{{ geometry.id }}">{{ geometry.name }}</option>
+                            {% endfor %}
                         </select>
                         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                             <label id="no_changes_label_geometry" style="color: green; display: none;">Se actualizará el campo</label>
@@ -141,25 +135,8 @@
             });
 
             // -----------------Geometria----------------- //
-            var geometryInput = document.getElementById('status-select');
-
-            getParameterByName('Geometria')
-                .then(function (geometryFromUrl) {
-                    var geometryFromUrlOption = document.createElement("option");
-                    geometryFromUrlOption.text = geometryFromUrl;
-                    geometryFromUrlOption.value = geometryFromUrl;
-
-                    geometryInput.add(geometryFromUrlOption);
-
-                    if (geometryInput) {
-                        geometryInput.value = geometryFromUrl || '';
-                    }
-                    geometrySelectorInitialValue = geometryInput.value;
-            })
-            .catch(function (error) {
-                console.error('Error al obtener el parámetro de la geometria:', error);
-            });
-
+            geometrySelectorInitialValue = "default"
+            
             // -----------------Project File----------------- //
             var projectFile = document.getElementById('projectFileUpload');
             var projectFileName = document.getElementById('projectFileName');
@@ -268,7 +245,6 @@
                 url = window.location.href;
         
                 var queryString = url.split('/');
-                console.log(queryString)
         
                 let edit_url = `{{ url_for('api_controller.get_execution_plan', execution_plan_id='') }}${queryString[5]}`;
         
@@ -385,6 +361,8 @@
                     noChangesLabelGeometry.style.display = 'inline-block';
                     resetLabelGeometry.style.display = 'inline-block';
                 }
+
+                console.log('VALOR:', geometrySelector.value)
             });
 
             resetLabelGeometry.addEventListener('click', function () {
