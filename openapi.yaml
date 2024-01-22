@@ -139,7 +139,8 @@ paths:
       responses:
         '200':
           description: Execution successfully started or modified
-        '400': error while starting execution
+        '400':
+          description: Error while starting execution
 
 components:
   schemas:
@@ -172,20 +173,19 @@ components:
           items:
             $ref: '#/components/schemas/ExecutionPlanOutput'
         # Add other required fields based on your actual API's behavior
-
-      ExecutionPlanOutput:
-        type: object
-        properties:
-          river:
-            type: string
-          reach:
-            type: string
-          river_stat:
-            type: string
-        required:
-          - river
-          - reach
-          - river_stat
+    ExecutionPlanOutput:
+      type: object
+      properties:
+        river:
+          type: string
+        reach:
+          type: string
+        river_stat:
+          type: string
+      required:
+        - river
+        - reach
+        - river_stat
     CopyExecutionPlanRequest:
       type: object
       # Define the properties for copying an execution plan
@@ -218,25 +218,17 @@ components:
         - plan_file
         - flow_file
         - restart_file
-      FileInput:
-        type: object
-        properties:
-          filename:
-            type: string
-            description: The path of the file in the Minio repository
-          data:
-            type: string
-            format: binary
-            description: The content of the file
-      ExecutionPlanOutput:
-        type: object
-        properties:
-          river:
-            type: string
-          reach:
-            type: string
-          river_stat:
-            type: string
+    FileInput:
+      type: object
+      properties:
+        filename:
+          type: string
+          description: The path of the file in the Minio repository
+        data:
+          type: string
+          format: binary
+          description: The content of the file
+
     StartOrModifyExecutionRequest:
       type: object
       # Define the properties for starting or modifying an execution
