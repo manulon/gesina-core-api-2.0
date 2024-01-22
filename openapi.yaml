@@ -1,0 +1,243 @@
+openapi: 3.0.0
+info:
+  title: Execution Plan API
+  version: '1.0'
+  description: API for managing execution plans
+
+servers:
+  - url: http://localhost:5000/
+    description: Local development server
+
+paths:
+  /execution_plan/{execution_plan_id}:
+    get:
+      summary: Get an execution plan
+      operationId: getExecutionPlan
+      tags:
+        - Execution Plan
+      parameters:
+        - name: execution_plan_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionPlan'
+        '400':
+          description: Execution plan not found
+    delete:
+      summary: Delete an execution plan
+      operationId: deleteExecutionPlan
+      tags:
+        - Execution Plan
+      parameters:
+        - name: execution_plan_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Execution plan successfully deleted
+        '400':
+          description: Execution plan not found
+
+  /execution_plan/copy:
+    post:
+      summary: Copy an execution plan
+      operationId: copyExecutionPlan
+      tags:
+        - Execution Plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CopyExecutionPlanRequest'
+      responses:
+        '200':
+          description: Execution plan successfully copied
+        '400':
+          description: Error while copyinh execution plan
+
+  /execution_plan:
+    post:
+      summary: Create an execution plan
+      operationId: createExecutionPlan
+      tags:
+        - Execution Plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExecutionPlanRequest'
+      responses:
+        '201':
+          description: Execution plan successfully created
+        '400':
+          description: Error while creating execution plan. Bad request.
+
+  /execution_plan/upload_file:
+    post:
+      summary: Upload a file for an execution plan
+      operationId: uploadFileForExecutionPlan
+      tags:
+        - Execution Plan
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: File successfully uploaded
+        '400':
+          description: Error while uploading file
+
+
+  /execution_plan/plans:
+    get:
+      summary: Get a list of execution plans
+      operationId: listExecutionPlans
+      tags:
+        - Execution Plan
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExecutionPlan'
+        '400':
+          description: Error while getting execution plans
+
+  /execution_plan/{execution_id}:
+    post:
+      summary: Start or modify an execution
+      operationId: startOrModifyExecution
+      tags:
+        - Execution
+      parameters:
+        - name: execution_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Execution successfully started or modified
+        '400': error while starting execution
+
+components:
+  schemas:
+    ExecutionPlan:
+      type: object
+      properties:
+        id:
+          type: integer
+        plan_name:
+          type: string
+        geometry_id:
+          type: integer
+        user_id:
+          type: integer
+        start_datetime:
+          type: string
+          format: date-time
+        end_datetime:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [ PENDING, RUNNING, FINISHED, CANCELED, ERROR ]
+          description: Current status of the execution plan
+        execution_plan_output_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExecutionPlanOutput'
+        # Add other required fields based on your actual API's behavior
+
+      ExecutionPlanOutput:
+        type: object
+        properties:
+          river:
+            type: string
+          reach:
+            type: string
+          river_stat:
+            type: string
+        required:
+          - river
+          - reach
+          - river_stat
+    CopyExecutionPlanRequest:
+      type: object
+      # Define the properties for copying an execution plan
+    CreateExecutionPlanRequest:
+      type: object
+      properties:
+        plan_name:
+          type: string
+        geometry_id:
+          type: string
+        user_id:
+          type: string
+        project_file:
+          $ref: '#/components/schemas/FileInput'
+        plan_file:
+          $ref: '#/components/schemas/FileInput'
+        flow_file:
+          $ref: '#/components/schemas/FileInput'
+        restart_file:
+          $ref: '#/components/schemas/FileInput'
+        output_list_data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExecutionPlanOutput'
+      required:
+        - plan_name
+        - geometry_id
+        - user_id
+        - project_file
+        - plan_file
+        - flow_file
+        - restart_file
+      FileInput:
+        type: object
+        properties:
+          filename:
+            type: string
+            description: The path of the file in the Minio repository
+          data:
+            type: string
+            format: binary
+            description: The content of the file
+      ExecutionPlanOutput:
+        type: object
+        properties:
+          river:
+            type: string
+          reach:
+            type: string
+          river_stat:
+            type: string
+    StartOrModifyExecutionRequest:
+      type: object
+      # Define the properties for starting or modifying an execution
+
