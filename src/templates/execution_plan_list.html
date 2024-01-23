@@ -43,29 +43,46 @@
     </div>
 
     <script>
-        let update_url = "{{ url_for('execution_plan_controller.update', execution_id='')|urlencode }}";
-        let cancel_url = "{{ url_for('execution_plan_controller.cancel', execution_id='')|urlencode }}";
         function executionPlanActionFormatter(value, row) {
-            let base_url = "{{ url_for('view_controller.execution_plan_read', execution_plan_id='')|urlencode }}";
-            form = `
-                <form action="${update_url}${row["id"]}" method="POST">
-                    <button type="submit" class="btn btn-outline-secondary" ${row['status'] == "PENDING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Finalizada"'}>
-                        <i class="fa-solid fa-play"></i>
-                    </button>
-                </form>
-            `
+            let update_url = "{{ url_for('view_controller.execution_plan_read', execution_plan_id='')}}"
+            
+            let update_button = `
+                <a class="btn btn-outline-secondary mr-2" title="Inspeccionar Simulacion" href="${update_url}${row["id"]}">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </a>
+            `;
+
+            let start_button = `
+                <button class="btn btn-outline-secondary mr-2" title="Encolar Simulacion" ${row['status'] == "PENDING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Finalizada"'} onclick="startSimulation(${row['id']})">
+                    <i class="fa-solid fa-play"></i>
+                </button>
+            `;
+           
+            let duplicate_button = `
+                <button type="button" class="btn btn-outline-secondary mr-2" onclick="duplicateSimulation(${row['id']})" title="Duplicar Simulación">
+                    <i class="fa-solid fa-clipboard"></i>
+                </button>
+            `;
+
+            let edit_button = `
+                <button type="button" class="btn btn-outline-secondary" title="Editar simulacion" onclick="editSimulation(${row['id']})">
+                    <i class="fa-solid fa-code-compare"></i>
+                </button>
+            `;
+
+            let cancel_button = `
+                <button type="button" class="btn btn-outline-danger"  ${row['status'] == "PENDING" || row['status'] == "RUNNING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Cancelada"'} onclick="cancelSimulation(${row['id']})">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            `;
+            
             return `
                 <div class="d-flex justify-content-around">
-                    <a class="btn btn-outline-secondary" href="${base_url}${row["id"]}">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </a>
-                    ${form}
-                    <form action="${cancel_url}${row["id"]}" method="POST">
-                        <button type="submit" class="btn btn-outline-danger" ${row['status'] == "PENDING" || row['status'] == "RUNNING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Cancelada"'}>
-                            <i class="fa-solid fa-times"></i>
-                        </button>
-                    </form>
-                </div>
+                    ${update_button}
+                    ${start_button}
+                    ${duplicate_button}
+                    ${edit_button}
+                    ${cancel_button}
             `
         }
 
@@ -86,6 +103,20 @@
             return status_map[value];
         }
 
+        function startSimulation(id) {
+            let start_url = `{{ url_for('execution_plan_controller.update', execution_id='') }}${id}`;
+
+            fetch(start_url, {method: 'POST'})
+            .then(response => {
+                console.log('Enconlado exitoso');
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error al encolar la simulación', error);
+            });
+        }
+    
+
         function duplicateSimulation(id) {
             let duplicate_url = `{{ url_for('api_controller.copy_execution_plan', copyFrom='') }}${id}`;
 
@@ -98,6 +129,25 @@
                 console.error('Error al duplicar la simulación', error);
             });
         }
+    
+        function editSimulation(id) {
+            let new_simulation_url = `{{ url_for('view_controller.execution_plan_edit_view', execution_plan_id='')}}${id}`
+            window.location.href = new_simulation_url
+        }
+
+        function cancelSimulation(id) {
+            let cancel_url = `{{ url_for('execution_plan_controller.cancel', execution_id='') }}${id}`;
+
+            fetch(cancel_url, {method: 'POST'})
+            .then(response => {
+                console.log('Cancelacion exitosa');
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error al cancelar la simulación', error);
+            });
+        }
+
     </script>
 
 {% endblock %}

@@ -97,9 +97,9 @@ class ScheduledTaskJob:
             scheduled_task.plan_series_list,
         )
 
-        execitexecution_plan_service.get_execution_plan(execution_plan.id)
+        execution_plan_service.get_execution_plan(execution_plan.id)
 
-        update_execution_plan_status.update_execution_plan_status(execution_plan.id, ExecutionPlanStatus.RUNNING)
+        execution_plan_service.update_execution_plan_status(execution_plan.id, ExecutionPlanStatus.RUNNING)
         try:
             queue_or_fake_simulate(
                 execution_plan.id, 
