@@ -79,7 +79,9 @@
                             <label id="reset_label_restart_file" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
                         </div>
                     </div>
+                    <!-- Carga del form -->
                     <div class="form-group">
+                        <h5>{{ form.execution_plan_output_list.label }}</h5>
                         <table class="table" id="execution_plan_output_table">
                               <thead>
                                 <tr>
@@ -91,13 +93,16 @@
                                 </tr>
                               </thead>
                               <tbody id="execution_plan_output_table_body">
+                                {% for form in form.execution_plan_output_list %}
                                     <tr>
-                                        <th scope="row">aca habia otra cosa</th>
-                                        <td>aca habia un form</td>
-                                        <td>aca habia un form</td>
-                                        <td>aca habia un form</td>
+                                        {{ form.idx }}
+                                        <th scope="row">{{loop.index}}</th>
+                                        <td>{{ form.river }}</td>
+                                        <td>{{ form.reach }}</td>
+                                        <td>{{ form.river_stat }}</td>
                                         <td><button type="button" class="btn btn-danger remove-row-execution-plan-output">&#8722;</button></td>
                                     </tr>
+                                {% endfor %}
                               </tbody>
                         </table>
                         <button id="add-row-execution-plan" type="button" class="btn btn-success">&#43;</button>
@@ -209,6 +214,34 @@
             .catch(function (error) {
                 console.error('Error al obtener el parámetro del nombre de archivo del restart:', error);
             }); 
+
+            // -----------------Output List----------------- //
+            var output_list_table = document.getElementById('execution_plan_output_table');
+            var output_list_body = document.getElementById('execution_plan_output_table_body');
+            
+            getParameterByName('Output List')
+                .then(function (outputListFromURL) {
+                    var row_number = 1
+                    for (var i in outputListFromURL){
+                        var initialRow = document.createElement('tr');
+                        initialRow.innerHTML = `
+                            <th scope="row">${row_number}</th>
+                            <td><input id="execution_plan_output_list-0-river" name="execution_plan_output_list-0-river" required="" type="text" value="${outputListFromURL[i]['river']}"></td>
+                            <td><input id="execution_plan_output_list-0-reach" name="execution_plan_output_list-0-reach" required="" type="text" value="${outputListFromURL[i]['reach']}"></td>
+                            <td><input id="execution_plan_output_list-0-river_stat" name="execution_plan_output_list-0-river_stat" required="" type="text" value="${outputListFromURL[i]['river_stat']}"></td>
+                            <td><button type="button" class="btn btn-danger remove-row-execution-plan-output">&#8722;</button></td>
+                        `;
+
+                        output_list_body.appendChild(initialRow);
+
+                        removeRowListener(".remove-row-execution-plan-output");
+                        row_number = row_number + 1;           
+                    }         
+            })
+            .catch(function (error) {
+                console.error('Error al obtener el output list:', error);
+            }); 
+
         }
 
         $('#startDateInput').datepicker({
@@ -307,8 +340,10 @@
                     extensionesPorTipo['Condicion de Borde'].push(valor);
                 } else if (palabras[1] == 'rst'){
                     extensionesPorTipo['Restart File'] = valor;
-                }
+                } 
             }
+
+            extensionesPorTipo['Output List'] = data.execution_output_list
             
             return extensionesPorTipo
         }
