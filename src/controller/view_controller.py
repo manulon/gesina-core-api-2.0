@@ -405,6 +405,9 @@ def clean_form_list(form_list):
 @VIEW_BLUEPRINT.route("/execution_plan/edit/<execution_plan_id>", methods=["POST"])
 def edit_execution_plan(execution_plan_id):
     form = EditedExecutionPlanForm()
+
+    output_list = _get_output_list(form)
+
     try:
         if form.validate_on_submit():
             
@@ -441,7 +444,8 @@ def edit_execution_plan(execution_plan_id):
                                                                         project_file = project_file_to_upload,
                                                                         plan_file = plan_file_to_upload,
                                                                         flow_file = flow_file_to_upload,
-                                                                        restart_file= restart_file_to_upload)
+                                                                        restart_file = restart_file_to_upload,
+                                                                        execution_plan_output = output_list)
             
             success_message = f"Simulación #{str(execution_plan.id)} editada con éxito."
             return render_template(
@@ -459,3 +463,17 @@ def edit_execution_plan(execution_plan_id):
         error_message = "Error cargando archivo. Intente nuevamente."
 
         return render_template("execution_plan.html", form=form, errors=[error_message])
+    
+def _get_output_list(form):
+    execution_plan_output_list = []
+
+    river = request.form.getlist(f'execution_plan_output_list-0-river')
+    reach = request.form.getlist(f'execution_plan_output_list-0-reach')
+    river_stat = request.form.getlist(f'execution_plan_output_list-0-river_stat')
+
+    for i in range(len(river)):
+        execution_plan_output_list.append({"river": river[i], 
+                                           "reach": reach[i], 
+                                           "river_stat": river_stat[i]})
+
+    return execution_plan_output_list
