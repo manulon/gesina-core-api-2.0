@@ -42,7 +42,7 @@
                         <input type="hidden" name="project_file_name" id="projectFileName">
                         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                             <label id="no_changes_label_project_file" style="color: green; display: none;">Se actualizará el campo</label>
-                            <label id="file_info_label" style="color: blue; display: inline-block;">El valor inicial del campo esta seleccionado, para modificarlo por favor seleccione un archivo.</label>
+                            <label id="file_info_label_project" style="color: blue; display: inline-block;"></label>
                             <label id="reset_label_project_file" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
                         </div>
                     </div>
@@ -140,6 +140,11 @@
             // -----------------Project File----------------- //
             var projectFile = document.getElementById('projectFileUpload');
             var projectFileName = document.getElementById('projectFileName');
+            var selectedFileInfoLabel = document.getElementById('file_info_label_project');
+            var selectedPlanFileInfoLabel = document.getElementById('file_info_label_plan');
+            var selectedCdbFileInfoLabel = document.getElementById('file_info_label_cdb');
+            var selectedRestartFileInfoLabel = document.getElementById('file_info_label_restart');
+
 
             getParameterByName('Proyecto')
                 .then(function (projectFileFromUrl) {
@@ -147,6 +152,8 @@
                         projectFileName.value = projectFileFromUrl || ''; 
                     }
                     projectFileInitialValue = projectFileFromUrl || '';
+                    selectedFileInfoLabel.textContent = 'El archivo cargado es: ' + projectFileInitialValue
+                    + ', No habrán modificaciones en este campo.'
             })
             .catch(function (error) {
                 console.error('Error al obtener el parámetro del nombre de archivo del proyecto:', error);
@@ -162,6 +169,8 @@
                         planFileName.value = planFileFromUrl[0] || ''; 
                     }
                     planFileInitialValue = planFileFromUrl[0] || '';
+                    selectedPlanFileInfoLabel.textContent = 'El archivo cargado es: ' + planFileInitialValue
+                    + ', No habrán modificaciones en este campo.'
             })
             .catch(function (error) {
                 console.error('Error al obtener el parámetro del nombre de archivo del plan:', error);
@@ -177,6 +186,8 @@
                         cdbFileName.value = cdbFileFromUrl[0] || ''; 
                     }
                     cdbFileInitialValue = cdbFileFromUrl[0] || '';
+                    selectedCdbFileInfoLabel.textContent = 'El archivo cargado es: ' + cdbFileInitialValue
+                    + ', No habrán modificaciones en este campo.'
             })
             .catch(function (error) {
                 console.error('Error al obtener el parámetro del nombre de archivo de las condiciones de borde:', error);
@@ -189,9 +200,11 @@
             getParameterByName('Restart File')
                 .then(function (restartFileFromUrl) {
                     if (restartFile) {
-                        restartFileName.value = restartFileFromUrl[0] || ''; 
+                        restartFileName.value = restartFileFromUrl || ''; 
                     }
-                    restartFileInitialValue = restartFileFromUrl[0] || '';
+                    restartFileInitialValue = restartFileFromUrl || '';
+                    selectedRestartFileInfoLabel.textContent = 'El archivo cargado es: ' + restartFileInitialValue
+                    + ', No habrán modificaciones en este campo.'
             })
             .catch(function (error) {
                 console.error('Error al obtener el parámetro del nombre de archivo del restart:', error);
@@ -250,7 +263,7 @@
         
                 fetch(edit_url, { method: 'GET' })
                     .then(response => response.json())
-                    .then(data => {
+                    .then(data => {       
                         plan_name = data.plan_name;
         
                         files = getFileNames(data);
@@ -296,7 +309,7 @@
                     extensionesPorTipo['Restart File'] = valor;
                 }
             }
-
+            
             return extensionesPorTipo
         }
 
@@ -313,7 +326,7 @@
             var projectFileName = document.getElementById('projectFileName');
             var noChangesLabelProjectFile = document.getElementById('no_changes_label_project_file');
             var resetLabelProjectFile = document.getElementById('reset_label_project_file');
-            var fileInfoLabel = document.getElementById('file_info_label');
+            var fileInfoLabel = document.getElementById('file_info_label_project');
 
             var planFileUpload = document.getElementById('planFileUpload');
             var planFileName = document.getElementById('planFileName');
@@ -378,6 +391,8 @@
                     noChangesLabelProjectFile.style.display = 'none';
                     resetLabelProjectFile.style.display = 'none';
                     fileInfoLabel.style.display = 'inline-block';
+                    fileInfoLabel.textContent = 'El archivo cargado es: ' + projectFileInitialValue
+                    + ' No habrán modificaciones en este campo.'
                 } else {
                     fileInfoLabel.style.display = 'none';
                     noChangesLabelProjectFile.style.display = 'inline-block';
@@ -391,6 +406,8 @@
                 noChangesLabelProjectFile.style.display = 'none'; 
                 resetLabelProjectFile.style.display = 'none'; 
                 fileInfoLabel.style.display = 'inline-block';
+                fileInfoLabel.textContent = 'El archivo cargado es: ' + projectFileInitialValue
+                    + ' No habrán modificaciones en este campo.'
             });
 
             planFileUpload.addEventListener('input', function () {
@@ -400,6 +417,8 @@
                     noChangesLabelPlanFile.style.display = 'none';
                     resetLabelPlanFile.style.display = 'none';
                     filePlanInfoLabel.style.display = 'inline-block';
+                    filePlanInfoLabel.textContent = 'El archivo cargado es: ' + planFileInitialValue
+                    + ' No habrán modificaciones en este campo.'
                 } else {
                     filePlanInfoLabel.style.display = 'none';
                     noChangesLabelPlanFile.style.display = 'inline-block';
@@ -413,6 +432,8 @@
                 noChangesLabelPlanFile.style.display = 'none'; 
                 resetLabelPlanFile.style.display = 'none'; 
                 filePlanInfoLabel.style.display = 'inline-block';
+                filePlanInfoLabel.textContent = 'El archivo cargado es: ' + planFileInitialValue
+                    + ' No habrán modificaciones en este campo.'
             });            
 
             cdbFileUpload.addEventListener('input', function () {
@@ -422,6 +443,8 @@
                     noChangesLabelCdbFile.style.display = 'none';
                     resetLabelCdbFile.style.display = 'none';
                     fileCdbInfoLabel.style.display = 'inline-block';
+                    fileCdbInfoLabel.textContent = 'El archivo cargado es: ' + cdbFileInitialValue
+                    + ' No habrán modificaciones en este campo.'
                 } else {
                     fileCdbInfoLabel.style.display = 'none';
                     noChangesLabelCdbFile.style.display = 'inline-block';
@@ -435,6 +458,8 @@
                 noChangesLabelCdbFile.style.display = 'none'; 
                 resetLabelCdbFile.style.display = 'none'; 
                 fileCdbInfoLabel.style.display = 'inline-block';
+                fileCdbInfoLabel.textContent = 'El archivo cargado es: ' + cdbFileInitialValue
+                    + ' No habrán modificaciones en este campo.'
             });
 
             restartFileUpload.addEventListener('input', function () {
@@ -444,6 +469,8 @@
                     noChangesLabelRestartFile.style.display = 'none';
                     resetLabelRestartFile.style.display = 'none';
                     fileRestartInfoLabel.style.display = 'inline-block';
+                    fileRestartInfoLabel.textContent = 'El archivo cargado es: ' + restartFileInitialValue
+                    + ' No habrán modificaciones en este campo.'
                 } else {
                     fileRestartInfoLabel.style.display = 'none';
                     noChangesLabelRestartFile.style.display = 'inline-block';
@@ -457,6 +484,8 @@
                 noChangesLabelRestartFile.style.display = 'none'; 
                 resetLabelRestartFile.style.display = 'none'; 
                 fileRestartInfoLabel.style.display = 'inline-block';
+                fileRestartInfoLabel.textContent = 'El archivo cargado es: ' + restartFileInitialValue
+                    + ' No habrán modificaciones en este campo.'
             });
         });
 

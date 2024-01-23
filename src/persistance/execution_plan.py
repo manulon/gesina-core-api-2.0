@@ -53,6 +53,14 @@ class ExecutionPlan(Base):
 
     def to_dict(self):
         # Create a dictionary containing the object's attributes
+        
+
+        execution_output_list = [ {"river": i.river, 
+                                   "river_stat": i.river_stat, 
+                                   "reach": i.reach}
+                                    for i in self.execution_plan_output_list
+                                ]
+        
         attributes = {
             "id": self.id,
             "plan_name": self.plan_name,
@@ -62,6 +70,7 @@ class ExecutionPlan(Base):
             "end_datetime": str(self.end_datetime),
             "created_at": str(self.created_at),
             "status": self.status.value if self.status else None,
+            "execution_output_list": execution_output_list
             # Include other attributes as needed
         }
 

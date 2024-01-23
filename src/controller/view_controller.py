@@ -416,8 +416,9 @@ def edit_execution_plan(execution_plan_id):
 
             if form.geometry_option.data != "default":
                 print('Se cambiara la geometría')
-                geometry_to_upload = form.geometry_option.data
+                geometry_to_upload = int(form.geometry_option.data)
                 print(geometry_to_upload)
+                print(type(geometry_to_upload))
 
 
             if form.project_file.data != None:
