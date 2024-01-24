@@ -291,8 +291,8 @@
                 url = window.location.href;
         
                 var queryString = url.split('/');
-        
-                let edit_url = `{{ url_for('api_controller.get_execution_plan', execution_plan_id='') }}${queryString[5]}`;
+                
+                let edit_url = `{{ url_for('execution_plan_controller.get', execution_plan_id='') }}${queryString[5]}`;
         
                 fetch(edit_url, { method: 'GET' })
                     .then(response => response.json())
