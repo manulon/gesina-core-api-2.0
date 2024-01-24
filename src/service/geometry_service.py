@@ -64,3 +64,23 @@ def delete_geometry(geometry_id):
         print("error while deleting geometry: " + geometry_id)
         print(e)
         raise e
+
+def edit_geometry(
+        geometry_id, 
+        id=None, 
+        name=None,
+        description=None,
+        created_at=None,
+        user_id=None,
+        user=None
+    ):
+    geometry = get_geometry(geometry_id)
+    with get_session() as session:
+        session.add(geometry)
+        geometry.name = name if name is not None else geometry.name
+        geometry.description = description if description is not None else geometry.description
+        geometry.created_at = created_at if created_at is not None else geometry.created_at
+        #geometry.user_id = user_id if user_id is not None else geometry.user_id
+        #geometry.user = user if user is not None else geometry.user
+        session.commit()
+    return get_geometry(geometry_id)

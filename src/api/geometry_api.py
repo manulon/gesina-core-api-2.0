@@ -40,7 +40,7 @@ def get_geometry(geometry_id):
         return response
     
 @GEOMETRY_API_BLUEPRINT.delete("/<geometry_id>")
-def delete_execution_plan(geometry_id):
+def delete_geometry(geometry_id):
     try:
         geometry_service.delete_geometry(geometry_id)
         response = jsonify({"message": "Geometry with id " + geometry_id + " deleted successfully"})
@@ -51,3 +51,32 @@ def delete_execution_plan(geometry_id):
                             "error": str(e)})
         response.status_code = 400
         return response
+    
+@GEOMETRY_API_BLUEPRINT.patch("/<geometry_id>")
+def edit_geometry(geometry_id):
+    try:
+        body = request.get_json()
+        id = body.get("id")
+        name = body.get("name")
+        description = body.get("description")
+        created_at = body.get("created_at")
+        user_id = body.get("user_id")
+        user = body.get("user")
+
+        geometry_service.edit_geometry(
+            geometry_id, 
+            id, 
+            name,
+            description,
+            created_at,
+            user_id,
+            user
+        )
+        return jsonify({"message": f"successfully edited geometry with id: {geometry_id}"})
+    except Exception as e:
+        response = jsonify({"message": "error deleting editing plan " + geometry_id,
+                            "error": str(e)})
+        response.status_code = 400
+        return response
+    
+    
