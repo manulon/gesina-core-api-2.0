@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from flask import Blueprint, jsonify, send_file, url_for, redirect
+from flask import Blueprint, jsonify, send_file, url_for, redirect, request
 from src import logger
 
 from src.login_manager import user_is_authenticated
@@ -56,3 +56,54 @@ def update(execution_id):
     except Exception as e:
         logger.error(e)
         raise e
+
+@EXECUTION_PLAN_BLUEPRINT.route("cancel/<execution_id>", methods=["POST"])
+def cancel(execution_id):
+    from src.tasks import cancel_simulation
+
+    try:
+        cancel_simulation(execution_id)
+        return redirect(url_for("view_controller.execution_plan_list"))
+    except Exception as e:
+        logger.error(e)
+        raise e
+
+@EXECUTION_PLAN_BLUEPRINT.route("copy/<id>", methods=["POST"])
+def copy(id):
+    try:
+        execution_plan = execution_plan_service.copy_execution_plan(id)
+        return {"new_execution_plan_id": execution_plan.id}
+    except Exception as e:
+        print(e.with_traceback())
+        response = jsonify({"error": str(e)})
+        response.status_code = 400
+        return response
+    
+@EXECUTION_PLAN_BLUEPRINT.get("get/<execution_plan_id>")
+def get(execution_plan_id):
+    try:
+        execution_plan = execution_plan_service.get_execution_plan(execution_plan_id)
+        if execution_plan is None:
+            raise Exception(f'Execution plan {execution_plan_id} does not exist')
+        execution_plan_dict = execution_plan.to_dict()
+        execution_files = [
+            f.object_name
+            for f in file_storage_service.list_execution_files(
+                FileType.EXECUTION_PLAN, execution_plan_id
+            )
+        ]
+        full_content_param = request.args.get('full_content', '').lower() == 'true'
+        if full_content_param:
+            execution_plan_dict["files"] = []
+            for i in execution_files:
+                data = file_storage_service.get_file(i).data
+                file = {"name": i.split("/")[-1], "content": str(data)}
+                execution_plan_dict["files"].append(file)
+        else:
+            execution_plan_dict["files"] = [i.split("/")[-1] for i in execution_files]
+
+        return jsonify(execution_plan_dict)
+    except Exception as e:
+        response = jsonify({"error while getting execution plan": str(e)})
+        response.status_code = 400
+        return response    

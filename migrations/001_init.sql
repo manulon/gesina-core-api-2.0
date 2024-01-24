@@ -49,15 +49,16 @@ create table if not exists execution_plan
 	status text not null
 );
 
-create table if not exists execution_plan_output
+CREATE TABLE IF NOT EXISTS execution_plan_output
 (
-    river text not null,
-    reach text not null,
-    river_stat text not null,
-    execution_plan_id integer not null constraint execution_plan_output_execution_plan_fk references "execution_plan",
-    stage_series_id integer default null,
-    flow_series_id integer default null,
-    primary key (river, reach, river_stat, execution_plan_id)
+    river text NOT NULL,
+    reach text NOT NULL,
+    river_stat text NOT NULL,
+    execution_plan_id integer NOT NULL CONSTRAINT execution_plan_output_execution_plan_fk
+        REFERENCES "execution_plan" ON DELETE CASCADE,
+    stage_series_id integer DEFAULT NULL,
+    flow_series_id integer DEFAULT NULL,
+    PRIMARY KEY (river, reach, river_stat, execution_plan_id)
 );
 
 alter table execution_plan owner to "user";
@@ -127,3 +128,12 @@ create table if not exists "plan_series"
     flow_series_id integer default null,
     scheduled_task_id integer not null constraint plan_series_scheduled_task_id_fk references "scheduled_task"
 );
+
+create table if not exists execution_tasks
+(
+	id serial constraint execution_tasks_pk primary key,
+	execution_id integer not null constraint execution_plan__id_fk references "execution_plan",
+    task_id varchar
+);
+
+alter table execution_tasks owner to "user";

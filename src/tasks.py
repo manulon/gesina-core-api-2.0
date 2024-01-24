@@ -2,11 +2,12 @@ import io
 import logging
 
 from celery import Celery
+from celery.result import AsyncResult
 from datetime import datetime, timedelta
 import os
 from src import config
 from src.persistance.execution_plan import ExecutionPlanStatus
-from src.service import execution_plan_service, notification_service, ina_service
+from src.service import execution_plan_service, notification_service, ina_service, execution_task_service
 from src.service.file_storage_service import FileType
 import sys
 
@@ -120,6 +121,8 @@ def simulate(execution_id, user_id, calibration_id_for_simulations):
         execution_plan_service.update_execution_plan_status(
             execution_id, ExecutionPlanStatus.ERROR
         )
+    except NotImplementedError as e:
+        print(f"Termination requested")
     finally:
         if RC:
             RC.Project_Close()
@@ -180,7 +183,7 @@ def queue_or_fake_simulate(execution_id, calibration_id_for_simulations=None):
     else:
         logger.info(f"Queueing simulation for {execution_id}")
         logger.info({"execution_id": execution_id, "user_id": execution.user.id})
-        simulate.apply_async(
+        result = simulate.apply_async(
             kwargs={
                 "execution_id": execution_id,
                 "user_id": execution.user.id,
@@ -188,7 +191,42 @@ def queue_or_fake_simulate(execution_id, calibration_id_for_simulations=None):
             },
             link_error=error_handler.s(),
         )
+        task_id = result.id
+        logger.info(f"SAVING TASK ID: {task_id}")
+        execution_task_service.save_task_id_in_database(execution_id, task_id)
 
+
+def cancel_simulation(execution_id):
+    win_logger = get_logger(execution_id)
+
+    execution_plan = execution_plan_service.get_execution_plan(execution_id)
+
+    if execution_plan.status == ExecutionPlanStatus.PENDING: 
+
+        execution_plan_service.update_execution_plan_status(
+            execution_id, ExecutionPlanStatus.CANCELED
+        )
+        win_logger.info(f"status: PENDING - Canceled simulation with execution id: {execution_id}")
+
+    else: 
+
+        task_id = execution_task_service.get_task_id_by_execution_id(execution_id)
+        win_logger.info(f"status: RUNNING - TASK ID to be canceled: {task_id}")
+        
+        if task_id is not None:
+            try:
+                AsyncResult(task_id).revoke(terminate=True)
+                execution_plan_service.update_execution_plan_status(
+                    execution_id, ExecutionPlanStatus.CANCELED
+                )
+                win_logger.info(f"status: CANCELED - Canceled simulation with execution id: {execution_id}")
+            except NotImplementedError as e:
+                print(f"Termination requested")
+        else:
+           win_logger.info(f"No task found for execution id: {execution_id}")
+
+        return
+        
 
 @celery_app.task
 def error_handler(request, exc, traceback):

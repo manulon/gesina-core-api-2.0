@@ -1,0 +1,533 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div>
+        <div class="d-flex justify-content-between pb-4">
+                <h2>Editar plan de ejecucion</h2>
+        </div>
+        <div class="container-xxl">
+            <form method=post
+                  enctype=multipart/form-data
+                  class="p-4 container needs-validation"
+                  id="edit-execution-plan-form"
+                  action="{{ url_for('view_controller.edit_execution_plan', execution_plan_id=execution_plan_id) }}">
+                {{ form.csrf_token }}
+                    <!-- Nombre del plan -->
+                    <div class="form-group" style="display: flex; flex-direction: column; align-items: flex-start;">
+                        <input type="hidden" name="execution_plan_id" value="1">
+                        <label for="plan_name" style="margin-bottom: 5px;"><h5>Nombre del plan</h5></label>
+                        <input class="form-control" id="plan_name" name="plan_name">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <label id="no_changes_label" style="color: green; display: none;">Se actualizará el campo</label>
+                            <label id="reset_label" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
+                        </div>
+                    </div>
+                    <!-- Geometría del plan -->
+                    <div class="form-group">
+                        <label for="status-select"><h5>Geometría</h5></label>
+                        <select class="custom-select" id="status-select" name="geometry_option">
+                            <option value="default">Seleccione una geometria..</option>
+                            {% for geometry in geometries %}
+                                <option value="{{ geometry.id }}">{{ geometry.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <label id="no_changes_label_geometry" style="color: green; display: none;">Se actualizará el campo</label>
+                            <label id="reset_label_geometry" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
+                        </div>
+                    </div>
+                    <!-- Carga del project file -->
+                    <div class="form-group">
+                        <label for="projectFileUpload"><h5>Proyecto</h5></label>
+                        <input type="file" name="project_file" class="form-control-file" id="projectFileUpload">
+                        <input type="hidden" name="project_file_name" id="projectFileName">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <label id="no_changes_label_project_file" style="color: green; display: none;">Se actualizará el campo</label>
+                            <label id="file_info_label_project" style="color: blue; display: inline-block;"></label>
+                            <label id="reset_label_project_file" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
+                        </div>
+                    </div>
+                    <!-- Carga del plan file -->
+                    <div class="form-group">
+                        <label for="planFileUpload"><h5>Plan</h5></label>
+                        <input type="file" name="plan_file" class="form-control-file" id="planFileUpload">
+                        <input type="hidden" name="plan_file_name" id="planFileName">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <label id="no_changes_label_plan_file" style="color: green; display: none;">Se actualizará el campo</label>
+                            <label id="file_info_label_plan" style="color: blue; display: inline-block;">El valor inicial del campo esta seleccionado, para modificarlo por favor seleccione un archivo.</label>
+                            <label id="reset_label_plan_file" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
+                        </div>
+                    </div>
+                    <!-- Carga de Condiciones de borde file -->
+                    <div class="form-group">
+                        <label for="flowFileUpload"><h5>Condiciones de borde</h5></label>
+                        <input type="file" name="flow_file" class="form-control-file" id="flowFileUpload">
+                        <input type="hidden" name="plan_file_name" id="cdbFileName">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <label id="no_changes_label_cdb_file" style="color: green; display: none;">Se actualizará el campo</label>
+                            <label id="file_info_label_cdb" style="color: blue; display: inline-block;">El valor inicial del campo esta seleccionado, para modificarlo por favor seleccione un archivo.</label>
+                            <label id="reset_label_cdb_file" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
+                        </div>
+                    </div>
+                    <!-- Carga de Restart file -->
+                    <div class="form-group">
+                        <label for="restartFileUpload"><h5>Restart File</h5></label>
+                        <input type="file" name="restart_file" class="form-control-file" id="restartFileUpload">
+                        <input type="hidden" name="restart_name" id="restartFileName">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                            <label id="no_changes_label_restart_file" style="color: green; display: none;">Se actualizará el campo</label>
+                            <label id="file_info_label_restart" style="color: blue; display: inline-block;">El valor inicial del campo esta seleccionado, para modificarlo por favor seleccione un archivo.</label>
+                            <label id="reset_label_restart_file" style="color: red; cursor: pointer; display: none;">Restablecer valores iniciales</label>
+                        </div>
+                    </div>
+                    <!-- Carga del form -->
+                    <div class="form-group">
+                        <h5>{{ form.execution_plan_output_list.label }}</h5>
+                        <table class="table" id="execution_plan_output_table">
+                              <thead>
+                                <tr>
+                                  <th scope="col">#</th>
+                                  <th scope="col">River</th>
+                                  <th scope="col">Reach</th>
+                                  <th scope="col">River stat</th>
+                                  <th scope="col">Acciones</th>
+                                </tr>
+                              </thead>
+                              <tbody id="execution_plan_output_table_body">
+                                {% for form in form.execution_plan_output_list %}
+                                    <tr>
+                                        {{ form.idx }}
+                                        <th scope="row">{{loop.index}}</th>
+                                        <td>{{ form.river }}</td>
+                                        <td>{{ form.reach }}</td>
+                                        <td>{{ form.river_stat }}</td>
+                                        <td><button type="button" class="btn btn-danger remove-row-execution-plan-output">&#8722;</button></td>
+                                    </tr>
+                                {% endfor %}
+                              </tbody>
+                        </table>
+                        <button id="add-row-execution-plan" type="button" class="btn btn-success">&#43;</button>
+                        <button id="clear-row-execution-plan" type="button" class="btn btn-danger">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+            </form>
+        </div>
+    </div>
+    <script>            
+        var initialValuePlanValue = '';
+        var geometrySelectorInitialValue = '';
+        var projectFileInitialValue = '';
+        var planFileInitialValue = '';
+        var cdbFileInitialValue = '';
+        var restartFileInitialValue = '';
+
+        window.onload = function() {
+            // -----------------Plan name----------------- //
+            var planNameInput = document.getElementById('plan_name');
+
+            getParameterByName('plan_name')
+                .then(function (planNameFromUrl) {
+                    if (planNameInput) {
+                        planNameInput.value = planNameFromUrl || '';
+                    }
+                    initialValuePlanValue = planNameInput.value;
+            })
+            .catch(function (error) {
+                console.error('Error al obtener el parámetro del nombre del plan:', error);
+            });
+
+            // -----------------Geometria----------------- //
+            geometrySelectorInitialValue = "default"
+            
+            // -----------------Project File----------------- //
+            var projectFile = document.getElementById('projectFileUpload');
+            var projectFileName = document.getElementById('projectFileName');
+            var selectedFileInfoLabel = document.getElementById('file_info_label_project');
+            var selectedPlanFileInfoLabel = document.getElementById('file_info_label_plan');
+            var selectedCdbFileInfoLabel = document.getElementById('file_info_label_cdb');
+            var selectedRestartFileInfoLabel = document.getElementById('file_info_label_restart');
+
+
+            getParameterByName('Proyecto')
+                .then(function (projectFileFromUrl) {
+                    if (projectFile) {
+                        projectFileName.value = projectFileFromUrl || ''; 
+                    }
+                    projectFileInitialValue = projectFileFromUrl || '';
+                    selectedFileInfoLabel.textContent = 'El archivo cargado es: ' + projectFileInitialValue
+                    + ', No habrán modificaciones en este campo.'
+            })
+            .catch(function (error) {
+                console.error('Error al obtener el parámetro del nombre de archivo del proyecto:', error);
+            });          
+
+            // -----------------Plan File----------------- //
+            var planFile = document.getElementById('planFileUpload');
+            var planFileName = document.getElementById('planFileName');
+
+            getParameterByName('Plan')
+                .then(function (planFileFromUrl) {
+                    if (planFile) {
+                        planFileName.value = planFileFromUrl[0] || ''; 
+                    }
+                    planFileInitialValue = planFileFromUrl[0] || '';
+                    selectedPlanFileInfoLabel.textContent = 'El archivo cargado es: ' + planFileInitialValue
+                    + ', No habrán modificaciones en este campo.'
+            })
+            .catch(function (error) {
+                console.error('Error al obtener el parámetro del nombre de archivo del plan:', error);
+            }); 
+
+            // -----------------Condiciones de Borde File----------------- //
+            var cdbFile = document.getElementById('flowFileUpload');
+            var cdbFileName = document.getElementById('cdbFileName');
+
+            getParameterByName('Condicion de Borde')
+                .then(function (cdbFileFromUrl) {
+                    if (planFile) {
+                        cdbFileName.value = cdbFileFromUrl[0] || ''; 
+                    }
+                    cdbFileInitialValue = cdbFileFromUrl[0] || '';
+                    selectedCdbFileInfoLabel.textContent = 'El archivo cargado es: ' + cdbFileInitialValue
+                    + ', No habrán modificaciones en este campo.'
+            })
+            .catch(function (error) {
+                console.error('Error al obtener el parámetro del nombre de archivo de las condiciones de borde:', error);
+            }); 
+
+            // -----------------Restart File----------------- //
+            var restartFile = document.getElementById('restartFileUpload');
+            var restartFileName = document.getElementById('restartFileName');
+
+            getParameterByName('Restart File')
+                .then(function (restartFileFromUrl) {
+                    if (restartFile) {
+                        restartFileName.value = restartFileFromUrl || ''; 
+                    }
+                    restartFileInitialValue = restartFileFromUrl || '';
+                    selectedRestartFileInfoLabel.textContent = 'El archivo cargado es: ' + restartFileInitialValue
+                    + ', No habrán modificaciones en este campo.'
+            })
+            .catch(function (error) {
+                console.error('Error al obtener el parámetro del nombre de archivo del restart:', error);
+            }); 
+
+            // -----------------Output List----------------- //
+            var output_list_table = document.getElementById('execution_plan_output_table');
+            var output_list_body = document.getElementById('execution_plan_output_table_body');
+            
+            getParameterByName('Output List')
+                .then(function (outputListFromURL) {
+                    var row_number = 1
+                    for (var i in outputListFromURL){
+                        var initialRow = document.createElement('tr');
+                        initialRow.innerHTML = `
+                            <th scope="row">${row_number}</th>
+                            <td><input id="execution_plan_output_list-0-river" name="execution_plan_output_list-0-river" required="" type="text" value="${outputListFromURL[i]['river']}"></td>
+                            <td><input id="execution_plan_output_list-0-reach" name="execution_plan_output_list-0-reach" required="" type="text" value="${outputListFromURL[i]['reach']}"></td>
+                            <td><input id="execution_plan_output_list-0-river_stat" name="execution_plan_output_list-0-river_stat" required="" type="text" value="${outputListFromURL[i]['river_stat']}"></td>
+                            <td><button type="button" class="btn btn-danger remove-row-execution-plan-output">&#8722;</button></td>
+                        `;
+
+                        output_list_body.appendChild(initialRow);
+
+                        removeRowListener(".remove-row-execution-plan-output");
+                        row_number = row_number + 1;           
+                    }         
+            })
+            .catch(function (error) {
+                console.error('Error al obtener el output list:', error);
+            }); 
+
+        }
+
+        $('#startDateInput').datepicker({
+            language: 'es',
+            clearBtn: true,
+            startDate: new Date(2021, 0, 0),
+            endDate: "0d"
+        });
+        $('#endDateInput').datepicker({
+            language: 'es',
+            clearBtn: true,
+            startDate: new Date(2021, 0, 0),
+            endDate: "0d"
+        });
+
+        function removeRowListener(selector) {
+            $( selector ).off("click")
+            $( selector ).on("click", function() {
+                $(this).parent().parent().remove();
+            });
+        }
+
+        $( "#add-row-execution-plan" ).on("click", function() {
+            let idx = 0
+            tr = $("#execution_plan_output_table_body tr:last-child")
+            if( tr.length ){
+                idx = $("#execution_plan_output_table_body tr:last-child th")[0].textContent
+                idx = parseInt(idx)
+            }
+
+            new_row = `
+                <tr>
+                    <th scope="row">${idx + 1}</th>
+                    <td><input id="execution_plan_output_list-${idx}-river" name="execution_plan_output_list-${idx}-river" required="" type="text" value=""></td>
+                    <td><input id="execution_plan_output_list-${idx}-reach" name="execution_plan_output_list-${idx}-reach" required="" type="text" value=""></td>
+                    <td><input id="execution_plan_output_list-${idx}-river_stat" name="execution_plan_output_list-${idx}-river_stat" required="" type="text" value=""></td>
+                    <td><button type="button" class="btn btn-danger remove-row-execution-plan-output">−</button></td>
+                </tr>
+            `
+
+            $( "#execution_plan_output_table_body" ).append( new_row );
+            removeRowListener(".remove-row-execution-plan-output")
+        });
+
+        function getParameterByName(name) {
+            return new Promise(function (resolve, reject) {
+                url = window.location.href;
+        
+                var queryString = url.split('/');
+                
+                let edit_url = `{{ url_for('execution_plan_controller.get', execution_plan_id='') }}${queryString[5]}`;
+        
+                fetch(edit_url, { method: 'GET' })
+                    .then(response => response.json())
+                    .then(data => {       
+                        plan_name = data.plan_name;
+        
+                        files = getFileNames(data);
+                        
+                        if (name == 'plan_name') {
+                            resolve(plan_name);
+                        } else {
+                            resolve(files[name]);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al intentar el comienzo de edición de la simulación', error);
+                        reject(error);
+                    });
+            });
+        }
+
+        function getFileNames(data){
+            var extension = new Array();
+            var extensionesPorTipo = {};
+
+            var planes = new Array();
+            var condicionesDeBorde = new Array();
+
+            extensionesPorTipo['Nombre de plan'] = data.plan_name
+            extensionesPorTipo['Plan'] = planes
+            extensionesPorTipo['Condicion de Borde'] = condicionesDeBorde
+
+            for (var clave in data.files) {
+                valor = data.files[clave]
+                
+                var palabras = valor.split('.');
+
+                if (palabras[1][0] == 'g'){
+                    extensionesPorTipo['Geometria'] = valor;
+                } else if (palabras[1] == 'prj'){
+                    extensionesPorTipo['Proyecto'] = valor;
+                } else if (palabras[1][0] == 'p'){
+                    extensionesPorTipo['Plan'].push(valor);
+                } else if (palabras[1][0] == 'u'){
+                    extensionesPorTipo['Condicion de Borde'].push(valor);
+                } else if (palabras[1] == 'rst'){
+                    extensionesPorTipo['Restart File'] = valor;
+                } 
+            }
+
+            extensionesPorTipo['Output List'] = data.execution_output_list
+            
+            return extensionesPorTipo
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var planNameInput = document.getElementById('plan_name');
+            var noChangesLabel = document.getElementById('no_changes_label');
+            var resetLabel = document.getElementById('reset_label');
+            
+            var geometrySelector = document.getElementById('status-select');
+            var noChangesLabelGeometry = document.getElementById('no_changes_label_geometry');
+            var resetLabelGeometry = document.getElementById('reset_label_geometry');
+
+            var projectFileUpload = document.getElementById('projectFileUpload');
+            var projectFileName = document.getElementById('projectFileName');
+            var noChangesLabelProjectFile = document.getElementById('no_changes_label_project_file');
+            var resetLabelProjectFile = document.getElementById('reset_label_project_file');
+            var fileInfoLabel = document.getElementById('file_info_label_project');
+
+            var planFileUpload = document.getElementById('planFileUpload');
+            var planFileName = document.getElementById('planFileName');
+            var noChangesLabelPlanFile = document.getElementById('no_changes_label_plan_file');
+            var resetLabelPlanFile = document.getElementById('reset_label_plan_file');
+            var filePlanInfoLabel = document.getElementById('file_info_label_plan');
+
+            var cdbFileUpload = document.getElementById('flowFileUpload');
+            var cdbFileName = document.getElementById('cdbFileName');
+            var noChangesLabelCdbFile = document.getElementById('no_changes_label_cdb_file');
+            var resetLabelCdbFile = document.getElementById('reset_label_cdb_file');
+            var fileCdbInfoLabel = document.getElementById('file_info_label_cdb');
+
+            var restartFileUpload = document.getElementById('restartFileUpload');
+            var restartFileName = document.getElementById('restartFileName');
+            var noChangesLabelRestartFile = document.getElementById('no_changes_label_restart_file');
+            var resetLabelRestartFile = document.getElementById('reset_label_restart_file');
+            var fileRestartInfoLabel = document.getElementById('file_info_label_restart');
+            
+            document.getElementById('plan_name').addEventListener('input', function () {
+                var currentValue = this.value;
+
+                if (currentValue === initialValuePlanValue) {
+                    noChangesLabel.style.display = 'none';
+                    resetLabel.style.display = 'none';
+                } else {
+                    noChangesLabel.style.display = 'inline-block';
+                    resetLabel.style.display = 'inline-block';
+                }
+            });
+
+            resetLabel.addEventListener('click', function () {
+                document.getElementById('plan_name').value = initialValuePlanValue;
+                noChangesLabel.style.display = 'none'; 
+                resetLabel.style.display = 'none'; 
+            });
+
+            geometrySelector.addEventListener('change', function () {
+                var currentValue = this.value;
+
+                if (currentValue === geometrySelectorInitialValue) {
+                    noChangesLabelGeometry.style.display = 'none';
+                    resetLabelGeometry.style.display = 'none';
+                } else {
+                    noChangesLabelGeometry.style.display = 'inline-block';
+                    resetLabelGeometry.style.display = 'inline-block';
+                }
+            });
+
+            resetLabelGeometry.addEventListener('click', function () {
+                geometrySelector.value = geometrySelectorInitialValue;
+                noChangesLabelGeometry.style.display = 'none'; 
+                resetLabelGeometry.style.display = 'none'; 
+            });
+
+            projectFileUpload.addEventListener('input', function () {
+                var currentValue = this.files[0].name;
+
+                if (currentValue === projectFileInitialValue) {
+                    noChangesLabelProjectFile.style.display = 'none';
+                    resetLabelProjectFile.style.display = 'none';
+                    fileInfoLabel.style.display = 'inline-block';
+                    fileInfoLabel.textContent = 'El archivo cargado es: ' + projectFileInitialValue
+                    + ' No habrán modificaciones en este campo.'
+                } else {
+                    fileInfoLabel.style.display = 'none';
+                    noChangesLabelProjectFile.style.display = 'inline-block';
+                    resetLabelProjectFile.style.display = 'inline-block';
+                    
+                }
+            });
+
+            resetLabelProjectFile.addEventListener('click', function () {
+                projectFileName.value = projectFileInitialValue;
+                noChangesLabelProjectFile.style.display = 'none'; 
+                resetLabelProjectFile.style.display = 'none'; 
+                fileInfoLabel.style.display = 'inline-block';
+                fileInfoLabel.textContent = 'El archivo cargado es: ' + projectFileInitialValue
+                    + ' No habrán modificaciones en este campo.'
+            });
+
+            planFileUpload.addEventListener('input', function () {
+                var currentValue = this.files[0].name;
+
+                if (currentValue === planFileInitialValue) {
+                    noChangesLabelPlanFile.style.display = 'none';
+                    resetLabelPlanFile.style.display = 'none';
+                    filePlanInfoLabel.style.display = 'inline-block';
+                    filePlanInfoLabel.textContent = 'El archivo cargado es: ' + planFileInitialValue
+                    + ' No habrán modificaciones en este campo.'
+                } else {
+                    filePlanInfoLabel.style.display = 'none';
+                    noChangesLabelPlanFile.style.display = 'inline-block';
+                    resetLabelPlanFile.style.display = 'inline-block';
+                    
+                }
+            });
+
+            resetLabelPlanFile.addEventListener('click', function () {
+                planFileName.value = planFileInitialValue;
+                noChangesLabelPlanFile.style.display = 'none'; 
+                resetLabelPlanFile.style.display = 'none'; 
+                filePlanInfoLabel.style.display = 'inline-block';
+                filePlanInfoLabel.textContent = 'El archivo cargado es: ' + planFileInitialValue
+                    + ' No habrán modificaciones en este campo.'
+            });            
+
+            cdbFileUpload.addEventListener('input', function () {
+                var currentValue = this.files[0].name;
+
+                if (currentValue === cdbFileInitialValue) {
+                    noChangesLabelCdbFile.style.display = 'none';
+                    resetLabelCdbFile.style.display = 'none';
+                    fileCdbInfoLabel.style.display = 'inline-block';
+                    fileCdbInfoLabel.textContent = 'El archivo cargado es: ' + cdbFileInitialValue
+                    + ' No habrán modificaciones en este campo.'
+                } else {
+                    fileCdbInfoLabel.style.display = 'none';
+                    noChangesLabelCdbFile.style.display = 'inline-block';
+                    resetLabelCdbFile.style.display = 'inline-block';
+                    
+                }
+            });
+
+            resetLabelCdbFile.addEventListener('click', function () {
+                cdbFileName.value = cdbFileInitialValue;
+                noChangesLabelCdbFile.style.display = 'none'; 
+                resetLabelCdbFile.style.display = 'none'; 
+                fileCdbInfoLabel.style.display = 'inline-block';
+                fileCdbInfoLabel.textContent = 'El archivo cargado es: ' + cdbFileInitialValue
+                    + ' No habrán modificaciones en este campo.'
+            });
+
+            restartFileUpload.addEventListener('input', function () {
+                var currentValue = this.files[0].name;
+
+                if (currentValue === restartFileInitialValue) {
+                    noChangesLabelRestartFile.style.display = 'none';
+                    resetLabelRestartFile.style.display = 'none';
+                    fileRestartInfoLabel.style.display = 'inline-block';
+                    fileRestartInfoLabel.textContent = 'El archivo cargado es: ' + restartFileInitialValue
+                    + ' No habrán modificaciones en este campo.'
+                } else {
+                    fileRestartInfoLabel.style.display = 'none';
+                    noChangesLabelRestartFile.style.display = 'inline-block';
+                    resetLabelRestartFile.style.display = 'inline-block';
+                    
+                }
+            });
+
+            resetLabelRestartFile.addEventListener('click', function () {
+                restartFileName.value = restartFileInitialValue;
+                noChangesLabelRestartFile.style.display = 'none'; 
+                resetLabelRestartFile.style.display = 'none'; 
+                fileRestartInfoLabel.style.display = 'inline-block';
+                fileRestartInfoLabel.textContent = 'El archivo cargado es: ' + restartFileInitialValue
+                    + ' No habrán modificaciones en este campo.'
+            });
+        });
+
+    </script>
+    <style>
+        .datepicker {
+            border-radius: 0.25rem;
+            border-color: lightgray;
+        }
+    </style>
+
+{% endblock %}

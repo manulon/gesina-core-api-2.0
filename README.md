@@ -9,7 +9,7 @@ Gesina-API uses gunicorn to run. You can follow this steps:
 - Run:
 `export BROKER_URL='redis://localhost:6379/0'`
 `export RESULT_BACKEND='redis://localhost:6379/0'`
-`export DATABASE_HOST='localhost:5432'`
+`export DATABASE_HOST='localhost:5432'` (replace 'localhost' with IP Addr)
 `export MINIO_URL='localhost:9000'`
 `export PYTHONPATH='/app/'`
 
