@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from flask import Blueprint, jsonify, send_file, url_for, redirect
+from flask import Blueprint, jsonify, send_file, url_for, redirect, request
 from src import logger
 
 from src.login_manager import user_is_authenticated
@@ -67,3 +67,14 @@ def cancel(execution_id):
     except Exception as e:
         logger.error(e)
         raise e
+
+@EXECUTION_PLAN_BLUEPRINT.route("copy/<id>", methods=["POST"])
+def copy(id):
+    try:
+        execution_plan = execution_plan_service.copy_execution_plan(id)
+        return {"new_execution_plan_id": execution_plan.id}
+    except Exception as e:
+        print(e.with_traceback())
+        response = jsonify({"error": str(e)})
+        response.status_code = 400
+        return response
