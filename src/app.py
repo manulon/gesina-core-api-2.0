@@ -9,6 +9,7 @@ from src import controller
 from src import login_manager
 from src.api import API_BLUEPRINT
 from src.api.execution_plan_api import EXECUTION_PLAN_API_BLUEPRINT
+from src.api.geometry_api import GEOMETRY_API_BLUEPRINT
 from src.encoders import CustomJSONEncoder
 from src.translations import gettext, pretty_date
 
@@ -28,6 +29,7 @@ app.register_blueprint(controller.SCHEDULE_TASK_BLUEPRINT, url_prefix="/schedule
 app.register_blueprint(controller.USER_BLUEPRINT, url_prefix="/user")
 
 API_BLUEPRINT.register_blueprint(EXECUTION_PLAN_API_BLUEPRINT)
+API_BLUEPRINT.register_blueprint(GEOMETRY_API_BLUEPRINT)
 app.register_blueprint(API_BLUEPRINT)
 
 app.jinja_env.globals.update(gettext=gettext)
