@@ -68,7 +68,7 @@ def create_from_json(execution_plan):
                 reach=d.get("reach"),
                 river_stat=d.get("river_stat")
             )
-            for d in execution_plan.get('output_list_data', [])
+            for d in execution_plan.get('execution_output_list', [])
         ]
     )
 
