@@ -47,6 +47,32 @@ paths:
         '400':
           description: Execution plan not found
 
+    patch:
+      summary: Edit an existing execution plan
+      description: Updates the details of an existing execution plan by its ID.
+      operationId: editExecutionPlan
+      tags:
+        - Execution Plan
+      parameters:
+        - in: path
+          name: execution_plan_id
+          required: true
+          schema:
+            type: string
+          description: The ID of the execution plan to be updated.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionPlanRequest'
+      responses:
+        '200':
+          description: Successfully edited the execution plan.
+        '400':
+          description: Error occurred while editing the execution plan.
+
+
   /execution_plan/copy:
     post:
       summary: Copy an execution plan
@@ -168,7 +194,7 @@ components:
           type: string
           enum: [ PENDING, RUNNING, FINISHED, CANCELED, ERROR ]
           description: Current status of the execution plan
-        execution_plan_output_list:
+        execution_output_list:
           type: array
           items:
             $ref: '#/components/schemas/ExecutionPlanOutput'
@@ -195,7 +221,7 @@ components:
         plan_name:
           type: string
         geometry_id:
-          type: string
+          type: integer
         user_id:
           type: string
         project_file:
@@ -206,7 +232,7 @@ components:
           $ref: '#/components/schemas/FileInput'
         restart_file:
           $ref: '#/components/schemas/FileInput'
-        output_list_data:
+        execution_output_list:
           type: array
           items:
             $ref: '#/components/schemas/ExecutionPlanOutput'
@@ -229,7 +255,35 @@ components:
           format: binary
           description: The content of the file
 
+
     StartOrModifyExecutionRequest:
       type: object
       # Define the properties for starting or modifying an execution
+
+    EditExecutionPlanRequest:
+      type: object
+      properties:
+        plan_name:
+          type: string
+          description: Name of the execution plan.
+        geometry_id:
+          type: integer
+          description: ID of the associated geometry.
+        plan_file:
+          type: string
+          description: Path to the file associated with the execution plan.
+        flow_file:
+          type: string
+          description: Path to the flow file for the execution.
+        restart_file:
+          type: string
+          description: Path to the restart file if applicable.
+        execution_output_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExecutionPlanOutput'
+          description: List of execution outputs
+        project_file:
+          type: string
+          description: Project file for the execution plan.
 
