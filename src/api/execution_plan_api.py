@@ -71,7 +71,7 @@ def delete_execution_plan(execution_plan_id):
     try:
         execution_plan_service.delete_execution_plan(execution_plan_id)
         response = jsonify({"message": "Execution plan with id " + execution_plan_id + " deleted successfully"})
-        response.status_code = 200
+        response.status_code = 204
         return response
     except Exception as e:
         response = jsonify({"message": "error deleting execution plan " + execution_plan_id,
