@@ -64,12 +64,6 @@
                 </button>
             `;
 
-            let edit_button = `
-                <button type="button" class="btn btn-outline-secondary" title="Editar simulacion" onclick="editSimulation(${row['id']})">
-                    <i class="fa-solid fa-code-compare"></i>
-                </button>
-            `;
-
             let cancel_button = `
                 <button type="button" class="btn btn-outline-danger"  ${row['status'] == "PENDING" || row['status'] == "RUNNING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Cancelada"'} onclick="cancelSimulation(${row['id']})">
                     <i class="fa-solid fa-times"></i>
@@ -81,7 +75,6 @@
                     ${update_button}
                     ${start_button}
                     ${duplicate_button}
-                    ${edit_button}
                     ${cancel_button}
             `
         }
@@ -127,11 +120,6 @@
             .catch(error => {
                 console.error('Error al duplicar la simulación', error);
             });
-        }
-    
-        function editSimulation(id) {
-            let new_simulation_url = `{{ url_for('view_controller.execution_plan_edit_view', execution_plan_id='')}}${id}`
-            window.location.href = new_simulation_url
         }
 
         function cancelSimulation(id) {
