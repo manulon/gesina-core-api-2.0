@@ -58,18 +58,6 @@
                 </button>
             `;
            
-            let duplicate_button = `
-                <button type="button" class="btn btn-outline-secondary mr-2" onclick="duplicateSimulation(${row['id']})" title="Duplicar Simulación">
-                    <i class="fa-solid fa-clipboard"></i>
-                </button>
-            `;
-
-            let edit_button = `
-                <button type="button" class="btn btn-outline-secondary" title="Editar simulacion" onclick="editSimulation(${row['id']})">
-                    <i class="fa-solid fa-code-compare"></i>
-                </button>
-            `;
-
             let cancel_button = `
                 <button type="button" class="btn btn-outline-danger"  ${row['status'] == "PENDING" || row['status'] == "RUNNING" ? '' : 'disabled data-toggle="tooltip" data-placement="bottom" title="Simulación Cancelada"'} onclick="cancelSimulation(${row['id']})">
                     <i class="fa-solid fa-times"></i>
@@ -80,8 +68,6 @@
                 <div class="d-flex justify-content-around">
                     ${update_button}
                     ${start_button}
-                    ${duplicate_button}
-                    ${edit_button}
                     ${cancel_button}
             `
         }
@@ -116,24 +102,6 @@
             });
         }
     
-        function duplicateSimulation(id) {
-            let copy_url = `{{ url_for('execution_plan_controller.copy', id='') }}${id}`;
-                          
-            fetch(copy_url, {method: 'POST'})
-            .then(response => {
-                console.log('Duplicación exitosa');
-                window.location.reload();
-            })
-            .catch(error => {
-                console.error('Error al duplicar la simulación', error);
-            });
-        }
-    
-        function editSimulation(id) {
-            let new_simulation_url = `{{ url_for('view_controller.execution_plan_edit_view', execution_plan_id='')}}${id}`
-            window.location.href = new_simulation_url
-        }
-
         function cancelSimulation(id) {
             let cancel_url = `{{ url_for('execution_plan_controller.cancel', execution_id='') }}${id}`;
 
