@@ -65,7 +65,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ExecutionPlanRequest'
+              $ref: '#/components/schemas/EditExecutionPlanRequest'
       responses:
         '200':
           description: Successfully edited the execution plan.
