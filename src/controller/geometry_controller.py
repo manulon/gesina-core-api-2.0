@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from flask import Blueprint, jsonify, send_file
+from flask import Blueprint, jsonify, send_file, request, render_template
 
 from src.login_manager import user_is_authenticated
 from src.service import geometry_service, file_storage_service, list_utils_service
@@ -51,6 +51,25 @@ def delete(geometry_id):
         return response
     except Exception as e:
         response = jsonify({"message": "error deleting geometry " + geometry_id,
+                            "error": str(e)})
+        response.status_code = 400
+        return response
+    
+@GEOMETRY_BLUEPRINT.route("/<geometry_id>", methods=["POST"])
+def edit_geometry(geometry_id):
+    try:
+        geometry_id = request.form.get("geometry_id")
+        description = request.form.get("description")
+
+        geometry_service.edit_geometry(
+            geometry_id,
+            description
+        )
+        success_message = jsonify({"message": f"successfully edited geometry with id: {geometry_id}"})
+
+        return render_template("geometry_list.html", success_message=success_message)
+    except Exception as e:
+        response = jsonify({"message": "error editing geometry with id " + geometry_id,
                             "error": str(e)})
         response.status_code = 400
         return response
