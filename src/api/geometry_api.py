@@ -56,21 +56,11 @@ def delete_geometry(geometry_id):
 def edit_geometry(geometry_id):
     try:
         body = request.get_json()
-        id = body.get("id")
-        name = body.get("name")
         description = body.get("description")
-        created_at = body.get("created_at")
-        user_id = body.get("user_id")
-        user = body.get("user")
 
         geometry_service.edit_geometry(
             geometry_id, 
-            id, 
-            name,
-            description,
-            created_at,
-            user_id,
-            user
+            description
         )
         return jsonify({"message": f"successfully edited geometry with id: {geometry_id}"})
     except Exception as e:
