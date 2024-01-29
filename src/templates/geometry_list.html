@@ -45,16 +45,29 @@
     <script>
         function geometryActionFormatter(value, row) {
             let base_url = "{{ url_for("view_controller.geometry_read", geometry_id="")}}"
+
+            let cancel_button = `
+                <button type="button" class="btn btn-outline-danger" onclick="cancelSimulation(${row['id']})">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            `;
+
             return `
-                <a class="btn btn-outline-secondary" href="${base_url}${row["id"]}">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </a>
+                <div class="d-flex justify-content-around">
+                    <a class="btn btn-outline-secondary" href="${base_url}${row["id"]}">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </a>
+                    ${cancel_button}
             `
           }
         function descriptionFormatter(value) {
             if (value.length > 20)
                 return value.substr(0, 20).concat('[...]');
             return value;
+        }
+
+        function cancelSimulation(id) {
+            console.log('EL BOTON ANDA OK')
         }
     </script>
 {% endblock %}
