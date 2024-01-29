@@ -10,6 +10,7 @@ GEOMETRY_BLUEPRINT = Blueprint("geometry_controller", __name__)
 GEOMETRY_BLUEPRINT.before_request(user_is_authenticated)
 
 
+
 @GEOMETRY_BLUEPRINT.route("", methods=["GET"])
 def list_geometries():
     offset, limit = list_utils_service.process_list_params()
@@ -40,3 +41,16 @@ def download(_id):
         file = BytesIO(file_from_storage.data)
 
     return send_file(file, attachment_filename=geometry.name)
+
+@GEOMETRY_BLUEPRINT.route("/<geometry_id>", methods=["DELETE"])
+def delete(geometry_id):
+    try:
+        geometry_service.delete_geometry(geometry_id)
+        response = jsonify({"message": "Geometry with id " + geometry_id + " deleted successfully"})
+        response.status_code = 200
+        return response
+    except Exception as e:
+        response = jsonify({"message": "error deleting geometry " + geometry_id,
+                            "error": str(e)})
+        response.status_code = 400
+        return response
