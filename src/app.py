@@ -1,7 +1,7 @@
 from http import HTTPStatus
 
 import matplotlib
-from flask import Flask, jsonify, redirect, url_for
+from flask import Flask, jsonify, redirect, url_for, render_template
 
 import src
 from src import config
@@ -13,11 +13,14 @@ from src.api.geometry_api import GEOMETRY_API_BLUEPRINT
 from src.encoders import CustomJSONEncoder
 from src.translations import gettext, pretty_date
 
+
 matplotlib.use("Agg")
 
 app = Flask(__name__)
 
 app.config["SECRET_KEY"] = config.secret_key
+
+
 
 app.register_blueprint(controller.GEOMETRY_BLUEPRINT, url_prefix="/geometry")
 app.register_blueprint(
@@ -36,6 +39,9 @@ app.jinja_env.globals.update(gettext=gettext)
 app.jinja_env.globals.update(pretty_date=pretty_date)
 
 login_manager.set_up_login(app)
+@app.route('/api_spec')
+def swagger_ui():
+    return render_template('swaggerui.html')
 
 
 @app.route("/health-check")
@@ -45,7 +51,10 @@ def health_check():
 
 @app.errorhandler(HTTPStatus.NOT_FOUND)
 def page_not_found(e):
+    print("no found")
     return redirect(url_for("view_controller.home")), HTTPStatus.MOVED_PERMANENTLY
+
+
 
 
 @app.route('/list_routes')
