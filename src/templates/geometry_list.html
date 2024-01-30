@@ -45,16 +45,40 @@
     <script>
         function geometryActionFormatter(value, row) {
             let base_url = "{{ url_for("view_controller.geometry_read", geometry_id="")}}"
+
+            let delete_button = `
+                <button type="button" class="btn btn-outline-danger" onclick="deleteGeometry(${row['id']})">
+                    <i class="fa-solid fa-trash-alt"></i>
+                </button>
+            `;
+
             return `
-                <a class="btn btn-outline-secondary" href="${base_url}${row["id"]}">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </a>
+                <div class="d-flex justify-content-around">
+                    <a class="btn btn-outline-secondary" href="${base_url}${row["id"]}">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </a>
+                    ${delete_button}
             `
           }
         function descriptionFormatter(value) {
             if (value.length > 20)
                 return value.substr(0, 20).concat('[...]');
             return value;
+        }
+
+        function deleteGeometry(id) {
+            let delete_url = `{{ url_for('geometry_controller.delete', geometry_id='') }}${id}`;
+            let geometry_list_url = '{{url_for("view_controller.geometry_list")}}'
+
+
+            fetch(delete_url, {method: 'DELETE'})
+            .then(response => {
+                console.log('Borrado exitoso');
+                window.location.href = geometry_list_url
+            })
+            .catch(error => {
+                console.error('Error al borrar la geometria', error);
+            });
         }
     </script>
 {% endblock %}

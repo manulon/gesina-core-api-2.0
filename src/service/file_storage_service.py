@@ -230,3 +230,11 @@ def delete_execution_file_for_type(execution_plan_id,file_to_delete):
     except Exception as e:
         error_message = f"Error while deleting execution file {file_to_delete}"
         raise Exception(error_message) from e
+    
+def delete_geometry_file(file_name):
+    try:
+        minio_client.remove_object(ROOT_BUCKET, f"{GEOMETRY_FOLDER}/{file_name}")
+    except Exception as e:
+        error_message = f"Error deleting objects from Minio bucket: {e}"
+        print(error_message)
+        raise Exception(error_message) from e

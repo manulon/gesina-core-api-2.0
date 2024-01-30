@@ -477,3 +477,9 @@ def _get_output_list(form):
                                            "river_stat": river_stat[i]})
 
     return execution_plan_output_list
+
+@VIEW_BLUEPRINT.route("/geometry_edit/<geometry_id>")
+def geometry_edit_view(geometry_id):
+    geometry = geometry_service.get_geometry(geometry_id)
+    data = {"geometry": geometry}
+    return render_template("edit_geometry.html", **data)
