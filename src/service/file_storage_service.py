@@ -198,16 +198,18 @@ def copy_execution_files(id_copy_from, id_copy_to):
 
     return list_execution_files(FileType.EXECUTION_PLAN, id_copy_to)
 
+
 def copy_execution_file(file_to_copy, id_copy_to):
     minio_path = f"{FileType.EXECUTION_PLAN.value}"
     minio_path += f"/{id_copy_to}"
     minio_path += f"/{secure_filename(file_to_copy.split('/')[-1])}"
-    minio_client.copy_object(ROOT_BUCKET, minio_path, CopySource(ROOT_BUCKET,file_to_copy))
+    minio_client.copy_object(ROOT_BUCKET, minio_path, CopySource(ROOT_BUCKET, file_to_copy))
     return minio_path
+
 
 def delete_execution_files(local_directory_path):
     try:
-        local_files = list_execution_files(FileType.EXECUTION_PLAN,local_directory_path)
+        local_files = list_execution_files(FileType.EXECUTION_PLAN, local_directory_path)
         for file in local_files:
             minio_object_name = file.object_name
             minio_client.remove_object(ROOT_BUCKET, minio_object_name)
@@ -216,13 +218,19 @@ def delete_execution_files(local_directory_path):
         error_message = f"Error deleting objects from Minio bucket: {e}"
         print(error_message)
         raise Exception(error_message) from e
-    
-def delete_file(file_to_delete):
-    minio_client.remove_object(ROOT_BUCKET, f"{file_to_delete}")    
 
-def delete_execution_file_for_type(execution_plan_id,file_to_delete):
+
+def delete_file(file_to_delete):
+    minio_client.remove_object(ROOT_BUCKET, f"{file_to_delete}")
+
+
+def delete_execution_file(execution_plan_id, filename):
+    delete_file(f"{EXECUTION_FOLDER}/{execution_plan_id}/{filename}")
+
+
+def delete_execution_file_for_type(execution_plan_id, file_to_delete):
     try:
-        execution_files = list_execution_files(FileType.EXECUTION_PLAN,execution_plan_id)
+        execution_files = list_execution_files(FileType.EXECUTION_PLAN, execution_plan_id)
         file_type = file_to_delete.split('.')[-1]
         for file in execution_files:
             if file.object_name.split('.')[-1] == file_type:
@@ -230,7 +238,8 @@ def delete_execution_file_for_type(execution_plan_id,file_to_delete):
     except Exception as e:
         error_message = f"Error while deleting execution file {file_to_delete}"
         raise Exception(error_message) from e
-    
+
+
 def delete_geometry_file(file_name):
     try:
         minio_client.remove_object(ROOT_BUCKET, f"{GEOMETRY_FOLDER}/{file_name}")

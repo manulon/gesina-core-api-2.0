@@ -42,7 +42,7 @@ paths:
           schema:
             type: string
       responses:
-        '204':
+        '200':
           description: Execution plan successfully deleted
         '400':
           description: Execution plan not found
@@ -179,6 +179,8 @@ components:
           type: string
         geometry_id:
           type: integer
+        geometry:
+          type: string
         user_id:
           type: integer
         start_datetime:

@@ -65,6 +65,7 @@ class ExecutionPlan(Base):
             "id": self.id,
             "plan_name": self.plan_name,
             "geometry_id": self.geometry_id,
+            "geometry": str(self.geometry),
             "user_id": self.user_id,
             "start_datetime": str(self.start_datetime),
             "end_datetime": str(self.end_datetime),
