@@ -179,6 +179,8 @@ components:
           type: string
         geometry_id:
           type: integer
+        geometry:
+          type: string
         user_id:
           type: integer
         start_datetime:
