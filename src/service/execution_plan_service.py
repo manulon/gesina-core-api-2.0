@@ -318,7 +318,7 @@ def update_finished_execution_plan(execution_plan_id, start_datetime, end_dateti
 
 
 def edit_execution_plan(execution_plan_id, plan_name=None, geometry_id=None, project_file=None, plan_file=None,
-                        flow_file=None, restart_file=None, execution_plan_output=None, status=None):
+                        flow_file=None, restart_file=None, execution_plan_output=None):
     execution_plan = get_execution_plan(execution_plan_id)
     with get_session() as session:
         session.add(execution_plan)
@@ -339,7 +339,6 @@ def edit_execution_plan(execution_plan_id, plan_name=None, geometry_id=None, pro
             session.refresh(execution_plan)
             execution_plan.execution_plan_output_list = new_output_list
         execution_plan.plan_name = plan_name if plan_name is not None else execution_plan.plan_name
-        execution_plan.status = status if status is not None else execution_plan.status
         if geometry_id is not None:
             new_geometry_filename = str(geometry_service.get_geometry(int(geometry_id)))
 
