@@ -5,10 +5,9 @@ from src.persistance.execution_plan import (
 )
 from src.persistance.session import get_session
 from src.persistance.user import User
-from src.service import file_storage_service, user_service
+from src.service import file_storage_service, user_service, geometry_service
 from src.service.file_storage_service import FileType
-from sqlalchemy import and_,func
-
+from sqlalchemy import and_, func
 
 import io
 
@@ -47,7 +46,6 @@ def copy_execution_plan(execution_plan_id):
     execution_plan = create_copy(e.plan_name, e.geometry, e.user, e.execution_plan_output_list)
     file_storage_service.copy_execution_files(execution_plan_id, execution_plan.id)
     return execution_plan
-
 
 
 def create_from_json(execution_plan):
@@ -166,7 +164,6 @@ def create(
         if not isinstance(restart_file, io.BytesIO):
             restart_file_name = restart_file.filename
 
-
         if restart_file:
             file_storage_service.save_file(
                 FileType.EXECUTION_PLAN,
@@ -200,26 +197,23 @@ def create_copy(execution_plan_name,
 
 
 def delete_execution_plan(execution_plan_id):
-    try:
-        execution_plan = get_execution_plan(execution_plan_id)
-        with get_session() as session:
-            session.delete(execution_plan)
-            session.commit()
-        file_storage_service.delete_execution_files(execution_plan_id)
-        return True
-    except Exception as e:
-        print("error while deleting execution plan: " + execution_plan_id)
-        print(e)
-        raise e
+    execution_plan = get_execution_plan(execution_plan_id)
+    if execution_plan is None:
+        raise Exception(f"Execution plan with id {execution_plan_id} does not exist")
+    with get_session() as session:
+        session.delete(execution_plan)
+        session.commit()
+    file_storage_service.delete_execution_files(execution_plan_id)
+    return True
 
-from datetime import datetime
 
-def get_execution_plans(plan_name=None, user_first_name=None, user_last_name=None, status=None, date_from=None, date_to=None):
+def get_execution_plans(plan_name=None, user_first_name=None, user_last_name=None, status=None, date_from=None,
+                        date_to=None):
     execution_plans = []
     with get_session() as session:
-        
+
         query = session.query(ExecutionPlan).order_by(ExecutionPlan.id.desc())
-        
+
         if plan_name is not None:
             query = query.filter(ExecutionPlan.plan_name.like(f"%{plan_name}%"))
         if user_first_name is not None or user_last_name is not None:
@@ -234,7 +228,7 @@ def get_execution_plans(plan_name=None, user_first_name=None, user_last_name=Non
             query = query.filter(ExecutionPlan.start_datetime >= date_from)
         if date_to is not None:
             query = query.filter(ExecutionPlan.start_datetime <= date_to)
-        
+
         data = query.all()
         if data:
             execution_plans = data
@@ -261,20 +255,24 @@ def get_execution_plans_by_dates(date_from, date_to):
             )
             .all()
         )
-    
-def get_execution_plans_json(offset=0, limit=9999,date_from=None, date_to=None, user_first_name=None,user_last_name=None,name=None, status=None):
-    execution_plans = get_execution_plans(plan_name=name,user_first_name=user_first_name,user_last_name=user_last_name , status=status, date_from=date_from, date_to=date_to)
+
+
+def get_execution_plans_json(offset=0, limit=9999, date_from=None, date_to=None, user_first_name=None,
+                             user_last_name=None, name=None, status=None):
+    execution_plans = get_execution_plans(plan_name=name, user_first_name=user_first_name,
+                                          user_last_name=user_last_name, status=status, date_from=date_from,
+                                          date_to=date_to)
     total_rows = len(execution_plans)
 
     response_list = []
-    for execution_plan in execution_plans[offset : offset + limit]:
+    for execution_plan in execution_plans[offset: offset + limit]:
         user = execution_plan.user
         execution_files = [
-        f.object_name
-        for f in file_storage_service.list_execution_files(
-            FileType.EXECUTION_PLAN, execution_plan.id
-        )
-    ] 
+            f.object_name
+            for f in file_storage_service.list_execution_files(
+                FileType.EXECUTION_PLAN, execution_plan.id
+            )
+        ]
         execution_plan_row = {
             "id": execution_plan.id,
             "plan_name": execution_plan.plan_name,
@@ -308,6 +306,7 @@ def update_execution_plan_status(execution_plan_id, status: ExecutionPlanStatus)
         session.add(execution_plan)
         execution_plan.status = status
 
+
 def update_finished_execution_plan(execution_plan_id, start_datetime, end_datetime):
     execution_plan = get_execution_plan(execution_plan_id)
 
@@ -317,7 +316,9 @@ def update_finished_execution_plan(execution_plan_id, start_datetime, end_dateti
         execution_plan.start_datetime = start_datetime
         execution_plan.end_datetime = end_datetime
 
-def edit_execution_plan(execution_plan_id, plan_name=None, geometry_id=None,project_file=None,plan_file=None,flow_file=None,restart_file=None,execution_plan_output=None, status=None):
+
+def edit_execution_plan(execution_plan_id, plan_name=None, geometry_id=None, project_file=None, plan_file=None,
+                        flow_file=None, restart_file=None, execution_plan_output=None, status=None):
     execution_plan = get_execution_plan(execution_plan_id)
     with get_session() as session:
         session.add(execution_plan)
@@ -326,10 +327,11 @@ def edit_execution_plan(execution_plan_id, plan_name=None, geometry_id=None,proj
             for d in execution_plan_output:
                 if d.get("river") is None or d.get("reach") is None or d.get("river_stat") is None:
                     raise Exception("Execution plan output does not contain river, river_stat or reach")
-                
+
                 new_output_list.append(
                     ExecutionPlanOutput(
-                        river=d.get("river"), reach=d.get("reach"), river_stat=d.get("river_stat"),execution_plan_id=execution_plan_id
+                        river=d.get("river"), reach=d.get("reach"), river_stat=d.get("river_stat"),
+                        execution_plan_id=execution_plan_id
                     )
                 )
             session.query(ExecutionPlanOutput).filter_by(execution_plan_id=execution_plan_id).delete()
@@ -337,15 +339,21 @@ def edit_execution_plan(execution_plan_id, plan_name=None, geometry_id=None,proj
             session.refresh(execution_plan)
             execution_plan.execution_plan_output_list = new_output_list
         execution_plan.plan_name = plan_name if plan_name is not None else execution_plan.plan_name
-        execution_plan.geometry_id = geometry_id if geometry_id is not None else execution_plan.geometry_id
         execution_plan.status = status if status is not None else execution_plan.status
+        if geometry_id is not None:
+            new_geometry_filename = str(geometry_service.get_geometry(int(geometry_id)))
+
+            if new_geometry_filename == "None":
+                raise Exception(f"Geometry with id {geometry_id} does not exist")
+            old_geometry_filename = execution_plan.geometry
+            file_storage_service.copy_geometry_to(execution_plan_id, new_geometry_filename)
+            file_storage_service.delete_execution_file(execution_plan_id, old_geometry_filename)
+            execution_plan.geometry_id = geometry_id
         session.commit()
-    if geometry_id is not None:
-        file_storage_service.copy_geometry_to(execution_plan_id, execution_plan.geometry) 
     for file in [project_file, plan_file, flow_file, restart_file]:
         if file is not None:
             try:
-                file_storage_service.delete_execution_file_for_type(execution_plan_id,file)
+                file_storage_service.delete_execution_file_for_type(execution_plan_id, file)
                 file_storage_service.copy_execution_file(file, execution_plan_id)
                 file_storage_service.delete_file(file)
             except Exception as e:
