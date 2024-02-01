@@ -197,11 +197,20 @@ def read_all_notifications_for_user():
 
 @VIEW_BLUEPRINT.route("/execution_plan/list")
 def execution_plan_list():
-    success_message = request.args.get('success_message')
-    if success_message:
-        success_message = "Geometría duplicada con éxito."
+    success_message_duplicate = request.args.get('duplicate_success')
+    success_message_cancel = request.args.get('cancel_success')
 
-    return render_template("execution_plan_list.html", success_message=success_message)
+    message = None
+
+    if success_message_duplicate:
+        message = "Geometría duplicada con éxito."
+
+    if success_message_cancel:
+        message = "Geometría cancelada con éxito."
+
+    print(message)
+
+    return render_template("execution_plan_list.html", success_message=message)
 
 @VIEW_BLUEPRINT.route("/execution_plan")
 def execution_plan_new():

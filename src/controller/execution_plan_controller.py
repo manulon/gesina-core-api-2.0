@@ -62,7 +62,7 @@ def cancel(execution_id):
 
     try:
         cancel_simulation(execution_id)
-        return redirect(url_for("view_controller.execution_plan_list"))
+        return redirect(url_for("view_controller.execution_plan_list, cancel_success=true"))
     except Exception as e:
         logger.error(e)
         raise e
