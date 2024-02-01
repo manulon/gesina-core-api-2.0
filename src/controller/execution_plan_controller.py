@@ -62,8 +62,7 @@ def cancel(execution_id):
 
     try:
         cancel_simulation(execution_id)
-        success_message = f"Simulación #{str(execution_id)} cancelada con éxito."
-        return render_template("geometry_list.html", success_message=success_message)
+        return redirect(url_for("view_controller.execution_plan_list"))
     except Exception as e:
         logger.error(e)
         raise e
@@ -72,7 +71,8 @@ def cancel(execution_id):
 def copy(id):
     try:
         execution_plan = execution_plan_service.copy_execution_plan(id)
-        return {"new_execution_plan_id": execution_plan.id}
+        success_message = f"Simulación #{str(execution_plan.id)} duplicada con éxito."
+        return render_template("execution_plan_list.html", success_message=success_message)
     except Exception as e:
         print(e.with_traceback())
         response = jsonify({"error": str(e)})

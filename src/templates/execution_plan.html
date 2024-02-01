@@ -4,7 +4,7 @@
         <div class="d-flex justify-content-between pb-4">
             {% if readonly %}
                 <h2>Simulación #{{ execution_plan.id }}</h2>
-                <button type="button" class="btn btn-outline-secondary" title="Editar simulacion" onclick="editSimulation({{ execution_plan.id }})">
+                <button type="button" class="btn btn-outline-secondary" role="button" title="Editar simulacion" onclick="editSimulation({{ execution_plan.id }})">
                     <i class="fa-solid fa-pencil"></i>
                 </button>
             {% else %}
@@ -202,16 +202,18 @@
 
         function duplicateSimulation(id) {
             let copy_url = `{{ url_for('execution_plan_controller.copy', id='') }}${id}`;
-                          
-            fetch(copy_url, {method: 'POST'})
-            .then(response => {
-                list_url = "{{ url_for('view_controller.execution_plan_list') }}";
-                window.location.href = list_url;
-            })
-            .catch(error => {
-                console.error('Error al duplicar la simulación', error);
-            });
+            console.log('URL de copia:', copy_url);
+
+            fetch(copy_url, { method: 'POST' })
+                .then(response => {
+                    console.log('Duplicado exitoso');
+                    window.location.href = '{{ url_for("view_controller.execution_plan_list", success_message=true) }}';
+                })
+                .catch(error => {
+                    console.error('Error al duplicar la simulación', error);
+                });
         }
+
 
     </script>
     <style>

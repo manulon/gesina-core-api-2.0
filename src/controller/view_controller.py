@@ -195,11 +195,13 @@ def read_all_notifications_for_user():
     notification_service.read_all_user_notifications(user.id)
     return {"result": "OK"}, 201
 
-
 @VIEW_BLUEPRINT.route("/execution_plan/list")
 def execution_plan_list():
-    return render_template("execution_plan_list.html")
+    success_message = request.args.get('success_message')
+    if success_message:
+        success_message = "Geometría duplicada con éxito."
 
+    return render_template("execution_plan_list.html", success_message=success_message)
 
 @VIEW_BLUEPRINT.route("/execution_plan")
 def execution_plan_new():

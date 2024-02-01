@@ -108,6 +108,7 @@
             fetch(cancel_url, {method: 'POST'})
             .then(response => {
                 console.log('Cancelacion exitosa');
+                window.location.reload();
             })
             .catch(error => {
                 console.error('Error al cancelar la simulación', error);
