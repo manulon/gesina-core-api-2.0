@@ -154,6 +154,8 @@ def list_execution_files(file_type, execution_id):
     return minio_client.list_objects(ROOT_BUCKET, f"{file_type.value}/{execution_id}/")
 
 
+
+
 def get_file(file_path):
     logging.info(f"Obtaining file {file_path} from bucket {ROOT_BUCKET}")
     return minio_client.get_object(ROOT_BUCKET, file_path)
@@ -209,7 +211,9 @@ def copy_execution_file(file_to_copy, id_copy_to):
 
 def delete_execution_files(local_directory_path):
     try:
-        local_files = list_execution_files(FileType.EXECUTION_PLAN, local_directory_path)
+        executions_files = list_execution_files(FileType.EXECUTION_PLAN, local_directory_path)
+        result_files = list_execution_files(FileType.RESULT, local_directory_path)
+        local_files = list(executions_files) + list(result_files)
         for file in local_files:
             minio_object_name = file.object_name
             minio_client.remove_object(ROOT_BUCKET, minio_object_name)
