@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from flask import Blueprint, jsonify, send_file, url_for, redirect, request
+from flask import Blueprint, jsonify, send_file, url_for, redirect, request, render_template
 from src import logger
 
 from src.login_manager import user_is_authenticated
@@ -42,7 +42,6 @@ def download(_id, _file_type, _file):
 
     return send_file(file, attachment_filename=_file)
 
-
 @EXECUTION_PLAN_BLUEPRINT.route("/<execution_id>", methods=["POST"])
 def update(execution_id):
     from src.tasks import queue_or_fake_simulate
@@ -63,7 +62,8 @@ def cancel(execution_id):
 
     try:
         cancel_simulation(execution_id)
-        return redirect(url_for("view_controller.execution_plan_list"))
+        success_message = f"Simulación #{str(execution_id)} cancelada con éxito."
+        return render_template("geometry_list.html", success_message=success_message)
     except Exception as e:
         logger.error(e)
         raise e
