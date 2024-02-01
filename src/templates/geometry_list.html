@@ -71,14 +71,17 @@
 
             fetch(delete_url, {method: 'DELETE'})
             .then(response => {
-                console.log('Borrado exitoso');
-                let geometry_list_url = '{{url_for("view_controller.geometry_list", error_message=true)}}'
-                window.location.href = geometry_list_url
+                console.log(response)
+                if (response.status == 200){
+                    let geometry_list_url = '{{url_for("view_controller.geometry_list", success_message=true)}}'
+                    window.location.href = geometry_list_url
+                } else if (response.status == 400) {
+                    console.log('entre aca')
+                    let geometry_list_url = '{{url_for("view_controller.geometry_list", error_message_foreign_key=true)}}'
+                    window.location.href = geometry_list_url
+                }
             })
             .catch(error => {
-                console.error('Error al borrar la geometria', error);
-                let geometry_list_url = '{{url_for("view_controller.geometry_list", error_message=true)}}'
-                window.location.href = geometry_list_url
             });
         }
     </script>

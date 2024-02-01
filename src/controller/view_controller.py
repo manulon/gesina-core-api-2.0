@@ -127,14 +127,15 @@ def geometry_read(geometry_id):
 @VIEW_BLUEPRINT.route("/geometry/list")
 def geometry_list():
     success_message = request.args.get('success_message')
-    error_message = request.args.get('error_message')
+    error_message_foreign_key = request.args.get('error_message_foreign_key')
+
+    error_message = None
 
     if success_message:
         success_message = "La geometría ha sido borrada correctamente."
-    if error_message:
-        error_message = "La geometría no pudo ser borrada."
+    if error_message_foreign_key:
+        error_message = "La geometría no pudo ser borrada. La geometria está siendo usada en un plan de ejecución"
 
-    print(error_message)
 
     return render_template("geometry_list.html", 
                            success_message = success_message, 
