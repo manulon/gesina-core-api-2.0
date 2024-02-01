@@ -63,16 +63,18 @@
 
         <div class="w-100" style="min-height: 1000px">
             {% if errors is defined %}
-                {% for error in errors %}
-                    <div class="alert alert-danger error-message mb-n3" role="alert">
-                        <button type="button" class="close close-error" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                        <div>
-                        {{ error }}
-                        </div>
-                    </div>
-                {% endfor %}
+                    {% for error in errors %}
+                        {% if error is not none %}
+                            <div class="alert alert-danger error-message mb-n3" role="alert">
+                                <button type="button" class="close close-error" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <div>
+                                {{ error }}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
             {% endif %}
             {% if success_message is defined and success_message is not none %}
             <div class="alert alert-success success-message mb-n3" role="alert">

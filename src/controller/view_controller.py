@@ -126,7 +126,19 @@ def geometry_read(geometry_id):
 
 @VIEW_BLUEPRINT.route("/geometry/list")
 def geometry_list():
-    return render_template("geometry_list.html")
+    success_message = request.args.get('success_message')
+    error_message = request.args.get('error_message')
+
+    if success_message:
+        success_message = "La geometría ha sido borrada correctamente."
+    if error_message:
+        error_message = "La geometría no pudo ser borrada."
+
+    print(error_message)
+
+    return render_template("geometry_list.html", 
+                           success_message = success_message, 
+                           errors = [error_message])
 
 
 @VIEW_BLUEPRINT.route("/geometry")
