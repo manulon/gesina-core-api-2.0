@@ -108,7 +108,7 @@
             fetch(cancel_url, {method: 'POST'})
             .then(response => {
                 console.log('Cancelacion exitosa');
-                window.location.href = '{{ url_for("view_controller.execution_plan_list", cancel_success=true) }}';
+                window.location.href = '{{ url_for("view_controller.execution_plan_list_cancel_success") }}';
             })
             .catch(error => {
                 console.error('Error al cancelar la simulación', error);

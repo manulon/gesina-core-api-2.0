@@ -208,22 +208,22 @@ def read_all_notifications_for_user():
     notification_service.read_all_user_notifications(user.id)
     return {"result": "OK"}, 201
 
-@VIEW_BLUEPRINT.route("/execution_plan/list")
-def execution_plan_list():
-    success_message_duplicate = request.args.get('duplicate_success')
-    success_message_cancel = request.args.get('cancel_success')
 
-    message = None
-
-    if success_message_duplicate:
-        message = "Geometría duplicada con éxito."
-
-    if success_message_cancel:
-        message = "Geometría cancelada con éxito."
-
-    print(message)
+@VIEW_BLUEPRINT.route('/execution_plan/list/cancel_success')
+def execution_plan_list_cancel_success():
+    message = "Geometría cancelada con éxito."
 
     return render_template("execution_plan_list.html", success_message=message)
+
+@VIEW_BLUEPRINT.route('/execution_plan/list/duplicate_success')
+def execution_plan_list_duplicate_success():    
+    message = "Geometría duplicada con éxito."
+
+    return render_template("execution_plan_list.html", success_message=message)
+
+@VIEW_BLUEPRINT.route('/execution_plan/list')
+def execution_plan_list():
+    return render_template("execution_plan_list.html")
 
 @VIEW_BLUEPRINT.route("/execution_plan")
 def execution_plan_new():

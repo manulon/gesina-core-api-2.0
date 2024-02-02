@@ -65,11 +65,9 @@ def edit_geometry(geometry_id):
             geometry_id,
             description
         )
-        success_message = jsonify({"message": f"successfully edited geometry with id: {geometry_id}"})
+        success_message =  f"Geometria #{geometry_id} editada con éxito" 
 
         return render_template("geometry_list.html", success_message=success_message)
     except Exception as e:
-        response = jsonify({"message": "error editing geometry with id " + geometry_id,
-                            "error": str(e)})
-        response.status_code = 400
-        return response
+        error_message =  f"Error al editar la geometría:" + str(e)
+        return render_template("geometry_list.html", errors=[error_message])
