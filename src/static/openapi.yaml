@@ -5,9 +5,12 @@ info:
   description: API for managing execution plans
 
 servers:
-  - url: http://localhost:5000/
+  - url: http://localhost:8000/api/
     description: Local development server
 
+
+security:
+  - basicAuth: [ ]
 paths:
   /execution_plan/{execution_plan_id}:
     get:
@@ -21,6 +24,13 @@ paths:
           required: true
           schema:
             type: string
+        - name: full_content
+          in: query
+          required: false
+          default: false
+          schema:
+            type: boolean
+          description: whether the files come with the full content (true) or no (false, default)
       responses:
         '200':
           description: Successful response
@@ -169,6 +179,10 @@ paths:
           description: Error while starting execution
 
 components:
+  securitySchemes:
+    basicAuth: # Name of the security scheme
+      type: http
+      scheme: basic
   schemas:
     ExecutionPlan:
       type: object
@@ -200,6 +214,17 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ExecutionPlanOutput'
+        execution_files:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              content:
+                type: string
+
+
         # Add other required fields based on your actual API's behavior
     ExecutionPlanOutput:
       type: object

@@ -27,14 +27,29 @@ def get_execution_plan(execution_plan_id):
             )
         ]
         full_content_param = request.args.get('full_content', '').lower() == 'true'
+
+        result_files = [
+            f.object_name
+            for f in file_storage_service.list_execution_files(
+                FileType.RESULT, execution_plan_id
+            )
+        ]
         if full_content_param:
-            execution_plan_dict["files"] = []
+            execution_plan_dict["execution_files"] = []
+            execution_plan_dict["result_files"] = []
             for i in execution_files:
                 data = file_storage_service.get_file(i).data
                 file = {"name": i.split("/")[-1], "content": str(data)}
-                execution_plan_dict["files"].append(file)
+                execution_plan_dict["execution_files"].append(file)
+            for i in result_files:
+                data = file_storage_service.get_file(i).data
+                file = {"name": i.split("/")[-1], "content": str(data)}
+                execution_plan_dict["result_files"].append(file)
+
         else:
-            execution_plan_dict["files"] = [i.split("/")[-1] for i in execution_files]
+            execution_plan_dict["execution_files"] = [{"name": i.split("/")[-1]} for i in execution_files]
+            execution_plan_dict["result_files"] = [{"name":i.split("/")[-1]} for i in result_files]
+
 
         return jsonify(execution_plan_dict)
     except Exception as e:
