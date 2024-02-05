@@ -141,6 +141,17 @@ def geometry_list():
                            success_message = success_message, 
                            errors = [error_message])
 
+@VIEW_BLUEPRINT.route("/geometry/list/edit_success")
+def geometry_list_edit_success():
+    success_message = 'La geometría ha sido editada con éxito'
+
+    return render_template("geometry_list.html", success_message = success_message)
+
+@VIEW_BLUEPRINT.route("/geometry/list/edit_failed")
+def geometry_list_edit_failed():
+    msg = 'Ha ocurrido un error al editar la geometria'
+
+    return render_template("geometry_list.html", errors=[msg])
 
 @VIEW_BLUEPRINT.route("/geometry")
 def geometry_new():
@@ -208,7 +219,6 @@ def read_all_notifications_for_user():
     notification_service.read_all_user_notifications(user.id)
     return {"result": "OK"}, 201
 
-
 @VIEW_BLUEPRINT.route('/execution_plan/list/cancel_success')
 def execution_plan_list_cancel_success():
     message = "Geometría cancelada con éxito."
@@ -236,7 +246,6 @@ def execution_plan_new():
     geometries = geometry_service.get_geometries()
     data = {"form": ExecutionPlanForm(), "geometries": geometries}
     return render_template("execution_plan.html", **data)
-
 
 @VIEW_BLUEPRINT.route("/execution_plan", methods=["POST"])
 def save_execution_plan():

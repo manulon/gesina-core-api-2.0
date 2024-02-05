@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from flask import Blueprint, jsonify, send_file, request, render_template
+from flask import Blueprint, jsonify, send_file, request, redirect, url_for
 
 from src.login_manager import user_is_authenticated
 from src.service import geometry_service, file_storage_service, list_utils_service
@@ -63,9 +63,6 @@ def edit_geometry(geometry_id):
             geometry_id,
             description
         )
-        success_message =  f"Geometria #{geometry_id} editada con éxito" 
-
-        return render_template("geometry_list.html", success_message=success_message)
+        return redirect(url_for("view_controller.geometry_list_edit_success"))
     except Exception as e:
-        error_message =  f"Error al editar la geometría:" + str(e)
-        return render_template("geometry_list.html", errors=[error_message])
+        return redirect(url_for("view_controller.geometry_list_edit_failed"))

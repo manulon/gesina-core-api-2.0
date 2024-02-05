@@ -32,7 +32,6 @@ def list_execution_plans():
 
     return jsonify({"rows": response_list, "total": total_rows})
 
-
 @EXECUTION_PLAN_BLUEPRINT.route("/download/<_id>/<_file_type>/<_file>")
 def download(_id, _file_type, _file):
     with file_storage_service.get_file_by_type(
