@@ -68,16 +68,19 @@
 
         function deleteGeometry(id) {
             let delete_url = `{{ url_for('geometry_controller.delete', geometry_id='') }}${id}`;
-            let geometry_list_url = '{{url_for("view_controller.geometry_list")}}'
-
 
             fetch(delete_url, {method: 'DELETE'})
             .then(response => {
-                console.log('Borrado exitoso');
-                window.location.href = geometry_list_url
+                if (response.status == 200){
+                    let geometry_list_url = '{{url_for("view_controller.geometry_list_delete_success")}}'
+                    window.location.href = geometry_list_url
+                } else if (response.status == 400) {
+                    console.log('entre aca')
+                    let geometry_list_url = '{{url_for("view_controller.geometry_list_delete_failed_foreign_key")}}'
+                    window.location.href = geometry_list_url
+                }
             })
             .catch(error => {
-                console.error('Error al borrar la geometria', error);
             });
         }
     </script>

@@ -126,13 +126,48 @@ def geometry_read(geometry_id):
 
 @VIEW_BLUEPRINT.route("/geometry/list")
 def geometry_list():
-    return render_template("geometry_list.html")
+    success_message = request.args.get('success_message')
+    error_message_foreign_key = request.args.get('error_message_foreign_key')
 
+    error_message = None
+
+    if success_message:
+        success_message = "La geometría ha sido borrada correctamente."
+    if error_message_foreign_key:
+        error_message = "La geometría no pudo ser borrada. La geometria está siendo usada en un plan de ejecución"
+
+
+    return render_template("geometry_list.html", 
+                           success_message = success_message, 
+                           errors = [error_message])
+
+@VIEW_BLUEPRINT.route("/geometry/list/delete_success")
+def geometry_list_delete_success():
+    success_message = "La geometría ha sido borrada correctamente."
+    
+    return render_template("geometry_list.html", success_message = success_message)
+
+@VIEW_BLUEPRINT.route("/geometry/list/delete_failed_foreign_key")
+def geometry_list_delete_failed_foreign_key():
+    error_message = "La geometría no pudo ser borrada. La geometria está siendo usada en un plan de ejecución"
+
+    return render_template("geometry_list.html", errors = [error_message])
+
+@VIEW_BLUEPRINT.route("/geometry/list/edit_success")
+def geometry_list_edit_success():
+    success_message = 'La geometría ha sido editada con éxito'
+
+    return render_template("geometry_list.html", success_message = success_message)
+
+@VIEW_BLUEPRINT.route("/geometry/list/edit_failed")
+def geometry_list_edit_failed():
+    msg = 'Ha ocurrido un error al editar la geometria'
+
+    return render_template("geometry_list.html", errors=[msg])
 
 @VIEW_BLUEPRINT.route("/geometry")
 def geometry_new():
     return render_template("geometry.html", form=GeometryForm())
-
 
 @VIEW_BLUEPRINT.route("/geometry", methods=["POST"])
 def save_geometry():
@@ -157,7 +192,6 @@ def save_geometry():
         error_message = "Error cargando archivo. Intente nuevamente."
 
         return render_template("geometry.html", form=form, errors=[error_message])
-
 
 @VIEW_BLUEPRINT.route("/execution_plan/<execution_plan_id>")
 def execution_plan_read(execution_plan_id):
@@ -195,18 +229,33 @@ def read_all_notifications_for_user():
     notification_service.read_all_user_notifications(user.id)
     return {"result": "OK"}, 201
 
+@VIEW_BLUEPRINT.route('/execution_plan/list/cancel_success')
+def execution_plan_list_cancel_success():
+    message = "Geometría cancelada con éxito."
 
-@VIEW_BLUEPRINT.route("/execution_plan/list")
+    return render_template("execution_plan_list.html", success_message=message)
+
+@VIEW_BLUEPRINT.route('/execution_plan/list/duplicate_success')
+def execution_plan_list_duplicate_success():  
+    message = "Geometría duplicada con éxito."
+
+    return render_template("execution_plan_list.html", success_message=message)
+
+@VIEW_BLUEPRINT.route('/execution_plan/list/duplicate_failed')
+def execution_plan_list_duplicate_failed():    
+    message = "La geometría no ha podido ser duplicada, ha ocurrido un error."
+
+    return render_template("execution_plan_list.html", erros=[message])
+
+@VIEW_BLUEPRINT.route('/execution_plan/list')
 def execution_plan_list():
     return render_template("execution_plan_list.html")
-
 
 @VIEW_BLUEPRINT.route("/execution_plan")
 def execution_plan_new():
     geometries = geometry_service.get_geometries()
     data = {"form": ExecutionPlanForm(), "geometries": geometries}
     return render_template("execution_plan.html", **data)
-
 
 @VIEW_BLUEPRINT.route("/execution_plan", methods=["POST"])
 def save_execution_plan():

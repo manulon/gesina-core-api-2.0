@@ -32,7 +32,6 @@ def list_execution_plans():
 
     return jsonify({"rows": response_list, "total": total_rows})
 
-
 @EXECUTION_PLAN_BLUEPRINT.route("/download/<_id>/<_file_type>/<_file>")
 def download(_id, _file_type, _file):
     with file_storage_service.get_file_by_type(
@@ -41,7 +40,6 @@ def download(_id, _file_type, _file):
         file = BytesIO(file_from_storage.data)
 
     return send_file(file, attachment_filename=_file)
-
 
 @EXECUTION_PLAN_BLUEPRINT.route("/<execution_id>", methods=["POST"])
 def update(execution_id):
@@ -72,7 +70,7 @@ def cancel(execution_id):
 def copy(id):
     try:
         execution_plan = execution_plan_service.copy_execution_plan(id)
-        return {"new_execution_plan_id": execution_plan.id}
+        return jsonify({"execution_plan": execution_plan.id})
     except Exception as e:
         print(e.with_traceback())
         response = jsonify({"error": str(e)})
