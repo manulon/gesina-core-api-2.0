@@ -71,8 +71,7 @@ def cancel(execution_id):
 def copy(id):
     try:
         execution_plan = execution_plan_service.copy_execution_plan(id)
-        success_message = f"Simulación #{str(execution_plan.id)} duplicada con éxito."
-        return render_template("execution_plan_list.html", success_message=success_message)
+        return jsonify({"execution_plan": execution_plan.id})
     except Exception as e:
         print(e.with_traceback())
         response = jsonify({"error": str(e)})

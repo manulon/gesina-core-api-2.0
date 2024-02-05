@@ -216,7 +216,7 @@ def execution_plan_list_cancel_success():
     return render_template("execution_plan_list.html", success_message=message)
 
 @VIEW_BLUEPRINT.route('/execution_plan/list/duplicate_success')
-def execution_plan_list_duplicate_success():    
+def execution_plan_list_duplicate_success():  
     message = "Geometría duplicada con éxito."
 
     return render_template("execution_plan_list.html", success_message=message)
