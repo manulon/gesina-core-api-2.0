@@ -72,11 +72,11 @@
             fetch(delete_url, {method: 'DELETE'})
             .then(response => {
                 if (response.status == 200){
-                    let geometry_list_url = '{{url_for("view_controller.geometry_list", success_message=true)}}'
+                    let geometry_list_url = '{{url_for("view_controller.geometry_list_delete_success")}}'
                     window.location.href = geometry_list_url
                 } else if (response.status == 400) {
                     console.log('entre aca')
-                    let geometry_list_url = '{{url_for("view_controller.geometry_list", error_message_foreign_key=true)}}'
+                    let geometry_list_url = '{{url_for("view_controller.geometry_list_delete_failed_foreign_key")}}'
                     window.location.href = geometry_list_url
                 }
             })
