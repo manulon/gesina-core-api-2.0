@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from flask import Blueprint, jsonify, send_file, url_for, redirect, request, render_template
+from flask import Blueprint, jsonify, send_file, url_for, redirect, request
 from src import logger
 
 from src.login_manager import user_is_authenticated
