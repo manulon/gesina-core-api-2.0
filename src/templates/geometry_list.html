@@ -71,7 +71,6 @@
 
             fetch(delete_url, {method: 'DELETE'})
             .then(response => {
-                console.log(response)
                 if (response.status == 200){
                     let geometry_list_url = '{{url_for("view_controller.geometry_list", success_message=true)}}'
                     window.location.href = geometry_list_url
