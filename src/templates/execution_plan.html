@@ -207,9 +207,11 @@
             fetch(copy_url, { method: 'POST' })
                 .then(response => {
                     if (response.status == 200){
-                        window.location.href = '{{ url_for("view_controller.execution_plan_list_duplicate_success") }}';
+                        let execution_plan_list_url = `{{ url_for('view_controller.execution_plan_list', duplicate_success='') }}${id}`;
+                        window.location.href = execution_plan_list_url;
                     } else if (response.status == 400) {
-                        window.location.href = '{{ url_for("view_controller.execution_plan_list_duplicate_failed") }}';
+                        let execution_plan_list_url = `{{ url_for('view_controller.execution_plan_list', duplicate_failed='') }}${id}`;
+                        window.location.href = execution_plan_list_url;
                     }
                 }).catch(error => {
                     console.error('Error al duplicar la simulación', error);

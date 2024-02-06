@@ -234,6 +234,8 @@ def execution_plan_list():
     cancel_success = request.args.get('cancel_success')
     delete_success = request.args.get('delete_success')
     delete_failed = request.args.get('delete_failed')
+    duplicate_success = request.args.get('duplicate_success')
+    duplicate_failed = request.args.get('duplicate_failed')
 
     message = None
     
@@ -248,21 +250,17 @@ def execution_plan_list():
     if delete_failed:
         message = "Ha ocurrido un error al eliminar el plan de ejecucion #" + delete_failed
         return render_template("execution_plan_list.html", errors=[message])
+    
+    if duplicate_success:
+        message = "El plan de ejecucion #" + duplicate_success +  " ha sido duplicado con éxito."
+        return render_template("execution_plan_list.html", success_message=message)
+    
+    if duplicate_failed:
+        message = "Ha ocurrido un error al duplicar el plan de ejecucion #" + duplicate_failed
+        return render_template("execution_plan_list.html", errors=[message])
 
     return render_template("execution_plan_list.html")        
     
-@VIEW_BLUEPRINT.route('/execution_plan/list/duplicate_success')
-def execution_plan_list_duplicate_success():  
-    message = "Geometría duplicada con éxito."
-
-    return render_template("execution_plan_list.html", success_message=message)
-
-@VIEW_BLUEPRINT.route('/execution_plan/list/duplicate_failed')
-def execution_plan_list_duplicate_failed():    
-    message = "La geometría no ha podido ser duplicada, ha ocurrido un error."
-
-    return render_template("execution_plan_list.html", errors=[message])
-
 @VIEW_BLUEPRINT.route("/execution_plan")
 def execution_plan_new():
     geometries = geometry_service.get_geometries()
