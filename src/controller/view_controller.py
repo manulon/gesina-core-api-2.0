@@ -128,8 +128,8 @@ def geometry_read(geometry_id):
 def geometry_list():    
     delete_success = request.args.get('delete_success')
     delete_failed = request.args.get('delete_failed')
-    duplicate_success = request.args.get('duplicate_success')
-    duplicate_failed = request.args.get('duplicate_failed')
+    edit_success = request.args.get('edit_success')
+    edit_failed = request.args.get('edit_failed')
 
     message = None
 
@@ -141,12 +141,12 @@ def geometry_list():
         message = "Ha ocurrido un error al eliminar la geometría #" + delete_failed + ". Esta está siendo usada en un plan de ejecución activo."
         return render_template("geometry_list.html", errors=[message])
     
-    if duplicate_success:
-        message = "La geometría #" + duplicate_success +  " ha sido duplicado con éxito."
+    if edit_success:
+        message = "La geometría #" + edit_success +  " ha sido editada con éxito."
         return render_template("geometry_list.html", success_message=message)
     
-    if duplicate_failed:
-        message = "Ha ocurrido un error al duplicar la geometría #" + duplicate_failed
+    if edit_failed:
+        message = "Ha ocurrido un error al editar la geometría #" + edit_failed
         return render_template("geometry_list.html", errors=[message])
 
     return render_template("geometry_list.html")    
