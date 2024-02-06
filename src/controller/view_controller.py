@@ -229,12 +229,17 @@ def read_all_notifications_for_user():
     notification_service.read_all_user_notifications(user.id)
     return {"result": "OK"}, 201
 
-@VIEW_BLUEPRINT.route('/execution_plan/list/cancel_success')
-def execution_plan_list_cancel_success():
-    message = "Geometría cancelada con éxito."
+@VIEW_BLUEPRINT.route('/execution_plan/list/')
+def execution_plan_list():
+    cancel_success = request.args.get('cancel_success')
+    message = None
+    
+    if cancel_success:
+        message = "Geometría #" + cancel_success +  " ha sido cancelada con éxito."
+        return render_template("execution_plan_list.html", success_message=message)
 
-    return render_template("execution_plan_list.html", success_message=message)
-
+    return render_template("execution_plan_list.html")        
+    
 @VIEW_BLUEPRINT.route('/execution_plan/list/duplicate_success')
 def execution_plan_list_duplicate_success():  
     message = "Geometría duplicada con éxito."
@@ -258,10 +263,6 @@ def execution_plan_list_delete_failed():
     message = "No se ha podido eliminar el plan de ejecucion, ha ocurrido un error."
 
     return render_template("execution_plan_list.html", errors=[message])
-
-@VIEW_BLUEPRINT.route('/execution_plan/list')
-def execution_plan_list():
-    return render_template("execution_plan_list.html")
 
 @VIEW_BLUEPRINT.route("/execution_plan")
 def execution_plan_new():
