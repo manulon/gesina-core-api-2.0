@@ -64,11 +64,18 @@
                 </button>
             `;
             
+            let delete_button = `
+                <button type="button" class="btn btn-outline-danger" onclick="deleteExecutionPlan(${row['id']})">
+                    <i class="fa-solid fa-trash-alt"></i>
+                </button>
+            `;
+
             return `
                 <div class="d-flex justify-content-around">
                     ${update_button}
                     ${start_button}
                     ${cancel_button}
+                    ${delete_button}
             `
         }
 
@@ -112,6 +119,24 @@
             })
             .catch(error => {
                 console.error('Error al cancelar la simulación', error);
+            });
+        }
+
+
+        function deleteExecutionPlan(id) {
+            let delete_url = `{{ url_for('execution_plan_controller.delete', execution_plan_id='') }}${id}`;
+
+            fetch(delete_url, {method: 'DELETE'})
+            .then(response => {
+                if (response.status == 200){
+                    let execution_plan_list_url = '{{url_for("view_controller.execution_plan_list_delete_success")}}'
+                    window.location.href = execution_plan_list_url
+                } else if (response.status == 400) {
+                    let execution_plan_list_url = '{{url_for("view_controller.execution_plan_list_delete_failed")}}'
+                    window.location.href = execution_plan_list_url
+                }
+            })
+            .catch(error => {
             });
         }
 

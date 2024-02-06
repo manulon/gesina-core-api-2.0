@@ -245,7 +245,19 @@ def execution_plan_list_duplicate_success():
 def execution_plan_list_duplicate_failed():    
     message = "La geometría no ha podido ser duplicada, ha ocurrido un error."
 
-    return render_template("execution_plan_list.html", erros=[message])
+    return render_template("execution_plan_list.html", errors=[message])
+
+@VIEW_BLUEPRINT.route('/execution_plan/list/delete_success')
+def execution_plan_list_delete_success():    
+    message = "El plan de ejecución ha sido eliminado"
+
+    return render_template("execution_plan_list.html", success_message=message)
+
+@VIEW_BLUEPRINT.route('/execution_plan/list/delete_failed')
+def execution_plan_list_delete_failed():    
+    message = "No se ha podido eliminar el plan de ejecucion, ha ocurrido un error."
+
+    return render_template("execution_plan_list.html", errors=[message])
 
 @VIEW_BLUEPRINT.route('/execution_plan/list')
 def execution_plan_list():
