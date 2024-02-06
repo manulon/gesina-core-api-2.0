@@ -232,11 +232,22 @@ def read_all_notifications_for_user():
 @VIEW_BLUEPRINT.route('/execution_plan/list/')
 def execution_plan_list():
     cancel_success = request.args.get('cancel_success')
+    delete_success = request.args.get('delete_success')
+    delete_failed = request.args.get('delete_failed')
+
     message = None
     
     if cancel_success:
-        message = "Geometría #" + cancel_success +  " ha sido cancelada con éxito."
+        message = "El plan de ejecucion #" + cancel_success +  " ha sido cancelado con éxito."
         return render_template("execution_plan_list.html", success_message=message)
+
+    if delete_success:
+        message = "El plan de ejecucion #" + delete_success +  " ha sido eliminado con éxito."
+        return render_template("execution_plan_list.html", success_message=message)
+    
+    if delete_failed:
+        message = "Ha ocurrido un error al eliminar el plan de ejecucion #" + delete_failed
+        return render_template("execution_plan_list.html", errors=[message])
 
     return render_template("execution_plan_list.html")        
     
@@ -249,18 +260,6 @@ def execution_plan_list_duplicate_success():
 @VIEW_BLUEPRINT.route('/execution_plan/list/duplicate_failed')
 def execution_plan_list_duplicate_failed():    
     message = "La geometría no ha podido ser duplicada, ha ocurrido un error."
-
-    return render_template("execution_plan_list.html", errors=[message])
-
-@VIEW_BLUEPRINT.route('/execution_plan/list/delete_success')
-def execution_plan_list_delete_success():    
-    message = "El plan de ejecución ha sido eliminado"
-
-    return render_template("execution_plan_list.html", success_message=message)
-
-@VIEW_BLUEPRINT.route('/execution_plan/list/delete_failed')
-def execution_plan_list_delete_failed():    
-    message = "No se ha podido eliminar el plan de ejecucion, ha ocurrido un error."
 
     return render_template("execution_plan_list.html", errors=[message])
 

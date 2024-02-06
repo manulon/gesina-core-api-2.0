@@ -128,10 +128,11 @@
             fetch(delete_url, {method: 'DELETE'})
             .then(response => {
                 if (response.status == 200){
-                    
+                    let execution_plan_list_url = `{{ url_for('view_controller.execution_plan_list', delete_success='') }}${id}`;
+                    window.location.href = execution_plan_list_url;
                 } else if (response.status == 400) {
-                    let execution_plan_list_url = '{{url_for("view_controller.execution_plan_list_delete_failed")}}'
-                    window.location.href = execution_plan_list_url
+                    let execution_plan_list_url = `{{ url_for('view_controller.execution_plan_list', delete_failed='') }}${id}`;
+                    window.location.href = execution_plan_list_url;
                 }
             })
             .catch(error => {
