@@ -54,12 +54,12 @@ def create_from_json(execution_plan):
         execution_plan.get('geometry_id'),
         execution_plan.get('user_id'),
         execution_plan.get('project_file', {}).get('filename'),
-        io.BytesIO(execution_plan.get('project_file', {}).get('data').encode('utf-8')),
+        None if execution_plan.get('project_file', {}).get('data') is None else io.BytesIO(execution_plan.get('project_file', {}).get('data').encode('utf-8')),
         execution_plan.get('plan_file', {}).get('filename'),
-        io.BytesIO(execution_plan.get('plan_file', {}).get('data').encode('utf-8')),
+        None if execution_plan.get('plan_file', {}).get('data') is None else io.BytesIO(execution_plan.get('plan_file', {}).get('data').encode('utf-8')),
         execution_plan.get('flow_file', {}).get('filename'),
-        io.BytesIO(execution_plan.get('flow_file', {}).get('data').encode('utf-8')),
-        io.BytesIO(execution_plan.get('restart_file', {}).get('data').encode('utf-8')),
+        None if execution_plan.get('flow_file', {}).get('data') is None else io.BytesIO(execution_plan.get('flow_file', {}).get('data').encode('utf-8')),
+        None if execution_plan.get('restart_file', {}).get('data') is None else io.BytesIO(execution_plan.get('restart_file', {}).get('data').encode('utf-8')),
         [
             ExecutionPlanOutput(
                 river=d.get("river"),
@@ -67,7 +67,8 @@ def create_from_json(execution_plan):
                 river_stat=d.get("river_stat")
             )
             for d in execution_plan.get('execution_output_list', [])
-        ]
+        ],
+        restart_name=execution_plan.get('restart_file', {}).get('filename')
     )
 
 
@@ -124,6 +125,7 @@ def create(
         flow_file,
         restart_file=None,
         execution_plan_output_list=None,
+        restart_name=None
 ):
     with get_session() as session:
         execution_plan = ExecutionPlan(
@@ -140,37 +142,50 @@ def create(
 
         file_storage_service.copy_geometry_to(execution_plan_id, geometry.name)
 
-        file_storage_service.save_file(
-            FileType.EXECUTION_PLAN,
-            project_file,
-            project_name,
-            execution_plan_id,
-        )
+        if project_file is not None:
+            file_storage_service.save_file(
+                FileType.EXECUTION_PLAN,
+                project_file,
+                project_name,
+                execution_plan_id,
+            )
+        else:
+            file_storage_service.copy_execution_file(project_name, execution_plan_id)
 
-        file_storage_service.save_file(
-            FileType.EXECUTION_PLAN,
-            plan_file,
-            plan_name,
-            execution_plan_id,
-        )
+        if plan_file is not None:
+            file_storage_service.save_file(
+                FileType.EXECUTION_PLAN,
+                plan_file,
+                plan_name,
+                execution_plan_id,
+            )
+        else:
+            file_storage_service.copy_execution_file(plan_name,execution_plan_id)
 
-        file_storage_service.save_file(
-            FileType.EXECUTION_PLAN,
-            flow_file,
-            flow_name,
-            execution_plan_id,
-        )
+        if flow_file is not None:
+            file_storage_service.save_file(
+                FileType.EXECUTION_PLAN,
+                flow_file,
+                flow_name,
+                execution_plan_id,
+            )
+        else:
+            file_storage_service.copy_execution_file(flow_name,execution_plan_id)
         restart_file_name = "restart_file.rst"
-        if not isinstance(restart_file, io.BytesIO):
+        if not isinstance(restart_file, io.BytesIO) and restart_file is not None:
             restart_file_name = restart_file.filename
 
-        if restart_file:
+
+        if restart_file is not None:
             file_storage_service.save_file(
                 FileType.EXECUTION_PLAN,
                 restart_file,
                 restart_file_name,
                 execution_plan_id,
             )
+        else:
+            file_storage_service.copy_execution_file(restart_name, execution_plan_id,restart_file_name)
+
 
         return execution_plan
 

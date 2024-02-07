@@ -201,10 +201,10 @@ def copy_execution_files(id_copy_from, id_copy_to):
     return list_execution_files(FileType.EXECUTION_PLAN, id_copy_to)
 
 
-def copy_execution_file(file_to_copy, id_copy_to):
+def copy_execution_file(file_to_copy, id_copy_to, new_name=None):
     minio_path = f"{FileType.EXECUTION_PLAN.value}"
     minio_path += f"/{id_copy_to}"
-    minio_path += f"/{secure_filename(file_to_copy.split('/')[-1])}"
+    minio_path += f"/{new_name}" if new_name is not None else f"/{secure_filename(file_to_copy.split('/')[-1])}"
     minio_client.copy_object(ROOT_BUCKET, minio_path, CopySource(ROOT_BUCKET, file_to_copy))
     return minio_path
 
