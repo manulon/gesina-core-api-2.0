@@ -6,7 +6,9 @@ info:
 
 servers:
   - url: http://localhost:8000/api/
-    description: Local development server
+    description: Local development server ran with gunicorn
+  - url: http://localhost:5000/api/
+    description: Local development server ran with docker
 
 
 security:
@@ -89,17 +91,18 @@ paths:
       operationId: copyExecutionPlan
       tags:
         - Execution Plan
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CopyExecutionPlanRequest'
+      parameters:
+        - name: copyFrom
+          in: path
+          required: true
+          description: the id of the execution plan you want to copy
+          schema:
+            type: string
       responses:
         '200':
-          description: Execution plan successfully copied
+          description: Execution plan successfully copied with id {new_id}
         '400':
-          description: Error while copyinh execution plan
+          description: Error while copying execution plan
 
   /execution_plan:
     post:
@@ -239,9 +242,6 @@ components:
         - river
         - reach
         - river_stat
-    CopyExecutionPlanRequest:
-      type: object
-      # Define the properties for copying an execution plan
     CreateExecutionPlanRequest:
       type: object
       properties:
@@ -249,8 +249,6 @@ components:
           type: string
         geometry_id:
           type: integer
-        user_id:
-          type: string
         project_file:
           $ref: '#/components/schemas/FileInput'
         plan_file:
@@ -276,7 +274,7 @@ components:
       properties:
         filename:
           type: string
-          description: The path of the file in the Minio repository
+          description: The path of the file in the Minio repository or the name of the new file if the data is also sent
         data:
           type: string
           format: binary
@@ -305,12 +303,12 @@ components:
         restart_file:
           type: string
           description: Path to the restart file if applicable.
+        project_file:
+          type: string
+          description: Project file for the execution plan.
         execution_output_list:
           type: array
           items:
             $ref: '#/components/schemas/ExecutionPlanOutput'
           description: List of execution outputs
-        project_file:
-          type: string
-          description: Project file for the execution plan.
 
