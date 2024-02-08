@@ -48,11 +48,11 @@ def copy_execution_plan(execution_plan_id):
     return execution_plan
 
 
-def create_from_json(execution_plan):
+def create_from_json(execution_plan, user_id):
     return create(
         execution_plan.get('plan_name'),
         execution_plan.get('geometry_id'),
-        execution_plan.get('user_id'),
+        user_id,
         execution_plan.get('project_file', {}).get('filename'),
         None if execution_plan.get('project_file', {}).get('data') is None else io.BytesIO(execution_plan.get('project_file', {}).get('data').encode('utf-8')),
         execution_plan.get('plan_file', {}).get('filename'),

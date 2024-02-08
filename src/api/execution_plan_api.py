@@ -7,6 +7,7 @@ from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service import (
     execution_plan_service,
     file_storage_service,
+    api_authentication_service
 )
 from src.service.file_storage_service import FileType
 
@@ -73,7 +74,8 @@ def copy_execution_plan():
 @EXECUTION_PLAN_API_BLUEPRINT.post("/")
 def create_execution_plan():
     try:
-        execution_plan = execution_plan_service.create_from_json(request.get_json())
+        execution_plan = execution_plan_service.create_from_json(request.get_json(),
+                                                                 api_authentication_service.auth.current_user().id)
         return {"new_execution_plan_id": execution_plan.id}
     except Exception as e:
         response = jsonify({"error": str(e)})
