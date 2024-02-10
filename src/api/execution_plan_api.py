@@ -132,22 +132,6 @@ def upload_execution_file():
         return jsonify({'error': str(e)}), 500
 
 
-#     try:
-#         body = request.get_json()
-#         data = body.get("data")
-#         execution_plan_id = body.get("execution_plan_id")
-#         file_name = body.get("file_name")
-#         if file_name is None or data is None:
-#             raise Exception("file_name and data must have a value")
-#         path = file_storage_service.save_file(FileType.EXECUTION_PLAN, io.BytesIO(bytes(data, encoding="utf-8")),
-#                                               file_name, execution_plan_id)
-#         return jsonify({"message": f"success at uploading file at path {path}"})
-#     except Exception as e:
-#         response = jsonify({"message": "error uploading file ",
-#                             "error": str(e)})
-#         response.status_code = 400
-#         return response
-
 
 @EXECUTION_PLAN_API_BLUEPRINT.get("/plans")
 def list_execution_plans():
