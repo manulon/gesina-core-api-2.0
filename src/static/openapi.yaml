@@ -147,13 +147,53 @@ paths:
 
   /execution_plan/plans:
     get:
-      summary: Get a list of execution plans
-      operationId: listExecutionPlans
+      summary: List execution plans
+      description: Retrieve a list of execution plans, optionally filtered by various criteria.
       tags:
         - Execution Plan
+      parameters:
+        - in: query
+          name: plan_name
+          schema:
+            type: string
+          description: Filter by plan name.
+          required: false
+        - in: query
+          name: user_last_name
+          schema:
+            type: string
+          description: Filter by user's last name.
+          required: false
+        - in: query
+          name: user_first_name
+          schema:
+            type: string
+          description: Filter by user's first name.
+          required: false
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [ PENDING, RUNNING, FINISHED, CANCELED, ERROR ]
+          description: Filter by plan status.
+          required: false
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+          description: Filter by start date range.
+          required: false
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+          description: Filter by end date range.
+          required: false
       responses:
         '200':
-          description: Successful response
+          description: Successfully retrieved list of execution plans.
           content:
             application/json:
               schema:
@@ -161,7 +201,18 @@ paths:
                 items:
                   $ref: '#/components/schemas/ExecutionPlan'
         '400':
-          description: Error while getting execution plans
+          description: Error retrieving execution plans.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message.
+                  error:
+                    type: string
+                    description: Detailed error message.
 
   /execution_plan/{execution_id}:
     post:
