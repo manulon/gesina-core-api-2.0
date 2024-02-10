@@ -93,7 +93,7 @@ paths:
         - Execution Plan
       parameters:
         - name: copyFrom
-          in: path
+          in: query
           required: true
           description: the id of the execution plan you want to copy
           schema:
@@ -165,7 +165,7 @@ paths:
 
   /execution_plan/{execution_id}:
     post:
-      summary: Start or modify an execution
+      summary: Start an execution plan in Hecras
       operationId: startOrModifyExecution
       tags:
         - Execution
