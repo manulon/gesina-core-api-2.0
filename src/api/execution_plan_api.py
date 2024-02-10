@@ -49,14 +49,14 @@ def get_execution_plan(execution_plan_id):
 
         else:
             execution_plan_dict["execution_files"] = [{"name": i.split("/")[-1]} for i in execution_files]
-            execution_plan_dict["result_files"] = [{"name":i.split("/")[-1]} for i in result_files]
-
+            execution_plan_dict["result_files"] = [{"name": i.split("/")[-1]} for i in result_files]
 
         return jsonify(execution_plan_dict)
     except Exception as e:
         response = jsonify({"error while getting execution plan": str(e)})
         response.status_code = 400
         return response
+
 
 @EXECUTION_PLAN_API_BLUEPRINT.post("/copy")
 def copy_execution_plan():
@@ -75,7 +75,7 @@ def copy_execution_plan():
 def create_execution_plan():
     try:
         execution_plan = execution_plan_service.create_from_json(request.get_json(),
-                                                                 api_authentication_service.auth.current_user().id)
+                                                                 api_authentication_service.get_current_user_id())
         return {"new_execution_plan_id": execution_plan.id}
     except Exception as e:
         response = jsonify({"error": str(e)})
