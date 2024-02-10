@@ -251,3 +251,5 @@ def delete_geometry_file(file_name):
         error_message = f"Error deleting objects from Minio bucket: {e}"
         print(error_message)
         raise Exception(error_message) from e
+
+
