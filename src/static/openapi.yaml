@@ -124,10 +124,8 @@ paths:
 
   /execution_plan/upload_file:
     post:
-      summary: Upload a file for an execution plan
-      operationId: uploadFileForExecutionPlan
-      tags:
-        - Execution Plan
+      summary: Uploads an execution plan file
+      operationId: uploadExecutionFile
       requestBody:
         required: true
         content:
@@ -138,11 +136,38 @@ paths:
                 file:
                   type: string
                   format: binary
+              required:
+                - file
       responses:
         '200':
-          description: File successfully uploaded
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  file_path:
+                    type: string
         '400':
-          description: Error while uploading file
+          description: No selected file or bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Server error during file upload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
 
 
   /execution_plan/plans:

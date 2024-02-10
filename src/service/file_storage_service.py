@@ -251,3 +251,11 @@ def delete_geometry_file(file_name):
         error_message = f"Error deleting objects from Minio bucket: {e}"
         print(error_message)
         raise Exception(error_message) from e
+
+
+def upload_file(file_path_in_bucket, file, content_length):
+    try:
+        minio_client.put_object(ROOT_BUCKET, file_path_in_bucket, file, content_length)
+    except S3Error as e:
+        raise Exception("error uploading file")
+
