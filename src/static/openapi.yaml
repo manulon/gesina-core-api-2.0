@@ -1,0 +1,390 @@
+openapi: 3.0.0
+info:
+  title: Execution Plan API
+  version: '1.0'
+  description: API for managing execution plans
+
+servers:
+  - url: http://localhost:8000/api/
+    description: Local development server ran with gunicorn
+  - url: http://localhost:5000/api/
+    description: Local development server ran with docker
+
+
+security:
+  - basicAuth: [ ]
+paths:
+  /execution_plan/{execution_plan_id}:
+    get:
+      summary: Get an execution plan
+      operationId: getExecutionPlan
+      tags:
+        - Execution Plan
+      parameters:
+        - name: execution_plan_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: full_content
+          in: query
+          required: false
+          default: false
+          schema:
+            type: boolean
+          description: whether the files come with the full content (true) or no (false, default)
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionPlan'
+        '400':
+          description: Execution plan not found
+    delete:
+      summary: Delete an execution plan
+      operationId: deleteExecutionPlan
+      tags:
+        - Execution Plan
+      parameters:
+        - name: execution_plan_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Execution plan successfully deleted
+        '400':
+          description: Execution plan not found
+
+    patch:
+      summary: Edit an existing execution plan
+      description: Updates the details of an existing execution plan by its ID.
+      operationId: editExecutionPlan
+      tags:
+        - Execution Plan
+      parameters:
+        - in: path
+          name: execution_plan_id
+          required: true
+          schema:
+            type: string
+          description: The ID of the execution plan to be updated.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditExecutionPlanRequest'
+      responses:
+        '200':
+          description: Successfully edited the execution plan.
+        '400':
+          description: Error occurred while editing the execution plan.
+
+
+  /execution_plan/copy:
+    post:
+      summary: Copy an execution plan
+      operationId: copyExecutionPlan
+      tags:
+        - Execution Plan
+      parameters:
+        - name: copyFrom
+          in: query
+          required: true
+          description: the id of the execution plan you want to copy
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Execution plan successfully copied with id {new_id}
+        '400':
+          description: Error while copying execution plan
+
+  /execution_plan:
+    post:
+      summary: Create an execution plan
+      operationId: createExecutionPlan
+      tags:
+        - Execution Plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateExecutionPlanRequest'
+      responses:
+        '201':
+          description: Execution plan successfully created
+        '400':
+          description: Error while creating execution plan. Bad request.
+
+  /execution_plan/upload_file:
+    post:
+      summary: Uploads an execution plan file
+      operationId: uploadExecutionFile
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+                - file
+      responses:
+        '200':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  file_path:
+                    type: string
+        '400':
+          description: No selected file or bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Server error during file upload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+
+  /execution_plan/plans:
+    get:
+      summary: List execution plans
+      description: Retrieve a list of execution plans, optionally filtered by various criteria.
+      tags:
+        - Execution Plan
+      parameters:
+        - in: query
+          name: plan_name
+          schema:
+            type: string
+          description: Filter by plan name.
+          required: false
+        - in: query
+          name: user_last_name
+          schema:
+            type: string
+          description: Filter by user's last name.
+          required: false
+        - in: query
+          name: user_first_name
+          schema:
+            type: string
+          description: Filter by user's first name.
+          required: false
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [ PENDING, RUNNING, FINISHED, CANCELED, ERROR ]
+          description: Filter by plan status.
+          required: false
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+          description: Filter by start date range.
+          required: false
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+          description: Filter by end date range.
+          required: false
+      responses:
+        '200':
+          description: Successfully retrieved list of execution plans.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExecutionPlan'
+        '400':
+          description: Error retrieving execution plans.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message.
+                  error:
+                    type: string
+                    description: Detailed error message.
+
+  /execution_plan/{execution_id}:
+    post:
+      summary: Start an execution plan in Hecras
+      operationId: startOrModifyExecution
+      tags:
+        - Execution
+      parameters:
+        - name: execution_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Execution successfully started or modified
+        '400':
+          description: Error while starting execution
+
+components:
+  securitySchemes:
+    basicAuth: # Name of the security scheme
+      type: http
+      scheme: basic
+  schemas:
+    ExecutionPlan:
+      type: object
+      properties:
+        id:
+          type: integer
+        plan_name:
+          type: string
+        geometry_id:
+          type: integer
+        geometry:
+          type: string
+        user_id:
+          type: integer
+        start_datetime:
+          type: string
+          format: date-time
+        end_datetime:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [ PENDING, RUNNING, FINISHED, CANCELED, ERROR ]
+          description: Current status of the execution plan
+        execution_output_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExecutionPlanOutput'
+        execution_files:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              content:
+                type: string
+
+
+        # Add other required fields based on your actual API's behavior
+    ExecutionPlanOutput:
+      type: object
+      properties:
+        river:
+          type: string
+        reach:
+          type: string
+        river_stat:
+          type: string
+      required:
+        - river
+        - reach
+        - river_stat
+    CreateExecutionPlanRequest:
+      type: object
+      properties:
+        plan_name:
+          type: string
+        geometry_id:
+          type: integer
+        project_file:
+          $ref: '#/components/schemas/FileInput'
+        plan_file:
+          $ref: '#/components/schemas/FileInput'
+        flow_file:
+          $ref: '#/components/schemas/FileInput'
+        restart_file:
+          $ref: '#/components/schemas/FileInput'
+        execution_output_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExecutionPlanOutput'
+      required:
+        - plan_name
+        - geometry_id
+        - user_id
+        - project_file
+        - plan_file
+        - flow_file
+        - restart_file
+    FileInput:
+      type: object
+      properties:
+        filename:
+          type: string
+          description: The path of the file in the Minio repository or the name of the new file if the data is also sent
+        data:
+          type: string
+          format: binary
+          description: The content of the file
+
+
+    StartOrModifyExecutionRequest:
+      type: object
+      # Define the properties for starting or modifying an execution
+
+    EditExecutionPlanRequest:
+      type: object
+      properties:
+        plan_name:
+          type: string
+          description: Name of the execution plan.
+        geometry_id:
+          type: integer
+          description: ID of the associated geometry.
+        plan_file:
+          type: string
+          description: Path to the file associated with the execution plan.
+        flow_file:
+          type: string
+          description: Path to the flow file for the execution.
+        restart_file:
+          type: string
+          description: Path to the restart file if applicable.
+        project_file:
+          type: string
+          description: Project file for the execution plan.
+        execution_output_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExecutionPlanOutput'
+          description: List of execution outputs
+

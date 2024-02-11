@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from flask import Blueprint, jsonify, send_file
+from flask import Blueprint, jsonify, send_file, request, redirect, url_for
 
 from src.login_manager import user_is_authenticated
 from src.service import geometry_service, file_storage_service, list_utils_service
@@ -30,7 +30,6 @@ def list_geometries():
 
     return jsonify({"rows": response_list, "total": total_rows})
 
-
 @GEOMETRY_BLUEPRINT.route("/download/<_id>")
 def download(_id):
     geometry = geometry_service.get_geometry(_id)
@@ -40,3 +39,31 @@ def download(_id):
         file = BytesIO(file_from_storage.data)
 
     return send_file(file, attachment_filename=geometry.name)
+
+@GEOMETRY_BLUEPRINT.route("/<geometry_id>", methods=["DELETE"])
+def delete(geometry_id):
+    try:
+        geometry_service.delete_geometry(geometry_id)
+        response = jsonify({"message": "Geometry with id " + geometry_id + " deleted successfully"})
+        response.status_code = 200
+        return response
+    except Exception as e:
+        response = jsonify({"message": "error deleting geometry " + geometry_id,
+                            "error": str(e)})
+        response.status_code = 400
+        return response
+    
+@GEOMETRY_BLUEPRINT.route("/<geometry_id>", methods=["POST"])
+def edit_geometry(geometry_id):
+    try:
+        geometry_id = request.form.get("geometry_id")
+        description = request.form.get("description")
+
+        geometry_service.edit_geometry(
+            geometry_id,
+            description
+        )
+
+        return redirect(url_for('view_controller.geometry_list', edit_success=geometry_id))
+    except Exception as e:
+        return redirect(url_for('view_controller.geometry_list', edit_failed=geometry_id))

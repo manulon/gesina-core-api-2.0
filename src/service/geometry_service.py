@@ -51,3 +51,27 @@ def get_geometry(geometry_id):
             session.query(Geometry).options(joinedload(Geometry.user)).get(geometry_id)
         )
         return result
+    
+def delete_geometry(geometry_id):
+    try:
+        geometry = get_geometry(geometry_id)
+        file_storage_service.delete_geometry_file(geometry.name)
+        with get_session() as session:
+            session.delete(geometry)
+            session.commit()
+        return True
+    except Exception as e:
+        print("error while deleting geometry: " + geometry_id)
+        print(e)
+        raise e
+
+def edit_geometry(
+        geometry_id, 
+        description=None
+    ):
+    geometry = get_geometry(geometry_id)
+    with get_session() as session:
+        session.add(geometry)
+        geometry.description = description if description is not None else geometry.description
+        session.commit()
+    return get_geometry(geometry_id)

@@ -7,6 +7,7 @@ from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service import (
     execution_plan_service,
     file_storage_service,
+    api_authentication_service
 )
 from src.service.file_storage_service import FileType
 
@@ -27,20 +28,35 @@ def get_execution_plan(execution_plan_id):
             )
         ]
         full_content_param = request.args.get('full_content', '').lower() == 'true'
+
+        result_files = [
+            f.object_name
+            for f in file_storage_service.list_execution_files(
+                FileType.RESULT, execution_plan_id
+            )
+        ]
         if full_content_param:
-            execution_plan_dict["files"] = []
+            execution_plan_dict["execution_files"] = []
+            execution_plan_dict["result_files"] = []
             for i in execution_files:
                 data = file_storage_service.get_file(i).data
                 file = {"name": i.split("/")[-1], "content": str(data)}
-                execution_plan_dict["files"].append(file)
+                execution_plan_dict["execution_files"].append(file)
+            for i in result_files:
+                data = file_storage_service.get_file(i).data
+                file = {"name": i.split("/")[-1], "content": str(data)}
+                execution_plan_dict["result_files"].append(file)
+
         else:
-            execution_plan_dict["files"] = [i.split("/")[-1] for i in execution_files]
+            execution_plan_dict["execution_files"] = [{"name": i.split("/")[-1]} for i in execution_files]
+            execution_plan_dict["result_files"] = [{"name": i.split("/")[-1]} for i in result_files]
 
         return jsonify(execution_plan_dict)
     except Exception as e:
         response = jsonify({"error while getting execution plan": str(e)})
         response.status_code = 400
         return response
+
 
 @EXECUTION_PLAN_API_BLUEPRINT.post("/copy")
 def copy_execution_plan():
@@ -58,7 +74,8 @@ def copy_execution_plan():
 @EXECUTION_PLAN_API_BLUEPRINT.post("/")
 def create_execution_plan():
     try:
-        execution_plan = execution_plan_service.create_from_json(request.get_json())
+        execution_plan = execution_plan_service.create_from_json(request.get_json(),
+                                                                 api_authentication_service.get_current_user_id())
         return {"new_execution_plan_id": execution_plan.id}
     except Exception as e:
         response = jsonify({"error": str(e)})
@@ -89,10 +106,10 @@ def edit_execution_plan(execution_plan_id):
         plan_file = body.get("plan_file")
         flow_file = body.get("flow_file")
         restart_file = body.get("restart_file")
-        execution_plan_output = body.get("execution_output_list")
+        execution_output_list = body.get("execution_output_list")
         project_file = body.get("project_file")
         execution_plan_service.edit_execution_plan(execution_plan_id, plan_name, geometry_id, project_file, plan_file,
-                                                   flow_file, restart_file, execution_plan_output)
+                                                   flow_file, restart_file, execution_output_list)
         return jsonify({"message": f"successfully edited execution plan with id: {execution_plan_id}"})
     except Exception as e:
         response = jsonify({"message": "error deleting editing plan " + execution_plan_id,
@@ -104,20 +121,16 @@ def edit_execution_plan(execution_plan_id):
 @EXECUTION_PLAN_API_BLUEPRINT.post("/upload_file")
 def upload_execution_file():
     try:
-        body = request.get_json()
-        data = body.get("data")
-        execution_plan_id = body.get("execution_plan_id")
-        file_name = body.get("file_name")
-        if file_name is None or data is None:
-            raise Exception("file_name and data must have a value")
-        path = file_storage_service.save_file(FileType.EXECUTION_PLAN, io.BytesIO(bytes(data, encoding="utf-8")),
-                                              file_name, execution_plan_id)
-        return jsonify({"message": f"success at uploading file at path {path}"})
+        file = request.files['file']
+        if file.filename == '':
+            raise Exception("No selected file")
+
+        path = file_storage_service.save_file(FileType.EXECUTION_PLAN, file, file.filename)
+
+        return jsonify({'message': 'File uploaded successfully', 'file_path': path})
     except Exception as e:
-        response = jsonify({"message": "error uploading file ",
-                            "error": str(e)})
-        response.status_code = 400
-        return response
+        return jsonify({'error': str(e)}), 500
+
 
 
 @EXECUTION_PLAN_API_BLUEPRINT.get("/plans")
