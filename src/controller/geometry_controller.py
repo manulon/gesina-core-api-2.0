@@ -63,6 +63,7 @@ def edit_geometry(geometry_id):
             geometry_id,
             description
         )
-        return redirect(url_for("view_controller.geometry_list_edit_success"))
+
+        return redirect(url_for('view_controller.geometry_list', edit_success=geometry_id))
     except Exception as e:
-        return redirect(url_for("view_controller.geometry_list_edit_failed"))
+        return redirect(url_for('view_controller.geometry_list', edit_failed=geometry_id))
