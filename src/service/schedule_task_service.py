@@ -1,6 +1,6 @@
 from src.persistance.scheduled_task import ScheduledTask
 from src.persistance.session import get_session
-from src.service import project_file_service, plan_file_service
+from src.service import project_file_service, plan_file_service, file_storage_service
 from src.service.file_storage_service import save_restart_file
 from src.service.user_service import get_current_user
 from src.service.initial_flow_service import *
@@ -35,7 +35,6 @@ def update(_id, form):
         project_file_service.process_project_template(form.project_file.data, _id)
         plan_file_service.process_plan_template(form.plan_file.data, _id)
         session.add(schedule_config)
-
 
 def create(form):
     params = {
@@ -74,11 +73,9 @@ def create(form):
 
         return scheduled_task
 
-
 def get_schedule_tasks():
     with get_session() as session:
         return session.query(ScheduledTask).order_by(ScheduledTask.id.desc()).all()
-
 
 def get_schedule_task_config(schedule_config_id):
     with get_session() as session:
@@ -87,3 +84,26 @@ def get_schedule_task_config(schedule_config_id):
             .filter(ScheduledTask.id == schedule_config_id)
             .first()
         )
+
+def delete_scheduled_task(scheduled_task_id):
+    try:
+        # TENGO QUE OBTENER LA GEOMETRIA PARA ELIMINARLA DE LA BDD
+        scheduled_task = get_schedule_task_config(scheduled_task_id)
+
+        print(scheduled_task)
+
+        # SIMIL A ELIMINAR GEOMETRIA, BORRO LA CARPETA QUE CONTIENE
+        # LOS ARCHIVOS DEL SCHEDULED TASK. 
+
+        # - fede me critico esta -
+        file_storage_service.delete_scheduled_task(scheduled_task_id)
+
+        # ELIMINARLA DE LA BASE DE DATOS.
+        with get_session() as session:
+            session.delete(scheduled_task)
+            session.commit()
+        return True
+    except Exception as e:
+        print("error while deleting scheduled task: " + scheduled_task_id)
+        print(e)
+        raise e

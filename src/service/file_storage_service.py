@@ -153,9 +153,6 @@ def is_restart_file_present(schedule_task_id):
 def list_execution_files(file_type, execution_id):
     return minio_client.list_objects(ROOT_BUCKET, f"{file_type.value}/{execution_id}/")
 
-
-
-
 def get_file(file_path):
     logging.info(f"Obtaining file {file_path} from bucket {ROOT_BUCKET}")
     return minio_client.get_object(ROOT_BUCKET, file_path)
@@ -247,6 +244,14 @@ def delete_execution_file_for_type(execution_plan_id, file_to_delete):
 def delete_geometry_file(file_name):
     try:
         minio_client.remove_object(ROOT_BUCKET, f"{GEOMETRY_FOLDER}/{file_name}")
+    except Exception as e:
+        error_message = f"Error deleting objects from Minio bucket: {e}"
+        print(error_message)
+        raise Exception(error_message) from e
+
+def delete_scheduled_task(schedule_task_id):
+    try:
+        minio_client.remove_object(ROOT_BUCKET, f"{SCHEDULED_TASK_FOLDER}/{schedule_task_id}")
     except Exception as e:
         error_message = f"Error deleting objects from Minio bucket: {e}"
         print(error_message)

@@ -9,8 +9,6 @@ from src.service.file_storage_service import FileType
 GEOMETRY_BLUEPRINT = Blueprint("geometry_controller", __name__)
 GEOMETRY_BLUEPRINT.before_request(user_is_authenticated)
 
-
-
 @GEOMETRY_BLUEPRINT.route("", methods=["GET"])
 def list_geometries():
     offset, limit = list_utils_service.process_list_params()
