@@ -17,20 +17,16 @@ GEOMETRY_API_BLUEPRINT = Blueprint("geometry", __name__, url_prefix="/geometry")
 @GEOMETRY_API_BLUEPRINT.post("/")
 def create_geometry():
     try:
-        body = request.get_json()
-
-        geometry_file = body.get("geometry_file", {})
-        file_name = geometry_file.get("filename")
-        file_data = geometry_file.get("data")
-        description = body.get("description")
-
-        if not file_name or not file_data or not description:
-            raise ValueError("Incomplete geometry data provided")
+        file = request.files.getlist('file')
+        if len(file) > 1:
+            raise ValueError("Only one file allowed")
+        if not file[0].filename or file[0].filename == '':
+            raise ValueError("Incomplete geometry data provided: upload file")
 
         geometry = geometry_service.create(
-            file_name,
-            io.BytesIO(file_data.encode('utf-8')),
-            description,
+            file[0].filename,
+            file[0],
+            "Creada usando API",
             api_authentication_service.get_current_user()
         )
         
