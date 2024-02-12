@@ -77,6 +77,9 @@
                 } else if (response.status == 400) {
                     let geometry_list = `{{ url_for('view_controller.geometry_list', delete_failed='') }}${id}`;
                     window.location.href = geometry_list;
+                } else if (response.status == 403) {
+                    let geometry_list = `{{ url_for('view_controller.geometry_list', geometry_in_use='') }}${id}`;
+                    window.location.href = geometry_list;
                 }
             })
             .catch(error => {

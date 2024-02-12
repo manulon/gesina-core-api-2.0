@@ -1,6 +1,7 @@
 from io import BytesIO
 
 from flask import Blueprint, jsonify, send_file, request, redirect, url_for
+from src.exception.delete_geometry_exception import GeometryInUseException
 
 from src.login_manager import user_is_authenticated
 from src.service import geometry_service, file_storage_service, list_utils_service
@@ -45,6 +46,10 @@ def delete(geometry_id):
         geometry_service.delete_geometry(geometry_id)
         response = jsonify({"message": "Geometry with id " + geometry_id + " deleted successfully"})
         response.status_code = 200
+        return response
+    except GeometryInUseException as dge:
+        response = jsonify({"message": str(dge)})
+        response.status_code = dge.status_code
         return response
     except Exception as e:
         response = jsonify({"message": "error deleting geometry " + geometry_id,
