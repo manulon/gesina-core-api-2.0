@@ -90,7 +90,7 @@ create table if not exists "scheduled_task"
 create table if not exists "initial_flow"
 (
 	id serial constraint initial_flow_pk primary key,
-    scheduled_task_id integer not null constraint initial_flows_scheduled_task_id_fk references "scheduled_task",
+    scheduled_task_id integer not null constraint initial_flows_scheduled_task_id_fk references "scheduled_task" on delete cascade,
     river text not null,
     reach text not null,
     river_stat text not null,
@@ -100,7 +100,7 @@ create table if not exists "initial_flow"
 create table if not exists "border_condition"
 (
 	id serial constraint border_condition_pk primary key,
-    scheduled_task_id integer not null constraint border_condition_scheduled_task_id_fk references "scheduled_task",
+    scheduled_task_id integer not null constraint border_condition_scheduled_task_id_fk references "scheduled_task" on delete cascade,
     river text not null,
     reach text not null,
     river_stat text not null,
@@ -126,7 +126,7 @@ create table if not exists "plan_series"
     river_stat text not null,
     stage_series_id integer default null,
     flow_series_id integer default null,
-    scheduled_task_id integer not null constraint plan_series_scheduled_task_id_fk references "scheduled_task"
+    scheduled_task_id integer not null constraint plan_series_scheduled_task_id_fk references "scheduled_task" on delete cascade
 );
 
 create table if not exists execution_tasks
