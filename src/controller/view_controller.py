@@ -287,7 +287,23 @@ def get_schedule_task_config(schedule_task_id):
 @VIEW_BLUEPRINT.route("/schedule_tasks")
 def get_schedule_tasks():
     success_message = request.args.get("success_message", None)
-    return render_template("schedule_tasks_list.html", success_message=success_message)
+    delete_success = request.args.get('delete_success')
+    delete_failed = request.args.get('delete_failed')
+
+    message = None
+
+    if delete_success:
+        message = "La corrida programada #" + delete_success +  " ha sido eliminada con éxito."
+        return render_template("schedule_tasks_list.html", success_message=message)
+    
+    if delete_failed:
+        message = "Ha ocurrido un error al eliminar la corrida programada #" + delete_failed + "."
+        return render_template("schedule_tasks_list.html", errors=[message])
+    
+    if success_message:
+        message = success_message
+
+    return render_template("schedule_tasks_list.html", success_message=message)
 
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/<schedule_config_id>", methods=["POST"])

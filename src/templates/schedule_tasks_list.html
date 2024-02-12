@@ -45,16 +45,41 @@
     <script>
         function actionFormatter(value, row) {
             let base_url = "{{ url_for("view_controller.get_schedule_task_config", schedule_task_id="")}}"
+
+            let delete_button = `
+                <button type="button" class="btn btn-outline-danger" onclick="deleteScheduledTask(${row['id']})">
+                    <i class="fa-solid fa-trash-alt"></i>
+                </button>
+            `;
+
             return `
                 <a class="btn btn-outline-secondary" href="${base_url}${row["id"]}">
                     <i class="fa-solid fa-pencil"></i>
                 </a>
+                ${delete_button}
             `
           }
         function descriptionFormatter(value) {
             if (value.length > 20)
                 return value.substr(0, 20).concat('[...]');
             return value;
+        }
+
+        function deleteScheduledTask(id) {
+            let delete_url = `{{ url_for('schedule_controller.delete', scheduled_task_id='') }}${id}`;
+
+            fetch(delete_url, {method: 'DELETE'})
+            .then(response => {
+                if (response.status == 200){
+                    let schedule_list = `{{ url_for('view_controller.get_schedule_tasks', delete_success='') }}${id}`;
+                    window.location.href = schedule_list;
+                } else if (response.status == 400) {
+                    let schedule_list = `{{ url_for('view_controller.get_schedule_tasks', delete_failed='') }}${id}`;
+                    window.location.href = schedule_list;
+                }
+            })
+            .catch(error => {
+            });
         }
     </script>
 {% endblock %}

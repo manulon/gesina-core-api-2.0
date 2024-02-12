@@ -35,3 +35,16 @@ def download(_id, _file_name):
         file = BytesIO(file_from_storage.data)
 
     return send_file(file, attachment_filename=_file_name)
+
+@SCHEDULE_TASK_BLUEPRINT.route("/<scheduled_task_id>", methods=["DELETE"])
+def delete(scheduled_task_id):
+    try:
+        schedule_task_service.delete_scheduled_task(scheduled_task_id)
+        response = jsonify({"message": "Scheduled task with id " + scheduled_task_id + " deleted successfully"})
+        response.status_code = 200
+        return response
+    except Exception as e:
+        response = jsonify({"message": "error deleting geometry " + scheduled_task_id,
+                            "error": str(e)})
+        response.status_code = 400
+        return response
