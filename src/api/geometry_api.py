@@ -3,6 +3,7 @@ import io
 from flask import request, jsonify, Blueprint
 
 from src import logger
+from src.exception.delete_geometry_exception import GeometryInUseException
 from src.persistance.geometry import Geometry
 from src.service import (
     geometry_service,
@@ -45,6 +46,10 @@ def delete_geometry(geometry_id):
         geometry_service.delete_geometry(geometry_id)
         response = jsonify({"message": "Geometry with id " + geometry_id + " deleted successfully"})
         response.status_code = 200
+        return response
+    except GeometryInUseException as dge:
+        response = jsonify({"message": str(dge)})
+        response.status_code = dge.status_code
         return response
     except Exception as e:
         response = jsonify({"message": "error deleting geometry " + geometry_id,
