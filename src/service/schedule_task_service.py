@@ -7,7 +7,6 @@ from src.service.initial_flow_service import *
 from src.service.border_series_service import *
 from src.service.plan_series_service import *
 
-
 def update(_id, form):
     with get_session() as session:
         schedule_config = session.query(ScheduledTask).filter_by(id=_id).one_or_none()
@@ -87,18 +86,11 @@ def get_schedule_task_config(schedule_config_id):
 
 def delete_scheduled_task(scheduled_task_id):
     try:
-        # TENGO QUE OBTENER LA GEOMETRIA PARA ELIMINARLA DE LA BDD
         scheduled_task = get_schedule_task_config(scheduled_task_id)
 
-        print(scheduled_task)
-
-        # SIMIL A ELIMINAR GEOMETRIA, BORRO LA CARPETA QUE CONTIENE
-        # LOS ARCHIVOS DEL SCHEDULED TASK. 
-
-        # - fede me critico esta -
         file_storage_service.delete_scheduled_task(scheduled_task_id)
 
-        # ELIMINARLA DE LA BASE DE DATOS.
+        # - Esto tira una excepcion. -
         with get_session() as session:
             session.delete(scheduled_task)
             session.commit()

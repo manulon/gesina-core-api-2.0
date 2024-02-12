@@ -23,6 +23,13 @@ def list_schedule_tasks():
 
 @SCHEDULE_API_BLUEPRINT.delete("/<scheduled_task_id>")
 def delete_scheduled_task(scheduled_task_id):
-    task = schedule_task_service.delete_scheduled_task(scheduled_task_id)
-    obj = task
-    return jsonify(obj)
+    try:
+        schedule_task_service.delete_scheduled_task(scheduled_task_id)
+        response = jsonify({"message": "Scheduled task with id " + scheduled_task_id + " deleted successfully"})
+        response.status_code = 200
+        return response
+    except Exception as e:
+        response = jsonify({"message": "error deleting geometry " + scheduled_task_id,
+                            "error": str(e)})
+        response.status_code = 400
+        return response
