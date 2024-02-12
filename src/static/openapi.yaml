@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
-  title: Execution Plan API
+  title: GESINA API
   version: '1.0'
-  description: API for managing execution plans
+  description: API for managing execution plans, geometries and scheduled tasks
 
 servers:
   - url: http://localhost:8000/api/
@@ -84,7 +84,6 @@ paths:
         '400':
           description: Error occurred while editing the execution plan.
 
-
   /execution_plan/copy:
     post:
       summary: Copy an execution plan
@@ -126,6 +125,8 @@ paths:
     post:
       summary: Uploads an execution plan file
       operationId: uploadExecutionFile
+      tags:
+        - Execution Plan
       requestBody:
         required: true
         content:
@@ -168,7 +169,6 @@ paths:
                 properties:
                   error:
                     type: string
-
 
   /execution_plan/plans:
     get:
@@ -244,7 +244,7 @@ paths:
       summary: Start an execution plan in Hecras
       operationId: startOrModifyExecution
       tags:
-        - Execution
+        - Execution Plan
       parameters:
         - name: execution_id
           in: path
@@ -256,6 +256,70 @@ paths:
           description: Execution successfully started or modified
         '400':
           description: Error while starting execution
+
+  /geometry/{geometry_id}:
+    get:
+      summary: Get a geometry
+      operationId: getGeometry
+      tags:
+        - Geometry
+      parameters:
+        - name: geometry_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Geometry'
+        '404':
+          description: Geometry not found
+
+    delete:
+      summary: Delete a geometry
+      operationId: deleteGeometry
+      tags:
+        - Geometry
+      parameters:
+        - name: geometry_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Geometry deleted successfully
+        '404':
+          description: Geometry not found
+        '500':
+          description: Internal server error
+
+    patch:
+      summary: Edit a geometry
+      operationId: editGeometry
+      tags:
+        - Geometry
+      parameters:
+        - name: geometry_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditGeometryRequest'
+      responses:
+        '200':
+          description: Successfully edited the geometry
+        '400':
+          description: Error occurred while editing the geometry
 
 components:
   securitySchemes:
@@ -303,8 +367,6 @@ components:
               content:
                 type: string
 
-
-        # Add other required fields based on your actual API's behavior
     ExecutionPlanOutput:
       type: object
       properties:
@@ -355,7 +417,29 @@ components:
           type: string
           format: binary
           description: The content of the file
-
+    Geometry:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        user_id:
+          type: integer
+        user:
+          type: string
+    EditGeometryRequest:
+      type: object
+      properties:
+        description:
+          type: string
+      required:
+        - description
 
     StartOrModifyExecutionRequest:
       type: object
