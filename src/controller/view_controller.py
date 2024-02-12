@@ -324,7 +324,7 @@ def save_or_create_schedule_config(schedule_config_id):
             if schedule_config_id:
                 schedule_task_service.update(schedule_config_id, form)
             else:
-                schedule_config = schedule_task_service.create(form)
+                schedule_config = schedule_task_service.create_from_form(form)
 
             success_message = "Configuración actualizada con éxito."
 

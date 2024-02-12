@@ -30,6 +30,8 @@ def retrieve_series(form, scheduled_config_id=None):
     return merged_series
 
 
+
+
 def update_series_list(session, scheduled_config_id, series):
     session.query(BorderCondition).filter_by(
         scheduled_task_id=scheduled_config_id
