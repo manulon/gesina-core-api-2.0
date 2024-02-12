@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy.orm import joinedload
+from src.exception.delete_geometry_exception import GeometryInUseException
 
 from src.persistance import Geometry
 from src.persistance.session import get_session
@@ -8,26 +9,29 @@ from src.service import file_storage_service
 from werkzeug.utils import secure_filename
 
 from src.service.file_storage_service import FileType
+from src.persistance.execution_plan import ExecutionPlan
+from src.persistance.scheduled_task import ScheduledTask
 
-
-def create(form, user):
-    file_field = form.file
-    name = secure_filename(file_field.data.filename)
-    description_field = form.description
+def create(file_name, file_data, description, user):
+    name = secure_filename(file_name)
     created_at = datetime.now()
 
     geometry = Geometry(
         name=name,
-        description=description_field.data,
+        description=description,
         user=user,
         created_at=created_at,
     )
-    with get_session() as session:
-        session.add(geometry)
-        file = file_field.data
-        file_storage_service.save_file(FileType.GEOMETRY, file, file.filename)
 
-    return geometry
+    try:
+        with get_session() as session:
+            session.add(geometry)
+            file_storage_service.save_file(FileType.GEOMETRY, file_data, file_name)
+            return geometry
+        
+    except Exception as e:
+        print(e)
+        raise e
 
 
 def get_geometries():
@@ -55,13 +59,19 @@ def get_geometry(geometry_id):
 def delete_geometry(geometry_id):
     try:
         geometry = get_geometry(geometry_id)
-        file_storage_service.delete_geometry_file(geometry.name)
+        geometry_name = geometry.name
         with get_session() as session:
-            session.delete(geometry)
-            session.commit()
-        return True
+            execution_plan = session.query(ExecutionPlan).filter(ExecutionPlan.geometry_id == geometry_id).first()
+            scheduled_task = session.query(ScheduledTask).filter(ScheduledTask.geometry_id == geometry_id).first()
+            if execution_plan == None and scheduled_task == None:
+                session.delete(geometry)
+                session.commit()
+                file_storage_service.delete_geometry_file(geometry_name)
+                return True
+            else:
+                raise GeometryInUseException(geometry_id)
     except Exception as e:
-        print("error while deleting geometry: " + geometry_id)
+        print("Error while deleting geometry: " + geometry_id)
         print(e)
         raise e
 

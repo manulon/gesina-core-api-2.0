@@ -1,12 +1,11 @@
 from src.persistance.scheduled_task import ScheduledTask
 from src.persistance.session import get_session
-from src.service import project_file_service, plan_file_service
+from src.service import project_file_service, plan_file_service, file_storage_service
 from src.service.file_storage_service import save_restart_file
 from src.service.user_service import get_current_user
 from src.service.initial_flow_service import *
 from src.service.border_series_service import *
 from src.service.plan_series_service import *
-
 
 def update(_id, form):
     with get_session() as session:
@@ -35,7 +34,6 @@ def update(_id, form):
         project_file_service.process_project_template(form.project_file.data, _id)
         plan_file_service.process_plan_template(form.plan_file.data, _id)
         session.add(schedule_config)
-
 
 def create(form):
     params = {
@@ -74,11 +72,9 @@ def create(form):
 
         return scheduled_task
 
-
 def get_schedule_tasks():
     with get_session() as session:
         return session.query(ScheduledTask).order_by(ScheduledTask.id.desc()).all()
-
 
 def get_schedule_task_config(schedule_config_id):
     with get_session() as session:
@@ -87,3 +83,19 @@ def get_schedule_task_config(schedule_config_id):
             .filter(ScheduledTask.id == schedule_config_id)
             .first()
         )
+
+def delete_scheduled_task(scheduled_task_id):
+    try:
+        scheduled_task = get_schedule_task_config(scheduled_task_id)
+
+        file_storage_service.delete_scheduled_task(scheduled_task_id)
+
+        # - Esto tira una excepcion. -
+        with get_session() as session:
+            session.delete(scheduled_task)
+            session.commit()
+        return True
+    except Exception as e:
+        print("error while deleting scheduled task: " + scheduled_task_id)
+        print(e)
+        raise e

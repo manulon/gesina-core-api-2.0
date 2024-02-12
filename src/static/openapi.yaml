@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
-  title: Execution Plan API
+  title: GESINA API
   version: '1.0'
-  description: API for managing execution plans
+  description: API for managing execution plans, geometries and scheduled tasks
 
 servers:
   - url: http://localhost:8000/api/
@@ -84,7 +84,6 @@ paths:
         '400':
           description: Error occurred while editing the execution plan.
 
-
   /execution_plan/copy:
     post:
       summary: Copy an execution plan
@@ -126,6 +125,8 @@ paths:
     post:
       summary: Uploads an execution plan file
       operationId: uploadExecutionFile
+      tags:
+        - Execution Plan
       requestBody:
         required: true
         content:
@@ -168,7 +169,6 @@ paths:
                 properties:
                   error:
                     type: string
-
 
   /execution_plan/plans:
     get:
@@ -244,7 +244,7 @@ paths:
       summary: Start an execution plan in Hecras
       operationId: startOrModifyExecution
       tags:
-        - Execution
+        - Execution Plan
       parameters:
         - name: execution_id
           in: path
@@ -256,6 +256,160 @@ paths:
           description: Execution successfully started or modified
         '400':
           description: Error while starting execution
+
+  /geometry/{geometry_id}:
+    get:
+      summary: Get a geometry
+      operationId: getGeometry
+      tags:
+        - Geometry
+      parameters:
+        - name: geometry_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Geometry'
+        '404':
+          description: Geometry not found
+
+    delete:
+      summary: Delete a geometry
+      operationId: deleteGeometry
+      tags:
+        - Geometry
+      parameters:
+        - name: geometry_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Geometry deleted successfully
+        '404':
+          description: Geometry not found
+        '500':
+          description: Internal server error
+
+    patch:
+      summary: Edit a geometry
+      operationId: editGeometry
+      tags:
+        - Geometry
+      parameters:
+        - name: geometry_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditGeometryRequest'
+      responses:
+        '200':
+          description: Successfully edited the geometry
+        '400':
+          description: Error occurred while editing the geometry
+
+  /geometry:
+    post:
+      summary: Create a geometry
+      operationId: createGeometry
+      tags:
+        - Geometry
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GeometryRequest'
+      responses:
+        '200':
+          description: Geometry successfully created
+        '400':
+          description: Error while creating geometry
+
+  /schedule_task/{scheduled_task_id}:
+    get:
+      tags:
+        - Scheduled Tasks
+      summary: Get a scheduled task
+      operationId: get_scheduled_task
+      parameters:
+        - name: scheduled_task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the scheduled task to retrieve
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleTaskSchema'
+        '404':
+          description: Scheduled task not found
+    delete:
+      tags:
+        - Scheduled Tasks
+      summary: Delete a scheduled task
+      operationId: delete_scheduled_task
+      parameters:
+        - name: scheduled_task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the scheduled task to delete
+      responses:
+        '200':
+          description: Scheduled task deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Error occurred during deletion
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  error:
+                    type: string
+  /schedule_task/all:
+    get:
+      tags:
+        - Scheduled Tasks
+      summary: List all scheduled tasks
+      operationId: list_schedule_tasks
+      responses:
+        '200':
+          description: A list of scheduled tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduleTaskSchema'
+
 
 components:
   securitySchemes:
@@ -302,9 +456,6 @@ components:
                 type: string
               content:
                 type: string
-
-
-        # Add other required fields based on your actual API's behavior
     ExecutionPlanOutput:
       type: object
       properties:
@@ -355,12 +506,41 @@ components:
           type: string
           format: binary
           description: The content of the file
-
+    Geometry:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        user_id:
+          type: integer
+        user:
+          type: string
+    EditGeometryRequest:
+      type: object
+      properties:
+        description:
+          type: string
+      required:
+        - description
+    GeometryRequest:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+      required:
+        - file
 
     StartOrModifyExecutionRequest:
       type: object
       # Define the properties for starting or modifying an execution
-
     EditExecutionPlanRequest:
       type: object
       properties:
@@ -387,4 +567,122 @@ components:
           items:
             $ref: '#/components/schemas/ExecutionPlanOutput'
           description: List of execution outputs
+    ScheduleTaskSchema:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Daily Water Level Check"
+        description:
+          type: string
+          example: "Checks water levels of specified rivers daily."
+        frequency:
+          type: integer
+          example: 24
+        created_at:
+          type: string
+          format: date-time
+          example: "2024-02-11T16:43:32"
+        start_datetime:
+          type: string
+          format: date-time
+          example: "2024-02-12T08:00:00"
+        enabled:
+          type: boolean
+          example: true
+        geometry:
+          type: string
+          example: "POINT(30 10)"
+        user:
+          type: string
+          example: "admin@example.com"
+        initial_flows:
+          type: array
+          items:
+            $ref: '#/components/schemas/InitialFlowSchema'
+        border_conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/BorderConditionSchema'
+        plan_series_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlanSeriesSchema'
+    InitialFlowSchema:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        scheduled_task_id:
+          type: integer
+          example: 1
+        river:
+          type: string
+          example: "Amazon"
+        reach:
+          type: string
+          example: "Upper"
+        river_stat:
+          type: string
+          example: "Stat1"
+        flow:
+          type: string
+          example: "1500"
+    PlanSeriesSchema:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        river:
+          type: string
+          example: "Parana"
+        reach:
+          type: string
+          example: "Media"
+        river_stat:
+          type: string
+          example: "Stat3"
+        stage_series_id:
+          type: integer
+          example: 4
+        flow_series_id:
+          type: integer
+          example: 5
+        scheduled_task_id:
+          type: integer
+          example: 6
+    BorderConditionSchema:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        scheduled_task_id:
+          type: integer
+          example: 2
+        river:
+          type: string
+          example: "Nile"
+        reach:
+          type: string
+          example: "Lower"
+        river_stat:
+          type: string
+          example: "Stat2"
+        interval:
+          type: string
+          example: "1-MINUTE"
+          description: "Interval format is defined as number followed by a dash and the time unit. Example: '1-MINUTE' for a minute interval."
+        type:
+          type: string
+          example: "Volume"
+        series_id:
+          type: integer
+          example: 3
+
 

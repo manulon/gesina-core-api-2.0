@@ -1,10 +1,40 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, post_load
 
 
 class ActivityParams(Schema):
     refresh_rate = fields.Integer(missing=-1)
     date_from = fields.String()
     date_to = fields.String()
+
+
+class BorderConditionSchema(Schema):
+    id = fields.Int()
+    scheduled_task_id = fields.Int()
+    river = fields.Str()
+    reach = fields.Str()
+    river_stat = fields.Str()
+    interval = fields.Str()
+    type = fields.Str()  # Assuming type is a string representation of the Enum
+    series_id = fields.Int()
+
+
+class PlanSeriesSchema(Schema):
+    id = fields.Int()
+    river = fields.Str()
+    reach = fields.Str()
+    river_stat = fields.Str()
+    stage_series_id = fields.Int()
+    flow_series_id = fields.Int()
+    scheduled_task_id = fields.Int()
+
+
+class InitialFlowSchema(Schema):
+    id = fields.Int()
+    scheduled_task_id = fields.Int()
+    river = fields.Str()
+    reach = fields.Str()
+    river_stat = fields.Str()
+    flow = fields.Str()
 
 
 class ScheduleTaskSchema(Schema):
@@ -15,8 +45,11 @@ class ScheduleTaskSchema(Schema):
     created_at = fields.DateTime("%Y-%m-%dT%H:%M:%S")
     start_datetime = fields.DateTime()
     enabled = fields.Bool()
-    geometry = fields.Str()
-    user = fields.Str()
+    geometry = fields.Str()  # Ensure this correctly serializes the Geometry relationship
+    user = fields.Str()  # Ensure this correctly serializes the User relationship
+    initial_flows = fields.List(fields.Nested(InitialFlowSchema))
+    border_conditions = fields.List(fields.Nested(BorderConditionSchema))
+    plan_series_list = fields.List(fields.Nested(PlanSeriesSchema))
 
 
 class UserSchema(Schema):
