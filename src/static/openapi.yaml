@@ -321,6 +321,24 @@ paths:
         '400':
           description: Error occurred while editing the geometry
 
+  /geometry:
+    post:
+      summary: Create a geometry
+      operationId: createGeometry
+      tags:
+        - Geometry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeometryRequest'
+      responses:
+        '200':
+          description: Geometry successfully created
+        '400':
+          description: Error while creating geometry
+
 components:
   securitySchemes:
     basicAuth: # Name of the security scheme
@@ -366,7 +384,6 @@ components:
                 type: string
               content:
                 type: string
-
     ExecutionPlanOutput:
       type: object
       properties:
@@ -440,11 +457,16 @@ components:
           type: string
       required:
         - description
-
+    GeometryRequest:
+      type: object
+      properties:
+        geometry_file:
+          $ref: '#/components/schemas/FileInput'
+        description:
+          type: string
     StartOrModifyExecutionRequest:
       type: object
       # Define the properties for starting or modifying an execution
-
     EditExecutionPlanRequest:
       type: object
       properties:
