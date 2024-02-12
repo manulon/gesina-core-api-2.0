@@ -128,6 +128,7 @@ def geometry_read(geometry_id):
 def geometry_list():    
     delete_success = request.args.get('delete_success')
     delete_failed = request.args.get('delete_failed')
+    geometry_in_use = request.args.get('geometry_in_use')
     edit_success = request.args.get('edit_success')
     edit_failed = request.args.get('edit_failed')
 
@@ -138,7 +139,11 @@ def geometry_list():
         return render_template("geometry_list.html", success_message=message)
     
     if delete_failed:
-        message = "Ha ocurrido un error al eliminar la geometría #" + delete_failed + ". Esta está siendo usada en un plan de ejecución activo."
+        message = "Ha ocurrido un error al eliminar la geometría #" + delete_failed
+        return render_template("geometry_list.html", errors=[message])
+    
+    if geometry_in_use:
+        message = "Ha ocurrido un error al eliminar la geometría #" + geometry_in_use + ". Esta está siendo usada en un plan de ejecución activo."
         return render_template("geometry_list.html", errors=[message])
     
     if edit_success:
