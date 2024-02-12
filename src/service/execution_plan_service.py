@@ -11,7 +11,6 @@ from sqlalchemy import and_, func
 
 import io
 
-
 def create_from_form(form):
     plan_name = form.plan_name.data
     geometry_id = form.geometry_option.data
@@ -40,13 +39,11 @@ def create_from_form(form):
         ],
     )
 
-
 def copy_execution_plan(execution_plan_id):
     e = get_execution_plan(execution_plan_id)
     execution_plan = create_copy(e.plan_name, e.geometry, e.user, e.execution_plan_output_list)
     file_storage_service.copy_execution_files(execution_plan_id, execution_plan.id)
     return execution_plan
-
 
 def create_from_json(execution_plan, user_id):
     return create(
@@ -70,7 +67,6 @@ def create_from_json(execution_plan, user_id):
         ],
         restart_name=execution_plan.get('restart_file', {}).get('filename')
     )
-
 
 def create_from_scheduler(
         execution_plan_name,
@@ -112,7 +108,6 @@ def create_from_scheduler(
 
     return execution_plan
 
-
 def create(
         execution_plan_name,
         geometry_id,
@@ -140,7 +135,7 @@ def create(
         execution_plan_id = execution_plan.id
         geometry = execution_plan.geometry
 
-        file_storage_service.copy_geometry_to(execution_plan_id, geometry.name)
+        file_storage_service.copy_geometry_to(execution_plan_id, geometry.name, FileType.EXECUTION_PLAN)
 
         if project_file is not None:
             file_storage_service.save_file(
@@ -189,7 +184,6 @@ def create(
 
         return execution_plan
 
-
 def create_copy(execution_plan_name,
                 geometry_id,
                 user,
@@ -207,9 +201,8 @@ def create_copy(execution_plan_name,
         execution_plan_id = execution_plan.id
         geometry = execution_plan.geometry
 
-        file_storage_service.copy_geometry_to(execution_plan_id, geometry.name)
+        file_storage_service.copy_geometry_to(execution_plan_id, geometry.name, FileType.EXECUTION_PLAN)
         return execution_plan
-
 
 def delete_execution_plan(execution_plan_id):
     execution_plan = get_execution_plan(execution_plan_id)
@@ -220,7 +213,6 @@ def delete_execution_plan(execution_plan_id):
         session.commit()
     file_storage_service.delete_execution_files(execution_plan_id)
     return True
-
 
 def get_execution_plans(plan_name=None, user_first_name=None, user_last_name=None, status=None, date_from=None,
                         date_to=None):
@@ -250,13 +242,11 @@ def get_execution_plans(plan_name=None, user_first_name=None, user_last_name=Non
 
     return execution_plans
 
-
 def get_execution_plan(execution_plan_id):
     with get_session() as session:
         return (
             session.query(ExecutionPlan).filter_by(id=execution_plan_id).one_or_none()
         )
-
 
 def get_execution_plans_by_dates(date_from, date_to):
     with get_session() as session:
@@ -270,7 +260,6 @@ def get_execution_plans_by_dates(date_from, date_to):
             )
             .all()
         )
-
 
 def get_execution_plans_json(offset=0, limit=9999, date_from=None, date_to=None, user_first_name=None,
                              user_last_name=None, name=None, status=None):
@@ -299,7 +288,6 @@ def get_execution_plans_json(offset=0, limit=9999, date_from=None, date_to=None,
         response_list.append(execution_plan_row)
     return response_list
 
-
 def get_execution_plans_grouped_by_interval(interval):
     with get_session() as session:
         query = f"""SELECT COUNT(*) AS QUANTITY,
@@ -313,14 +301,12 @@ def get_execution_plans_grouped_by_interval(interval):
 
         return session.execute(query)
 
-
 def update_execution_plan_status(execution_plan_id, status: ExecutionPlanStatus):
     execution_plan = get_execution_plan(execution_plan_id)
 
     with get_session() as session:
         session.add(execution_plan)
         execution_plan.status = status
-
 
 def update_finished_execution_plan(execution_plan_id, start_datetime, end_datetime):
     execution_plan = get_execution_plan(execution_plan_id)
@@ -330,7 +316,6 @@ def update_finished_execution_plan(execution_plan_id, start_datetime, end_dateti
         execution_plan.status = ExecutionPlanStatus.FINISHED
         execution_plan.start_datetime = start_datetime
         execution_plan.end_datetime = end_datetime
-
 
 def edit_execution_plan(execution_plan_id, plan_name=None, geometry_id=None, project_file=None, plan_file=None,
                         flow_file=None, restart_file=None, execution_plan_output=None):
@@ -360,7 +345,7 @@ def edit_execution_plan(execution_plan_id, plan_name=None, geometry_id=None, pro
             if new_geometry_filename == "None":
                 raise Exception(f"Geometry with id {geometry_id} does not exist")
             old_geometry_filename = execution_plan.geometry
-            file_storage_service.copy_geometry_to(execution_plan_id, new_geometry_filename)
+            file_storage_service.copy_geometry_to(execution_plan_id, new_geometry_filename, FileType.EXECUTION_PLAN)
             file_storage_service.delete_execution_file(execution_plan_id, old_geometry_filename)
             execution_plan.geometry_id = geometry_id
         session.commit()

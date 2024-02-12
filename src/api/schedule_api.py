@@ -1,17 +1,15 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 
 from src.controller.schemas import SCHEDULE_TASK_SCHEMA
 from src.service import schedule_task_service, list_utils_service
 
 SCHEDULE_API_BLUEPRINT = Blueprint("scheduled_task", __name__, url_prefix="/schedule_task")
 
-
 @SCHEDULE_API_BLUEPRINT.get("/<scheduled_task_id>")
 def get_scheduled_task(scheduled_task_id):
     task = schedule_task_service.get_schedule_task_config(scheduled_task_id)
     obj = SCHEDULE_TASK_SCHEMA.dump(task)
     return jsonify(obj)
-
 
 @SCHEDULE_API_BLUEPRINT.get("/all")
 def list_schedule_tasks():
@@ -22,7 +20,6 @@ def list_schedule_tasks():
             schedule_tasks, many=True
         )
     )
-
 
 @SCHEDULE_API_BLUEPRINT.delete("/<scheduled_task_id>")
 def delete_scheduled_task(scheduled_task_id):
@@ -37,3 +34,14 @@ def delete_scheduled_task(scheduled_task_id):
         response.status_code = 400
         return response
 
+@SCHEDULE_API_BLUEPRINT.post("/copy")
+def copy_schedule_task():
+    try:
+        copy_from_id = request.args.get('copyFrom', '')
+        schedule_task = schedule_task_service.copy_schedule_task(copy_from_id)
+        return {"new_scheduled_task_id": schedule_task.id}
+    except Exception as e:
+        print(e.with_traceback())
+        response = jsonify({"error": str(e)})
+        response.status_code = 400
+        return response
