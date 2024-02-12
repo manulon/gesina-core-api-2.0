@@ -7,7 +7,7 @@ info:
 servers:
   - url: http://localhost:8000/api/
     description: Local development server ran with gunicorn
-  - url: http://localhost:5000/api/
+  - url: http://localhost:5001/api/
     description: Local development server ran with docker
 
 
