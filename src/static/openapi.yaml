@@ -321,6 +321,24 @@ paths:
         '400':
           description: Error occurred while editing the geometry
 
+  /geometry:
+    post:
+      summary: Create a geometry
+      operationId: createGeometry
+      tags:
+        - Geometry
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GeometryRequest'
+      responses:
+        '200':
+          description: Geometry successfully created
+        '400':
+          description: Error while creating geometry
+
   /schedule_task/{scheduled_task_id}:
     get:
       tags:
@@ -438,7 +456,6 @@ components:
                 type: string
               content:
                 type: string
-
     ExecutionPlanOutput:
       type: object
       properties:
@@ -512,6 +529,15 @@ components:
           type: string
       required:
         - description
+    GeometryRequest:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+      required:
+        - file
+
     StartOrModifyExecutionRequest:
       type: object
       # Define the properties for starting or modifying an execution
