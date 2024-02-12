@@ -20,7 +20,7 @@ services:
       - redis
       - database
     ports:
-      - "5000:5000"
+      - "5001:5001"
   database:
       image: postgres:latest
       restart: always

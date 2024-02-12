@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from flask import Blueprint, jsonify, send_file, request, render_template
+from flask import Blueprint, jsonify, send_file, request, redirect, url_for
 
 from src.login_manager import user_is_authenticated
 from src.service import geometry_service, file_storage_service, list_utils_service
@@ -28,7 +28,6 @@ def list_geometries():
         response_list.append(geometry_row)
 
     return jsonify({"rows": response_list, "total": total_rows})
-
 
 @GEOMETRY_BLUEPRINT.route("/download/<_id>")
 def download(_id):
@@ -63,11 +62,7 @@ def edit_geometry(geometry_id):
             geometry_id,
             description
         )
-        success_message = jsonify({"message": f"successfully edited geometry with id: {geometry_id}"})
 
-        return render_template("geometry_list.html", success_message=success_message)
+        return redirect(url_for('view_controller.geometry_list', edit_success=geometry_id))
     except Exception as e:
-        response = jsonify({"message": "error editing geometry with id " + geometry_id,
-                            "error": str(e)})
-        response.status_code = 400
-        return response
+        return redirect(url_for('view_controller.geometry_list', edit_failed=geometry_id))

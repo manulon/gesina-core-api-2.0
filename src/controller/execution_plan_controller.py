@@ -32,7 +32,6 @@ def list_execution_plans():
 
     return jsonify({"rows": response_list, "total": total_rows})
 
-
 @EXECUTION_PLAN_BLUEPRINT.route("/download/<_id>/<_file_type>/<_file>")
 def download(_id, _file_type, _file):
     with file_storage_service.get_file_by_type(
@@ -41,7 +40,6 @@ def download(_id, _file_type, _file):
         file = BytesIO(file_from_storage.data)
 
     return send_file(file, attachment_filename=_file)
-
 
 @EXECUTION_PLAN_BLUEPRINT.route("/<execution_id>", methods=["POST"])
 def update(execution_id):
@@ -72,7 +70,7 @@ def cancel(execution_id):
 def copy(id):
     try:
         execution_plan = execution_plan_service.copy_execution_plan(id)
-        return {"new_execution_plan_id": execution_plan.id}
+        return jsonify({"execution_plan": execution_plan.id})
     except Exception as e:
         print(e.with_traceback())
         response = jsonify({"error": str(e)})
@@ -107,3 +105,16 @@ def get(execution_plan_id):
         response = jsonify({"error while getting execution plan": str(e)})
         response.status_code = 400
         return response    
+    
+@EXECUTION_PLAN_BLUEPRINT.route("delete/<execution_plan_id>", methods=["DELETE"])
+def delete(execution_plan_id):
+    try:
+        execution_plan_service.delete_execution_plan(execution_plan_id)
+        response = jsonify({"message": "Execution plan with id " + execution_plan_id + " deleted successfully"})
+        response.status_code = 200
+        return response
+    except Exception as e:
+        response = jsonify({"message": "error deleting execution plan " + execution_plan_id,
+                            "error": str(e)})
+        response.status_code = 400
+        return response
