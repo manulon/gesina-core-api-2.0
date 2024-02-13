@@ -35,15 +35,16 @@ def create_user():
 def get_user(user_id):
     try:
         user = user_service.get_user(user_id)
+        if user is None:
+            raise ValueError("User ID: " + user_id + " does not exist")
 
-        if user:
-            return {
-                "email": user.email, 
-                "first_name": user.first_name, 
-                "last_name": user.last_name,
-                "admin_role": user.admin_role,
-                "active": user.active
-            }
+        return {
+            "email": user.email, 
+            "first_name": user.first_name, 
+            "last_name": user.last_name,
+            "admin_role": user.admin_role,
+            "active": user.active
+        }
     
     except Exception as e:
         response = jsonify({"error": str(e)})
@@ -53,6 +54,9 @@ def get_user(user_id):
 @USER_API_BLUEPRINT.patch("/enable_disable/<user_id>")
 def enable_disable_user(user_id):
     try:
+        if user_service.get_user(user_id) is None:
+            raise ValueError("User ID: " + user_id + " does not exist")
+        
         user = user_service.enable_disable_user(user_id)
 
         if user.active:
@@ -68,6 +72,9 @@ def enable_disable_user(user_id):
 @USER_API_BLUEPRINT.patch("/<user_id>")
 def edit_user(user_id):
     try:
+        if user_service.get_user(user_id) is None:
+            raise ValueError("User ID: " + user_id + " does not exist")
+        
         body = request.get_json()
         user_service.edit(
             user_id,
