@@ -1,13 +1,5 @@
-import io
-
 from flask import request, jsonify, Blueprint
-
-from src import logger
-from src.persistance.user import User
-from src.service import (
-    user_service,
-    api_authentication_service
-)
+from src.service import user_service
 
 USER_API_BLUEPRINT = Blueprint("user", __name__, url_prefix="/user")
 
