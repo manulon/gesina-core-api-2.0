@@ -46,10 +46,14 @@ def save(email, first_name, last_name, admin_role, password):
 
 def edit(user_id, email, first_name, last_name, admin_role, password):
     user = get_user(user_id)
-    user.email = email
-    user.first_name = first_name
-    user.last_name = last_name
-    user.admin_role = admin_role
+    if email is not None:
+        user.email = email
+    if first_name is not None:
+        user.first_name = first_name
+    if last_name is not None:
+        user.last_name = last_name
+    if admin_role is not None:
+        user.admin_role = admin_role
     if password:
         user.password = password
 
