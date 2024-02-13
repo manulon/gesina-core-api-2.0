@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: GESINA API
   version: '1.0'
-  description: API for managing execution plans, geometries and scheduled tasks
+  description: API for managing execution plans, geometries, scheduled tasks and users
 
 servers:
   - url: http://localhost:8000/api/
@@ -257,6 +257,24 @@ paths:
         '400':
           description: Error while starting execution
 
+  /geometry:
+    post:
+      summary: Create a geometry
+      operationId: createGeometry
+      tags:
+        - Geometry
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/GeometryRequest'
+      responses:
+        '200':
+          description: Geometry successfully created
+        '400':
+          description: Error while creating geometry
+
   /geometry/{geometry_id}:
     get:
       summary: Get a geometry
@@ -278,26 +296,7 @@ paths:
                 $ref: '#/components/schemas/Geometry'
         '404':
           description: Geometry not found
-
-    delete:
-      summary: Delete a geometry
-      operationId: deleteGeometry
-      tags:
-        - Geometry
-      parameters:
-        - name: geometry_id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Geometry deleted successfully
-        '404':
-          description: Geometry not found
-        '500':
-          description: Internal server error
-
+    
     patch:
       summary: Edit a geometry
       operationId: editGeometry
@@ -321,23 +320,24 @@ paths:
         '400':
           description: Error occurred while editing the geometry
 
-  /geometry:
-    post:
-      summary: Create a geometry
-      operationId: createGeometry
+    delete:
+      summary: Delete a geometry
+      operationId: deleteGeometry
       tags:
         - Geometry
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/GeometryRequest'
+      parameters:
+        - name: geometry_id
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
-          description: Geometry successfully created
-        '400':
-          description: Error while creating geometry
+          description: Geometry deleted successfully
+        '404':
+          description: Geometry not found
+        '500':
+          description: Internal server error
 
   /schedule_task/{scheduled_task_id}:
     get:
@@ -410,6 +410,139 @@ paths:
                 items:
                   $ref: '#/components/schemas/ScheduleTaskSchema'
 
+  /user:
+    post:
+      summary: Create a new user
+      operationId: createUser
+      tags:
+        - User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '200':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: User created successfully
+        '400':
+          description: Error creating user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /user/{user_id}:
+    get:
+      summary: Get User Information
+      operationId: getUser
+      tags:
+        - User
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the user to retrieve.
+      responses:
+        '200':
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserRequest'
+        '400':
+          description: Error occurred while retrieving user information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+    patch:
+      summary: Edit User Information
+      operationId: editUser
+      tags:
+        - User
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the user to edit.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditUserRequest'
+      responses:
+        '200':
+          description: User information edited successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Confirmation message.
+        '400':
+          description: Error occurred while editing user information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  
+  /user/enable_disable/{user_id}:
+    patch:
+      summary: Enable or Disable a User
+      operationId: enableDisableUser
+      tags:
+        - User
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the user to enable or disable.
+      responses:
+        '200':
+          description: User enabled or disabled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Error occurred while enabling or disabling the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
 
 components:
   securitySchemes:
@@ -685,4 +818,52 @@ components:
           type: integer
           example: 3
 
-
+    UserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        admin_role:
+          type: boolean
+        password:
+          type: string
+    GetUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email of the user.
+        first_name:
+          type: string
+          description: First name of the user.
+        last_name:
+          type: string
+          description: Last name of the user.
+        admin_role:
+          type: string
+          description: Role of the user.
+        active:
+          type: boolean
+          description: Indicates if the user is active.
+    EditUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          description: New email of the user.
+        first_name:
+          type: string
+          description: New first name of the user.
+        last_name:
+          type: string
+          description: New last name of the user.
+        admin_role:
+          type: string
+          description: New role of the user.
+        password:
+          type: string
+          description: New password of the user.
