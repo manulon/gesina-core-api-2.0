@@ -1,8 +1,11 @@
 from flask import request, jsonify, Blueprint
 from src.controller.schemas import SCHEDULE_TASK_SCHEMA
 from src.service import schedule_task_service, list_utils_service, api_authentication_service
-from src.service.border_series_service import retrieve_series
-from src.service.plan_series_service import retrieve_plan_series
+from src.service.border_series_service import retrieve_series, retrieve_series_json
+from src.service.initial_flow_service import create_initial_flows, create_initial_flows_from_form, \
+    create_initial_flows_from_json
+from src.service.plan_series_service import retrieve_plan_series, retrieve_plan_series_json
+from src.view.forms.schedule_config_form import SeriesForm
 
 SCHEDULE_API_BLUEPRINT = Blueprint("scheduled_task", __name__, url_prefix="/schedule_task")
 
@@ -55,8 +58,12 @@ def create_scheduled_task():
         "observation_days": body.get("observation_days"),
         "forecast_days": body.get("forecast_days"),
         "user": api_authentication_service.get_current_user(),
-        "border_conditions": retrieve_series(form),
-        "plan_series_list": retrieve_plan_series(form),
+        "border_conditions": retrieve_series_json(body.get("series_list_file")),
+        "plan_series_list": retrieve_plan_series_json(body.get("plan_series_file"), body.get("plan_series_list")),
     }
+    if body.get("start_condition_type") == "initial_flows":
+        params["initial_flows"] = create_initial_flows_from_json(body.get("start_condition_type"),
+                                                                 body.get("initial_flow_file"),
+                                                                 body.get("initial_flow_list"))
     schedule_task_service.create()
     return jsonify({"message": "ok"})

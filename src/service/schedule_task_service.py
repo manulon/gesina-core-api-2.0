@@ -1,3 +1,5 @@
+from flask_wtf.file import FileField
+
 from src.persistance.scheduled_task import ScheduledTask
 from src.persistance.session import get_session
 from src.service import project_file_service, plan_file_service, file_storage_service
@@ -48,7 +50,7 @@ def update(_id, form):
         if form.start_condition_type.data == "restart_file" and form.restart_file.data:
             save_restart_file(form.restart_file.data, schedule_config.id)
         else:
-            update_initial_flows(session, _id, retrieve_initial_flows(form, _id))
+            update_initial_flows(session, _id, retrieve_initial_flows_from_form(form, _id))
 
         project_file_service.process_project_template(form.project_file.data, _id)
         plan_file_service.process_plan_template(form.plan_file.data, _id)
@@ -74,7 +76,8 @@ def create_from_form(form):
     }
 
     if form.start_condition_type.data == "initial_flows":
-        params["initial_flows"] = create_initial_flows(form)
+        params["initial_flows"] = create_initial_flows_from_form(form)
+
 
     start_condition_type = form.start_condition_type.data
     restart_file_data = form.restart_file.data

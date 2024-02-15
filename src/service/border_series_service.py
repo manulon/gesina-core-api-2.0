@@ -21,7 +21,7 @@ CSV_HEADERS = [
 
 
 def retrieve_series(form, scheduled_config_id=None):
-    from_csv = process_series_csv_file(form.series_list_file, scheduled_config_id)
+    from_csv = process_series_csv_file(form.series_list_file.data, scheduled_config_id)
     from_form = process_series_form(form.series_list, scheduled_config_id)
     merged_series = from_csv + from_form
     for series in merged_series:
@@ -29,6 +29,15 @@ def retrieve_series(form, scheduled_config_id=None):
             raise SeriesUploadError("Error: Interval con formato incorrecto")
     return merged_series
 
+
+def retrieve_series_json(series_list_file,series_list,scheduled_config_id=None):
+    from_csv = process_series_csv_file(series_list_file, )
+    from_json = process_series_json(series_list,scheduled_config_id)
+    merged_series = from_csv + from_json
+    for series in merged_series:
+        if not bool(regex.match(SERIES_INTERVAL_REGEX, series.interval)):
+            raise SeriesUploadError("Error: Interval con formato incorrecto")
+    return merged_series
 
 
 
@@ -70,11 +79,41 @@ def process_series_form(series_list, scheduled_config_id=None):
 
     return result
 
-
-def process_series_csv_file(series_file_field, scheduled_config_id=None):
+def process_series_json(series_list, scheduled_config_id=None):
     result = []
-    if series_file_field.data:
-        buffer = series_file_field.data.read()
+    for each_series in series_list:
+        interval = each_series.get("interval")
+        # interval = (
+        #     str(interval_data["interval_value"]) + "-" + interval_data["interval_unit"]
+        # )
+        if scheduled_config_id:
+            border_condition = BorderCondition(
+                scheduled_task_id=scheduled_config_id,
+                river=each_series.get("river"),
+                reach=each_series.get("reach"),
+                river_stat=each_series.get("river_stat"),
+                interval=interval,
+                type=BorderConditionType(each_series.get("border_condition")),
+                series_id=each_series.get("series_id"),
+            )
+        else:
+            border_condition = BorderCondition(
+                river=each_series.get("river"),
+                reach=each_series.get("reach"),
+                river_stat=each_series.get("river_stat"),
+                interval=interval,
+                type=BorderConditionType(each_series.get("border_condition")),
+                series_id=each_series.get("series_id"),
+            )
+        result.append(border_condition)
+
+    return result
+
+
+def process_series_csv_file(series_file, scheduled_config_id=None):
+    result = []
+    if series_file:
+        buffer = series_file.read()
         content = buffer.decode()
         file = io.StringIO(content)
         csv_data = csv.reader(file, delimiter=",")
