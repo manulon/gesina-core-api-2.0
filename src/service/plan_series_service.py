@@ -54,7 +54,7 @@ def process_plan_series_csv_file(plan_series_file_field, scheduled_config_id=Non
         file = io.StringIO(content)
         csv_data = csv.reader(file, delimiter=",")
         header = next(csv_data)
-        if header == CSV_HEADERS:
+        if len(header) >= 5 and header[:5] == CSV_HEADERS:
             for row in csv_data:
                 if scheduled_config_id:
                     plan_series = PlanSeries(
@@ -75,6 +75,6 @@ def process_plan_series_csv_file(plan_series_file_field, scheduled_config_id=Non
                     )
                 result.append(plan_series)
         else:
-            raise FileUploadError("Error: Archivo .csv inválido")
+            raise FileUploadError("Error: Archivo .csv inválido - Plan series service")
 
     return result

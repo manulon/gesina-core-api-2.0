@@ -60,7 +60,7 @@ def process_initial_flows_csv_file(initial_flow_file_field, scheduled_config_id=
         file = io.StringIO(content)
         csv_data = csv.reader(file, delimiter=",")
         header = next(csv_data)
-        if header == CSV_HEADER:
+        if len(header) >= 4 and header[:4] == CSV_HEADER:
             for row in csv_data:
                 if scheduled_config_id:
                     initial_flow = InitialFlow(
@@ -79,6 +79,6 @@ def process_initial_flows_csv_file(initial_flow_file_field, scheduled_config_id=
                     )
                 result.append(initial_flow)
         else:
-            raise FileUploadError("Error: Archivo .csv inválido")
+            raise FileUploadError("Error: Archivo .csv inválido - Initial flow service")
 
     return result

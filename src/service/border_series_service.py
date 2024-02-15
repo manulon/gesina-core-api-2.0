@@ -29,6 +29,15 @@ def retrieve_series(form, scheduled_config_id=None):
             raise SeriesUploadError("Error: Interval con formato incorrecto")
     return merged_series
 
+#TODO hacer refactor y eliminar funcion de arriba
+def _retrieve_series(series_list_file, series_list, scheduled_config_id=None):
+    from_csv = process_series_csv_file(series_list_file, scheduled_config_id)
+    from_form = process_series_form(series_list, scheduled_config_id)
+    merged_series = from_csv + from_form
+    for series in merged_series:
+        if not bool(regex.match(SERIES_INTERVAL_REGEX, series.interval)):
+            raise SeriesUploadError("Error: Interval con formato incorrecto")
+    return merged_series
 
 def update_series_list(session, scheduled_config_id, series):
     session.query(BorderCondition).filter_by(
@@ -77,7 +86,7 @@ def process_series_csv_file(series_file_field, scheduled_config_id=None):
         file = io.StringIO(content)
         csv_data = csv.reader(file, delimiter=",")
         header = next(csv_data)
-        if header == CSV_HEADERS:
+        if len(header) >= 6 and header[:6] == CSV_HEADERS:
             for row in csv_data:
                 if scheduled_config_id:
                     border_condition = BorderCondition(
@@ -100,6 +109,6 @@ def process_series_csv_file(series_file_field, scheduled_config_id=None):
                     )
                 result.append(border_condition)
         else:
-            raise FileUploadError("Error: Archivo .csv inválido")
+            raise FileUploadError("Error: Archivo .csv inválido - Border series service")
 
     return result
