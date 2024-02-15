@@ -35,44 +35,28 @@ def update(_id, form):
         plan_file_service.process_plan_template(form.plan_file.data, _id)
         session.add(schedule_config)
 
-def update_from_json(
-        _id=None, 
-        frequency=None, 
-        calibration_id=None,
-        calibration_id_for_simulations=None,
-        name=None, 
-        description=None,
-        geometry_id=None,
-        start_datetime=None,
-        enabled=None,
-        observation_days=None,
-        forecast_days=None,
-        start_condition_type=None,
-        series_list_file=None,
-        series_list=None,
-        plan_series_file=None,
-        plan_series_list=None,
-        restart_file=None
-    ):
+def update_from_json(_id=None, **kwargs):
     with get_session() as session:
         schedule_config = session.query(ScheduledTask).filter_by(id=_id).one_or_none()
         if schedule_config:
             updates = {
-                'frequency': frequency,
-                'calibration_id': calibration_id,
-                'calibration_id_for_simulations': calibration_id_for_simulations,
-                'name': name,
-                'description': description,
-                'geometry_id': geometry_id,
-                'start_datetime': start_datetime,
-                'enabled': enabled,
-                'observation_days': observation_days,
-                'forecast_days': forecast_days,
-                'start_condition_type': start_condition_type
+                'frequency': kwargs.get('frequency'),
+                'calibration_id': kwargs.get('calibration_id'),
+                'calibration_id_for_simulations': kwargs.get('calibration_id_for_simulations'),
+                'name': kwargs.get('name'),
+                'description': kwargs.get('description'),
+                'geometry_id': kwargs.get('geometry_id'),
+                'start_datetime': kwargs.get('start_datetime'),
+                'enabled': kwargs.get('enabled'),
+                'observation_days': kwargs.get('observation_days'),
+                'forecast_days': kwargs.get('forecast_days'),
+                'start_condition_type': kwargs.get('start_condition_type'), # Initial flow or restart file
             }
             for key, value in updates.items():
                 if value is not None:
-                    setattr(schedule_config, key, value) # Initial flow or restart file
+                    setattr(schedule_config, key, value)
+            #if kwargs.get('series_list_file') and kwargs.get('series_list'):
+                #update_series_list(session, _id, retrieve_series2(kwargs.get('series_list_file'), kwargs.get('series_list'), _id))
         #update_series_list(session, _id, retrieve_series(form, _id))
         #update_plan_series_list(session, _id, retrieve_plan_series(form, _id))
 

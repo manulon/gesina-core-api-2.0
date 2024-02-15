@@ -30,7 +30,7 @@ def retrieve_series(form, scheduled_config_id=None):
     return merged_series
 
 #TODO hacer refactor y eliminar funcion de arriba
-def _retrieve_series(series_list_file, series_list, scheduled_config_id=None):
+def retrieve_series2(series_list_file, series_list, scheduled_config_id=None):
     from_csv = process_series_csv_file(series_list_file, scheduled_config_id)
     from_form = process_series_form(series_list, scheduled_config_id)
     merged_series = from_csv + from_form

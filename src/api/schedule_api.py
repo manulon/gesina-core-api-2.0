@@ -23,7 +23,6 @@ def list_schedule_tasks():
         )
     )
 
-
 @SCHEDULE_API_BLUEPRINT.delete("/<scheduled_task_id>")
 def delete_scheduled_task(scheduled_task_id):
     try:
@@ -41,30 +40,10 @@ def delete_scheduled_task(scheduled_task_id):
 def edit_scheduled_task(scheduled_task_id):
     try:
         body = request.get_json()
-        schedule_task_service.update_from_json(
-            scheduled_task_id,
-            body.get("frecuency"),
-            body.get("calibration_id"),
-            body.get("calibration_id_for_simulations"),
-            body.get("name"),
-            body.get("description"),
-            body.get("geometry_id"),
-            body.get("start_datetime"),
-            body.get("enabled"),
-            body.get("observation_days"),
-            body.get("forecast_days"),
-            body.get("start_condition_type"),
-            body.get("series_list_file"),
-            body.get("series_list"),
-            body.get("plan_series_file"),
-            body.get("plan_series_list"),
-            body.get("restart_file")
-        )
-        response = jsonify({"message": "Scheduled task with id " + scheduled_task_id + " edited successfully"})
+        schedule_task_service.update_from_json(scheduled_task_id, **body)
+        response = jsonify({"message": f"Scheduled task with id {scheduled_task_id} edited successfully"})
         response.status_code = 200
-        return response
     except Exception as e:
-        response = jsonify({"message": "error editing scheduled task " + scheduled_task_id,
-                            "error": str(e)})
+        response = jsonify({"message": f"Error editing scheduled task {scheduled_task_id}", "error": str(e)})
         response.status_code = 400
-        return response
+    return response
