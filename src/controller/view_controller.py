@@ -166,7 +166,12 @@ def save_geometry():
     user = user_service.get_current_user()
     try:
         if form.validate_on_submit():
-            geometry = geometry_service.create(form, user)
+            geometry = geometry_service.create(
+                form.file.data.filename,
+                form.file.data,
+                form.description.data,
+                user
+            )
             success_message = f"Geometría #{str(geometry.id)} creada con éxito."
             return render_template(
                 "geometry_list.html", success_message=success_message

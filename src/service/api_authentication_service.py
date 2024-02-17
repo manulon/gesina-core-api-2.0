@@ -26,10 +26,9 @@ def unauthorized():
 def before_api_request():
     pass
 
-
 def get_current_user_id():
     return auth.current_user().id
 
-
 def get_current_user():
     return auth.current_user()
+

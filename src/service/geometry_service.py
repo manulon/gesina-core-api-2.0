@@ -12,25 +12,26 @@ from src.service.file_storage_service import FileType
 from src.persistance.execution_plan import ExecutionPlan
 from src.persistance.scheduled_task import ScheduledTask
 
-
-def create(form, user):
-    file_field = form.file
-    name = secure_filename(file_field.data.filename)
-    description_field = form.description
+def create(file_name, file_data, description, user):
+    name = secure_filename(file_name)
     created_at = datetime.now()
 
     geometry = Geometry(
         name=name,
-        description=description_field.data,
+        description=description,
         user=user,
         created_at=created_at,
     )
-    with get_session() as session:
-        session.add(geometry)
-        file = file_field.data
-        file_storage_service.save_file(FileType.GEOMETRY, file, file.filename)
 
-    return geometry
+    try:
+        with get_session() as session:
+            session.add(geometry)
+            file_storage_service.save_file(FileType.GEOMETRY, file_data, file_name)
+            return geometry
+        
+    except Exception as e:
+        print(e)
+        raise e
 
 
 def get_geometries():
