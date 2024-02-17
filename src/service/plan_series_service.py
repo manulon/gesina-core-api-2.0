@@ -6,7 +6,7 @@ from src.persistance.scheduled_task import (
 )
 from src.service.exception.file_exception import FileUploadError
 
-CSV_HEADERS = ["river", "reach", "river_stat", "stage_series_id", "flow_series_id"]
+PLAN_SERIES_CSV_HEADERS = ["river", "reach", "river_stat", "stage_series_id", "flow_series_id"]
 
 
 def retrieve_plan_series(form, scheduled_config_id=None):
@@ -54,7 +54,7 @@ def process_plan_series_csv_file(plan_series_file_field, scheduled_config_id=Non
         file = io.StringIO(content)
         csv_data = csv.reader(file, delimiter=",")
         header = next(csv_data)
-        if len(header) >= 5 and header[:5] == CSV_HEADERS:
+        if len(header) >= 5 and header[:5] == PLAN_SERIES_CSV_HEADERS:
             for row in csv_data:
                 if scheduled_config_id:
                     plan_series = PlanSeries(

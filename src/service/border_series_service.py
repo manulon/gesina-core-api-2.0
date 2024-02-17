@@ -10,7 +10,7 @@ from src.service.exception.series_exception import SeriesUploadError
 
 SERIES_INTERVAL_REGEX = "^[0-9]*-(MINUTE|HOUR|DAY|WEEK)$"
 
-CSV_HEADERS = [
+BORDER_SERIES_CSV_HEADERS = [
     "river",
     "reach",
     "river_stat",
@@ -86,7 +86,7 @@ def process_series_csv_file(series_file_field, scheduled_config_id=None):
         file = io.StringIO(content)
         csv_data = csv.reader(file, delimiter=",")
         header = next(csv_data)
-        if len(header) >= 6 and header[:6] == CSV_HEADERS:
+        if len(header) >= 6 and header[:6] == BORDER_SERIES_CSV_HEADERS:
             for row in csv_data:
                 if scheduled_config_id:
                     border_condition = BorderCondition(

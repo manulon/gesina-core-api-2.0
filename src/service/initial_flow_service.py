@@ -5,7 +5,7 @@ from src.persistance.scheduled_task import (
 )
 from src.service.exception.file_exception import FileUploadError
 
-CSV_HEADER = ["river", "reach", "river_stat", "flow"]
+INITIAL_FLOW_CSV_HEADER = ["river", "reach", "river_stat", "flow"]
 
 
 def retrieve_initial_flows(form, scheduled_config_id=None):
@@ -60,7 +60,7 @@ def process_initial_flows_csv_file(initial_flow_file_field, scheduled_config_id=
         file = io.StringIO(content)
         csv_data = csv.reader(file, delimiter=",")
         header = next(csv_data)
-        if len(header) >= 4 and header[:4] == CSV_HEADER:
+        if len(header) >= 4 and header[:4] == INITIAL_FLOW_CSV_HEADER:
             for row in csv_data:
                 if scheduled_config_id:
                     initial_flow = InitialFlow(
