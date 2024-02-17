@@ -31,7 +31,7 @@ def retrieve_series(form, scheduled_config_id=None):
 
 
 def retrieve_series_json(series_list_file,series_list,scheduled_config_id=None):
-    from_csv = process_series_csv_file(series_list_file, )
+    from_csv = process_series_csv_file(None if series_list_file == None else series_list_file.data )
     from_json = process_series_json(series_list,scheduled_config_id)
     merged_series = from_csv + from_json
     for series in merged_series:
@@ -93,7 +93,7 @@ def process_series_json(series_list, scheduled_config_id=None):
                 reach=each_series.get("reach"),
                 river_stat=each_series.get("river_stat"),
                 interval=interval,
-                type=BorderConditionType(each_series.get("border_condition")),
+                type=BorderConditionType(each_series.get("type")),
                 series_id=each_series.get("series_id"),
             )
         else:
@@ -102,7 +102,7 @@ def process_series_json(series_list, scheduled_config_id=None):
                 reach=each_series.get("reach"),
                 river_stat=each_series.get("river_stat"),
                 interval=interval,
-                type=BorderConditionType(each_series.get("border_condition")),
+                type=BorderConditionType(each_series.get("type")),
                 series_id=each_series.get("series_id"),
             )
         result.append(border_condition)

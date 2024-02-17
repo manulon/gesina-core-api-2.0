@@ -16,8 +16,8 @@ def retrieve_plan_series(form, scheduled_config_id=None):
 
 
 def retrieve_plan_series_json(plan_series_file, plan_series_list, scheduled_config_id=None):
-    from_csv = process_plan_series_csv_file(plan_series_file.data, scheduled_config_id)
-    from_form = process_plan_series_form(plan_series_list, scheduled_config_id)
+    from_csv = process_plan_series_csv_file(None if plan_series_file == None else plan_series_file.data, scheduled_config_id)
+    from_form = process_plan_series_json(plan_series_list, scheduled_config_id)
     return from_csv + from_form
 
 
