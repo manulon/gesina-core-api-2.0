@@ -72,7 +72,6 @@ def create_scheduled_task():
             "border_conditions": retrieve_series_json(body.get("series_list_file"), body.get("border_conditions")),
             "plan_series_list": retrieve_plan_series_json(body.get("plan_series_file"), body.get("plan_series_list")),
         }
-        print(retrieve_series_json(body.get("series_list_file"), body.get("border_conditions")))
         if body.get("start_condition_type") == "initial_flows":
             params["initial_flows"] = create_initial_flows_from_json(body.get("start_condition_type"),
                                                                      body.get("initial_flow_file"),
