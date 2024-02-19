@@ -3,6 +3,7 @@ import io
 from flask import request, jsonify, Blueprint
 
 from src import logger
+from src.logger import get_logger
 from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service import (
     execution_plan_service,
@@ -65,7 +66,6 @@ def copy_execution_plan():
         execution_plan = execution_plan_service.copy_execution_plan(copy_from)
         return {"new_execution_plan_id": execution_plan.id}
     except Exception as e:
-        print(e.with_traceback())
         response = jsonify({"error": str(e)})
         response.status_code = 400
         return response
