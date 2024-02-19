@@ -20,6 +20,11 @@ def update_plan_series_list(session, scheduled_config_id, plan_series_list):
     for plan_series in plan_series_list:
         session.add(plan_series)
 
+def update_plan_series(plan, new_plan):
+    #TODO validate values
+    for key, value in new_plan.items():
+        if key in PLAN_SERIES_CSV_HEADERS:
+            setattr(plan, key, value)
 
 def process_plan_series_form(series_list, scheduled_config_id=None):
     result = []
@@ -40,6 +45,30 @@ def process_plan_series_form(series_list, scheduled_config_id=None):
                 river_stat=each_plan_series.river_stat.data,
                 stage_series_id=each_plan_series.stage_series_id.data,
                 flow_series_id=each_plan_series.flow_series_id.data,
+            )
+        result.append(plan_series)
+
+    return result
+
+def process_plan_series_json(series_list, scheduled_config_id=None):
+    result = []
+    for each_plan_series in series_list:
+        if scheduled_config_id:
+            plan_series = PlanSeries(
+                scheduled_task_id=scheduled_config_id,
+                river=each_plan_series.get("river"),
+                reach=each_plan_series.get("reach"),
+                river_stat=each_plan_series.get("river_stat"),
+                stage_series_id=each_plan_series.get("stage_series_id"),
+                flow_series_id=each_plan_series.get("flow_series_id"),
+            )
+        else:
+            plan_series = PlanSeries(
+                river=each_plan_series.get("river"),
+                reach=each_plan_series.get("reach"),
+                river_stat=each_plan_series.get("river_stat"),
+                stage_series_id=each_plan_series.get("stage_series_id"),
+                flow_series_id=each_plan_series.get("flow_series_id"),
             )
         result.append(plan_series)
 

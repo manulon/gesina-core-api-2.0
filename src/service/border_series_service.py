@@ -19,20 +19,9 @@ BORDER_SERIES_CSV_HEADERS = [
     "series_id",
 ]
 
-
 def retrieve_series(form, scheduled_config_id=None):
     from_csv = process_series_csv_file(form.series_list_file, scheduled_config_id)
     from_form = process_series_form(form.series_list, scheduled_config_id)
-    merged_series = from_csv + from_form
-    for series in merged_series:
-        if not bool(regex.match(SERIES_INTERVAL_REGEX, series.interval)):
-            raise SeriesUploadError("Error: Interval con formato incorrecto")
-    return merged_series
-
-#TODO hacer refactor y eliminar funcion de arriba
-def retrieve_series2(series_list_file, series_list, scheduled_config_id=None):
-    from_csv = process_series_csv_file(series_list_file, scheduled_config_id)
-    from_form = process_series_form(series_list, scheduled_config_id)
     merged_series = from_csv + from_form
     for series in merged_series:
         if not bool(regex.match(SERIES_INTERVAL_REGEX, series.interval)):
@@ -46,6 +35,11 @@ def update_series_list(session, scheduled_config_id, series):
     for each_series in series:
         session.add(each_series)
 
+def update_border_condition(condition, new_condition):
+    #TODO validate values
+    for key, value in new_condition.items():
+        if key in BORDER_SERIES_CSV_HEADERS:
+            setattr(condition, key, value)
 
 def process_series_form(series_list, scheduled_config_id=None):
     result = []
@@ -72,6 +66,33 @@ def process_series_form(series_list, scheduled_config_id=None):
                 interval=interval,
                 type=BorderConditionType(each_series.border_condition.data),
                 series_id=each_series.series_id.data,
+            )
+        result.append(border_condition)
+
+    return result
+
+def process_series_json(series_list, scheduled_config_id=None):
+    result = []
+    for each_series in series_list:
+        interval = each_series.get("interval")
+        if scheduled_config_id:
+            border_condition = BorderCondition(
+                scheduled_task_id=scheduled_config_id,
+                river=each_series.get("river"),
+                reach=each_series.get("reach"),
+                river_stat=each_series.get("river_stat"),
+                interval=interval,
+                type=BorderConditionType(each_series.get("type")),
+                series_id=each_series.get("series_id"),
+            )
+        else:
+            border_condition = BorderCondition(
+                river=each_series.get("river"),
+                reach=each_series.get("reach"),
+                river_stat=each_series.get("river_stat"),
+                interval=interval,
+                type=BorderConditionType(each_series.get("type")),
+                series_id=each_series.get("series_id"),
             )
         result.append(border_condition)
 

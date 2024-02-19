@@ -40,10 +40,31 @@ def delete_scheduled_task(scheduled_task_id):
 def edit_scheduled_task(scheduled_task_id):
     try:
         body = request.get_json()
-        schedule_task_service.update_from_json(scheduled_task_id, **body)
+        params = {
+            'frequency': body.get('frequency'),
+            'calibration_id': body.get('calibration_id'),
+            'calibration_id_for_simulations': body.get('calibration_id_for_simulations'),
+            'name': body.get('name'),
+            'description': body.get('description'),
+            'geometry_id': body.get('geometry_id'),
+            'start_datetime': body.get('start_datetime'),
+            'enabled': body.get('enabled'),
+            'observation_days': body.get('observation_days'),
+            'forecast_days': body.get('forecast_days'),
+            'start_condition_type': body.get('start_condition_type'), # Initial flow or restart file
+            'border_conditions': body.get('border_conditions'),
+            'plan_series_list': body.get('plan_series_list')
+        }
+        schedule_task_service.update_from_json(scheduled_task_id, **params)
         response = jsonify({"message": f"Scheduled task with id {scheduled_task_id} edited successfully"})
         response.status_code = 200
+    except KeyError as ke:
+        response = jsonify({"message": f"Error editing scheduled task {scheduled_task_id}", "error": str(ke)})
+        response.status_code = 400
     except Exception as e:
         response = jsonify({"message": f"Error editing scheduled task {scheduled_task_id}", "error": str(e)})
         response.status_code = 400
     return response
+    
+    
+    

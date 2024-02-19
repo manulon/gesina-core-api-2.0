@@ -35,69 +35,37 @@ def update(_id, form):
         plan_file_service.process_plan_template(form.plan_file.data, _id)
         session.add(schedule_config)
 
-def update_from_json(_id=None, **kwargs):
+def _update_objects(schedule_config, new_objects, update_func):
+    if not schedule_config or not new_objects or not schedule_config:
+        return 
+    
+    if not callable(update_func):
+        raise ValueError("The update function provided is not callable")
+
+    for new_object in new_objects:
+        for obj in schedule_config:
+            try:
+                if obj.id == new_object["id"]:
+                    update_func(obj, new_object)
+            except KeyError as ke:
+                error_msg = f"MSG: You must specify the {obj.__class__.__name__} ID to edit it - ERROR: {ke}"
+                raise KeyError(error_msg) from ke
+
+def update_from_json(_id=None, **params):
     with get_session() as session:
         schedule_config = session.query(ScheduledTask).filter_by(id=_id).one_or_none()
         if schedule_config:
-            updates = {
-                'frequency': kwargs.get('frequency'),
-                'calibration_id': kwargs.get('calibration_id'),
-                'calibration_id_for_simulations': kwargs.get('calibration_id_for_simulations'),
-                'name': kwargs.get('name'),
-                'description': kwargs.get('description'),
-                'geometry_id': kwargs.get('geometry_id'),
-                'start_datetime': kwargs.get('start_datetime'),
-                'enabled': kwargs.get('enabled'),
-                'observation_days': kwargs.get('observation_days'),
-                'forecast_days': kwargs.get('forecast_days'),
-                'start_condition_type': kwargs.get('start_condition_type'), # Initial flow or restart file
-                'border_conditions': kwargs.get('border_conditions'),
-                'plan_series_list': kwargs.get('plan_series_list')
-            }
-            for key, value in updates.items():
+            for key, value in params.items():
                 if value is not None:
                     if key == 'border_conditions':
-                        if schedule_config.border_conditions == []:
-                            for new_condition in value:
-                                #TODO create BorderCondition object
-                                schedule_config.border_conditions.append(new_condition)
-                        else:
-                            for new_condition in value:
-                                for condition in schedule_config.border_conditions:
-                                    if condition.id == new_condition["id"]:
-                                        #TODO validate values
-                                        for key, value in new_condition.items():
-                                            if key in BORDER_SERIES_CSV_HEADERS:
-                                                setattr(condition, key, value)
-                    if key == 'plan_series_list':
-                        if schedule_config.plan_series_list == []:
-                            for new_plan in value:
-                                #TODO create PlanSeries object
-                                schedule_config.plan_series_list.append(new_plan)
-                        else:
-                            for new_plan in value:
-                                for plan in schedule_config.border_conditions:
-                                    if plan.id == new_plan["id"]:
-                                        #TODO validate values
-                                        for key, value in new_plan.items():
-                                            if key in PLAN_SERIES_CSV_HEADERS:
-                                                setattr(plan, key, value)
+                        _update_objects(schedule_config.border_conditions, value, update_border_condition)
+                    elif key == 'plan_series_list':
+                        _update_objects(schedule_config.plan_series_list, value, update_plan_series)
+                    elif key == 'initial_flows':
+                        _update_objects(schedule_config.initial_flows, value, update_initial_flow)
                     else:
                         setattr(schedule_config, key, value)
-            #if kwargs.get('series_list_file') and kwargs.get('series_list'):
-                #update_series_list(session, _id, retrieve_series2(kwargs.get('series_list_file'), kwargs.get('series_list'), _id))
-        #update_series_list(session, _id, retrieve_series(form, _id))
-        #update_plan_series_list(session, _id, retrieve_plan_series(form, _id))
-
-        #if form.start_condition_type.data == "restart_file" and form.restart_file.data:
-        #    save_restart_file(form.restart_file.data, schedule_config.id)
-        #else:
-        #    update_initial_flows(session, _id, retrieve_initial_flows(form, _id))
-
-        #project_file_service.process_project_template(form.project_file.data, _id)
-        #plan_file_service.process_plan_template(form.plan_file.data, _id)
         session.add(schedule_config)
-
 
 def create(form):
     params = {
