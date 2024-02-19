@@ -409,6 +409,115 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ScheduleTaskSchema'
+  /schedule_task:
+    tags:
+      - Scheduled Tasks
+    post:
+      summary: Create a new scheduled task
+      operationId: create_scheduled_task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                frequency:
+                  type: integer
+                  example: 360
+                calibration_id:
+                  type: integer
+                  example: 5
+                calibration_id_for_simulations:
+                  type: integer
+                  example: 24
+                enabled:
+                  type: boolean
+                  example: true
+                name:
+                  type: string
+                  example: "Paraná"
+                description:
+                  type: string
+                  example: "Corrida periódica del rio Paraná"
+                geometry_id:
+                  type: integer
+                  example: 1
+                start_datetime:
+                  type: string
+                  format: date-time
+                  example: "2021-12-21T00:00:00"
+                start_condition_type:
+                  type: string
+                  enum:
+                    - initial_flows
+                    - restart_file
+                observation_days:
+                  type: integer
+                  example: 5
+                forecast_days:
+                  type: integer
+                  example: 7
+                border_conditions:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/BorderConditionSchema'
+                plan_series_list:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/PlanSeriesSchema'
+                project_file:
+                  type: string
+                  example: "execution-plan/1/1.prj"
+                plan_file:
+                  type: string
+                  example: "execution-plan/1/1.p01"
+                restart_file:
+                  type: string
+                  example: "scheduled-task/1/restart_file.rst"
+              required:
+                - frequency
+                - calibration_id
+                - calibration_id_for_simulations
+                - enabled
+                - name
+                - description
+                - geometry_id
+                - start_datetime
+                - start_condition_type
+                - observation_days
+                - forecast_days
+                - border_conditions
+                - project_file
+                - plan_file
+                - restart_file
+      responses:
+        '200':
+          description: Scheduled task created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Success at creating scheduled task"
+                  id:
+                    type: integer
+                    example: 10
+        '400':
+          description: Bad request, missing required fields or other error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  missing:
+                    type: array
+                    items:
+                      type: string
 
   /user:
     post:
@@ -732,7 +841,7 @@ components:
         user:
           type: string
           example: "admin@example.com"
-        initial_flows:
+        initial_flow_list:
           type: array
           items:
             $ref: '#/components/schemas/InitialFlowSchema'
@@ -813,7 +922,10 @@ components:
           description: "Interval format is defined as number followed by a dash and the time unit. Example: '1-MINUTE' for a minute interval."
         type:
           type: string
-          example: "Volume"
+          enum:
+          - "Stage Hydrograph"
+          - "Flow Hydrograph"
+          - "Lateral Inflow Hydrograph"
         series_id:
           type: integer
           example: 3

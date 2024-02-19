@@ -81,8 +81,9 @@ def create_scheduled_task():
         project_file_data = file_storage_service.get_file(body.get("project_file"))
         plan_file_data = file_storage_service.get_file(body.get("plan_file"))
 
-        schedule_task_service.create(params, start_condition_type, restart_file_data, project_file_data, plan_file_data)
-        return jsonify({"message": "ok"})
+        scheduled_task = schedule_task_service.create(params, start_condition_type, restart_file_data, project_file_data, plan_file_data)
+        return jsonify({"message": "Success at creating scheduled task",
+                        "id": scheduled_task.id})
 
     except Exception as e:
         logger = get_logger()
