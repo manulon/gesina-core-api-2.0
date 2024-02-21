@@ -50,8 +50,7 @@ def create_scheduled_task():
         required_fields = [
             "frequency", "calibration_id", "calibration_id_for_simulations", "enabled",
             "name", "description", "geometry_id", "start_datetime", "start_condition_type",
-            "observation_days", "forecast_days", "border_conditions",
-            "restart_file", "project_file", "plan_file"
+            "observation_days", "forecast_days", "border_conditions", "project_file", "plan_file"
         ]
         missing_fields = validate_fields(body, required_fields)
         if missing_fields:
@@ -77,7 +76,7 @@ def create_scheduled_task():
                                                                      body.get("initial_flow_file"),
                                                                      body.get("initial_flow_list"))
         start_condition_type = body.get("start_condition_type")
-        restart_file_data = file_storage_service.get_file(body.get("restart_file"))
+        restart_file_data = None if body.get("restart_file") is None else file_storage_service.get_file(body.get("restart_file"))
         project_file_data = file_storage_service.get_file(body.get("project_file"))
         plan_file_data = file_storage_service.get_file(body.get("plan_file"))
 

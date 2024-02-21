@@ -3,6 +3,7 @@ import io
 from src.persistance.scheduled_task import (
     InitialFlow,
 )
+from src.service import file_storage_service
 from src.service.exception.file_exception import FileUploadError
 
 CSV_HEADER = ["river", "reach", "river_stat", "flow"]
@@ -17,7 +18,7 @@ def retrieve_initial_flows_from_form(form, scheduled_config_id=None):
 
 
 def retrieve_initial_flows_json(initial_flow_file, initial_flow_list, scheduled_config_id=None):
-    from_csv = process_initial_flows_csv_file(initial_flow_file, scheduled_config_id)
+    from_csv = process_initial_flows_csv_file(file_storage_service.get_file(initial_flow_file), scheduled_config_id)
     from_json = process_initial_flows_json(initial_flow_list, scheduled_config_id)
     return from_csv + from_json
 
@@ -65,6 +66,8 @@ def process_initial_flows_form(initial_flow_list, scheduled_config_id=None):
 
 def process_initial_flows_json(initial_flow_list, scheduled_config_id=None):
     result = []
+    if initial_flow_list is None:
+        return result
     for each_initial_flow in initial_flow_list:
         if scheduled_config_id:
             initial_flow = InitialFlow(

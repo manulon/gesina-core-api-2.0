@@ -4,6 +4,7 @@ from src.persistance.scheduled_task import (
     BorderCondition,
     PlanSeries,
 )
+from src.service import file_storage_service
 from src.service.exception.file_exception import FileUploadError
 
 CSV_HEADERS = ["river", "reach", "river_stat", "stage_series_id", "flow_series_id"]
@@ -16,9 +17,10 @@ def retrieve_plan_series(form, scheduled_config_id=None):
 
 
 def retrieve_plan_series_json(plan_series_file, plan_series_list, scheduled_config_id=None):
-    from_csv = process_plan_series_csv_file(None if plan_series_file == None else plan_series_file.data, scheduled_config_id)
-    from_form = process_plan_series_json(plan_series_list, scheduled_config_id)
-    return from_csv + from_form
+    from_csv = process_plan_series_csv_file(None if plan_series_file == None else
+                                            file_storage_service.get_file(plan_series_file), scheduled_config_id)
+    from_json = process_plan_series_json(plan_series_list, scheduled_config_id)
+    return from_csv + from_json
 
 
 def update_plan_series_list(session, scheduled_config_id, plan_series_list):
