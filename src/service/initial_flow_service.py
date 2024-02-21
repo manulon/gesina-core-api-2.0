@@ -57,6 +57,8 @@ def process_initial_flows_form(initial_flow_list, scheduled_config_id=None):
     return result
 
 def process_initial_flows_json(initial_flow_list, scheduled_config_id=None):
+    print("creando inital flows")
+    print(f"initial_flow_list {initial_flow_list}")
     result = []
     for each_initial_flow in initial_flow_list:
         if scheduled_config_id:
@@ -75,6 +77,8 @@ def process_initial_flows_json(initial_flow_list, scheduled_config_id=None):
                 flow=each_initial_flow.get("flow"),
             )
         result.append(initial_flow)
+
+    print(f"RESULT INITIAL FLOWS {result}")
     return result
 
 

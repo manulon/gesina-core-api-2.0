@@ -35,21 +35,42 @@ def update(_id, form):
         plan_file_service.process_plan_template(form.plan_file.data, _id)
         session.add(schedule_config)
 
-def _update_objects(schedule_config, new_objects, update_func):
-    if not schedule_config or not new_objects or not schedule_config:
-        return 
+def _create_objects(old_objects, new_objects, create_func, _id=None):
+    if not callable(create_func):
+        raise ValueError("The create function provided is not callable")
     
+    if old_objects == []:
+        return create_func(new_objects, _id)
+
+def _update_objects(old_objects, new_objects, update_func):    
     if not callable(update_func):
         raise ValueError("The update function provided is not callable")
 
     for new_object in new_objects:
-        for obj in schedule_config:
+        for obj in old_objects:
             try:
                 if obj.id == new_object["id"]:
                     update_func(obj, new_object)
             except KeyError as ke:
                 error_msg = f"MSG: You must specify the {obj.__class__.__name__} ID to edit it - ERROR: {ke}"
                 raise KeyError(error_msg) from ke
+    return
+
+def update_objects(schedule_config, old_objects, new_objects, update_func, create_func, attr_name, _id=None):
+    if old_objects == []:
+        setattr(
+            schedule_config, 
+            attr_name, 
+            _create_objects(
+                old_objects,
+                new_objects,
+                create_func,
+                _id
+            )
+        )
+    else:
+        _update_objects(old_objects, new_objects, update_func)
+    
 
 def update_from_json(_id=None, **params):
     with get_session() as session:
@@ -58,11 +79,35 @@ def update_from_json(_id=None, **params):
             for key, value in params.items():
                 if value is not None:
                     if key == 'border_conditions':
-                        _update_objects(schedule_config.border_conditions, value, update_border_condition)
+                        update_objects(
+                            schedule_config,
+                            schedule_config.border_conditions,
+                            value,
+                            update_border_condition,
+                            process_series_json,
+                            'border_conditions',
+                            _id
+                        )
                     elif key == 'plan_series_list':
-                        _update_objects(schedule_config.plan_series_list, value, update_plan_series)
+                        update_objects(
+                            schedule_config,
+                            schedule_config.plan_series_list,
+                            value,
+                            update_plan_series,
+                            process_plan_series_json,
+                            'plan_series_list',
+                            _id
+                        )
                     elif key == 'initial_flows':
-                        _update_objects(schedule_config.initial_flows, value, update_initial_flow)
+                        update_objects(
+                            schedule_config,
+                            schedule_config.initial_flows, 
+                            value, 
+                            update_initial_flow, 
+                            process_initial_flows_json, 
+                            'initial_flows',
+                            _id
+                        )
                     else:
                         setattr(schedule_config, key, value)
         session.add(schedule_config)
