@@ -52,11 +52,18 @@
                 </button>
             `;
 
+            let copy_button = `
+                <button type="button" class="btn btn-outline-danger" onclick="copyScheduledTask(${row['id']})">
+                    <i class="fa-solid fa-clipboard"></i>
+                </button>
+            `;
+
             return `
                 <a class="btn btn-outline-secondary" href="${base_url}${row["id"]}">
                     <i class="fa-solid fa-pencil"></i>
                 </a>
                 ${delete_button}
+                ${copy_button}
             `
           }
         function descriptionFormatter(value) {
@@ -75,6 +82,23 @@
                     window.location.href = schedule_list;
                 } else if (response.status == 400) {
                     let schedule_list = `{{ url_for('view_controller.get_schedule_tasks', delete_failed='') }}${id}`;
+                    window.location.href = schedule_list;
+                }
+            })
+            .catch(error => {
+            });
+        }
+
+        function copyScheduledTask(id) {
+            let copy_url = `{{ url_for('schedule_controller.copy', id='') }}${id}`;
+
+            fetch(copy_url, {method: 'POST'})
+            .then(response => {
+                if (response.status == 200){
+                    let schedule_list = `{{ url_for('view_controller.get_schedule_tasks', copy_success='') }}${id}`;
+                    window.location.href = schedule_list;
+                } else if (response.status == 400) {
+                    let schedule_list = `{{ url_for('view_controller.get_schedule_tasks', copy_failed='') }}${id}`;
                     window.location.href = schedule_list;
                 }
             })

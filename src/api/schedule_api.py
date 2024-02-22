@@ -39,9 +39,11 @@ def copy_schedule_task():
     try:
         copy_from_id = request.args.get('copyFrom', '')
         schedule_task = schedule_task_service.copy_schedule_task(copy_from_id)
-        return {"new_scheduled_task_id": schedule_task.id}
+        response = jsonify({"message": "Scheduled task with id " + copy_from_id + " copied successfully"})
+        response.status_code = 200
+        return response
     except Exception as e:
-        print(e.with_traceback())
-        response = jsonify({"error": str(e)})
+        response = jsonify({"message": "error copying geometry " + copy_from_id,
+                            "error": str(e)})
         response.status_code = 400
         return response
