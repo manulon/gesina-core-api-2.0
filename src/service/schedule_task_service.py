@@ -138,8 +138,4 @@ def create_copy(name, description, frequency, start_datetime,
         session.commit()
         session.refresh(scheduled_task)
         
-        scheduled_task_id = scheduled_task.id
-        geometry = scheduled_task.geometry  
-
-        file_storage_service.copy_geometry_to(scheduled_task_id, geometry.name, FileType.SCHEDULED_TASK)
         return scheduled_task
