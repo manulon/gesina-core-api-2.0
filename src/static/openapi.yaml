@@ -518,12 +518,13 @@ paths:
                     type: array
                     items:
                       type: string
+
   /schedule_task/copy:
     post:
       summary: Copy a scheduled task
       operationId: copyScheduledTask
       tags:
-        - Scheduled Task
+        - Scheduled Tasks
       parameters:
         - name: copyFrom
           in: query
