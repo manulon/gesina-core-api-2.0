@@ -20,7 +20,17 @@ def get_scheduled_task(scheduled_task_id):
 
 @SCHEDULE_API_BLUEPRINT.get("/all")
 def list_schedule_tasks():
-    schedule_tasks = schedule_task_service.get_schedule_tasks()
+    args = request.args
+    schedule_tasks = schedule_task_service.get_schedule_tasks(args.get("name"),
+                                                              args.get('user_first_name'),
+                                                              args.get('user_last_name'),
+                                                              args.get('start_condition_type'),
+                                                              args.get('date_from'),
+                                                              args.get('date_to'),
+                                                              args.get('enabled'),
+                                                              args.get('frequency'),
+                                                              args.get('calibration_id'),
+                                                              args.get('calibration_id_for_simulations'))
 
     return jsonify(
         SCHEDULE_TASK_SCHEMA.dump(
