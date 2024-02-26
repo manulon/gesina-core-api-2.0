@@ -166,7 +166,12 @@ def save_geometry():
     user = user_service.get_current_user()
     try:
         if form.validate_on_submit():
-            geometry = geometry_service.create(form, user)
+            geometry = geometry_service.create(
+                form.file.data.filename,
+                form.file.data,
+                form.description.data,
+                user
+            )
             success_message = f"Geometría #{str(geometry.id)} creada con éxito."
             return render_template(
                 "geometry_list.html", success_message=success_message
@@ -334,7 +339,7 @@ def save_or_create_schedule_config(schedule_config_id):
             if schedule_config_id:
                 schedule_task_service.update(schedule_config_id, form)
             else:
-                schedule_config = schedule_task_service.create(form)
+                schedule_config = schedule_task_service.create_from_form(form)
 
             success_message = "Configuración actualizada con éxito."
 

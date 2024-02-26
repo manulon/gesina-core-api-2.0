@@ -41,6 +41,8 @@ def create_from_form(form):
 
 def copy_execution_plan(execution_plan_id):
     e = get_execution_plan(execution_plan_id)
+    if e is None:
+        raise Exception(f"Execution plan with id {execution_plan_id} does not exist")
     execution_plan = create_copy(e.plan_name, e.geometry, e.user, e.execution_plan_output_list)
     file_storage_service.copy_execution_files(execution_plan_id, execution_plan.id)
     return execution_plan

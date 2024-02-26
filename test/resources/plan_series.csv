@@ -1,0 +1,5 @@
+river,reach,river_stat,stage_series_id,flow_series_id
+Amazon,Upper,Stat100,101,201
+Nile,Middle,Stat200,301,401
+Mississippi,Lower,Stat300,501,601
+Yangtze,Upper,Stat400,701,801

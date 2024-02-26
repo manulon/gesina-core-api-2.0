@@ -8,10 +8,34 @@ from src.persistance.geometry import Geometry
 from src.service import (
     geometry_service,
     file_storage_service,
+    api_authentication_service
 )
 from src.service.file_storage_service import FileType
 
 GEOMETRY_API_BLUEPRINT = Blueprint("geometry", __name__, url_prefix="/geometry")
+
+@GEOMETRY_API_BLUEPRINT.post("/")
+def create_geometry():
+    try:
+        file = request.files.getlist('file')
+        if len(file) > 1:
+            raise ValueError("Only one file allowed")
+        if not file[0].filename or file[0].filename == '':
+            raise ValueError("Incomplete geometry data provided: upload file")
+
+        geometry = geometry_service.create(
+            file[0].filename,
+            file[0],
+            "Creada usando API",
+            api_authentication_service.get_current_user()
+        )
+        
+        return {"new_geometry": geometry.name}
+    
+    except Exception as e:
+        response = jsonify({"error": str(e)})
+        response.status_code = 400
+        return response
 
 @GEOMETRY_API_BLUEPRINT.get("/<geometry_id>")
 def get_geometry(geometry_id):
