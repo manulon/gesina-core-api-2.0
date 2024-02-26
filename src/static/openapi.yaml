@@ -518,6 +518,24 @@ paths:
                     type: array
                     items:
                       type: string
+  /schedule_task/copy:
+    post:
+      summary: Copy a scheduled task
+      operationId: copyScheduledTask
+      tags:
+        - Scheduled Task
+      parameters:
+        - name: copyFrom
+          in: query
+          required: true
+          description: the id of the scheduled task you want to copy
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Scheduled task successfully copied with id {new_id}
+        '400':
+          description: Error while copying scheduled task
 
   /user:
     post:
