@@ -41,4 +41,4 @@ def process_project_template(project_file, schedule_task_id):
             content += "\r\n"
 
         result_file = io.BytesIO(bytes(content, encoding="utf-8"))
-        file_storage_service.save_project_template_file(result_file, schedule_task_id)
+        return file_storage_service.save_project_template_file(result_file, schedule_task_id)

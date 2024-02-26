@@ -57,15 +57,13 @@ def copy_restart_file_to(execution_id, scheduled_task_id):
     )
 
 def save_restart_file(data, scheduled_task_id):
-    save_file(FileType.SCHEDULED_TASK, data, RESTART_FILE_NAME, scheduled_task_id)
+    return save_file(FileType.SCHEDULED_TASK, data, RESTART_FILE_NAME, scheduled_task_id)
 
 def save_project_template_file(data, scheduled_task_id):
-    save_file(
-        FileType.SCHEDULED_TASK, data, PROJECT_TEMPLATE_FILE_NAME, scheduled_task_id
-    )
+    return save_file(FileType.SCHEDULED_TASK, data, PROJECT_TEMPLATE_FILE_NAME, scheduled_task_id)
 
 def save_plan_template_file(data, scheduled_task_id):
-    save_file(FileType.SCHEDULED_TASK, data, PLAN_TEMPLATE_FILE_NAME, scheduled_task_id)
+    return save_file(FileType.SCHEDULED_TASK, data, PLAN_TEMPLATE_FILE_NAME, scheduled_task_id)
 
 def save_file(file_type, file, filename, _id=None):
     if isinstance(file, io.BytesIO):

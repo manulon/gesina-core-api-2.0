@@ -112,6 +112,18 @@ def update_from_json(_id=None, **params):
                         setattr(schedule_config, key, value)
         session.add(schedule_config)
 
+def update_files(scheduled_task_id, project_file=None, plan_file=None, restart_file=None):
+    project_path = None
+    plan_path = None
+    restart_file_path = None
+    if project_file != None:
+        project_path = project_file_service.process_project_template(project_file, scheduled_task_id)
+    if plan_file != None:
+        plan_path = plan_file_service.process_plan_template(plan_file, scheduled_task_id)
+    if restart_file != None:
+        restart_file_path = save_restart_file(restart_file, scheduled_task_id)
+    return project_path, plan_path, restart_file_path
+
 def create(form):
     params = {
         "frequency": form.frequency.data,

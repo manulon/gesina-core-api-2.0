@@ -1,7 +1,12 @@
 from flask import request, jsonify, Blueprint
 
 from src.controller.schemas import SCHEDULE_TASK_SCHEMA
-from src.service import schedule_task_service, list_utils_service
+from src.service import (
+    schedule_task_service, 
+    list_utils_service,
+    file_storage_service
+)
+from src.service.file_storage_service import FileType
 
 SCHEDULE_API_BLUEPRINT = Blueprint("scheduled_task", __name__, url_prefix="/schedule_task")
 
@@ -66,6 +71,31 @@ def edit_scheduled_task(scheduled_task_id):
         response = jsonify({"message": f"Error editing scheduled task {scheduled_task_id}", "error": str(e)})
         response.status_code = 400
     return response
+
+@SCHEDULE_API_BLUEPRINT.post("/upload_file/<scheduled_task_id>")
+def upload_scheduled_task_file(scheduled_task_id):
+    try:
+        project_file = request.files['project_file']
+        plan_file = request.files['plan_file']
+        restart_file = request.files['restart_file']
+        if project_file.filename == '' and plan_file.filename == '' and restart_file.filename == '':
+            raise Exception("You must select at least one file to edit")
+        
+        project_path, plan_path, restart_file_path = schedule_task_service.update_files(
+            scheduled_task_id, 
+            project_file,
+            plan_file,
+            restart_file
+        )
+
+        path = []
+        if project_path != None: path.append(project_path)
+        if plan_path != None: path.append(plan_path)
+        if restart_file_path != None: path.append(restart_file_path)
+
+        return jsonify({'message': 'File uploaded successfully', 'file_path': path})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
     
     
     
