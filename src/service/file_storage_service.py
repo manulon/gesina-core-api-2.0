@@ -39,10 +39,10 @@ class FileType(Enum):
     RESULT = RESULT_FOLDER
     SCHEDULED_TASK = SCHEDULED_TASK_FOLDER
 
-def copy_geometry_to(execution_id, geometry_filename, folder_name):
+def copy_geometry_to(execution_id, geometry_filename):
     minio_client.copy_object(
         ROOT_BUCKET,
-        f"{folder_name}/{execution_id}/{geometry_filename}",
+        f"{EXECUTION_FOLDER}/{execution_id}/{geometry_filename}",
         CopySource(ROOT_BUCKET, f"{GEOMETRY_FOLDER}/{geometry_filename}"),
     )
 
