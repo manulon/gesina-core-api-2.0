@@ -4,15 +4,23 @@ from src.persistance.scheduled_task import (
     BorderCondition,
     PlanSeries,
 )
+from src.service import file_storage_service
 from src.service.exception.file_exception import FileUploadError
 
 PLAN_SERIES_CSV_HEADERS = ["river", "reach", "river_stat", "stage_series_id", "flow_series_id"]
 
 
 def retrieve_plan_series(form, scheduled_config_id=None):
-    from_csv = process_plan_series_csv_file(form.plan_series_file, scheduled_config_id)
+    from_csv = process_plan_series_csv_file(form.plan_series_file.data, scheduled_config_id)
     from_form = process_plan_series_form(form.plan_series_list, scheduled_config_id)
     return from_csv + from_form
+
+
+def retrieve_plan_series_json(plan_series_file, plan_series_list, scheduled_config_id=None):
+    from_csv = process_plan_series_csv_file(None if plan_series_file == None else
+                                            file_storage_service.get_file(plan_series_file), scheduled_config_id)
+    from_json = process_plan_series_json(plan_series_list, scheduled_config_id)
+    return from_csv + from_json
 
 
 def update_plan_series_list(session, scheduled_config_id, plan_series_list):
@@ -75,10 +83,35 @@ def process_plan_series_json(series_list, scheduled_config_id=None):
     return result
 
 
-def process_plan_series_csv_file(plan_series_file_field, scheduled_config_id=None):
+def process_plan_series_json(series_list, scheduled_config_id=None):
     result = []
-    if plan_series_file_field.data:
-        buffer = plan_series_file_field.data.read()
+    for each_plan_series in series_list:
+        if scheduled_config_id:
+            plan_series = PlanSeries(
+                scheduled_task_id=scheduled_config_id,
+                river=each_plan_series.get("river"),
+                reach=each_plan_series.get("reach"),
+                river_stat=each_plan_series.get("river_stat"),
+                stage_series_id=each_plan_series.get("stage_series_id"),
+                flow_series_id=each_plan_series.get("flow_series_id"),
+            )
+        else:
+            plan_series = PlanSeries(
+                river=each_plan_series.get("river"),
+                reach=each_plan_series.get("reach"),
+                river_stat=each_plan_series.get("river_stat"),
+                stage_series_id=each_plan_series.get("stage_series_id"),
+                flow_series_id=each_plan_series.get("flow_series_id"),
+            )
+        result.append(plan_series)
+
+    return result
+
+
+def process_plan_series_csv_file(plan_series_file, scheduled_config_id=None):
+    result = []
+    if plan_series_file:
+        buffer = plan_series_file.read()
         content = buffer.decode()
         file = io.StringIO(content)
         csv_data = csv.reader(file, delimiter=",")

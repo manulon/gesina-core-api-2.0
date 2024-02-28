@@ -134,7 +134,7 @@ def is_restart_file_present(schedule_task_id):
         return True
     except Exception as exception:
         error_message = f"Restart file for {schedule_task_id} doesnt exist"
-        logger.error(error_message, exception)
+        logger.warning(error_message)
         return False
 
 def list_execution_files(file_type, execution_id):
@@ -180,9 +180,22 @@ def copy_execution_files(id_copy_from, id_copy_to):
 
     return list_execution_files(FileType.EXECUTION_PLAN, id_copy_to)
 
+def copy_execution_files_scheduled(id_copy_from, id_copy_to):
+    execution_files = [f.object_name for f in list_execution_files(FileType.SCHEDULED_TASK, id_copy_from)]
+    for file in execution_files:
+        copy_execution_file_scheduled(file, id_copy_to)
+
+    return list_execution_files(FileType.SCHEDULED_TASK, id_copy_to)
 
 def copy_execution_file(file_to_copy, id_copy_to, new_name=None):
     minio_path = f"{FileType.EXECUTION_PLAN.value}"
+    minio_path += f"/{id_copy_to}"
+    minio_path += f"/{new_name}" if new_name is not None else f"/{secure_filename(file_to_copy.split('/')[-1])}"
+    minio_client.copy_object(ROOT_BUCKET, minio_path, CopySource(ROOT_BUCKET, file_to_copy))
+    return minio_path
+
+def copy_execution_file_scheduled(file_to_copy, id_copy_to, new_name=None):
+    minio_path = f"{FileType.SCHEDULED_TASK.value}"
     minio_path += f"/{id_copy_to}"
     minio_path += f"/{new_name}" if new_name is not None else f"/{secure_filename(file_to_copy.split('/')[-1])}"
     minio_client.copy_object(ROOT_BUCKET, minio_path, CopySource(ROOT_BUCKET, file_to_copy))
@@ -226,7 +239,6 @@ def delete_geometry_file(file_name):
         error_message = f"Error deleting objects from Minio bucket: {e}"
         print(error_message)
         raise Exception(error_message) from e
-
 
 def delete_scheduled_task(scheduled_task_id):
     try:

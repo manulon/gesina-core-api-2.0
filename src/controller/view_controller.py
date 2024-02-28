@@ -299,6 +299,8 @@ def get_schedule_tasks():
     success_message = request.args.get("success_message", None)
     delete_success = request.args.get('delete_success')
     delete_failed = request.args.get('delete_failed')
+    copy_success = request.args.get('copy_success')
+    copy_failed = request.args.get('copy_failed')
 
     message = None
 
@@ -308,6 +310,14 @@ def get_schedule_tasks():
     
     if delete_failed:
         message = "Ha ocurrido un error al eliminar la corrida programada #" + delete_failed + "."
+        return render_template("schedule_tasks_list.html", errors=[message])
+    
+    if copy_success:
+        message = "La corrida programada #" + copy_success +  " ha sido duplicada con éxito."
+        return render_template("schedule_tasks_list.html", success_message=message)
+    
+    if copy_failed:
+        message = "Ha ocurrido un error al duplicar la corrida programada #" + copy_failed + "."
         return render_template("schedule_tasks_list.html", errors=[message])
     
     if success_message:
@@ -329,7 +339,7 @@ def save_or_create_schedule_config(schedule_config_id):
             if schedule_config_id:
                 schedule_task_service.update(schedule_config_id, form)
             else:
-                schedule_config = schedule_task_service.create(form)
+                schedule_config = schedule_task_service.create_from_form(form)
 
             success_message = "Configuración actualizada con éxito."
 
