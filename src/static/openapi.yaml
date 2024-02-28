@@ -475,9 +475,9 @@ paths:
                   error:
                     type: string
   /schedule_task:
-    tags:
-      - Scheduled Tasks
     post:
+      tags:
+        - Scheduled Tasks
       summary: Create a new scheduled task
       operationId: create_scheduled_task
       requestBody:

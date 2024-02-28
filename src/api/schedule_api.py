@@ -14,6 +14,8 @@ SCHEDULE_API_BLUEPRINT = Blueprint("scheduled_task", __name__, url_prefix="/sche
 @SCHEDULE_API_BLUEPRINT.get("/<scheduled_task_id>")
 def get_scheduled_task(scheduled_task_id):
     try:
+        if not scheduled_task_id.isnumeric():
+            raise Exception("Id is not numeric")
         task = schedule_task_service.get_schedule_task_config(scheduled_task_id)
         obj = SCHEDULE_TASK_SCHEMA.dump(task)
         return jsonify(obj)
