@@ -6,7 +6,7 @@ from src.persistance.scheduled_task import (
 from src.service import file_storage_service
 from src.service.exception.file_exception import FileUploadError
 
-CSV_HEADER = ["river", "reach", "river_stat", "flow"]
+INITIAL_FLOW_CSV_HEADER = ["river", "reach", "river_stat", "flow"]
 
 
 def retrieve_initial_flows_from_form(form, scheduled_config_id=None):
@@ -41,6 +41,11 @@ def update_initial_flows(session, scheduled_config_id, initial_flows):
     for each_initial_flow in initial_flows:
         session.add(each_initial_flow)
 
+def update_initial_flow(initial_flow, new_initial_flow):
+    #TODO validate values
+    for key, value in new_initial_flow.items():
+        if key in INITIAL_FLOW_CSV_HEADER:
+            setattr(initial_flow, key, value)
 
 def process_initial_flows_form(initial_flow_list, scheduled_config_id=None):
     result = []
@@ -61,6 +66,31 @@ def process_initial_flows_form(initial_flow_list, scheduled_config_id=None):
                 flow=each_initial_flow.flow.data,
             )
         result.append(initial_flow)
+    return result
+
+def process_initial_flows_json(initial_flow_list, scheduled_config_id=None):
+    print("creando inital flows")
+    print(f"initial_flow_list {initial_flow_list}")
+    result = []
+    for each_initial_flow in initial_flow_list:
+        if scheduled_config_id:
+            initial_flow = InitialFlow(
+                scheduled_task_id=scheduled_config_id,
+                river=each_initial_flow.get("river"),
+                reach=each_initial_flow.get("reach"),
+                river_stat=each_initial_flow.get("river_stat"),
+                flow=each_initial_flow.get("flow"),
+            )
+        else:
+            initial_flow = InitialFlow(
+                river=each_initial_flow.get("river"),
+                reach=each_initial_flow.get("reach"),
+                river_stat=each_initial_flow.get("river_stat"),
+                flow=each_initial_flow.get("flow"),
+            )
+        result.append(initial_flow)
+
+    print(f"RESULT INITIAL FLOWS {result}")
     return result
 
 
@@ -96,7 +126,7 @@ def process_initial_flows_csv_file(initial_flow_file, scheduled_config_id=None):
         file = io.StringIO(content)
         csv_data = csv.reader(file, delimiter=",")
         header = next(csv_data)
-        if header == CSV_HEADER:
+        if len(header) >= 4 and header[:4] == INITIAL_FLOW_CSV_HEADER:
             for row in csv_data:
                 if scheduled_config_id:
                     initial_flow = InitialFlow(
@@ -115,6 +145,6 @@ def process_initial_flows_csv_file(initial_flow_file, scheduled_config_id=None):
                     )
                 result.append(initial_flow)
         else:
-            raise FileUploadError("Error: Archivo .csv inválido")
+            raise FileUploadError("Error: Archivo .csv inválido - Initial flow service")
 
     return result
