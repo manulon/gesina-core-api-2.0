@@ -206,14 +206,17 @@ paths:
           name: date_from
           schema:
             type: string
-            format: date
+            format: date-time
+            example: "2021-12-21T00:00:00"
           description: Filter by start date range.
           required: false
         - in: query
           name: date_to
           schema:
             type: string
-            format: date
+            format: date-time
+            example: "2021-12-21T00:00:00"
+
           description: Filter by end date range.
           required: false
       responses:
@@ -426,13 +429,15 @@ paths:
           name: date_from
           schema:
             type: string
-            format: date
+            format: date-time
+            example: "2021-12-21T00:00:00"
           description: Filter tasks that start from this date
         - in: query
           name: date_to
           schema:
             type: string
-            format: date
+            format: date-time
+            example: "2021-12-21T00:00:00"
           description: Filter tasks that start up to this date
         - in: query
           name: enabled
@@ -890,13 +895,13 @@ components:
           type: integer
           example: 24
         created_at:
-          type: string
-          format: date-time
           example: "2024-02-11T16:43:32"
-        start_datetime:
           type: string
           format: date-time
+        start_datetime:
           example: "2024-02-12T08:00:00"
+          type: string
+          format: date-time
         enabled:
           type: boolean
           example: true
