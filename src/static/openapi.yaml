@@ -394,6 +394,48 @@ paths:
                     type: string
                   error:
                     type: string
+    patch:
+      summary: Edit a scheduled task
+      operationId: editScheduledTask
+      tags:
+        - Scheduled Tasks
+      parameters:
+        - name: scheduled_task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the scheduled task to edit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditScheduledTaskRequest'
+      responses:
+        '200':
+          description: Scheduled task edited successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Confirmation message
+        '400':
+          description: Error editing scheduled task
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                  error:
+                    type: string
+                    description: Additional error information
   /schedule_task/all:
     get:
       tags:
@@ -537,6 +579,75 @@ paths:
           description: Scheduled task successfully copied with id {new_id}
         '400':
           description: Error while copying scheduled task
+
+  /schedule_task/upload_file/{scheduled_task_id}:
+    post:
+      summary: Upload scheduled task files
+      operationId: upload_scheduled_task_files
+      tags:
+        - Scheduled Tasks
+      parameters:
+        - name: scheduled_task_id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the scheduled task to edit
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                project_file:
+                  type: string
+                  format: binary
+                  description: The project file for the scheduled task
+                plan_file:
+                  type: string
+                  format: binary
+                  description: The plan file for the scheduled task
+                restart_file:
+                  type: string
+                  format: binary
+                  description: The restart file for the scheduled task
+      responses:
+        '200':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Confirmation message
+                  file_path:
+                    type: array
+                    items:
+                      type: string
+                    description: List of uploaded file paths
+        '400':
+          description: No selected file or bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
+        '500':
+          description: Server error during file upload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: Error message
 
   /user:
     post:
@@ -872,6 +983,73 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PlanSeriesSchema'
+    EditScheduledTaskRequest:
+      type: object
+      properties:
+        frequency:
+          type: integer
+          description: The frequency of the scheduled task
+        calibration_id:
+          type: integer
+          description: The calibration ID associated with the scheduled task
+        calibration_id_for_simulations:
+          type: integer
+          description: The calibration ID for simulations associated with the scheduled task
+        name:
+          type: string
+          description: The name of the scheduled task
+        description:
+          type: string
+          description: The description of the scheduled task
+        geometry_id:
+          type: integer
+          description: The geometry ID associated with the scheduled task
+        start_datetime:
+          type: string
+          format: date-time
+          description: The start datetime of the scheduled task
+        enabled:
+          type: boolean
+          description: Indicates if the scheduled task is enabled or disabled
+        observation_days:
+          type: integer
+          description: The number of observation days
+        forecast_days:
+          type: integer
+          description: The number of forecast days
+        start_condition_type:
+          type: string
+          description: The start condition type (Initial flow or restart file)
+        border_conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/BorderConditionSchema'
+          description: List of border conditions associated with the scheduled task
+        plan_series_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlanSeriesSchema'
+          description: List of plan series associated with the scheduled task
+        initial_flows:
+          type: array
+          items:
+            $ref: '#/components/schemas/InitialFlowSchema'
+          description: List of initial flows associated with the scheduled task
+      required:
+        - frequency
+        - calibration_id
+        - calibration_id_for_simulations
+        - name
+        - description
+        - geometry_id
+        - start_datetime
+        - enabled
+        - observation_days
+        - forecast_days
+        - start_condition_type
+        - border_conditions
+        - plan_series_list
+        - initial_flows
     InitialFlowSchema:
       type: object
       properties:
