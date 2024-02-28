@@ -1,4 +1,4 @@
-from flask import request, jsonify, Blueprint
+from flask import Blueprint, jsonify, request
 
 from src.api.utils import validate_fields
 from src.controller.schemas import SCHEDULE_TASK_SCHEMA
@@ -10,13 +10,11 @@ from src.service.plan_series_service import retrieve_plan_series_json
 
 SCHEDULE_API_BLUEPRINT = Blueprint("scheduled_task", __name__, url_prefix="/schedule_task")
 
-
 @SCHEDULE_API_BLUEPRINT.get("/<scheduled_task_id>")
 def get_scheduled_task(scheduled_task_id):
     task = schedule_task_service.get_schedule_task_config(scheduled_task_id)
     obj = SCHEDULE_TASK_SCHEMA.dump(task)
     return jsonify(obj)
-
 
 @SCHEDULE_API_BLUEPRINT.get("/all")
 def list_schedule_tasks():
@@ -27,7 +25,6 @@ def list_schedule_tasks():
             schedule_tasks, many=True
         )
     )
-
 
 @SCHEDULE_API_BLUEPRINT.delete("/<scheduled_task_id>")
 def delete_scheduled_task(scheduled_task_id):
@@ -91,5 +88,19 @@ def create_scheduled_task():
             "message": "bad request while creating scheduled task",
             "error": str(e)
         })
+        response.status_code = 400
+        return response
+
+@SCHEDULE_API_BLUEPRINT.post("/copy")
+def copy_schedule_task():
+    try:
+        copy_from_id = request.args.get('copyFrom', '')
+        schedule_task = schedule_task_service.copy_schedule_task(copy_from_id)
+        response = jsonify({"message": "Scheduled task with id " + copy_from_id + " copied successfully"})
+        response.status_code = 200
+        return response
+    except Exception as e:
+        response = jsonify({"message": "error copying geometry " + copy_from_id,
+                            "error": str(e)})
         response.status_code = 400
         return response

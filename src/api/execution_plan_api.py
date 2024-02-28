@@ -14,7 +14,6 @@ from src.service.file_storage_service import FileType
 
 EXECUTION_PLAN_API_BLUEPRINT = Blueprint("execution_plan", __name__, url_prefix="/execution_plan")
 
-
 @EXECUTION_PLAN_API_BLUEPRINT.get("/<execution_plan_id>")
 def get_execution_plan(execution_plan_id):
     try:
@@ -58,7 +57,6 @@ def get_execution_plan(execution_plan_id):
         response.status_code = 400
         return response
 
-
 @EXECUTION_PLAN_API_BLUEPRINT.post("/copy")
 def copy_execution_plan():
     try:
@@ -70,7 +68,6 @@ def copy_execution_plan():
         response.status_code = 400
         return response
 
-
 @EXECUTION_PLAN_API_BLUEPRINT.post("/")
 def create_execution_plan():
     try:
@@ -81,7 +78,6 @@ def create_execution_plan():
         response = jsonify({"error": str(e)})
         response.status_code = 400
         return response
-
 
 @EXECUTION_PLAN_API_BLUEPRINT.delete("/<execution_plan_id>")
 def delete_execution_plan(execution_plan_id):
@@ -95,7 +91,6 @@ def delete_execution_plan(execution_plan_id):
                             "error": str(e)})
         response.status_code = 400
         return response
-
 
 @EXECUTION_PLAN_API_BLUEPRINT.patch("/<execution_plan_id>")
 def edit_execution_plan(execution_plan_id):
@@ -117,7 +112,6 @@ def edit_execution_plan(execution_plan_id):
         response.status_code = 400
         return response
 
-
 @EXECUTION_PLAN_API_BLUEPRINT.post("/upload_file")
 def upload_execution_file():
     try:
@@ -130,8 +124,6 @@ def upload_execution_file():
         return jsonify({'message': 'File uploaded successfully', 'file_path': path})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-
 
 @EXECUTION_PLAN_API_BLUEPRINT.get("/plans")
 def list_execution_plans():
@@ -152,7 +144,6 @@ def list_execution_plans():
                             "error": str(e)})
         response.status_code = 400
         return response
-
 
 @EXECUTION_PLAN_API_BLUEPRINT.post("/<execution_id>")
 def execute_plan(execution_id):

@@ -3,7 +3,7 @@ from flask_wtf.file import FileField
 from src.persistance.scheduled_task import ScheduledTask
 from src.persistance.session import get_session
 from src.service import project_file_service, plan_file_service, file_storage_service
-from src.service.file_storage_service import save_restart_file
+from src.service.file_storage_service import save_restart_file, FileType
 from src.service.user_service import get_current_user
 from src.service.initial_flow_service import *
 from src.service.border_series_service import *
@@ -116,3 +116,43 @@ def delete_scheduled_task(scheduled_task_id):
         print("error while deleting scheduled task: " + scheduled_task_id)
         print(e)
         raise e
+
+def copy_schedule_task(scheduled_task_id):
+    s = get_schedule_task_config(scheduled_task_id)
+    new_scheduled_task = create_copy(s.name, s.description, s.frequency, s.start_datetime, 
+                                     s.enabled, s.geometry_id, s.user_id, s.start_condition_type,
+                                     s.observation_days, s.forecast_days, s.initial_flows,
+                                     s.border_conditions, s.plan_series_list, s.calibration_id,
+                                     s.calibration_id_for_simulations)
+    file_storage_service.copy_execution_files_scheduled(scheduled_task_id, new_scheduled_task.id) 
+    return new_scheduled_task
+
+def create_copy(name, description, frequency, start_datetime, 
+                enabled, geometry_id, user_id, start_condition_type,
+                observation_days, forecast_days, initial_flows,
+                border_conditions, plan_series_list, calibration_id,
+                calibration_id_for_simulations):
+    with get_session() as session:
+        scheduled_task = ScheduledTask(
+            name = name, 
+            description = description,
+            frequency = frequency,
+            start_datetime = start_datetime,
+            enabled = enabled,
+            geometry_id = geometry_id,
+            user_id = user_id,
+            start_condition_type = start_condition_type,
+            observation_days = observation_days,
+            forecast_days = forecast_days,
+            initial_flows = initial_flows,
+            border_conditions = border_conditions,
+            plan_series_list = plan_series_list,
+            calibration_id = calibration_id,
+            calibration_id_for_simulations = calibration_id_for_simulations
+        )
+        
+        session.add(scheduled_task)
+        session.commit()
+        session.refresh(scheduled_task)
+        
+        return scheduled_task

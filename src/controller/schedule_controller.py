@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from flask import Blueprint, jsonify, send_file
+from flask import Blueprint, jsonify, send_file, request
 
 from src.login_manager import user_is_authenticated
 from src.service import schedule_task_service, list_utils_service, file_storage_service
@@ -45,6 +45,19 @@ def delete(scheduled_task_id):
         return response
     except Exception as e:
         response = jsonify({"message": "error deleting geometry " + scheduled_task_id,
+                            "error": str(e)})
+        response.status_code = 400
+        return response
+
+@SCHEDULE_TASK_BLUEPRINT.route("/copy/<id>", methods=["POST"])
+def copy(id):
+    try:
+        schedule_task = schedule_task_service.copy_schedule_task(id)
+        response = jsonify({"message": "Scheduled task with id " + id + " copied successfully"})
+        response.status_code = 200
+        return response
+    except Exception as e:
+        response = jsonify({"message": "error copying geometry " + id,
                             "error": str(e)})
         response.status_code = 400
         return response
