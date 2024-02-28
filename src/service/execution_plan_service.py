@@ -137,7 +137,7 @@ def create(
         execution_plan_id = execution_plan.id
         geometry = execution_plan.geometry
 
-        file_storage_service.copy_geometry_to(execution_plan_id, geometry.name, FileType.EXECUTION_PLAN)
+        file_storage_service.copy_geometry_to(execution_plan_id, geometry.name)
 
         if project_file is not None:
             file_storage_service.save_file(
@@ -203,7 +203,7 @@ def create_copy(execution_plan_name,
         execution_plan_id = execution_plan.id
         geometry = execution_plan.geometry
 
-        file_storage_service.copy_geometry_to(execution_plan_id, geometry.name, FileType.EXECUTION_PLAN)
+        file_storage_service.copy_geometry_to(execution_plan_id, geometry.name)
         return execution_plan
 
 def delete_execution_plan(execution_plan_id):
@@ -347,7 +347,7 @@ def edit_execution_plan(execution_plan_id, plan_name=None, geometry_id=None, pro
             if new_geometry_filename == "None":
                 raise Exception(f"Geometry with id {geometry_id} does not exist")
             old_geometry_filename = execution_plan.geometry
-            file_storage_service.copy_geometry_to(execution_plan_id, new_geometry_filename, FileType.EXECUTION_PLAN)
+            file_storage_service.copy_geometry_to(execution_plan_id, new_geometry_filename)
             file_storage_service.delete_execution_file(execution_plan_id, old_geometry_filename)
             execution_plan.geometry_id = geometry_id
         session.commit()
