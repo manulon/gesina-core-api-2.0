@@ -34,7 +34,7 @@ class ExecutionPlan(Base):
     created_at = Column(DateTime, default=datetime.now)
     status = Column(Enum(ExecutionPlanStatus), default=ExecutionPlanStatus.PENDING)
     execution_plan_output_list = relationship(
-        "ExecutionPlanOutput", lazy="joined", back_populates="execution_plan"
+        "ExecutionPlanOutput", lazy="joined", back_populates="execution_plan", cascade="all, delete, delete-orphan"
     )
 
     def get_geometry_file_url(self):
@@ -49,18 +49,15 @@ class ExecutionPlan(Base):
             return ""
         return ""
 
-
-
     def to_dict(self):
         # Create a dictionary containing the object's attributes
-        
 
-        execution_output_list = [ {"river": i.river, 
-                                   "river_stat": i.river_stat, 
-                                   "reach": i.reach}
-                                    for i in self.execution_plan_output_list
-                                ]
-        
+        execution_output_list = [{"river": i.river,
+                                  "river_stat": i.river_stat,
+                                  "reach": i.reach}
+                                 for i in self.execution_plan_output_list
+                                 ]
+
         attributes = {
             "id": self.id,
             "plan_name": self.plan_name,

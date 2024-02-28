@@ -1,0 +1,5 @@
+river,reach,river_stat,flow
+Amazon,Upper,Stat100,5000
+Nile,Middle,Stat200,3000
+Mississippi,Lower,Stat300,2000
+Yangtze,Upper,Stat400,4000

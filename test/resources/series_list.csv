@@ -1,0 +1,5 @@
+river,reach,river_stat,interval,type,series_id
+Amazon,Upper,100,15-MINUTE,Flow Hydrograph,1
+Nile,Middle,200,2-HOUR,Stage Hydrograph,2
+Mississippi,Lower,300,1-DAY,Lateral Inflow Hydrograph,3
+Yangtze,Upper,400,3-WEEK,Flow Hydrograph,4
