@@ -74,10 +74,11 @@ def edit_scheduled_task(scheduled_task_id):
 @SCHEDULE_API_BLUEPRINT.post("/upload_file/<scheduled_task_id>")
 def upload_scheduled_task_file(scheduled_task_id):
     try:
-        project_file = request.files['project_file']
-        plan_file = request.files['plan_file']
-        restart_file = request.files['restart_file']
-        if project_file.filename == '' and plan_file.filename == '' and restart_file.filename == '':
+        project_file = request.files.get('project_file')
+        plan_file = request.files.get('plan_file')
+        restart_file = request.files.get('restart_file')
+
+        if not any([project_file, plan_file, restart_file]):
             raise Exception("You must select at least one file to edit")
         
         project_path, plan_path, restart_file_path = schedule_task_service.update_files(
