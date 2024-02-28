@@ -206,14 +206,17 @@ paths:
           name: date_from
           schema:
             type: string
-            format: date
+            format: date-time
+            example: "2021-12-21T00:00:00"
           description: Filter by start date range.
           required: false
         - in: query
           name: date_to
           schema:
             type: string
-            format: date
+            format: date-time
+            example: "2021-12-21T00:00:00"
+
           description: Filter by end date range.
           required: false
       responses:
@@ -394,6 +397,7 @@ paths:
                     type: string
                   error:
                     type: string
+  /schedule_task/tasks:
     patch:
       summary: Edit a scheduled task
       operationId: editScheduledTask
@@ -442,19 +446,86 @@ paths:
         - Scheduled Tasks
       summary: List all scheduled tasks
       operationId: list_schedule_tasks
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          description: Filter tasks by name
+        - in: query
+          name: user_first_name
+          schema:
+            type: string
+          description: Filter tasks by the first name of the user
+        - in: query
+          name: user_last_name
+          schema:
+            type: string
+          description: Filter tasks by the last name of the user
+        - in: query
+          name: start_condition_type
+          schema:
+            type: string
+            enum: [ restart_file, initial_flows ]
+          description: Filter tasks by the start condition type. Allowed values are "restart_file" or "initial_flows".
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date-time
+            example: "2021-12-21T00:00:00"
+          description: Filter tasks that start from this date
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date-time
+            example: "2021-12-21T00:00:00"
+          description: Filter tasks that start up to this date
+        - in: query
+          name: enabled
+          schema:
+            type: boolean
+          description: Filter tasks by enabled status
+        - in: query
+          name: frequency
+          schema:
+            type: integer
+          description: Filter tasks by frequency
+        - in: query
+          name: calibration_id
+          schema:
+            type: integer
+          description: Filter tasks by calibration ID
+        - in: query
+          name: calibration_id_for_simulations
+          schema:
+            type: integer
+          description: Filter tasks by calibration ID for simulations
       responses:
         '200':
-          description: A list of scheduled tasks
+          description: A list of scheduled tasks matching the criteria
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/ScheduleTaskSchema'
+        '400':
+          description: Bad request, error while retrieving scheduled tasks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  error:
+                    type: string
   /schedule_task:
-    tags:
-      - Scheduled Tasks
     post:
+      tags:
+        - Scheduled Tasks
       summary: Create a new scheduled task
       operationId: create_scheduled_task
       requestBody:
@@ -955,13 +1026,13 @@ components:
           type: integer
           example: 24
         created_at:
-          type: string
-          format: date-time
           example: "2024-02-11T16:43:32"
-        start_datetime:
           type: string
           format: date-time
+        start_datetime:
           example: "2024-02-12T08:00:00"
+          type: string
+          format: date-time
         enabled:
           type: boolean
           example: true

@@ -13,19 +13,51 @@ SCHEDULE_API_BLUEPRINT = Blueprint("scheduled_task", __name__, url_prefix="/sche
 
 @SCHEDULE_API_BLUEPRINT.get("/<scheduled_task_id>")
 def get_scheduled_task(scheduled_task_id):
-    task = schedule_task_service.get_schedule_task_config(scheduled_task_id)
-    obj = SCHEDULE_TASK_SCHEMA.dump(task)
-    return jsonify(obj)
+    try:
+        if not scheduled_task_id.isnumeric():
+            raise Exception("Id is not numeric")
+        task = schedule_task_service.get_schedule_task_config(scheduled_task_id)
+        obj = SCHEDULE_TASK_SCHEMA.dump(task)
+        return jsonify(obj)
+    except Exception as e:
+        logger = get_logger()
+        logger.error(e, exc_info=True)
+        response = jsonify({
+            "message": f"bad request while getting scheduled task {scheduled_task_id}",
+            "error": str(e)
+        })
+        response.status_code = 400
+        return response
 
-@SCHEDULE_API_BLUEPRINT.get("/all")
+@SCHEDULE_API_BLUEPRINT.get("/tasks")
 def list_schedule_tasks():
-    schedule_tasks = schedule_task_service.get_schedule_tasks()
+    try:
+        args = request.args
+        schedule_tasks = schedule_task_service.get_schedule_tasks(args.get("name"),
+                                                                  args.get('user_first_name'),
+                                                                  args.get('user_last_name'),
+                                                                  args.get('start_condition_type'),
+                                                                  args.get('date_from'),
+                                                                  args.get('date_to'),
+                                                                  args.get('enabled'),
+                                                                  args.get('frequency'),
+                                                                  args.get('calibration_id'),
+                                                                  args.get('calibration_id_for_simulations'))
 
-    return jsonify(
-        SCHEDULE_TASK_SCHEMA.dump(
-            schedule_tasks, many=True
+        return jsonify(
+            SCHEDULE_TASK_SCHEMA.dump(
+                schedule_tasks, many=True
+            )
         )
-    )
+    except Exception as e:
+        logger = get_logger()
+        logger.error(e, exc_info=True)
+        response = jsonify({
+            "message": "bad request while retrieving scheduled tasks",
+            "error": str(e)
+        })
+        response.status_code = 400
+        return response
 
 @SCHEDULE_API_BLUEPRINT.delete("/<scheduled_task_id>")
 def delete_scheduled_task(scheduled_task_id):
@@ -80,9 +112,9 @@ def upload_scheduled_task_file(scheduled_task_id):
 
         if not any([project_file, plan_file, restart_file]):
             raise Exception("You must select at least one file to edit")
-        
+
         project_path, plan_path, restart_file_path = schedule_task_service.update_files(
-            scheduled_task_id, 
+            scheduled_task_id,
             project_file,
             plan_file,
             restart_file
@@ -96,7 +128,7 @@ def upload_scheduled_task_file(scheduled_task_id):
         return jsonify({'message': 'File uploaded successfully', 'file_path': path})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+
 
 @SCHEDULE_API_BLUEPRINT.post("/")
 def create_scheduled_task():
