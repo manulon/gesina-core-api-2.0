@@ -137,3 +137,11 @@ create table if not exists execution_tasks
 );
 
 alter table execution_tasks owner to "user";
+
+create table if not exists execution_plan_schedule_task_mapping
+(
+	scheduled_task_id integer not null constraint scheduled_task__id_fk references "scheduled_task",
+	execution_id integer not null constraint execution_plan__id_fk references "execution_plan"
+);
+
+alter table execution_plan_schedule_task_mapping owner to "user";

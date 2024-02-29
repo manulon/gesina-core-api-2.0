@@ -10,6 +10,7 @@ from sqlalchemy import (
     Boolean,
     ForeignKey,
     Enum,
+    PrimaryKeyConstraint
 )
 from sqlalchemy.orm import relationship
 
@@ -112,3 +113,11 @@ class PlanSeries(Base):
     flow_series_id = Column(Integer)
     scheduled_task = relationship("ScheduledTask", back_populates="plan_series_list")
     scheduled_task_id = Column(Integer, ForeignKey("scheduled_task.id"))
+
+class ExecutionPlanScheduleTaskMapping(Base):
+    __tablename__ = "execution_plan_schedule_task_mapping"
+    scheduled_task_id = Column(Integer, ForeignKey("scheduled_task.id"), primary_key=True)
+    execution_plan_id = Column(Integer, ForeignKey("execution_plan.id"), primary_key=True)
+    __table_args__ = (
+        PrimaryKeyConstraint('scheduled_task_id', 'execution_plan_id'),
+    )

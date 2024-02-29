@@ -96,7 +96,6 @@ def upload_scheduled_task_file(scheduled_task_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
-
 @SCHEDULE_API_BLUEPRINT.post("/")
 def create_scheduled_task():
     try:

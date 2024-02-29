@@ -5,6 +5,7 @@ from src.persistance.execution_plan import (
 )
 from src.persistance.session import get_session
 from src.persistance.user import User
+from src.persistance.scheduled_task import ExecutionPlanScheduleTaskMapping
 from src.service import file_storage_service, user_service, geometry_service
 from src.service.file_storage_service import FileType
 from sqlalchemy import and_, func
@@ -84,6 +85,7 @@ def create_from_scheduler(
         schedule_task_id,
         plan_series_list,
 ):
+    print('Voy a crear un execution plan!!!')
     execution_plan = create(
         execution_plan_name,
         geometry_id,
@@ -105,8 +107,22 @@ def create_from_scheduler(
             for ps in plan_series_list
         ],
     )
+    print('Ya lo creé')
     if use_restart:
         file_storage_service.copy_restart_file_to(execution_plan.id, schedule_task_id)
+
+    print('Se viene el session')
+    with get_session() as session:
+        print('Crearé un mapping con:', schedule_task_id, execution_plan.id)
+        mapping = ExecutionPlanScheduleTaskMapping(
+            scheduled_task_id=schedule_task_id,
+            execution_plan_id=execution_plan.id
+        )
+        print(mapping)
+        session.add(mapping)
+        session.commit()
+        session.refresh(mapping)
+    print('Se fue el session')
 
     return execution_plan
 

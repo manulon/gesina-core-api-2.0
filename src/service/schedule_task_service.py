@@ -27,7 +27,6 @@ def create(params, start_condition_type, restart_file_data, project_file_data, p
 
         return scheduled_task
 
-
 def update(_id, form):
     with get_session() as session:
         schedule_config = session.query(ScheduledTask).filter_by(id=_id).one_or_none()
@@ -92,7 +91,6 @@ def update_objects(schedule_config, old_objects, new_objects, update_func, creat
     else:
         _update_objects(old_objects, new_objects, update_func)
     
-
 def update_from_json(_id=None, **params):
     with get_session() as session:
         schedule_config = session.query(ScheduledTask).filter_by(id=_id).one_or_none()
@@ -145,7 +143,6 @@ def update_files(scheduled_task_id, project_file=None, plan_file=None, restart_f
         restart_file_path = save_restart_file(restart_file, scheduled_task_id)
     return project_path, plan_path, restart_file_path
 
-
 def create_from_form(form):
     params = {
         "frequency": form.frequency.data,
@@ -175,11 +172,9 @@ def create_from_form(form):
 
     return create(params, start_condition_type, restart_file_data, project_file_data, plan_file_data)
 
-
 def get_schedule_tasks():
     with get_session() as session:
         return session.query(ScheduledTask).order_by(ScheduledTask.id.desc()).all()
-
 
 def get_schedule_task_config(schedule_config_id):
     with get_session() as session:
@@ -189,17 +184,17 @@ def get_schedule_task_config(schedule_config_id):
             .first()
         )
 
-
 def delete_scheduled_task(scheduled_task_id):
     try:
         scheduled_task = get_schedule_task_config(scheduled_task_id)
 
         file_storage_service.delete_scheduled_task(scheduled_task_id)
-
+            
         # - Esto tira una excepcion. -
         with get_session() as session:
             session.delete(scheduled_task)
             session.commit()
+
         return True
     except Exception as e:
         print("error while deleting scheduled task: " + scheduled_task_id)
