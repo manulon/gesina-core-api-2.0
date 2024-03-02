@@ -397,7 +397,6 @@ paths:
                     type: string
                   error:
                     type: string
-  /schedule_task/tasks:
     patch:
       summary: Edit a scheduled task
       operationId: editScheduledTask
