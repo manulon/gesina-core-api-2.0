@@ -109,7 +109,7 @@ def is_project_template_present(schedule_task_id):
         )
         return True
     except Exception as exception:
-        error_message = f"Project template file for {schedule_task_id} doesnt exist"
+        error_message = f"Project template file for {schedule_task_id} doesn't exist"
         logger.error(error_message, exception)
         return False
 
@@ -121,7 +121,7 @@ def is_plan_template_present(schedule_task_id):
         )
         return True
     except Exception as exception:
-        error_message = f"Plan template file for {schedule_task_id} doesnt exist"
+        error_message = f"Plan template file for {schedule_task_id} doesn't exist"
         logger.error(error_message, exception)
         return False
 
@@ -133,7 +133,7 @@ def is_restart_file_present(schedule_task_id):
         )
         return True
     except Exception as exception:
-        error_message = f"Restart file for {schedule_task_id} doesnt exist"
+        error_message = f"Restart file for {schedule_task_id} doesn't exist"
         logger.warning(error_message)
         return False
 

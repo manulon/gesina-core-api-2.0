@@ -5,6 +5,7 @@ from src.controller.schemas import SCHEDULE_TASK_SCHEMA
 from src.logger import get_logger
 from src.service import schedule_task_service, api_authentication_service, file_storage_service
 from src.service.border_series_service import retrieve_series_json
+from src.service.exception.file_exception import FileUploadError
 from src.service.initial_flow_service import create_initial_flows_from_json
 from src.service.plan_series_service import retrieve_plan_series_json
 from src.service.file_storage_service import FileType
@@ -92,9 +93,13 @@ def edit_scheduled_task(scheduled_task_id):
             'plan_series_list': body.get('plan_series_list'),
             'initial_flows': body.get('initial_flows')
         }
+        print(params)
         schedule_task_service.update_from_json(scheduled_task_id, **params)
         response = jsonify({"message": f"Scheduled task with id {scheduled_task_id} edited successfully"})
         response.status_code = 200
+    except FileUploadError as file_error:
+        response = jsonify({"message": f"You must upload all the required files to enable execution", "error": str(file_error)})
+        response.status_code = 400
     except KeyError as ke:
         response = jsonify({"message": f"Error editing scheduled task {scheduled_task_id}", "error": str(ke)})
         response.status_code = 400
