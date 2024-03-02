@@ -42,7 +42,6 @@ def update(_id, form):
         schedule_config.description = form.description.data
         schedule_config.geometry_id = form.geometry_id.data
         schedule_config.start_datetime = form.start_datetime.data
-        print(form.enabled.data)
         if form.enabled.data:
             if not file_storage_service.is_project_template_present(_id) or not file_storage_service.is_plan_template_present(_id) or not file_storage_service.is_restart_file_present(_id):
                 raise FileUploadError("Es mandatorio subir todos los archivos para habilitar la ejecución")
