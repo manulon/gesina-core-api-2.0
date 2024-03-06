@@ -191,6 +191,9 @@ def copy_execution_file(file_to_copy, id_copy_to, new_name=None):
     minio_path = f"{FileType.EXECUTION_PLAN.value}"
     minio_path += f"/{id_copy_to}"
     minio_path += f"/{new_name}" if new_name is not None else f"/{secure_filename(file_to_copy.split('/')[-1])}"
+    logger.error('minio_path')
+    logger.error(minio_path)
+    logger.error('----')
     minio_client.copy_object(ROOT_BUCKET, minio_path, CopySource(ROOT_BUCKET, file_to_copy))
     return minio_path
 
