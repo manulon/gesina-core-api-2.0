@@ -188,14 +188,15 @@ def copy_execution_files_scheduled(id_copy_from, id_copy_to):
     return list_execution_files(FileType.SCHEDULED_TASK, id_copy_to)
 
 def copy_execution_file(file_to_copy, id_copy_to, new_name=None):
-    minio_path = f"{FileType.EXECUTION_PLAN.value}"
-    minio_path += f"/{id_copy_to}"
-    minio_path += f"/{new_name}" if new_name is not None else f"/{secure_filename(file_to_copy.split('/')[-1])}"
-    logger.error('minio_path')
-    logger.error(minio_path)
-    logger.error('----')
-    minio_client.copy_object(ROOT_BUCKET, minio_path, CopySource(ROOT_BUCKET, file_to_copy))
-    return minio_path
+    if file_to_copy is not None:
+        minio_path = f"{FileType.EXECUTION_PLAN.value}"
+        minio_path += f"/{id_copy_to}"
+        minio_path += f"/{new_name}" if new_name is not None else f"/{secure_filename(file_to_copy.split('/')[-1])}"
+        logger.error('minio_path')
+        logger.error(minio_path)
+        logger.error('----')
+        minio_client.copy_object(ROOT_BUCKET, minio_path, CopySource(ROOT_BUCKET, file_to_copy))
+        return minio_path
 
 def copy_execution_file_scheduled(file_to_copy, id_copy_to, new_name=None):
     minio_path = f"{FileType.SCHEDULED_TASK.value}"

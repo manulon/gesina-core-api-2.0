@@ -68,7 +68,7 @@ class ScheduledTaskJob:
         plan_name = "scheduled-task.p01"
 
         use_restart = scheduled_task.start_condition_type == "restart_file"
-
+        logger.error(use_restart)
         # flow_file = flow_file or build_flow(
         #     use_restart=use_restart, initial_flows=scheduled_task.initial_flows
         # )

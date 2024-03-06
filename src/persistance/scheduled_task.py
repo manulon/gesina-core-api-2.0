@@ -117,7 +117,7 @@ class PlanSeries(Base):
 class ExecutionPlanScheduleTaskMapping(Base):
     __tablename__ = "execution_plan_schedule_task_mapping"
     scheduled_task_id = Column(Integer, ForeignKey("scheduled_task.id"), primary_key=True)
-    execution_plan_id = Column(Integer, ForeignKey("execution_plan.id"), primary_key=True)
+    execution_id = Column(Integer, ForeignKey("execution_plan.id"), primary_key=True)
     __table_args__ = (
-        PrimaryKeyConstraint('scheduled_task_id', 'execution_plan_id'),
+        PrimaryKeyConstraint('scheduled_task_id', 'execution_id'),
     )

@@ -128,10 +128,10 @@ def create_from_scheduler(
 
     logger.error('Se viene el session')
     with get_session() as session:
-        logger.error('Crearé un mapping con:', schedule_task_id, execution_plan.id)
+        print('Crearé un mapping con:', schedule_task_id, execution_plan.id)
         mapping = ExecutionPlanScheduleTaskMapping(
             scheduled_task_id=schedule_task_id,
-            execution_plan_id=execution_plan.id
+            execution_id=execution_plan.id
         )
         logger.error(mapping)
         session.add(mapping)
@@ -221,8 +221,7 @@ def create(
             logger.error(execution_plan_id)
             logger.error(restart_file_name)
             logger.error('---')
-            file_storage_service.copy_execution_file(restart_file_name, execution_plan_id)
-
+            file_storage_service.copy_execution_file(restart_name, execution_plan_id,restart_file_name)
 
         return execution_plan
 
