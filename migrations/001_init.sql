@@ -129,10 +129,10 @@ create table if not exists "plan_series"
     scheduled_task_id integer not null constraint plan_series_scheduled_task_id_fk references "scheduled_task" on delete cascade
 );
 
-create table if not exists execution_tasks
+create table if not exists execution_task
 (
 	id serial constraint execution_tasks_pk primary key,
-	execution_id integer not null constraint execution_plan__id_fk references "execution_plan",
+	execution_id integer not null constraint execution_plan__id_fk references "execution_plan" ON DELETE CASCADE,
     task_id varchar
 );
 
