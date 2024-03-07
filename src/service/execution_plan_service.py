@@ -11,9 +11,6 @@ from src.service.file_storage_service import FileType
 from sqlalchemy import and_, func
 
 import io
-import logging
-logger = logging.getLogger("TEST")
-
 
 def create_from_form(form):
     plan_name = form.plan_name.data
