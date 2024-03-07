@@ -50,6 +50,7 @@ class ScheduleTaskSchema(Schema):
     initial_flows = fields.List(fields.Nested(InitialFlowSchema))
     border_conditions = fields.List(fields.Nested(BorderConditionSchema))
     plan_series_list = fields.List(fields.Nested(PlanSeriesSchema))
+    start_condition_type = fields.Str()
 
 
 class UserSchema(Schema):

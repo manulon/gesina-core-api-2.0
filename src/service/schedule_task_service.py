@@ -1,6 +1,8 @@
 from flask_wtf.file import FileField
+from sqlalchemy import func
 
 from src.persistance.scheduled_task import ScheduledTask, ExecutionPlanScheduleTaskMapping
+from src.persistance import User
 from src.persistance.session import get_session
 from src.service import project_file_service, plan_file_service, file_storage_service, execution_plan_service
 from src.service.file_storage_service import save_restart_file, FileType
@@ -39,6 +41,9 @@ def update(_id, form):
         schedule_config.description = form.description.data
         schedule_config.geometry_id = form.geometry_id.data
         schedule_config.start_datetime = form.start_datetime.data
+        if form.enabled.data:
+            if not file_storage_service.is_project_template_present(_id) or not file_storage_service.is_plan_template_present(_id) or not file_storage_service.is_restart_file_present(_id):
+                raise FileUploadError("Es mandatorio subir todos los archivos para habilitar la ejecución")
         schedule_config.enabled = form.enabled.data
         schedule_config.observation_days = form.observation_days.data
         schedule_config.forecast_days = form.forecast_days.data
@@ -93,7 +98,7 @@ def update_objects(schedule_config, old_objects, new_objects, update_func, creat
     
 def update_from_json(_id=None, **params):
     with get_session() as session:
-        schedule_config = session.query(ScheduledTask).filter_by(id=_id).one_or_none()
+        schedule_config = session.query(ScheduledTask).filter_by(id = _id).one_or_none()
         if schedule_config:
             for key, value in params.items():
                 if value is not None:
@@ -127,6 +132,11 @@ def update_from_json(_id=None, **params):
                             'initial_flows',
                             _id
                         )
+                    elif key == 'enabled':
+                        if value:
+                            if not file_storage_service.is_project_template_present(_id) or not file_storage_service.is_plan_template_present(_id) or not file_storage_service.is_restart_file_present(_id):
+                                raise FileUploadError("You must upload all the required files to enable execution")
+                        setattr(schedule_config, key, value)
                     else:
                         setattr(schedule_config, key, value)
         session.add(schedule_config)
@@ -164,17 +174,49 @@ def create_from_form(form):
     if form.start_condition_type.data == "initial_flows":
         params["initial_flows"] = create_initial_flows_from_form(form)
 
-
     start_condition_type = form.start_condition_type.data
     restart_file_data = form.restart_file.data
     project_file_data = form.project_file.data
     plan_file_data = form.plan_file.data
 
+    if form.enabled.data:
+        if form.start_condition_type.data == "restar_file":
+            if restart_file_data.filename == '':
+                raise FileUploadError("Es mandatorio subir todos los archivos para habilitar la ejecución")
+        if project_file_data.filename == '' or plan_file_data.filename == '':
+            raise FileUploadError("Es mandatorio subir todos los archivos para habilitar la ejecución")
+
     return create(params, start_condition_type, restart_file_data, project_file_data, plan_file_data)
 
-def get_schedule_tasks():
+
+
+def get_schedule_tasks(name=None, user_first_name=None, user_last_name=None, start_condition_type=None, date_from=None,
+                       date_to=None, enabled=None, frequency=None, calibration_id=None,calibration_id_for_simulations=None):
     with get_session() as session:
-        return session.query(ScheduledTask).order_by(ScheduledTask.id.desc()).all()
+        query = session.query(ScheduledTask).order_by(ScheduledTask.id.desc())
+        if name is not None:
+            query = query.filter(func.lower(ScheduledTask.name).like(func.lower(f"%{name}%")))
+        if user_first_name is not None or user_last_name is not None:
+            query = query.join(User, aliased=True)
+            if user_first_name is not None:
+                query = query.filter(func.lower(User.first_name).like(func.lower(f"%{user_first_name}%")))
+            if user_last_name is not None:
+                query = query.filter(func.lower(User.last_name).like(func.lower(f"%{user_last_name}%")))
+        if start_condition_type is not None and start_condition_type != "":
+            query = query.filter(ScheduledTask.start_condition_type == start_condition_type)
+        if date_from is not None:
+            query = query.filter(ScheduledTask.start_datetime >= date_from)
+        if date_to is not None:
+            query = query.filter(ScheduledTask.start_datetime <= date_to)
+        if enabled is not None:
+            query = query.filter(ScheduledTask.enabled == enabled)
+        if frequency is not None:
+            query = query.filter(ScheduledTask.frequency == frequency)
+        if calibration_id is not None:
+            query = query.filter(ScheduledTask.calibration_id == calibration_id)
+        if calibration_id_for_simulations is not None:
+            query = query.filter(ScheduledTask.calibration_id_for_simulations == calibration_id_for_simulations)
+        return query.all()
 
 def get_schedule_task_config(schedule_config_id):
     with get_session() as session:

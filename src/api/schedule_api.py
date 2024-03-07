@@ -5,6 +5,7 @@ from src.controller.schemas import SCHEDULE_TASK_SCHEMA
 from src.logger import get_logger
 from src.service import schedule_task_service, api_authentication_service, file_storage_service
 from src.service.border_series_service import retrieve_series_json
+from src.service.exception.file_exception import FileUploadError
 from src.service.initial_flow_service import create_initial_flows_from_json
 from src.service.plan_series_service import retrieve_plan_series_json
 from src.service.file_storage_service import FileType
@@ -13,19 +14,51 @@ SCHEDULE_API_BLUEPRINT = Blueprint("scheduled_task", __name__, url_prefix="/sche
 
 @SCHEDULE_API_BLUEPRINT.get("/<scheduled_task_id>")
 def get_scheduled_task(scheduled_task_id):
-    task = schedule_task_service.get_schedule_task_config(scheduled_task_id)
-    obj = SCHEDULE_TASK_SCHEMA.dump(task)
-    return jsonify(obj)
+    try:
+        if not scheduled_task_id.isnumeric():
+            raise Exception("Id is not numeric")
+        task = schedule_task_service.get_schedule_task_config(scheduled_task_id)
+        obj = SCHEDULE_TASK_SCHEMA.dump(task)
+        return jsonify(obj)
+    except Exception as e:
+        logger = get_logger()
+        logger.error(e, exc_info=True)
+        response = jsonify({
+            "message": f"bad request while getting scheduled task {scheduled_task_id}",
+            "error": str(e)
+        })
+        response.status_code = 400
+        return response
 
-@SCHEDULE_API_BLUEPRINT.get("/all")
+@SCHEDULE_API_BLUEPRINT.get("/tasks")
 def list_schedule_tasks():
-    schedule_tasks = schedule_task_service.get_schedule_tasks()
+    try:
+        args = request.args
+        schedule_tasks = schedule_task_service.get_schedule_tasks(args.get("name"),
+                                                                  args.get('user_first_name'),
+                                                                  args.get('user_last_name'),
+                                                                  args.get('start_condition_type'),
+                                                                  args.get('date_from'),
+                                                                  args.get('date_to'),
+                                                                  args.get('enabled'),
+                                                                  args.get('frequency'),
+                                                                  args.get('calibration_id'),
+                                                                  args.get('calibration_id_for_simulations'))
 
-    return jsonify(
-        SCHEDULE_TASK_SCHEMA.dump(
-            schedule_tasks, many=True
+        return jsonify(
+            SCHEDULE_TASK_SCHEMA.dump(
+                schedule_tasks, many=True
+            )
         )
-    )
+    except Exception as e:
+        logger = get_logger()
+        logger.error(e, exc_info=True)
+        response = jsonify({
+            "message": "bad request while retrieving scheduled tasks",
+            "error": str(e)
+        })
+        response.status_code = 400
+        return response
 
 @SCHEDULE_API_BLUEPRINT.delete("/<scheduled_task_id>")
 def delete_scheduled_task(scheduled_task_id):
@@ -60,9 +93,13 @@ def edit_scheduled_task(scheduled_task_id):
             'plan_series_list': body.get('plan_series_list'),
             'initial_flows': body.get('initial_flows')
         }
+        print(params)
         schedule_task_service.update_from_json(scheduled_task_id, **params)
         response = jsonify({"message": f"Scheduled task with id {scheduled_task_id} edited successfully"})
         response.status_code = 200
+    except FileUploadError as file_error:
+        response = jsonify({"message": f"You must upload all the required files to enable execution", "error": str(file_error)})
+        response.status_code = 400
     except KeyError as ke:
         response = jsonify({"message": f"Error editing scheduled task {scheduled_task_id}", "error": str(ke)})
         response.status_code = 400
@@ -74,14 +111,15 @@ def edit_scheduled_task(scheduled_task_id):
 @SCHEDULE_API_BLUEPRINT.post("/upload_file/<scheduled_task_id>")
 def upload_scheduled_task_file(scheduled_task_id):
     try:
-        project_file = request.files['project_file']
-        plan_file = request.files['plan_file']
-        restart_file = request.files['restart_file']
-        if project_file.filename == '' and plan_file.filename == '' and restart_file.filename == '':
+        project_file = request.files.get('project_file')
+        plan_file = request.files.get('plan_file')
+        restart_file = request.files.get('restart_file')
+
+        if not any([project_file, plan_file, restart_file]):
             raise Exception("You must select at least one file to edit")
-        
+
         project_path, plan_path, restart_file_path = schedule_task_service.update_files(
-            scheduled_task_id, 
+            scheduled_task_id,
             project_file,
             plan_file,
             restart_file
@@ -95,7 +133,7 @@ def upload_scheduled_task_file(scheduled_task_id):
         return jsonify({'message': 'File uploaded successfully', 'file_path': path})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+      
 @SCHEDULE_API_BLUEPRINT.post("/")
 def create_scheduled_task():
     try:
