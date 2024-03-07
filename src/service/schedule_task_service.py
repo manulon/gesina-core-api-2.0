@@ -1,8 +1,8 @@
 from flask_wtf.file import FileField
 
-from src.persistance.scheduled_task import ScheduledTask
+from src.persistance.scheduled_task import ScheduledTask, ExecutionPlanScheduleTaskMapping
 from src.persistance.session import get_session
-from src.service import project_file_service, plan_file_service, file_storage_service
+from src.service import project_file_service, plan_file_service, file_storage_service, execution_plan_service
 from src.service.file_storage_service import save_restart_file, FileType
 from src.service.user_service import get_current_user
 from src.service.initial_flow_service import *
@@ -184,13 +184,24 @@ def get_schedule_task_config(schedule_config_id):
             .first()
         )
 
+def get_associated_execution_plans(scheduled_task_id):
+    with get_session() as session:
+        return (
+            session.query(ExecutionPlanScheduleTaskMapping)
+            .filter(ExecutionPlanScheduleTaskMapping.scheduled_task_id == scheduled_task_id)
+            .all()
+        )
+
 def delete_scheduled_task(scheduled_task_id):
     try:
         scheduled_task = get_schedule_task_config(scheduled_task_id)
+        execution_plan_schedule_task_mapping = get_associated_execution_plans(scheduled_task_id)
+
+        for mapping in execution_plan_schedule_task_mapping:
+            execution_plan_service.delete_execution_plan(mapping.execution_id)
 
         file_storage_service.delete_scheduled_task(scheduled_task_id)
             
-        # - Esto tira una excepcion. -
         with get_session() as session:
             session.delete(scheduled_task)
             session.commit()

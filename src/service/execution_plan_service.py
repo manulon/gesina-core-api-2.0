@@ -225,7 +225,7 @@ def delete_execution_plan(execution_plan_id):
         session.delete(execution_plan)
         session.commit()
     file_storage_service.delete_execution_files(execution_plan_id)
-    return True
+    return True   
 
 def get_execution_plans(plan_name=None, user_first_name=None, user_last_name=None, status=None, date_from=None,
                         date_to=None):
