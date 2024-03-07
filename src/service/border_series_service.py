@@ -128,7 +128,7 @@ def process_series_csv_file(series_file, scheduled_config_id=None):
                         reach=row[1],
                         river_stat=row[2],
                         interval=row[3],
-                        type=row[4],
+                        type=BorderConditionType(row[4]),
                         series_id=row[5],
                     )
                 else:
@@ -137,7 +137,7 @@ def process_series_csv_file(series_file, scheduled_config_id=None):
                         reach=row[1],
                         river_stat=row[2],
                         interval=row[3],
-                        type=row[4],
+                        type=BorderConditionType(row[4]),
                         series_id=row[5],
                     )
                 result.append(border_condition)
