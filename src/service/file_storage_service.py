@@ -88,7 +88,6 @@ def save_file(file_type, file, filename, _id=None):
         return minio_path
     except Exception as exception:
         error_message = "Error uploading file"
-        logger.error(error_message, exception)
         raise FileUploadError(error_message)
 
 def get_geometry_url(name):
@@ -98,7 +97,6 @@ def get_geometry_url(name):
         )
     except Exception as exception:
         error_message = f"Error generating presigned url for {name}"
-        logger.error(error_message, exception)
         raise FilePreSignedUrlError(error_message)
 
 def is_project_template_present(schedule_task_id):

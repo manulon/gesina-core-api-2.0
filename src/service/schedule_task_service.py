@@ -1,10 +1,10 @@
 from flask_wtf.file import FileField
 from sqlalchemy import func
 
+from src.persistance.scheduled_task import ScheduledTask, ExecutionPlanScheduleTaskMapping
 from src.persistance import User
-from src.persistance.scheduled_task import ScheduledTask
 from src.persistance.session import get_session
-from src.service import project_file_service, plan_file_service, file_storage_service
+from src.service import project_file_service, plan_file_service, file_storage_service, execution_plan_service
 from src.service.file_storage_service import save_restart_file, FileType
 from src.service.user_service import get_current_user
 from src.service.initial_flow_service import *
@@ -28,7 +28,6 @@ def create(params, start_condition_type, restart_file_data, project_file_data, p
         plan_file_service.process_plan_template(plan_file_data, scheduled_task.id)
 
         return scheduled_task
-
 
 def update(_id, form):
     with get_session() as session:
@@ -97,7 +96,6 @@ def update_objects(schedule_config, old_objects, new_objects, update_func, creat
     else:
         _update_objects(old_objects, new_objects, update_func)
     
-
 def update_from_json(_id=None, **params):
     with get_session() as session:
         schedule_config = session.query(ScheduledTask).filter_by(id = _id).one_or_none()
@@ -155,7 +153,6 @@ def update_files(scheduled_task_id, project_file=None, plan_file=None, restart_f
         restart_file_path = save_restart_file(restart_file, scheduled_task_id)
     return project_path, plan_path, restart_file_path
 
-
 def create_from_form(form):
     params = {
         "frequency": form.frequency.data,
@@ -192,6 +189,7 @@ def create_from_form(form):
     return create(params, start_condition_type, restart_file_data, project_file_data, plan_file_data)
 
 
+
 def get_schedule_tasks(name=None, user_first_name=None, user_last_name=None, start_condition_type=None, date_from=None,
                        date_to=None, enabled=None, frequency=None, calibration_id=None,calibration_id_for_simulations=None):
     with get_session() as session:
@@ -220,7 +218,6 @@ def get_schedule_tasks(name=None, user_first_name=None, user_last_name=None, sta
             query = query.filter(ScheduledTask.calibration_id_for_simulations == calibration_id_for_simulations)
         return query.all()
 
-
 def get_schedule_task_config(schedule_config_id):
     with get_session() as session:
         return (
@@ -229,17 +226,28 @@ def get_schedule_task_config(schedule_config_id):
             .first()
         )
 
+def get_associated_execution_plans(scheduled_task_id):
+    with get_session() as session:
+        return (
+            session.query(ExecutionPlanScheduleTaskMapping)
+            .filter(ExecutionPlanScheduleTaskMapping.scheduled_task_id == scheduled_task_id)
+            .all()
+        )
 
 def delete_scheduled_task(scheduled_task_id):
     try:
         scheduled_task = get_schedule_task_config(scheduled_task_id)
+        execution_plan_schedule_task_mapping = get_associated_execution_plans(scheduled_task_id)
+
+        for mapping in execution_plan_schedule_task_mapping:
+            execution_plan_service.delete_execution_plan(mapping.execution_id)
 
         file_storage_service.delete_scheduled_task(scheduled_task_id)
-
-        # - Esto tira una excepcion. -
+            
         with get_session() as session:
             session.delete(scheduled_task)
             session.commit()
+
         return True
     except Exception as e:
         print("error while deleting scheduled task: " + scheduled_task_id)

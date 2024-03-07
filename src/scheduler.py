@@ -48,7 +48,6 @@ class ScheduledTaskJob:
 
     def simulate(self, flow_file=None):
         scheduled_task = get_schedule_task_config(self.scheduled_task)
-        logger.error("Starting simulation")
         locale = timezone("America/Argentina/Buenos_Aires")
         today = datetime.now(tz=locale).replace(minute=0)
         start_date = today - timedelta(scheduled_task.observation_days)
@@ -56,7 +55,7 @@ class ScheduledTaskJob:
         logger.error(f"Start Date: {start_date} and End Date: {end_date}")
 
         simulation_name = f'{scheduled_task.name.replace(" ", "_")}-{start_date.strftime("%Y%m%d_%Hhs")}'
-
+        
         project_file = build_project(
             scheduled_task.id, simulation_name, start_date, end_date
         )
@@ -66,7 +65,7 @@ class ScheduledTaskJob:
         plan_name = "scheduled-task.p01"
 
         use_restart = scheduled_task.start_condition_type == "restart_file"
-
+        
         # flow_file = flow_file or build_flow(
         #     use_restart=use_restart, initial_flows=scheduled_task.initial_flows
         # )
