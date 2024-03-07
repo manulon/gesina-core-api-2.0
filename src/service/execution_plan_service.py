@@ -192,8 +192,8 @@ def create(
                 restart_file_name,
                 execution_plan_id,
             )
-        else:
-            file_storage_service.copy_execution_file(restart_name, execution_plan_id,restart_file_name)
+        elif restart_name is not None:
+            file_storage_service.copy_execution_file(restart_name, execution_plan_id, restart_file_name)
 
         return execution_plan
 
