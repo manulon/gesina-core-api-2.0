@@ -88,19 +88,6 @@ def create_from_scheduler(
         schedule_task_id,
         plan_series_list,
 ):
-    logger.error('Voy a crear un execution plan!!!')
-    logger.error('---')
-    logger.error(execution_plan_name)
-    logger.error(geometry_id)
-    logger.error(user.id)
-    logger.error(project_name)
-    logger.error(project_file)
-    logger.error(plan_name)
-    logger.error(plan_file)
-    logger.error(flow_name)
-    logger.error(flow_file)
-    logger.error(plan_series_list)
-    logger.error('---')
     execution_plan = create(
         execution_plan_name,
         geometry_id,
@@ -122,22 +109,17 @@ def create_from_scheduler(
             for ps in plan_series_list
         ],
     )
-    logger.error('Ya lo creé')
     if use_restart:
         file_storage_service.copy_restart_file_to(execution_plan.id, schedule_task_id)
 
-    logger.error('Se viene el session')
     with get_session() as session:
-        print('Crearé un mapping con:', schedule_task_id, execution_plan.id)
         mapping = ExecutionPlanScheduleTaskMapping(
             scheduled_task_id=schedule_task_id,
             execution_id=execution_plan.id
         )
-        logger.error(mapping)
         session.add(mapping)
         session.commit()
         session.refresh(mapping)
-    logger.error('Se fue el session')
 
     return execution_plan
 
@@ -190,9 +172,6 @@ def create(
         else:
             file_storage_service.copy_execution_file(plan_name,execution_plan_id)
 
-        logger.error('Flow File')
-        logger.error(flow_file)
-        logger.error('--------------------')
         if flow_file is not None:
             file_storage_service.save_file(
                 FileType.EXECUTION_PLAN,
@@ -206,9 +185,6 @@ def create(
         if not isinstance(restart_file, io.BytesIO) and restart_file is not None:
             restart_file_name = restart_file.filename
 
-        logger.error('Restart File')
-        logger.error(restart_file)
-        logger.error('--------------------')
         if restart_file is not None:
             file_storage_service.save_file(
                 FileType.EXECUTION_PLAN,
@@ -217,10 +193,6 @@ def create(
                 execution_plan_id,
             )
         else:
-            logger.error('VALORES:')
-            logger.error(execution_plan_id)
-            logger.error(restart_file_name)
-            logger.error('---')
             file_storage_service.copy_execution_file(restart_name, execution_plan_id,restart_file_name)
 
         return execution_plan
