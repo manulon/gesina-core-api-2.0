@@ -5,6 +5,7 @@ from src.persistance.execution_plan import (
 )
 from src.persistance.session import get_session
 from src.persistance.user import User
+from src.persistance.scheduled_task import ExecutionPlanScheduleTaskMapping
 from src.service import file_storage_service, user_service, geometry_service
 from src.service.file_storage_service import FileType
 from sqlalchemy import and_, func
@@ -108,6 +109,15 @@ def create_from_scheduler(
     if use_restart:
         file_storage_service.copy_restart_file_to(execution_plan.id, schedule_task_id)
 
+    with get_session() as session:
+        mapping = ExecutionPlanScheduleTaskMapping(
+            scheduled_task_id=schedule_task_id,
+            execution_id=execution_plan.id
+        )
+        session.add(mapping)
+        session.commit()
+        session.refresh(mapping)
+
     return execution_plan
 
 def create(
@@ -172,7 +182,6 @@ def create(
         if not isinstance(restart_file, io.BytesIO) and restart_file is not None:
             restart_file_name = restart_file.filename
 
-
         if restart_file is not None:
             file_storage_service.save_file(
                 FileType.EXECUTION_PLAN,
@@ -180,9 +189,8 @@ def create(
                 restart_file_name,
                 execution_plan_id,
             )
-        else:
-            file_storage_service.copy_execution_file(restart_name, execution_plan_id,restart_file_name)
-
+        elif restart_name is not None:
+            file_storage_service.copy_execution_file(restart_name, execution_plan_id, restart_file_name)
 
         return execution_plan
 
@@ -214,7 +222,7 @@ def delete_execution_plan(execution_plan_id):
         session.delete(execution_plan)
         session.commit()
     file_storage_service.delete_execution_files(execution_plan_id)
-    return True
+    return True   
 
 def get_execution_plans(plan_name=None, user_first_name=None, user_last_name=None, status=None, date_from=None,
                         date_to=None):

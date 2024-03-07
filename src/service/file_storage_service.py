@@ -88,7 +88,6 @@ def save_file(file_type, file, filename, _id=None):
         return minio_path
     except Exception as exception:
         error_message = "Error uploading file"
-        logger.error(error_message, exception)
         raise FileUploadError(error_message)
 
 def get_geometry_url(name):
@@ -98,7 +97,6 @@ def get_geometry_url(name):
         )
     except Exception as exception:
         error_message = f"Error generating presigned url for {name}"
-        logger.error(error_message, exception)
         raise FilePreSignedUrlError(error_message)
 
 def is_project_template_present(schedule_task_id):
@@ -109,7 +107,7 @@ def is_project_template_present(schedule_task_id):
         )
         return True
     except Exception as exception:
-        error_message = f"Project template file for {schedule_task_id} doesnt exist"
+        error_message = f"Project template file for {schedule_task_id} doesn't exist"
         logger.error(error_message, exception)
         return False
 
@@ -121,7 +119,7 @@ def is_plan_template_present(schedule_task_id):
         )
         return True
     except Exception as exception:
-        error_message = f"Plan template file for {schedule_task_id} doesnt exist"
+        error_message = f"Plan template file for {schedule_task_id} doesn't exist"
         logger.error(error_message, exception)
         return False
 
@@ -133,7 +131,7 @@ def is_restart_file_present(schedule_task_id):
         )
         return True
     except Exception as exception:
-        error_message = f"Restart file for {schedule_task_id} doesnt exist"
+        error_message = f"Restart file for {schedule_task_id} doesn't exist"
         logger.warning(error_message)
         return False
 
