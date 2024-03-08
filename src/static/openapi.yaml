@@ -1025,13 +1025,13 @@ components:
           type: integer
           example: 24
         created_at:
+          type: string
+          format: date-time
           example: "2024-02-11T16:43:32"
-          type: string
-          format: date-time
         start_datetime:
-          example: "2024-02-12T08:00:00"
           type: string
           format: date-time
+          example: "2024-02-12T08:00:00"
         enabled:
           type: boolean
           example: true
@@ -1053,6 +1053,24 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PlanSeriesSchema'
+        start_condition_type:
+          type: string
+          example: "Example Start Condition Type"
+        geometry_id:
+          type: integer
+          example: 2
+        observation_days:
+          type: integer
+          example: 30
+        forecast_days:
+          type: integer
+          example: 7
+        calibration_id:
+          type: integer
+          example: 3
+        calibration_id_for_simulations:
+          type: integer
+          example: 4
     EditScheduledTaskRequest:
       type: object
       properties:
