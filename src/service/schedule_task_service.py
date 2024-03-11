@@ -133,7 +133,7 @@ def update_from_json(_id=None, **params):
                             _id
                         )
                     elif key == 'enabled':
-                        if value:
+                        if value is True:
                             if not file_storage_service.is_project_template_present(_id) or not file_storage_service.is_plan_template_present(_id) or not file_storage_service.is_restart_file_present(_id):
                                 raise FileUploadError("You must upload all the required files to enable execution")
                         setattr(schedule_config, key, value)
@@ -180,7 +180,7 @@ def create_from_form(form):
     plan_file_data = form.plan_file.data
 
     if form.enabled.data:
-        if form.start_condition_type.data == "restar_file":
+        if form.start_condition_type.data == "restart_file":
             if restart_file_data.filename == '':
                 raise FileUploadError("Es mandatorio subir todos los archivos para habilitar la ejecución")
         if project_file_data.filename == '' or plan_file_data.filename == '':

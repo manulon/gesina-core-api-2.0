@@ -3,6 +3,7 @@ import io
 from flask import request, jsonify, Blueprint
 
 from src import logger
+from src.api.utils import validate_fields
 from src.logger import get_logger
 from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service import (
@@ -71,7 +72,13 @@ def copy_execution_plan():
 @EXECUTION_PLAN_API_BLUEPRINT.post("/")
 def create_execution_plan():
     try:
-        execution_plan = execution_plan_service.create_from_json(request.get_json(),
+        required_fields = ["plan_name","geometry_id",]
+        body = request.get_json()
+        missing_fields = validate_fields(body,required_fields)
+        if missing_fields:
+            return jsonify(
+                {"error": "Missing required fields for execution plan", "missing": missing_fields}), 400
+        execution_plan = execution_plan_service.create_from_json(body,
                                                                  api_authentication_service.get_current_user_id())
         return {"new_execution_plan_id": execution_plan.id}
     except Exception as e:
