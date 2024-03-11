@@ -112,14 +112,19 @@ def edit_execution_plan(execution_plan_id):
         response.status_code = 400
         return response
 
-@EXECUTION_PLAN_API_BLUEPRINT.post("/upload_file")
-def upload_execution_file():
+@EXECUTION_PLAN_API_BLUEPRINT.post("/upload_file/<execution_plan_id>")
+def upload_execution_file(execution_plan_id):
     try:
         file = request.files['file']
         if file.filename == '':
             raise Exception("No selected file")
 
-        path = file_storage_service.save_file(FileType.EXECUTION_PLAN, file, file.filename)
+        path = file_storage_service.save_file(
+            FileType.EXECUTION_PLAN, 
+            file, 
+            file.filename,
+            execution_plan_id
+        )
 
         return jsonify({'message': 'File uploaded successfully', 'file_path': path})
     except Exception as e:

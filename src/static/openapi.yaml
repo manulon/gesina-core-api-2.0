@@ -121,12 +121,18 @@ paths:
         '400':
           description: Error while creating execution plan. Bad request.
 
-  /execution_plan/upload_file:
+  /execution_plan/upload_file/{execution_plan_id}:
     post:
       summary: Uploads an execution plan file
       operationId: uploadExecutionFile
       tags:
         - Execution Plan
+      parameters:
+        - name: execution_plan_id
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
