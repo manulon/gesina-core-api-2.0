@@ -15,6 +15,7 @@ from src.service.file_storage_service import FileType
 
 EXECUTION_PLAN_API_BLUEPRINT = Blueprint("execution_plan", __name__, url_prefix="/execution_plan")
 
+
 @EXECUTION_PLAN_API_BLUEPRINT.get("/<execution_plan_id>")
 def get_execution_plan(execution_plan_id):
     try:
@@ -58,6 +59,7 @@ def get_execution_plan(execution_plan_id):
         response.status_code = 400
         return response
 
+
 @EXECUTION_PLAN_API_BLUEPRINT.post("/copy")
 def copy_execution_plan():
     try:
@@ -69,12 +71,13 @@ def copy_execution_plan():
         response.status_code = 400
         return response
 
+
 @EXECUTION_PLAN_API_BLUEPRINT.post("/")
 def create_execution_plan():
     try:
-        required_fields = ["plan_name","geometry_id",]
+        required_fields = ["plan_name", "geometry_id"]
         body = request.get_json()
-        missing_fields = validate_fields(body,required_fields)
+        missing_fields = validate_fields(body, required_fields)
         if missing_fields:
             return jsonify(
                 {"error": "Missing required fields for execution plan", "missing": missing_fields}), 400
@@ -85,6 +88,7 @@ def create_execution_plan():
         response = jsonify({"error": str(e)})
         response.status_code = 400
         return response
+
 
 @EXECUTION_PLAN_API_BLUEPRINT.delete("/<execution_plan_id>")
 def delete_execution_plan(execution_plan_id):
@@ -98,6 +102,7 @@ def delete_execution_plan(execution_plan_id):
                             "error": str(e)})
         response.status_code = 400
         return response
+
 
 @EXECUTION_PLAN_API_BLUEPRINT.patch("/<execution_plan_id>")
 def edit_execution_plan(execution_plan_id):
@@ -119,6 +124,7 @@ def edit_execution_plan(execution_plan_id):
         response.status_code = 400
         return response
 
+
 @EXECUTION_PLAN_API_BLUEPRINT.post("/upload_file/<execution_plan_id>")
 def upload_execution_file(execution_plan_id):
     try:
@@ -127,8 +133,8 @@ def upload_execution_file(execution_plan_id):
             raise Exception("No selected file")
 
         path = file_storage_service.save_file(
-            FileType.EXECUTION_PLAN, 
-            file, 
+            FileType.EXECUTION_PLAN,
+            file,
             file.filename,
             execution_plan_id
         )
@@ -136,6 +142,7 @@ def upload_execution_file(execution_plan_id):
         return jsonify({'message': 'File uploaded successfully', 'file_path': path})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @EXECUTION_PLAN_API_BLUEPRINT.get("/plans")
 def list_execution_plans():
@@ -157,6 +164,7 @@ def list_execution_plans():
         response.status_code = 400
         return response
 
+
 @EXECUTION_PLAN_API_BLUEPRINT.post("/<execution_id>")
 def execute_plan(execution_id):
     from src.tasks import queue_or_fake_simulate
@@ -173,7 +181,8 @@ def execute_plan(execution_id):
                             "error": str(e)})
         response.status_code = 400
         return response
-    
+
+
 @EXECUTION_PLAN_API_BLUEPRINT.get("/files/<execution_plan_id>")
 def get_execution_plan_files(execution_plan_id):
     try:
