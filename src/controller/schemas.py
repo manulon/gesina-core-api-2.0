@@ -51,7 +51,11 @@ class ScheduleTaskSchema(Schema):
     border_conditions = fields.List(fields.Nested(BorderConditionSchema))
     plan_series_list = fields.List(fields.Nested(PlanSeriesSchema))
     start_condition_type = fields.Str()
-
+    geometry_id = fields.Int()
+    observation_days = fields.Int()
+    forecast_days = fields.Int()
+    calibration_id = fields.Int()
+    calibration_id_for_simulations = fields.Int()
 
 class UserSchema(Schema):
     id = fields.Int()

@@ -190,7 +190,8 @@ def copy_schedule_task():
     try:
         copy_from_id = request.args.get('copyFrom', '')
         schedule_task = schedule_task_service.copy_schedule_task(copy_from_id)
-        response = jsonify({"message": "Scheduled task with id " + copy_from_id + " copied successfully"})
+        response = jsonify({"message": "Scheduled task with id " + copy_from_id + " copied successfully",
+                            "id": schedule_task.id})
         response.status_code = 200
         return response
     except Exception as e:
