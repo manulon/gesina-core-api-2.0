@@ -176,6 +176,28 @@ paths:
                   error:
                     type: string
 
+  /execution_plan/files/{execution_plan_id}:
+    get:
+      summary: Get execution plan files
+      operationId: getExecutionPlanFiles
+      tags:
+        - Execution Plan
+      parameters:
+        - name: execution_plan_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionPlan'
+        '400':
+          description: Execution plan files not found
+
   /execution_plan/plans:
     get:
       summary: List execution plans
