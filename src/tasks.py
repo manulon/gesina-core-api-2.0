@@ -238,7 +238,7 @@ def error_handler(request, exc, traceback):
 
 
 def floatHourToTime(fh):
-    hours, hourSeconds = divmod(fh, 1)
+    hours, hourSeconds = divmod(fh * 24, 1)
     minutes, seconds = divmod(hourSeconds * 60, 1)
     return (
         int(hours),
