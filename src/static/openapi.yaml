@@ -467,7 +467,7 @@ paths:
                   error:
                     type: string
                     description: Additional error information
-  /schedule_task/all:
+  /schedule_task/tasks:
     get:
       tags:
         - Scheduled Tasks
