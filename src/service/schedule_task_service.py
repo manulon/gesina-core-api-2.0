@@ -180,7 +180,7 @@ def create_from_form(form):
     plan_file_data = form.plan_file.data
 
     if form.enabled.data:
-        if form.start_condition_type.data == "restar_file":
+        if form.start_condition_type.data == "restart_file":
             if restart_file_data.filename == '':
                 raise FileUploadError("Es mandatorio subir todos los archivos para habilitar la ejecución")
         if project_file_data.filename == '' or plan_file_data.filename == '':
