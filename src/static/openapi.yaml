@@ -1211,6 +1211,8 @@ components:
         scheduled_task_id:
           type: integer
           example: 6
+        stage_datum:
+          type: float
     BorderConditionSchema:
       type: object
       properties:

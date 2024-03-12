@@ -61,30 +61,6 @@ def process_plan_series_form(series_list, scheduled_config_id=None):
 
     return result
 
-# TODO add stage_datum
-def process_plan_series_json(series_list, scheduled_config_id=None):
-    result = []
-    for each_plan_series in series_list:
-        if scheduled_config_id:
-            plan_series = PlanSeries(
-                scheduled_task_id=scheduled_config_id,
-                river=each_plan_series.get("river"),
-                reach=each_plan_series.get("reach"),
-                river_stat=each_plan_series.get("river_stat"),
-                stage_series_id=each_plan_series.get("stage_series_id"),
-                flow_series_id=each_plan_series.get("flow_series_id"),
-            )
-        else:
-            plan_series = PlanSeries(
-                river=each_plan_series.get("river"),
-                reach=each_plan_series.get("reach"),
-                river_stat=each_plan_series.get("river_stat"),
-                stage_series_id=each_plan_series.get("stage_series_id"),
-                flow_series_id=each_plan_series.get("flow_series_id"),
-            )
-        result.append(plan_series)
-
-    return result
 
 
 def process_plan_series_json(series_list, scheduled_config_id=None):
@@ -98,6 +74,7 @@ def process_plan_series_json(series_list, scheduled_config_id=None):
                 river_stat=each_plan_series.get("river_stat"),
                 stage_series_id=each_plan_series.get("stage_series_id"),
                 flow_series_id=each_plan_series.get("flow_series_id"),
+                stage_datum=each_plan_series.get("stage_datum")
             )
         else:
             plan_series = PlanSeries(
