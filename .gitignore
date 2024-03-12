@@ -144,3 +144,4 @@ cython_debug/
 minio_data
 package.box
 .DS_Store
+src/config.py
