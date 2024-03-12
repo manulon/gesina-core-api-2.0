@@ -84,6 +84,7 @@ def simulate(execution_id, user_id, calibration_id_for_simulations):
                             "flow": flow,
                             "stage_series_id": epo.stage_series_id,
                             "flow_series_id": epo.flow_series_id,
+                            "stage_datum" : epo.stage_datum
                         }
                     )
                 )
@@ -102,7 +103,7 @@ def simulate(execution_id, user_id, calibration_id_for_simulations):
                     ina_service.send_info_to_ina(
                         begin,
                         date_in_datetime,
-                        stage,
+                        [s - float(epo.stage_datum) for s in stage] if epo.stage_datum is not None else stage,
                         epo.stage_series_id,
                         calibration_id_for_simulations,
                         win_logger,

@@ -10,9 +10,10 @@ from sqlalchemy import (
     Boolean,
     ForeignKey,
     Enum,
-    PrimaryKeyConstraint
+    PrimaryKeyConstraint,
+    Numeric
 )
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import (relationship, validates)
 
 from src.persistance.session import Base
 from src.service import file_storage_service
@@ -113,6 +114,15 @@ class PlanSeries(Base):
     flow_series_id = Column(Integer)
     scheduled_task = relationship("ScheduledTask", back_populates="plan_series_list")
     scheduled_task_id = Column(Integer, ForeignKey("scheduled_task.id"))
+    stage_datum = Column(Numeric, default=None)
+
+
+    @validates('stage_datum')
+    def empty_string_to_null(self, key, value):
+        if isinstance(value,str) and value == '':
+            return None
+        else:
+            return value
 
 class ExecutionPlanScheduleTaskMapping(Base):
     __tablename__ = "execution_plan_schedule_task_mapping"

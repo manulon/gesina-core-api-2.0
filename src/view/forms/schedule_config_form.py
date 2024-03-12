@@ -1,5 +1,5 @@
 from flask_wtf.form import FlaskForm
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional
 from wtforms import (
     IntegerField,
     BooleanField,
@@ -11,6 +11,7 @@ from wtforms import (
     FormField,
     Form,
     HiddenField,
+    DecimalField
 )
 
 from src.persistance.scheduled_task import BorderConditionType
@@ -118,6 +119,13 @@ class PlanSeriesForm(Form):
         label="Id de serie de flujo",
         validators=[DataRequired(message="Error: El id no puede estar vacío")],
         render_kw=render_kw,
+    )
+
+    stage_datum = DecimalField(
+        label="Cero de escala de la serie de altura",
+        validators=[Optional()],
+        render_kw=render_kw,
+        places=6
     )
 
 
