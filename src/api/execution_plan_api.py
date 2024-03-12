@@ -3,6 +3,7 @@ import io
 from flask import request, jsonify, Blueprint
 
 from src import logger
+from src.api.utils import validate_fields
 from src.logger import get_logger
 from src.persistance.execution_plan import ExecutionPlanStatus
 from src.service import (
@@ -13,6 +14,7 @@ from src.service import (
 from src.service.file_storage_service import FileType
 
 EXECUTION_PLAN_API_BLUEPRINT = Blueprint("execution_plan", __name__, url_prefix="/execution_plan")
+
 
 @EXECUTION_PLAN_API_BLUEPRINT.get("/<execution_plan_id>")
 def get_execution_plan(execution_plan_id):
@@ -57,6 +59,7 @@ def get_execution_plan(execution_plan_id):
         response.status_code = 400
         return response
 
+
 @EXECUTION_PLAN_API_BLUEPRINT.post("/copy")
 def copy_execution_plan():
     try:
@@ -68,16 +71,24 @@ def copy_execution_plan():
         response.status_code = 400
         return response
 
+
 @EXECUTION_PLAN_API_BLUEPRINT.post("/")
 def create_execution_plan():
     try:
-        execution_plan = execution_plan_service.create_from_json(request.get_json(),
+        required_fields = ["plan_name", "geometry_id"]
+        body = request.get_json()
+        missing_fields = validate_fields(body, required_fields)
+        if missing_fields:
+            return jsonify(
+                {"error": "Missing required fields for execution plan", "missing": missing_fields}), 400
+        execution_plan = execution_plan_service.create_from_json(body,
                                                                  api_authentication_service.get_current_user_id())
         return {"new_execution_plan_id": execution_plan.id}
     except Exception as e:
         response = jsonify({"error": str(e)})
         response.status_code = 400
         return response
+
 
 @EXECUTION_PLAN_API_BLUEPRINT.delete("/<execution_plan_id>")
 def delete_execution_plan(execution_plan_id):
@@ -91,6 +102,7 @@ def delete_execution_plan(execution_plan_id):
                             "error": str(e)})
         response.status_code = 400
         return response
+
 
 @EXECUTION_PLAN_API_BLUEPRINT.patch("/<execution_plan_id>")
 def edit_execution_plan(execution_plan_id):
@@ -112,18 +124,25 @@ def edit_execution_plan(execution_plan_id):
         response.status_code = 400
         return response
 
-@EXECUTION_PLAN_API_BLUEPRINT.post("/upload_file")
-def upload_execution_file():
+
+@EXECUTION_PLAN_API_BLUEPRINT.post("/upload_file/<execution_plan_id>")
+def upload_execution_file(execution_plan_id):
     try:
         file = request.files['file']
         if file.filename == '':
             raise Exception("No selected file")
 
-        path = file_storage_service.save_file(FileType.EXECUTION_PLAN, file, file.filename)
+        path = file_storage_service.save_file(
+            FileType.EXECUTION_PLAN,
+            file,
+            file.filename,
+            execution_plan_id
+        )
 
         return jsonify({'message': 'File uploaded successfully', 'file_path': path})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @EXECUTION_PLAN_API_BLUEPRINT.get("/plans")
 def list_execution_plans():
@@ -145,6 +164,7 @@ def list_execution_plans():
         response.status_code = 400
         return response
 
+
 @EXECUTION_PLAN_API_BLUEPRINT.post("/<execution_id>")
 def execute_plan(execution_id):
     from src.tasks import queue_or_fake_simulate
@@ -159,5 +179,28 @@ def execute_plan(execution_id):
         logger.error(e)
         response = jsonify({"message": "error while running execution plan " + execution_id,
                             "error": str(e)})
+        response.status_code = 400
+        return response
+
+
+@EXECUTION_PLAN_API_BLUEPRINT.get("/files/<execution_plan_id>")
+def get_execution_plan_files(execution_plan_id):
+    try:
+        execution_files = [
+            f.object_name
+            for f in file_storage_service.list_execution_files(
+                FileType.EXECUTION_PLAN, execution_plan_id
+            )
+        ]
+        execution_plan_dict = {}
+        execution_plan_dict["execution_files"] = []
+        for i in execution_files:
+            data = file_storage_service.get_file(i).data
+            file = {"name": i.split("/")[-1]}
+            execution_plan_dict["execution_files"].append(file)
+
+        return jsonify(execution_plan_dict)
+    except Exception as e:
+        response = jsonify({"error while getting files for execution plan": str(e)})
         response.status_code = 400
         return response

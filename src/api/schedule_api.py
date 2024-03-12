@@ -12,6 +12,7 @@ from src.service.file_storage_service import FileType
 
 SCHEDULE_API_BLUEPRINT = Blueprint("scheduled_task", __name__, url_prefix="/schedule_task")
 
+
 @SCHEDULE_API_BLUEPRINT.get("/<scheduled_task_id>")
 def get_scheduled_task(scheduled_task_id):
     try:
@@ -29,6 +30,7 @@ def get_scheduled_task(scheduled_task_id):
         })
         response.status_code = 400
         return response
+
 
 @SCHEDULE_API_BLUEPRINT.get("/tasks")
 def list_schedule_tasks():
@@ -60,6 +62,7 @@ def list_schedule_tasks():
         response.status_code = 400
         return response
 
+
 @SCHEDULE_API_BLUEPRINT.delete("/<scheduled_task_id>")
 def delete_scheduled_task(scheduled_task_id):
     try:
@@ -72,6 +75,7 @@ def delete_scheduled_task(scheduled_task_id):
                             "error": str(e)})
         response.status_code = 400
         return response
+
 
 @SCHEDULE_API_BLUEPRINT.patch("/<scheduled_task_id>")
 def edit_scheduled_task(scheduled_task_id):
@@ -93,12 +97,12 @@ def edit_scheduled_task(scheduled_task_id):
             'plan_series_list': body.get('plan_series_list'),
             'initial_flows': body.get('initial_flows')
         }
-        print(params)
         schedule_task_service.update_from_json(scheduled_task_id, **params)
         response = jsonify({"message": f"Scheduled task with id {scheduled_task_id} edited successfully"})
         response.status_code = 200
     except FileUploadError as file_error:
-        response = jsonify({"message": f"You must upload all the required files to enable execution", "error": str(file_error)})
+        response = jsonify(
+            {"message": f"You must upload all the required files to enable execution", "error": str(file_error)})
         response.status_code = 400
     except KeyError as ke:
         response = jsonify({"message": f"Error editing scheduled task {scheduled_task_id}", "error": str(ke)})
@@ -107,6 +111,7 @@ def edit_scheduled_task(scheduled_task_id):
         response = jsonify({"message": f"Error editing scheduled task {scheduled_task_id}", "error": str(e)})
         response.status_code = 400
     return response
+
 
 @SCHEDULE_API_BLUEPRINT.post("/upload_file/<scheduled_task_id>")
 def upload_scheduled_task_file(scheduled_task_id):
@@ -133,7 +138,8 @@ def upload_scheduled_task_file(scheduled_task_id):
         return jsonify({'message': 'File uploaded successfully', 'file_path': path})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-      
+
+
 @SCHEDULE_API_BLUEPRINT.post("/")
 def create_scheduled_task():
     try:
@@ -144,8 +150,10 @@ def create_scheduled_task():
             "observation_days", "forecast_days", "border_conditions", "project_file", "plan_file"
         ]
         missing_fields = validate_fields(body, required_fields)
-        if missing_fields:
-            return jsonify({"error": "Missing required fields", "missing": missing_fields}), 400
+        enabled = body.get("enabled")
+        if missing_fields and (enabled is True):
+            return jsonify(
+                {"error": "Missing required fields for enabled scheduled task", "missing": missing_fields}), 400
         params = {
             "frequency": body.get("frequency"),
             "calibration_id": body.get("calibration_id"),
@@ -167,11 +175,13 @@ def create_scheduled_task():
                                                                      body.get("initial_flow_file"),
                                                                      body.get("initial_flow_list"))
         start_condition_type = body.get("start_condition_type")
-        restart_file_data = None if body.get("restart_file") is None else file_storage_service.get_file(body.get("restart_file"))
+        restart_file_data = None if body.get("restart_file") is None else file_storage_service.get_file(
+            body.get("restart_file"))
         project_file_data = file_storage_service.get_file(body.get("project_file"))
         plan_file_data = file_storage_service.get_file(body.get("plan_file"))
 
-        scheduled_task = schedule_task_service.create(params, start_condition_type, restart_file_data, project_file_data, plan_file_data)
+        scheduled_task = schedule_task_service.create(params, start_condition_type, restart_file_data,
+                                                      project_file_data, plan_file_data)
         return jsonify({"message": "Success at creating scheduled task",
                         "id": scheduled_task.id})
 
@@ -185,10 +195,13 @@ def create_scheduled_task():
         response.status_code = 400
         return response
 
+
 @SCHEDULE_API_BLUEPRINT.post("/copy")
 def copy_schedule_task():
     try:
         copy_from_id = request.args.get('copyFrom', '')
+        if copy_from_id is None:
+            return jsonify({"error": "copyFrom parameter not specified"}),400
         schedule_task = schedule_task_service.copy_schedule_task(copy_from_id)
         response = jsonify({"message": "Scheduled task with id " + copy_from_id + " copied successfully",
                             "id": schedule_task.id})

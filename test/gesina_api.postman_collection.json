@@ -1,0 +1,938 @@
+{
+	"info": {
+		"_postman_id": "0afc202e-fd40-4c13-9988-6711f90791b8",
+		"name": "Gesina API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18051689",
+		"_collection_link": "https://grey-shuttle-58525.postman.co/workspace/My-Workspace~28280de1-20aa-4d11-8b2d-0a1978d73ec4/collection/25830281-0afc202e-fd40-4c13-9988-6711f90791b8?action=share&source=collection_link&creator=18051689"
+	},
+	"item": [
+		{
+			"name": "Geometry API",
+			"item": [
+				{
+					"name": "GET geometry",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Geometry is Modelo1-Atucha.g01\", () => {",
+									"  const responseJson = pm.response.json();",
+									"  pm.expect(responseJson.name).to.eql(\"Modelo1-Atucha.g01\");",
+									"  pm.expect(responseJson.user).to.eql(\"Admin Ina\");",
+									"  pm.expect(responseJson.description).to.eql(\"Ejemplo dado por el INA\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/geometry/1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"geometry",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "EDIT geometry",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Geometry 1 edited\", () => {",
+									"  const responseJson = pm.response.json();",
+									"  pm.expect(responseJson.message).to.eql(\"successfully edited geometry with id: 1\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"Ejemplo dado por el INA\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/geometry/1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"geometry",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Execution Plan API",
+			"item": [
+				{
+					"name": "EDIT execution plan",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Execution Plan 1 edited\", () => {",
+									"  const responseJson = pm.response.json();",
+									"  pm.expect(responseJson.message).to.eql(\"successfully edited execution plan with id: 1\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"connection": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "session=.eJxlTrtuwzAM_BVBc1DoRUnMN3ToXgSBKJFOUDcuLHsogvx7lXbsQBDHe_Du-ixz6Rfu-vh-12obS39y72VifdBvM5fOal4mdb2pbVGl1kGq7XLt6mtoXvTpcfjve12midvT0_dfh-zz_P0Unw7j48r9oo_buvNA16aP2qOAD45M8D6k2IqhAgUIIbINTMSmQs5VOGMQROdrNJhTIcrOQq1UTawl5pqhUPDiGD0JIZUYMXpOFgpDcjLGJXRBBES8jS04W9vofN47r39t7IC1r3Lelg--jUOBBAYkpyiN3IjDNCoCBaiY0PiGgxOy-vED7jdlyw.ZV_G8Q.aBseIKQehJlbu1XqPKRciICw28g",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n   \"plan_name\": \"ejemplo-ina\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/execution_plan/1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"execution_plan",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "COPY execution plan",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "session=.eJxljjtuxDAMRK8iqF4E-n98hhTpg4VBiaRtxFkHll0Ei717tEG6VMSQ84ZzlyOv0GZqcni_S3H0IT-pNZhIXuTbStBIrNsklps4NgG19qM45qWJr-55kdfH5T_3uk0T4ZNp5y_B57p-P83XS_-4U5vlwLA26nJBOUidgALbkBCCUwQ-ZYxa62yqtr5AiRF8jsoboMSebDTgyWXns7IeqABkA446YVMgIFSAwCUAMlNSIXNgj64HagwuJcrJWHCmqqI95156PBvtf226rG3n8dg-6NYX0epSlCLXn0eHiD0_5YqV0ASH4LLXTBzl4wdl1Wcc.ZVaT8w.PGHHVD9auxQZI3s1gSRXry27cU4",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"plan_name\": \"Dummy Plan\",\n    \"geometry_id\": 1,\n    \"user_id\": 1,\n    \"project_file\": {\n        \"filename\": \"dummy_project_file.txt\",\n        \"data\": \"This is the content of the project file.\"\n    },\n    \"plan_file\": {\n        \"filename\": \"dummy_plan_file.txt\",\n        \"data\": \"This is the content of the plan file.\"\n    },\n    \"flow_file\": {\n        \"filename\": \"dummy_flow_file.txt\",\n        \"data\": \"This is the content of the flow file.\"\n    },\n    \"restart_file\": {\n        \"data\": \"This is the content of the restart file.\"\n    },\n    \"output_list_data\": \n    [\n        {\"river\": \"River1\", \"reach\": \"Reach1\", \"river_stat\": \"High\"},\n        {\"river\": \"River2\", \"reach\": \"Reach2\", \"river_stat\": \"Low\"}\n    ]\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/execution_plan/copy?copyFrom=1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"execution_plan",
+								"copy"
+							],
+							"query": [
+								{
+									"key": "copyFrom",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET execution plan 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Execution Plan is ejemplo-ina\", () => {",
+									"  const responseJson = pm.response.json();",
+									"  pm.expect(responseJson.plan_name).to.eql(\"ejemplo-ina\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "session=.eJxljjtuxDAMRK8iqF4E-n98hhTpg4VBiaRtxFkHll0Ei717tEG6VMSQ84ZzlyOv0GZqcni_S3H0IT-pNZhIXuTbStBIrNsklps4NgG19qM45qWJr-55kdfH5T_3uk0T4ZNp5y_B57p-P83XS_-4U5vlwLA26nJBOUidgALbkBCCUwQ-ZYxa62yqtr5AiRF8jsoboMSebDTgyWXns7IeqABkA446YVMgIFSAwCUAMlNSIXNgj64HagwuJcrJWHCmqqI95156PBvtf226rG3n8dg-6NYX0epSlCLXn0eHiD0_5YqV0ASH4LLXTBzl4wdl1Wcc.ZVaT8w.PGHHVD9auxQZI3s1gSRXry27cU4",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/execution_plan/1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"execution_plan",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET execution plans",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"plan_name\": \"Dummy Plan\",\n    \"geometry_id\": 1,\n    \"user_id\": 1,\n    \"project_file\": {\n        \"filename\": \"dummy_project_file.txt\",\n        \"data\": \"This is the content of the project file.\"\n    },\n    \"plan_file\": {\n        \"filename\": \"dummy_plan_file.txt\",\n        \"data\": \"This is the content of the plan file.\"\n    },\n    \"flow_file\": {\n        \"filename\": \"dummy_flow_file.txt\",\n        \"data\": \"This is the content of the flow file.\"\n    },\n    \"restart_file\": {\n        \"data\": \"This is the content of the restart file.\"\n    },\n    \"output_list_data\": \n    [\n        {\"river\": \"River1\", \"reach\": \"Reach1\", \"river_stat\": \"High\"},\n        {\"river\": \"River2\", \"reach\": \"Reach2\", \"river_stat\": \"Low\"}\n    ]\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/execution_plans?plan_name=&user_last_name=&user_first_name=ad&status=&date_from=2023/31/31",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"execution_plans"
+							],
+							"query": [
+								{
+									"key": "plan_name",
+									"value": ""
+								},
+								{
+									"key": "user_last_name",
+									"value": ""
+								},
+								{
+									"key": "user_first_name",
+									"value": "ad"
+								},
+								{
+									"key": "status",
+									"value": ""
+								},
+								{
+									"key": "date_to",
+									"value": "2022/1/1",
+									"disabled": true
+								},
+								{
+									"key": "date_from",
+									"value": "2023/31/31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Execute plan",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "session=.eJxljjtuxDAMRK8iqF4E-n98hhTpg4VBiaRtxFkHll0Ei717tEG6VMSQ84ZzlyOv0GZqcni_S3H0IT-pNZhIXuTbStBIrNsklps4NgG19qM45qWJr-55kdfH5T_3uk0T4ZNp5y_B57p-P83XS_-4U5vlwLA26nJBOUidgALbkBCCUwQ-ZYxa62yqtr5AiRF8jsoboMSebDTgyWXns7IeqABkA446YVMgIFSAwCUAMlNSIXNgj64HagwuJcrJWHCmqqI95156PBvtf226rG3n8dg-6NYX0epSlCLXn0eHiD0_5YqV0ASH4LLXTBzl4wdl1Wcc.ZVaT8w.PGHHVD9auxQZI3s1gSRXry27cU4",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"plan_name\": \"Dummy Plan\",\n    \"geometry_id\": 1,\n    \"user_id\": 1,\n    \"project_file\": {\n        \"filename\": \"dummy_project_file.txt\",\n        \"data\": \"This is the content of the project file.\"\n    },\n    \"plan_file\": {\n        \"filename\": \"dummy_plan_file.txt\",\n        \"data\": \"This is the content of the plan file.\"\n    },\n    \"flow_file\": {\n        \"filename\": \"dummy_flow_file.txt\",\n        \"data\": \"This is the content of the flow file.\"\n    },\n    \"restart_file\": {\n        \"data\": \"This is the content of the restart file.\"\n    },\n    \"output_list_data\": \n    [\n        {\"river\": \"River1\", \"reach\": \"Reach1\", \"river_stat\": \"High\"},\n        {\"river\": \"River2\", \"reach\": \"Reach2\", \"river_stat\": \"Low\"}\n    ]\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/execution_plan",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"execution_plan"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Scheduled task API",
+			"item": [
+				{
+					"name": "Get a single scheduled task",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Scheduled task is Paraná\", () => {",
+									"  const responseJson = pm.response.json();",
+									"  pm.expect(responseJson.name).to.eql(\"Paraná\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BaseUrl}}/api/schedule_task/1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"schedule_task",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete scheduled task",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BaseUrl}}/api/schedule_task/3",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"schedule_task",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Copy scheduled task",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{BaseUrl}}/api/schedule_task/copy?copyFrom=1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"schedule_task",
+								"copy"
+							],
+							"query": [
+								{
+									"key": "copyFrom",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "EDIT scheduled task",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"INITIAL FLOWS\",\n  \"enabled\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/schedule_task/1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"schedule_task",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE scheduled task with restart file",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"border_conditions\": [\n    {\n      \"id\": 29,\n      \"interval\": \"1-DAY\",\n      \"reach\": \"ParanaAA\",\n      \"river\": \"Parana\",\n      \"river_stat\": \"224000\",\n      \"scheduled_task_id\": 1,\n      \"series_id\": 1,\n      \"type\": \"Stage Hydrograph\"\n    },\n    {\n      \"id\": 30,\n      \"interval\": \"1-HOUR\",\n      \"reach\": \"1\",\n      \"river\": \"Lujan\",\n      \"river_stat\": \"30.664\",\n      \"scheduled_task_id\": 1,\n      \"series_id\": 1,\n      \"type\": \"Flow Hydrograph\"\n    }\n  ],\n  \"created_at\": \"2024-02-12T20:30:55\",\n  \"description\": \"Corrida periódica del rio Paraná\",\n  \"enabled\": true,\n  \"frequency\": 360,\n  \"geometry\": \"DeltaParana_2017.g01\",\n  \"id\": 1,\n  \"name\": \"Paraná\",\n  \"start_datetime\": \"2021-12-21T00:00:00\",\n  \"calibration_id\": 5,\n  \"calibration_id_for_simulations\": 24,\n  \"geometry_id\": 1,\n  \"start_condition_type\": \"restart_file\",\n  \"observation_days\": 5,\n  \"forecast_days\": 7,\n  \"project_file\": \"execution-plan/1/1.prj\",\n  \"plan_file\": \"execution-plan/1/1.p01\",\n  \"restart_file\": \"scheduled-task/1/restart_file.rst\",\n  \"plan_series_list\": [\n    {\n        \"river\": \"River Name 1\",\n        \"reach\": \"Reach 1\",\n        \"river_stat\": \"Stat 1\",\n        \"stage_series_id\": 101,\n        \"flow_series_id\": 201\n    },\n    {\n        \"river\": \"River Name 2\",\n        \"reach\": \"Reach 2\",\n        \"river_stat\": \"Stat 2\",\n        \"stage_series_id\": 102,\n        \"flow_series_id\": 202\n    }\n  ]\n\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/schedule_task/",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"schedule_task",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE scheduled task with initial flows",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"border_conditions\": [\n    {\n      \"id\": 29,\n      \"interval\": \"1-DAY\",\n      \"reach\": \"ParanaAA\",\n      \"river\": \"Parana\",\n      \"river_stat\": \"224000\",\n      \"scheduled_task_id\": 1,\n      \"series_id\": 1,\n      \"type\": \"Stage Hydrograph\"\n    },\n    {\n      \"id\": 30,\n      \"interval\": \"1-HOUR\",\n      \"reach\": \"1\",\n      \"river\": \"Lujan\",\n      \"river_stat\": \"30.664\",\n      \"scheduled_task_id\": 1,\n      \"series_id\": 1,\n      \"type\": \"Flow Hydrograph\"\n    }\n  ],\n  \"created_at\": \"2024-02-12T20:30:55\",\n  \"description\": \"Corrida periódica del rio Paraná\",\n  \"enabled\": true,\n  \"frequency\": 360,\n  \"geometry\": \"DeltaParana_2017.g01\",\n  \"id\": 1,\n  \"name\": \"Paraná\",\n  \"start_datetime\": \"2021-12-21T00:00:00\",\n  \"calibration_id\": 5,\n  \"calibration_id_for_simulations\": 24,\n  \"geometry_id\": 1,\n  \"start_condition_type\": \"initial_flows\",\n  \"observation_days\": 5,\n  \"forecast_days\": 7,\n  \"project_file\": \"execution-plan/1/1.prj\",\n  \"plan_file\": \"execution-plan/1/1.p01\",\n  \"plan_series_list\": [\n    {\n        \"river\": \"River Name 1\",\n        \"reach\": \"Reach 1\",\n        \"river_stat\": \"Stat 1\",\n        \"stage_series_id\": 101,\n        \"flow_series_id\": 201\n    },\n    {\n        \"river\": \"River Name 2\",\n        \"reach\": \"Reach 2\",\n        \"river_stat\": \"Stat 2\",\n        \"stage_series_id\": 102,\n        \"flow_series_id\": 202\n    }\n  ],\n  \"initial_flow_file\": \"scheduled-task/initial_flow_file.csv\"\n\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/schedule_task/",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"schedule_task",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User API",
+			"item": [
+				{
+					"name": "CREATE user",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"azul@gmail.com\",\n    \"first_name\": \"azul\",\n    \"last_name\": \"z\",\n    \"admin_role\": true,\n    \"password\": \"1234\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/user",
+							"host": [
+								"{{BaseUrl}}/api"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"User is Admin Ina\", () => {",
+									"  const responseJson = pm.response.json();",
+									"  pm.expect(responseJson.first_name).to.eql(\"Admin\");",
+									"  pm.expect(responseJson.last_name).to.eql(\"Ina\");",
+									"  pm.expect(responseJson.email).to.eql(\"admin@ina.com.ar\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BaseUrl}}/api/user/1",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"user",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Download a file",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Cookie",
+						"value": "session=.eJxlTrtuwzAM_BVBc1DoRUnMN3ToXgSBKJFOUDcuLHsogvx7lXbsQBDHe_Du-ixz6Rfu-vh-12obS39y72VifdBvM5fOal4mdb2pbVGl1kGq7XLt6mtoXvTpcfjve12midvT0_dfh-zz_P0Unw7j48r9oo_buvNA16aP2qOAD45M8D6k2IqhAgUIIbINTMSmQs5VOGMQROdrNJhTIcrOQq1UTawl5pqhUPDiGD0JIZUYMXpOFgpDcjLGJXRBBES8jS04W9vofN47r39t7IC1r3Lelg--jUOBBAYkpyiN3IjDNCoCBaiY0PiGgxOy-vED7jdlyw.ZV_G8Q.aBseIKQehJlbu1XqPKRciICw28g",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BaseUrl}}/execution_plan/download/1/execution-plan/1.prj",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"execution_plan",
+						"download",
+						"1",
+						"execution-plan",
+						"1.prj"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "password",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin@ina.com.ar",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{BaseUrl}}/api/login",
+					"host": [
+						"{{BaseUrl}}"
+					],
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": "session=.eJxlTrtuxDAM-xXD86GQY9mK8w0duheHwA8pCZpeijgZisP9e33t2EkkRYK861HWWGeueni_a3W0oz-51jixvui3lWNltW6TWm7q2FTMuT3VMS9VfTXPi74-Lv9zr9s0cXlm6vmbkHNdv5_m66U17lxnPRz7yY0tRQ9aCoARNkjIAMU4T1QsYUJ04MVkQGN75J6AbEO-dAVCDhZ74mhikg59YSRwKYOjnEIhQY99hOhtitQaciJIOfvMoYsOJHtpzBbf-bZ5PCvvf2tMo7nuMh7bB9-a4DrH3nGIEDqE3hjrRJwkCoaZCpqGnS9GP34AU3llAA.ZX4VmA.TmlWJiR-x3pdD4cxq5MzhGF9W_Y\n"
+		}
+	]
+}

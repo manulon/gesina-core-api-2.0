@@ -121,12 +121,18 @@ paths:
         '400':
           description: Error while creating execution plan. Bad request.
 
-  /execution_plan/upload_file:
+  /execution_plan/upload_file/{execution_plan_id}:
     post:
       summary: Uploads an execution plan file
       operationId: uploadExecutionFile
       tags:
         - Execution Plan
+      parameters:
+        - name: execution_plan_id
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -169,6 +175,28 @@ paths:
                 properties:
                   error:
                     type: string
+
+  /execution_plan/files/{execution_plan_id}:
+    get:
+      summary: Get execution plan files
+      operationId: getExecutionPlanFiles
+      tags:
+        - Execution Plan
+      parameters:
+        - name: execution_plan_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionPlan'
+        '400':
+          description: Execution plan files not found
 
   /execution_plan/plans:
     get:
@@ -439,7 +467,7 @@ paths:
                   error:
                     type: string
                     description: Additional error information
-  /schedule_task/all:
+  /schedule_task/tasks:
     get:
       tags:
         - Scheduled Tasks
