@@ -935,6 +935,9 @@ components:
           type: string
         river_stat:
           type: string
+        stage_datum:
+          type: float
+          example: 1.6
       required:
         - river
         - reach

@@ -88,4 +88,4 @@ class ExecutionPlanOutput(Base):
     )
     stage_series_id = Column(Integer)
     flow_series_id = Column(Integer)
-    stage_datum = Column(Numeric)
+    stage_datum = Column(Numeric, default=None)
