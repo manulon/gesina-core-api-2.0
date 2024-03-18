@@ -345,7 +345,7 @@ def save_or_create_schedule_config(schedule_config_id):
 
     if not exists_forecast_and_observation_values:
         error_message = 'No se pudo crear la ejecucion programada debido a que no se encontró una serie de borde en la base de datos del INA.'
-        return render_template("schedule_tasks_list.html", errors=[error_message])
+        return render_schedule_view(form, schedule_config, [error_message])
     
     try:
         if form.validate_on_submit():
