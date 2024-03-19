@@ -133,7 +133,7 @@ def update_from_json(_id=None, **params):
                             _id
                         )
                     elif key == 'enabled':
-                        if value:
+                        if value is True:
                             if not file_storage_service.is_project_template_present(_id) or not file_storage_service.is_plan_template_present(_id) or not file_storage_service.is_restart_file_present(_id):
                                 raise FileUploadError("You must upload all the required files to enable execution")
                         setattr(schedule_config, key, value)
@@ -153,7 +153,7 @@ def update_files(scheduled_task_id, project_file=None, plan_file=None, restart_f
         restart_file_path = save_restart_file(restart_file, scheduled_task_id)
     return project_path, plan_path, restart_file_path
 
-def create_from_form(form):
+def create_from_form(form, border_conditions):
     params = {
         "frequency": form.frequency.data,
         "calibration_id": form.calibration_id.data,
@@ -167,10 +167,9 @@ def create_from_form(form):
         "observation_days": form.observation_days.data,
         "forecast_days": form.forecast_days.data,
         "user": get_current_user(),
-        "border_conditions": retrieve_series(form),
+        "border_conditions": border_conditions,
         "plan_series_list": retrieve_plan_series(form),
     }
-
     if form.start_condition_type.data == "initial_flows":
         params["initial_flows"] = create_initial_flows_from_form(form)
 
@@ -180,7 +179,7 @@ def create_from_form(form):
     plan_file_data = form.plan_file.data
 
     if form.enabled.data:
-        if form.start_condition_type.data == "restar_file":
+        if form.start_condition_type.data == "restart_file":
             if restart_file_data.filename == '':
                 raise FileUploadError("Es mandatorio subir todos los archivos para habilitar la ejecución")
         if project_file_data.filename == '' or plan_file_data.filename == '':

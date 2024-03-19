@@ -138,8 +138,6 @@ def obtain_curated_series(series_id, calibration_id, timestart, timeend):
             f"Error obtaining values for the serie with id {series_id} and the calibration id {calibration_id}"
         )
 
-    logger.error(f"Answered: {response.json()}")
-
     data = response.json()["series"][0]["pronosticos"]
 
     data = sorted(data, key=lambda i: i[0], reverse=False)
