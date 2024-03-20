@@ -344,7 +344,7 @@ def save_or_create_schedule_config(schedule_config_id):
     exists_forecast_and_observation_values, border_conditions = forecast_and_observation_values_exists(form)
 
     if not exists_forecast_and_observation_values:
-        error_message = 'No se pudo crear la ejecucion programada debido a que no se encontró una serie de borde en la base de datos del INA.'
+        error_message = 'No se pudo crear la ejecucion programada debido a que no se encontró una serie de borde en la base de datos del INA para el ID ' + str(form.calibration_id.data)
         return render_schedule_view(form, schedule_config, [error_message])
     
     try:
