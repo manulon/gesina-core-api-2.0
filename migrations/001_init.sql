@@ -58,8 +58,10 @@ CREATE TABLE IF NOT EXISTS execution_plan_output
         REFERENCES "execution_plan" ON DELETE CASCADE,
     stage_series_id integer DEFAULT NULL,
     flow_series_id integer DEFAULT NULL,
+    stage_datum float default null,
     PRIMARY KEY (river, reach, river_stat, execution_plan_id)
 );
+
 
 alter table execution_plan owner to "user";
 
@@ -126,6 +128,7 @@ create table if not exists "plan_series"
     river_stat text not null,
     stage_series_id integer default null,
     flow_series_id integer default null,
+    stage_datum float default null,
     scheduled_task_id integer not null constraint plan_series_scheduled_task_id_fk references "scheduled_task" on delete cascade
 );
 
@@ -135,6 +138,7 @@ create table if not exists execution_tasks
 	execution_id integer not null constraint execution_plan__id_fk references "execution_plan" on delete cascade,
     task_id varchar
 );
+
 
 alter table execution_tasks owner to "user";
 

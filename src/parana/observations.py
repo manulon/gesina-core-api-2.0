@@ -18,7 +18,7 @@ from src.parana import (
 
 
 def obtain_observations(start_date, end_date):
-    df_obs = ina_service.obtain_obeservations_for_stations(
+    df_obs = ina_service.obtain_observations_for_stations(
         Df_Estaciones, start_date, end_date
     )
 

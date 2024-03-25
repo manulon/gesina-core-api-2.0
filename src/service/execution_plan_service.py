@@ -64,7 +64,8 @@ def create_from_json(execution_plan, user_id):
             ExecutionPlanOutput(
                 river=d.get("river"),
                 reach=d.get("reach"),
-                river_stat=d.get("river_stat")
+                river_stat=d.get("river_stat"),
+                stage_datum=d.get("stage_datum")
             )
             for d in execution_plan.get('execution_output_list', [])
         ],
@@ -102,6 +103,7 @@ def create_from_scheduler(
                 river_stat=ps.river_stat,
                 stage_series_id=ps.stage_series_id,
                 flow_series_id=ps.flow_series_id,
+                stage_datum=ps.stage_datum
             )
             for ps in plan_series_list
         ],
@@ -341,7 +343,7 @@ def edit_execution_plan(execution_plan_id, plan_name=None, geometry_id=None, pro
                 new_output_list.append(
                     ExecutionPlanOutput(
                         river=d.get("river"), reach=d.get("reach"), river_stat=d.get("river_stat"),
-                        execution_plan_id=execution_plan_id
+                        execution_plan_id=execution_plan_id, stage_datum=d.get("stage_datum")
                     )
                 )
             session.query(ExecutionPlanOutput).filter_by(execution_plan_id=execution_plan_id).delete()

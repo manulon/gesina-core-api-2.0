@@ -13,6 +13,9 @@ from datetime import datetime, timedelta
 from src.service import ina_service
 from src.service import file_storage_service
 
+import logging
+logger = logging.getLogger("foo")
+
 TEMPLATES_DIR = "src/file_templates"
 SCHEDULE_TASK_DIR = "scheduled-task"
 
@@ -143,6 +146,13 @@ def get_forecast_and_observation_values(
 ):
     result = []
     for condition in border_conditions:
+        curated_series = ina_service.obtain_curated_series(
+            condition.series_id, calibration_id, start_date, end_date
+        )
+        if curated_series["timeend"] < end_date:
+            logger.error("Warning: boundary series end date %s is before required %s" % (curated_series["timeend"].isoformat(), end_date.isoformat()))
+        if curated_series["timestart"] > start_date:
+            logger.error("Warning: boundary series start date %s is after required %s" % (curated_series["timestart"].isoformat(), end_date.isoformat()))
         result.append(
             {
                 "river": condition.river,
@@ -150,9 +160,9 @@ def get_forecast_and_observation_values(
                 "river_stat": condition.river_stat,
                 "interval": condition.interval.replace("-", ""),
                 "border_condition": condition.type,
-                "values": ina_service.obtain_curated_series(
-                    condition.series_id, calibration_id, start_date, end_date
-                ),
+                "values": curated_series["values"],
+                "timestart": curated_series["timestart"],
+                "timeend": curated_series["timeend"]
             }
         )
     return result
@@ -196,6 +206,13 @@ def new_build_flow(
     conditions = get_forecast_and_observation_values(
         border_conditions, calibration_id, start_date, end_date
     )
+    min_end_date = min([c["timeend"] for c in conditions])
+    if min_end_date < end_date:
+        logger.error("Warning: end_date of boundary conditions is before required end_date")
+    max_start_date = max(c["timestart"] for c in conditions)
+    if max_start_date > start_date:
+        logger.error("Warning: start_date of boundary conditions is after required end_date")
+    
     boundary_locations = build_boundary_conditions(start_date, conditions)
 
     with io.open(f"{TEMPLATES_DIR}/unsteady_flow_template.txt", "r", newline="") as f:
@@ -207,7 +224,7 @@ def new_build_flow(
         }
     )
 
-    return BytesIO(result.encode("utf8"))
+    return BytesIO(result.encode("utf8")), max_start_date, min_end_date
 
 
 class Item:

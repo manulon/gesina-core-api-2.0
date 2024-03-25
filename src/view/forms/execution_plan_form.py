@@ -1,6 +1,7 @@
 from flask_wtf.form import FlaskForm
+from wtforms.fields.numeric import IntegerField
 from wtforms.validators import DataRequired
-from wtforms import StringField, IntegerField, Form, HiddenField, FieldList, FormField
+from wtforms import StringField, FloatField, Form, FieldList, FormField
 from flask_wtf.file import FileField, FileRequired
 
 from src.view.forms import ErrorMixin
@@ -17,6 +18,9 @@ class ExecutionPlanOutputForm(Form):
     river_stat = StringField(
         label="River stat",
         validators=[DataRequired(message="Error: El river stat no puede estar vacío")],
+    )
+    stage_datum = FloatField(
+        label="Stage Datum"
     )
 
 
