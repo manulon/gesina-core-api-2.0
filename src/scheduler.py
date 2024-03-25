@@ -49,6 +49,12 @@ class ScheduledTaskJob:
 
     def simulate(self, flow_file=None,adjust_dates=True):
         scheduled_task = get_schedule_task_config(self.scheduled_task)
+        if scheduled_task is None:
+            # Este if esta puesto para arreglar este issue https://github.com/jbianchi81/gesina/issues/18
+            # El error ocurre cuando la scheduled task se elimina entre que se crea el job y se ejecuta el simulate
+            logger.info("A job has started for a scheduled task that no longer exist. Job canceled")
+            scheduler.remove_job(self.scheduled_task)
+            return
         logger.error("Starting simulation")
         locale = timezone("America/Argentina/Buenos_Aires")
         today = datetime.now(tz=locale).replace(minute=0,second=0,microsecond=0) - timedelta(hours=FORECAST_LAG_HOURS) # .replace(minute=0)
