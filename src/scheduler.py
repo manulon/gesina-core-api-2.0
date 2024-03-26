@@ -160,6 +160,17 @@ def check_for_scheduled_tasks():
                 scheduler.remove_job(job_id)
 
 
+
+
 if __name__ == "__main__":
+    job_store = jobstores["default"]
+    # Se eliminan todos los jobs que no tienen id numerico , son jobs seteados en ejecuciones anteriores de tipo
+    # check_for_scheduled_tasks
+    for job in job_store.get_all_jobs():
+        if not job.id.isnumeric():
+            job_store.remove_job(job.id)
+
+
     scheduler.add_job(check_for_scheduled_tasks, "interval", seconds=10)
     scheduler.start()
+
