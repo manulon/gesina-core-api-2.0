@@ -53,7 +53,7 @@ class ScheduledTaskJob:
             # Este if esta puesto para arreglar este issue https://github.com/jbianchi81/gesina/issues/18
             # El error ocurre cuando la scheduled task se elimina entre que se crea el job y se ejecuta el simulate
             logger.info("A job has started for a scheduled task that no longer exist. Job canceled")
-            scheduler.remove_job(self.scheduled_task)
+            scheduler.remove_job(str(self.scheduled_task))
             return
         logger.error("Starting simulation")
         locale = timezone("America/Argentina/Buenos_Aires")
