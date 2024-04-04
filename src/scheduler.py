@@ -7,6 +7,7 @@ from datetime import timedelta
 from apscheduler.schedulers.background import BlockingScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor
+from sqlalchemy.dialects.postgresql import psycopg2
 
 from src.service import execution_plan_service
 from src import config
@@ -166,10 +167,15 @@ if __name__ == "__main__":
     job_store = jobstores["default"]
     # Se eliminan todos los jobs que no tienen id numerico , son jobs seteados en ejecuciones anteriores de tipo
     # check_for_scheduled_tasks
-    for job in job_store.get_all_jobs():
-        if not job.id.isnumeric():
-            job_store.remove_job(job.id)
-
+    try:
+        for job in job_store.get_all_jobs():
+            if not job.id.isnumeric():
+                job_store.remove_job(job.id)
+    except Exception as e:
+        if "relation \"apscheduler_jobs\" does not exist" not in str(e):
+            raise e
+        else:
+            logger.info("Creando tabla apscheduler_jobs en la base de datos")
 
     scheduler.add_job(check_for_scheduled_tasks, "interval", seconds=10)
     scheduler.start()
