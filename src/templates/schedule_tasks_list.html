@@ -42,6 +42,7 @@
             </table>
         </div>
     </div>
+
     <script>
         function actionFormatter(value, row) {
             let base_url = "{{ url_for("view_controller.get_schedule_task_config", schedule_task_id="")}}"
@@ -66,6 +67,7 @@
                 ${delete_button}                
             `
           }
+        
         function descriptionFormatter(value) {
             if (value.length > 20)
                 return value.substr(0, 20).concat('[...]');
@@ -73,19 +75,23 @@
         }
 
         function deleteScheduledTask(id) {
-            let delete_url = `{{ url_for('schedule_controller.delete', scheduled_task_id='') }}${id}`;
+            $('#confirmationModal').modal('show');
 
-            fetch(delete_url, {method: 'DELETE'})
-            .then(response => {
-                if (response.status == 200){
-                    let schedule_list = `{{ url_for('view_controller.get_schedule_tasks', delete_success='') }}${id}`;
-                    window.location.href = schedule_list;
-                } else if (response.status == 400) {
-                    let schedule_list = `{{ url_for('view_controller.get_schedule_tasks', delete_failed='') }}${id}`;
-                    window.location.href = schedule_list;
-                }
-            })
-            .catch(error => {
+            $('#confirmDelete').click(function() {
+                let delete_url = `{{ url_for('schedule_controller.delete', scheduled_task_id='') }}${id}`;
+
+                fetch(delete_url, {method: 'DELETE'})
+                .then(response => {
+                    if (response.status == 200){
+                        let schedule_list = `{{ url_for('view_controller.get_schedule_tasks', delete_success='') }}${id}`;
+                        window.location.href = schedule_list;
+                    } else if (response.status == 400) {
+                        let schedule_list = `{{ url_for('view_controller.get_schedule_tasks', delete_failed='') }}${id}`;
+                        window.location.href = schedule_list;
+                    }
+                })
+                .catch(error => {
+                });
             });
         }
 
@@ -106,4 +112,25 @@
             });
         }
     </script>
+
+    <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Confirmación requerida</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              ¿Estas seguro de que quieres borrar esta corrida programada?
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+              <button type="button" class="btn btn-danger" id="confirmDelete">Borrar</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
 {% endblock %}
