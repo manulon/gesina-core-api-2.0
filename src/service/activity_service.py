@@ -61,6 +61,30 @@ def get_activity(activity_params):
     )
 
 
+def execution_results_data(executions, date_from, date_to):
+    labels = []
+    success_count = []
+    error_count = []
+
+    for day in rrule.rrule(rrule.DAILY, dtstart=date_from, until=date_to):
+        labels.append(day.date().strftime("%d-%m"))
+
+        success_in_day = filter(
+            lambda ex: ex.created_at.date() == day.date()
+                       and ex.status == ExecutionPlanStatus.FINISHED,
+            executions,
+        )
+        error_in_day = filter(
+            lambda ex: ex.created_at.date() == day.date()
+                       and ex.status == ExecutionPlanStatus.ERROR,
+            executions,
+        )
+
+        success_count.append(len(list(success_in_day)))
+        error_count.append(len(list(error_in_day)))
+    return labels, success_count, error_count
+
+
 def _base_64_img(ax):
     img = io.BytesIO()
     ax.figure.savefig(img, format="png", bbox_inches="tight")
@@ -73,27 +97,7 @@ def execution_results(executions, date_from, date_to):
         from src.service import fake_data_activity_service as fake_service
 
         return _base_64_img(fake_service.fake_execution_results())
-
-    labels = []
-    success_count = []
-    error_count = []
-
-    for day in rrule.rrule(rrule.DAILY, dtstart=date_from, until=date_to):
-        labels.append(day.date().strftime("%d-%m"))
-
-        success_in_day = filter(
-            lambda ex: ex.created_at.date() == day.date()
-            and ex.status == ExecutionPlanStatus.FINISHED,
-            executions,
-        )
-        error_in_day = filter(
-            lambda ex: ex.created_at.date() == day.date()
-            and ex.status == ExecutionPlanStatus.ERROR,
-            executions,
-        )
-
-        success_count.append(len(list(success_in_day)))
-        error_count.append(len(list(error_in_day)))
+    labels, success_count, error_count = execution_results_data(executions, date_from, date_to)
 
     width = 0.60
     fig, ax = plt.subplots(figsize=(25, 12))
@@ -146,9 +150,9 @@ def contributions():
     i = 0
     j = 0
     for day in rrule.rrule(
-        rrule.DAILY,
-        dtstart=first_sunday_date + timedelta(days=1),
-        until=first_sunday_date + timedelta(weeks=12),
+            rrule.DAILY,
+            dtstart=first_sunday_date + timedelta(days=1),
+            until=first_sunday_date + timedelta(weeks=12),
     ):
         if j == 0:
             sunday_of_the_week = day + timedelta(days=6)
@@ -159,7 +163,7 @@ def contributions():
         results_for_day = list(
             filter(
                 lambda row: datetime(int(row[3]), int(row[2]), int(row[1])).date()
-                == day.date(),
+                            == day.date(),
                 result,
             )
         )
@@ -182,12 +186,7 @@ def contributions():
     return _base_64_img(ax)
 
 
-def execution_time_average(executions, date_from, date_to):
-    if config.fake_activity:
-        from src.service import fake_data_activity_service as fake_service
-
-        return _base_64_img(fake_service.fake_execution_time_average())
-
+def execution_time_average_data(executions, date_from, date_to):
     labels = []
     data = []
     for day in rrule.rrule(rrule.DAILY, dtstart=date_from, until=date_to):
@@ -202,7 +201,7 @@ def execution_time_average(executions, date_from, date_to):
         execution_time_list = list(
             map(
                 lambda execution: (
-                    execution.end_datetime - execution.start_datetime
+                        execution.end_datetime - execution.start_datetime
                 ).total_seconds(),
                 executions_in_day,
             )
@@ -211,6 +210,16 @@ def execution_time_average(executions, date_from, date_to):
         if execution_time_list:
             average = sum(execution_time_list) / len(execution_time_list)
         data.append(average)
+    return labels, data
+
+
+def execution_time_average(executions, date_from, date_to):
+    if config.fake_activity:
+        from src.service import fake_data_activity_service as fake_service
+
+        return _base_64_img(fake_service.fake_execution_time_average())
+
+    labels, data = execution_time_average_data(executions, date_from, date_to)
 
     fig, axs = plt.subplots(figsize=(25, 12.5))
     axs.plot(labels, data, c=cm.hot(0.25))
@@ -221,3 +230,23 @@ def execution_time_average(executions, date_from, date_to):
     plt.yticks(fontsize=26)
 
     return _base_64_img(axs)
+
+
+def get_activity_data(date_from=None, date_to=None):
+    date_from, date_to = handle_activity_dates(date_from, date_to)
+    executions = (
+        get_execution_plans_by_dates(date_from, date_to)
+        if not config.fake_activity
+        else []
+    )
+    return execution_results_data(executions, date_from, date_to)
+
+
+def get_execution_average_time_data(date_from=None, date_to=None):
+    date_from, date_to = handle_activity_dates(date_from, date_to)
+    executions = (
+        get_execution_plans_by_dates(date_from, date_to)
+        if not config.fake_activity
+        else []
+    )
+    return execution_time_average_data(executions, date_from, date_to)
