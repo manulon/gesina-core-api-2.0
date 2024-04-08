@@ -97,7 +97,7 @@ def process_plan_series_csv_file(plan_series_file, scheduled_config_id=None):
         file = io.StringIO(content)
         csv_data = csv.reader(file, delimiter=",")
         header = next(csv_data)
-        if len(header) >= 5 and header[:5] == PLAN_SERIES_CSV_HEADERS:
+        if len(header) >= 5 and header == PLAN_SERIES_CSV_HEADERS:
             for row in csv_data:
                 if scheduled_config_id:
                     plan_series = PlanSeries(
