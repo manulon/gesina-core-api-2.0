@@ -341,11 +341,19 @@ def save_or_create_schedule_config(schedule_config_id):
     schedule_config = schedule_task_service.get_schedule_task_config(schedule_config_id)
     form = ScheduleConfigForm()
 
-    exists_forecast_and_observation_values, border_conditions = forecast_and_observation_values_exists(form)
+    border_conditions = []
 
-    if not exists_forecast_and_observation_values:
-        error_message = 'No se pudo crear la ejecucion programada debido a que no se encontró una serie de borde en la base de datos del INA para el ID ' + str(form.calibration_id.data)
-        return render_schedule_view(form, schedule_config, [error_message])
+    if form.enabled.data:
+        exists_forecast_and_observation_values, border_conditions = forecast_and_observation_values_exists(form)
+
+        if not exists_forecast_and_observation_values:
+            if border_conditions == None:
+                error_message = 'No se pudo crear la ejecucion programada debido a que no se encontró una serie de borde en la base de datos del INA para el ID ' + str(form.calibration_id.data)
+                return render_schedule_view(form, schedule_config, [error_message])
+            else:
+                print('Entre al caso de que esta habilitado pero no hay archivo o es vacio')
+                error_message = 'Tiene que haber al menos una condicion de borde para poder crear la corrida programada'
+                return render_schedule_view(form, schedule_config, [error_message])
     
     try:
         if form.validate_on_submit():
@@ -381,18 +389,22 @@ def forecast_and_observation_values_exists(form):
 
     border_conditions = retrieve_series(form)
 
-    url = f"{config.ina_url}/sim/calibrados/{form.calibration_id.data}/corridas/last?series_id={border_conditions[0].series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
+    if len(border_conditions) > 0:
+        url = f"{config.ina_url}/sim/calibrados/{form.calibration_id.data}/corridas/last?series_id={border_conditions[0].series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
 
-    response = None
-    for i in range(config.max_retries):
-        response = requests.get(
-            url, headers={"Authorization": f"Bearer {config.ina_token}"}
-        )
-        if response.status_code == 200 and len(response.json()["series"]) > 0:
-            return True, border_conditions
-        else:
-            return False, None
-        
+        response = None
+        for i in range(config.max_retries):
+            response = requests.get(
+                url, headers={"Authorization": f"Bearer {config.ina_token}"}
+            )
+            if response.status_code == 200 and len(response.json()["series"]) > 0:
+                return True, border_conditions
+            else:
+                return False, None
+    else:
+        empty_list = []
+        return False, empty_list
+     
     return False, None
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/validate_border_conditions", methods=["POST"])
