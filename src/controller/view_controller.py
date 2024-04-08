@@ -381,18 +381,22 @@ def forecast_and_observation_values_exists(form):
 
     border_conditions = retrieve_series(form)
 
-    url = f"{config.ina_url}/sim/calibrados/{form.calibration_id.data}/corridas/last?series_id={border_conditions[0].series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
+    if len(border_conditions) > 0:
+        url = f"{config.ina_url}/sim/calibrados/{form.calibration_id.data}/corridas/last?series_id={border_conditions[0].series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
 
-    response = None
-    for i in range(config.max_retries):
-        response = requests.get(
-            url, headers={"Authorization": f"Bearer {config.ina_token}"}
-        )
-        if response.status_code == 200 and len(response.json()["series"]) > 0:
-            return True, border_conditions
-        else:
-            return False, None
-        
+        response = None
+        for i in range(config.max_retries):
+            response = requests.get(
+                url, headers={"Authorization": f"Bearer {config.ina_token}"}
+            )
+            if response.status_code == 200 and len(response.json()["series"]) > 0:
+                return True, border_conditions
+            else:
+                return False, None
+    else:
+        empty_list = []
+        return True, empty_list
+     
     return False, None
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/validate_border_conditions", methods=["POST"])
