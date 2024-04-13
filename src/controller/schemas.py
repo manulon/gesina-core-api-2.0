@@ -26,6 +26,7 @@ class PlanSeriesSchema(Schema):
     stage_series_id = fields.Int()
     flow_series_id = fields.Int()
     scheduled_task_id = fields.Int()
+    stage_datum = fields.Float()
 
 
 class InitialFlowSchema(Schema):
