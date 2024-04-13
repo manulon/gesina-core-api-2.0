@@ -30,6 +30,7 @@ def handle_activity_dates(date_from_param, date_to_param):
     elif date_from_param and not date_to_param:
         date_from = datetime.strptime(date_from_param, "%d/%m/%Y").date()
         date_to = date_from + timedelta(weeks=1)
+        date_to = (datetime.now() + timedelta(days=1)).date() if date_to > datetime.now().date() else date_to
     elif not date_from_param and date_to_param:
         date_to = datetime.strptime(date_to_param, "%d/%m/%Y").date()
         date_from = date_to - timedelta(weeks=1)
@@ -65,7 +66,6 @@ def execution_results_data(executions, date_from, date_to):
     labels = []
     success_count = []
     error_count = []
-
     for day in rrule.rrule(rrule.DAILY, dtstart=date_from, until=date_to):
         labels.append(day.date().strftime("%d-%m"))
 
@@ -80,8 +80,8 @@ def execution_results_data(executions, date_from, date_to):
             executions,
         )
 
-        success_count.append(len(list(success_in_day)))
-        error_count.append(len(list(error_in_day)))
+        success_count.append(list(success_in_day).__len__())
+        error_count.append(list(error_in_day).__len__())
     return labels, success_count, error_count
 
 
