@@ -78,7 +78,7 @@ def _update_objects(old_objects, new_objects, update_func,_id=None):
 
     for new_object in new_objects:
         if not new_object.get("id"):
-            series = add_series_to_scheduled_task(new_object,_id)
+            add_series_to_scheduled_task(new_object,_id)
         else:
             for obj in old_objects:
                 try:
