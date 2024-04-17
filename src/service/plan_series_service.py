@@ -123,3 +123,16 @@ def process_plan_series_csv_file(plan_series_file, scheduled_config_id=None):
             raise FileUploadError("Error: Archivo .csv inválido - Plan series service")
 
     return result
+
+def check_duplicate_output_series(form):
+    plan_series = retrieve_plan_series(form)
+
+    dict_plan_series = {}
+
+    for var in plan_series:
+        if (var.river, var.reach, var.river_stat) in dict_plan_series:
+            return True, plan_series, (var.river, var.reach, var.river_stat)
+        else:
+            dict_plan_series[(var.river, var.reach, var.river_stat)] = 'value'
+
+    return False, plan_series, (var.river, var.reach, var.river_stat)

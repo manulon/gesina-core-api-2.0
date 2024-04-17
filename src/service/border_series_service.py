@@ -1,6 +1,12 @@
 import csv
 import io
 import re as regex
+from pytz import utc, timezone
+from datetime import datetime
+from datetime import timedelta
+from src import config
+import requests
+
 
 from src.logger import get_logger
 from src.persistance.scheduled_task import (
@@ -145,3 +151,58 @@ def process_series_csv_file(series_file, scheduled_config_id=None):
             raise FileUploadError("Error: Archivo .csv inválido - Border series service")
 
     return result
+
+def forecast_and_observation_values_exists(form):
+    locale = timezone("America/Argentina/Buenos_Aires")
+    today = datetime.now(tz=locale).replace(minute=0)
+    start_date = today - timedelta(form.observation_days.data)
+    end_date = today + timedelta(form.forecast_days.data)
+
+    format_time = lambda d: d.strftime("%Y-%m-%d")
+    timestart = start_date - timedelta(1)
+    timeend = end_date + timedelta(1)
+
+    border_conditions = retrieve_series(form)
+
+    if len(border_conditions) > 0:
+        url = f"{config.ina_url}/sim/calibrados/{form.calibration_id.data}/corridas/last?series_id={border_conditions[0].series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
+
+        response = None
+        for i in range(config.max_retries):
+            response = requests.get(
+                url, headers={"Authorization": f"Bearer {config.ina_token}"}
+            )
+            if response.status_code == 200 and len(response.json()["series"]) > 0:
+                return True, border_conditions
+            else:
+                return False, None
+    else:
+        empty_list = []
+        return False, empty_list
+     
+    return False, None
+
+def forecast_and_observation_values_exists_json(border_conditions, observation_days, forecast_days, calibration_id):
+    locale = timezone("America/Argentina/Buenos_Aires")
+    today = datetime.now(tz=locale).replace(minute=0)
+    start_date = today - timedelta(observation_days)
+    end_date = today + timedelta(forecast_days)
+
+    format_time = lambda d: d.strftime("%Y-%m-%d")
+    timestart = start_date - timedelta(1)
+    timeend = end_date + timedelta(1)
+
+
+    if len(border_conditions) > 0:
+        url = f"{config.ina_url}/sim/calibrados/{calibration_id}/corridas/last?series_id={border_conditions[0].series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
+        response = None
+        for i in range(config.max_retries):
+            response = requests.get(
+                url, headers={"Authorization": f"Bearer {config.ina_token}"}
+            )
+            if response.status_code == 200 and len(response.json()["series"]) > 0:
+                return True
+            else:
+                return False
+     
+    return False

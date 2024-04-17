@@ -153,7 +153,7 @@ def update_files(scheduled_task_id, project_file=None, plan_file=None, restart_f
         restart_file_path = save_restart_file(restart_file, scheduled_task_id)
     return project_path, plan_path, restart_file_path
 
-def create_from_form(form, border_conditions):
+def create_from_form(form, border_conditions, plan_series):
     params = {
         "frequency": form.frequency.data,
         "calibration_id": form.calibration_id.data,
@@ -168,7 +168,7 @@ def create_from_form(form, border_conditions):
         "forecast_days": form.forecast_days.data,
         "user": get_current_user(),
         "border_conditions": border_conditions,
-        "plan_series_list": retrieve_plan_series(form),
+        "plan_series_list": plan_series,
     }
     if form.start_condition_type.data == "initial_flows":
         params["initial_flows"] = create_initial_flows_from_form(form)
