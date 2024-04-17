@@ -72,18 +72,21 @@ def _create_objects(old_objects, new_objects, create_func, _id=None):
         return create_func(new_objects, _id)
 
 
-def _update_objects(old_objects, new_objects, update_func):
+def _update_objects(old_objects, new_objects, update_func,_id=None):
     if not callable(update_func):
         raise ValueError("The update function provided is not callable")
 
     for new_object in new_objects:
-        for obj in old_objects:
-            try:
-                if obj.id == new_object["id"]:
-                    update_func(obj, new_object)
-            except KeyError as ke:
-                error_msg = f"MSG: You must specify the {obj.__class__.__name__} ID to edit it - ERROR: {ke}"
-                raise KeyError(error_msg) from ke
+        if not new_object.get("id"):
+            add_series_to_scheduled_task(new_object,_id)
+        else:
+            for obj in old_objects:
+                try:
+                    if obj.id == new_object["id"]:
+                        update_func(obj, new_object)
+                except KeyError as ke:
+                    error_msg = f"MSG: You must specify the {obj.__class__.__name__} ID to edit it - ERROR: {ke}"
+                    raise KeyError(error_msg) from ke
     return
 
 
@@ -100,7 +103,7 @@ def update_objects(schedule_config, old_objects, new_objects, update_func, creat
             )
         )
     else:
-        _update_objects(old_objects, new_objects, update_func)
+        _update_objects(old_objects, new_objects, update_func,_id)
 
 
 def update_from_json(_id=None, **params):

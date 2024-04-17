@@ -10,8 +10,9 @@ import requests
 from src.logger import get_logger
 from src.persistance.scheduled_task import (
     BorderCondition,
-    BorderConditionType,
+    BorderConditionType, ScheduledTask,
 )
+from src.persistance.session import get_session
 from src.service import file_storage_service
 from src.service.exception.file_exception import FileUploadError
 from src.service.exception.series_exception import SeriesUploadError
@@ -48,6 +49,15 @@ def retrieve_series_json(series_list_file, series_list, scheduled_config_id=None
             print(series.interval)
             raise SeriesUploadError("Error: Interval con formato incorrecto")
     return merged_series
+
+
+def add_series_to_scheduled_task(oneSeries, scheduled_config_id):
+    if not scheduled_config_id:
+        raise Exception("Scheduled config id not present while adding new border series")
+    seriesList = process_series_json([oneSeries],scheduled_config_id)
+    with get_session() as session:
+        session.add(seriesList[0])
+
 
 
 def update_series_list(session, scheduled_config_id, series):
