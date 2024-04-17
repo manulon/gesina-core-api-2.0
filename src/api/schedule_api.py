@@ -19,6 +19,8 @@ def get_scheduled_task(scheduled_task_id):
         if not scheduled_task_id.isnumeric():
             raise Exception("Id is not numeric")
         task = schedule_task_service.get_schedule_task_config(scheduled_task_id)
+        if not task:
+            raise Exception(f"Scheduled task with id {scheduled_task_id} not found")
         obj = SCHEDULE_TASK_SCHEMA.dump(task)
         return jsonify(obj)
     except Exception as e:
@@ -71,6 +73,8 @@ def delete_scheduled_task(scheduled_task_id):
         response.status_code = 200
         return response
     except Exception as e:
+        logger = get_logger()
+        logger.error(e, exc_info=True)
         response = jsonify({"message": "error deleting geometry " + scheduled_task_id,
                             "error": str(e)})
         response.status_code = 400
@@ -101,13 +105,19 @@ def edit_scheduled_task(scheduled_task_id):
         response = jsonify({"message": f"Scheduled task with id {scheduled_task_id} edited successfully"})
         response.status_code = 200
     except FileUploadError as file_error:
+        logger = get_logger()
+        logger.error(file_error, exc_info=True)
         response = jsonify(
             {"message": f"You must upload all the required files to enable execution", "error": str(file_error)})
         response.status_code = 400
     except KeyError as ke:
+        logger = get_logger()
+        logger.error(ke, exc_info=True)
         response = jsonify({"message": f"Error editing scheduled task {scheduled_task_id}", "error": str(ke)})
         response.status_code = 400
     except Exception as e:
+        logger = get_logger()
+        logger.error(e, exc_info=True)
         response = jsonify({"message": f"Error editing scheduled task {scheduled_task_id}", "error": str(e)})
         response.status_code = 400
     return response
