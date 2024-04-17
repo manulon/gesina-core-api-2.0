@@ -45,7 +45,7 @@ def update(_id, form):
         if form.enabled.data:
             if not file_storage_service.is_project_template_present(
                     _id) or not file_storage_service.is_plan_template_present(
-                    _id) or not file_storage_service.is_restart_file_present(_id):
+                _id) or not file_storage_service.is_restart_file_present(_id):
                 raise FileUploadError("Es mandatorio subir todos los archivos para habilitar la ejecución")
         schedule_config.enabled = form.enabled.data
         schedule_config.observation_days = form.observation_days.data
@@ -144,7 +144,7 @@ def update_from_json(_id=None, **params):
                     if value is True:
                         if not file_storage_service.is_project_template_present(
                                 _id) or not file_storage_service.is_plan_template_present(
-                                _id) or not file_storage_service.is_restart_file_present(_id):
+                            _id) or not file_storage_service.is_restart_file_present(_id):
                             raise FileUploadError("You must upload all the required files to enable execution")
                     setattr(schedule_config, key, value)
                 else:
@@ -165,7 +165,7 @@ def update_files(scheduled_task_id, project_file=None, plan_file=None, restart_f
     return project_path, plan_path, restart_file_path
 
 
-def create_from_form(form, border_conditions):
+def create_from_form(form, border_conditions, plan_series):
     params = {
         "frequency": form.frequency.data,
         "calibration_id": form.calibration_id.data,
@@ -180,7 +180,7 @@ def create_from_form(form, border_conditions):
         "forecast_days": form.forecast_days.data,
         "user": get_current_user(),
         "border_conditions": border_conditions,
-        "plan_series_list": retrieve_plan_series(form),
+        "plan_series_list": plan_series,
     }
     if form.start_condition_type.data == "initial_flows":
         params["initial_flows"] = create_initial_flows_from_form(form)
