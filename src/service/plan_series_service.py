@@ -4,6 +4,7 @@ from src.persistance.scheduled_task import (
     BorderCondition,
     PlanSeries,
 )
+from src.persistance.session import get_session
 from src.service import file_storage_service
 from src.service.exception.file_exception import FileUploadError
 
@@ -83,6 +84,7 @@ def process_plan_series_json(series_list, scheduled_config_id=None):
                 river_stat=each_plan_series.get("river_stat"),
                 stage_series_id=each_plan_series.get("stage_series_id"),
                 flow_series_id=each_plan_series.get("flow_series_id"),
+                stage_datum=each_plan_series.get("stage_datum")
             )
         result.append(plan_series)
 
@@ -147,3 +149,11 @@ def check_duplicate_output_series_json(plan_series):
             dict_plan_series[(var.river, var.reach, var.river_stat)] = 'value'
 
     return False, (var.river, var.reach, var.river_stat)
+
+
+def add_series_to_scheduled_task(oneSeries, scheduled_config_id):
+    if not scheduled_config_id:
+        raise Exception("Scheduled config id not present while adding new border series")
+    seriesList = process_plan_series_json([oneSeries],scheduled_config_id)
+    with get_session() as session:
+        session.add(seriesList[0])

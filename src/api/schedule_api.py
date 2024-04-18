@@ -96,34 +96,45 @@ def edit_scheduled_task(scheduled_task_id):
             'enabled': body.get('enabled'),
             'observation_days': body.get('observation_days'),
             'forecast_days': body.get('forecast_days'),
-            'start_condition_type': body.get('start_condition_type'), # Initial flow or restart file
+            'start_condition_type': body.get('start_condition_type'),  # Initial flow or restart file
             'border_conditions': body.get('border_conditions'),
             'plan_series_list': body.get('plan_series_list'),
             'initial_flows': body.get('initial_flows')
         }
 
+        scheduled_config = schedule_task_service.get_schedule_task_config(scheduled_task_id)
+        if not scheduled_config:
+            raise Exception(f"Scheduled task with id {scheduled_task_id} not found")
+
+
+
         if params["enabled"]:
-            if len(params["border_conditions"]) == 0:
+            if len(params["border_conditions"]) == 0 and len(scheduled_config.border_conditions) == 0:
                 response = jsonify({
                     "message": "There must be at least one boundary series in order to create the scheduled task.",
                 })
                 response.status_code = 400
                 return response
             else:
-                exists_forecast_and_observation_values = forecast_and_observation_values_exists_json(params["border_conditions"], params["observation_days"], params["forecast_days"], params["calibration_id"])
-                
+                exists_forecast_and_observation_values = forecast_and_observation_values_exists_json(
+                    params["border_conditions"], params["observation_days"], params["forecast_days"],
+                    params["calibration_id"])
+
                 if not exists_forecast_and_observation_values:
                     response = jsonify({
-                        "message": "The scheduled task could not be created due to the absence of a boundary series in the INA database for the ID " + str(params["calibration_id"]),
+                        "message": "The scheduled task could not be created due to the absence of a boundary series "
+                                   "in the INA database for the ID " + str(
+                            params["calibration_id"]),
                     })
                     response.status_code = 400
                     return response
 
             duplicate_border_conditions, duplicate_key = check_duplicate_output_series_json(params["plan_series_list"])
-            
+
             if duplicate_border_conditions:
                 response = jsonify({
-                    "message": 'The output series (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' + duplicate_key[2] + ') is duplicated. The scheduled task run can not be created.'
+                    "message": 'The output series (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' +
+                               duplicate_key[2] + ') is duplicated. The scheduled task run can not be updated.'
                 })
                 response.status_code = 400
                 return response
@@ -216,20 +227,24 @@ def create_scheduled_task():
                 response.status_code = 400
                 return response
             else:
-                exists_forecast_and_observation_values = forecast_and_observation_values_exists_json(params["border_conditions"], params["observation_days"], params["forecast_days"], params["calibration_id"])
-                
+                exists_forecast_and_observation_values = forecast_and_observation_values_exists_json(
+                    params["border_conditions"], params["observation_days"], params["forecast_days"],
+                    params["calibration_id"])
+
                 if not exists_forecast_and_observation_values:
                     response = jsonify({
-                        "message": "The scheduled task could not be created due to the absence of a boundary series in the INA database for the ID " + str(params["calibration_id"]),
+                        "message": "The scheduled task could not be created due to the absence of a boundary series in the INA database for the ID " + str(
+                            params["calibration_id"]),
                     })
                     response.status_code = 400
                     return response
 
             duplicate_border_conditions, duplicate_key = check_duplicate_output_series_json(params["plan_series_list"])
-            
+
             if duplicate_border_conditions:
                 response = jsonify({
-                    "message": 'The output series (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' + duplicate_key[2] + ') is duplicated. The scheduled task run can not be created.'
+                    "message": 'The output series (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' +
+                               duplicate_key[2] + ') is duplicated. The scheduled task run can not be created.'
                 })
                 response.status_code = 400
                 return response
@@ -265,7 +280,7 @@ def copy_schedule_task():
     try:
         copy_from_id = request.args.get('copyFrom', '')
         if copy_from_id is None:
-            return jsonify({"error": "copyFrom parameter not specified"}),400
+            return jsonify({"error": "copyFrom parameter not specified"}), 400
         schedule_task = schedule_task_service.copy_schedule_task(copy_from_id)
         response = jsonify({"message": "Scheduled task with id " + copy_from_id + " copied successfully",
                             "id": schedule_task.id})
