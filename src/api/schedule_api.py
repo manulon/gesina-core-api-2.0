@@ -119,9 +119,9 @@ def edit_scheduled_task(scheduled_task_id):
                     response.status_code = 400
                     return response
 
-            duplicate_border_conditions, duplicate_key = check_duplicate_output_series_json(params["plan_series_list"])
+            duplicate_output_series, duplicate_key = check_duplicate_output_series_json(params["plan_series_list"])
             
-            if duplicate_border_conditions:
+            if duplicate_output_series:
                 response = jsonify({
                     "message": 'The output series (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' + duplicate_key[2] + ') is duplicated. The scheduled task run can not be created.'
                 })
@@ -225,9 +225,9 @@ def create_scheduled_task():
                     response.status_code = 400
                     return response
 
-            duplicate_border_conditions, duplicate_key = check_duplicate_output_series_json(params["plan_series_list"])
+            duplicate_output_series, duplicate_key = check_duplicate_output_series_json(params["plan_series_list"])
             
-            if duplicate_border_conditions:
+            if duplicate_output_series:
                 response = jsonify({
                     "message": 'The output series (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' + duplicate_key[2] + ') is duplicated. The scheduled task run can not be created.'
                 })
