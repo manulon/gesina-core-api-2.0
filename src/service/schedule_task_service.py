@@ -7,9 +7,9 @@ from src.persistance.session import get_session
 from src.service import project_file_service, plan_file_service, file_storage_service, execution_plan_service
 from src.service.file_storage_service import save_restart_file, FileType
 from src.service.user_service import get_current_user
-from src.service.initial_flow_service import *
-from src.service.border_series_service import *
-from src.service.plan_series_service import *
+from src.service import initial_flow_service
+from src.service import border_series_service
+from src.service import plan_series_service
 
 
 def create(params, start_condition_type, restart_file_data, project_file_data, plan_file_data):
@@ -72,13 +72,18 @@ def _create_objects(old_objects, new_objects, create_func, _id=None):
         return create_func(new_objects, _id)
 
 
-def _update_objects(old_objects, new_objects, update_func,_id=None):
+def _update_objects(old_objects, new_objects, update_func, attr_name, _id=None):
     if not callable(update_func):
         raise ValueError("The update function provided is not callable")
 
     for new_object in new_objects:
         if not new_object.get("id"):
-            add_series_to_scheduled_task(new_object,_id)
+            if attr_name == "border_conditions":
+                border_series_service.add_series_to_scheduled_task(new_object, _id)
+            elif attr_name == "plan_series_list":
+                plan_series_service.add_series_to_scheduled_task(new_object,_id)
+            elif attr_name == "initial_flows":
+                initial_flow_service.add_initial_flow_to_scheduled_task(new_object,_id)
         else:
             for obj in old_objects:
                 try:
@@ -103,7 +108,7 @@ def update_objects(schedule_config, old_objects, new_objects, update_func, creat
             )
         )
     else:
-        _update_objects(old_objects, new_objects, update_func,_id)
+        _update_objects(old_objects, new_objects, update_func, attr_name, _id)
 
 
 def update_from_json(_id=None, **params):
@@ -118,8 +123,8 @@ def update_from_json(_id=None, **params):
                         schedule_config,
                         schedule_config.border_conditions,
                         value,
-                        update_border_condition,
-                        process_series_json,
+                        border_series_service.update_border_condition,
+                        border_series_service.process_series_json,
                         'border_conditions',
                         _id
                     )
@@ -128,8 +133,8 @@ def update_from_json(_id=None, **params):
                         schedule_config,
                         schedule_config.plan_series_list,
                         value,
-                        update_plan_series,
-                        process_plan_series_json,
+                        plan_series_service.update_plan_series,
+                        plan_series_service.process_plan_series_json,
                         'plan_series_list',
                         _id
                     )
@@ -138,8 +143,8 @@ def update_from_json(_id=None, **params):
                         schedule_config,
                         schedule_config.initial_flows,
                         value,
-                        update_initial_flow,
-                        process_initial_flows_json,
+                        initial_flow_service.update_initial_flow,
+                        initial_flow_service.process_initial_flows_json,
                         'initial_flows',
                         _id
                     )
@@ -233,7 +238,7 @@ def get_schedule_tasks(name=None, user_first_name=None, user_last_name=None, sta
         return query.all()
 
 
-def get_schedule_task_config(schedule_config_id):
+def get_schedule_task_config(schedule_config_id) -> ScheduledTask:
     with get_session() as session:
         return (
             session.query(ScheduledTask)

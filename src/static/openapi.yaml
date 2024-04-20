@@ -1143,17 +1143,17 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BorderConditionSchema'
-          description: List of border conditions associated with the scheduled task
+          description: List of border conditions associated with the scheduled task. If the border condition id is set then that border condition is edited. If not, a new one will be created
         plan_series_list:
           type: array
           items:
             $ref: '#/components/schemas/PlanSeriesSchema'
-          description: List of plan series associated with the scheduled task
+          description: List of plan series associated with the scheduled task. If the plan series id is set then that border condition is edited. If not, a new one will be created
         initial_flows:
           type: array
           items:
             $ref: '#/components/schemas/InitialFlowSchema'
-          description: List of initial flows associated with the scheduled task
+          description: List of initial flows associated with the scheduled task. If the initial flow id is set then that border condition is edited. If not, a new one will be created
       required:
         - frequency
         - calibration_id
