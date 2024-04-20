@@ -108,7 +108,7 @@ def edit_scheduled_task(scheduled_task_id):
 
         if params["enabled"]:
             if len(params["border_conditions"]) == 0 and len(scheduled_config.border_conditions) == 0:
-                return send_bad_request("There must be at least one boundary series in order to create the scheduled "
+                return send_bad_request("There must be at least one border condition set to enable the scheduled "
                                         "task.")
             if len(params["border_conditions"]) != 0:
                 if not params['observation_days'] and not scheduled_config.observation_days:
@@ -133,13 +133,20 @@ def edit_scheduled_task(scheduled_task_id):
                     return send_bad_request("The scheduled task could not be created due to the absence of a boundary "
                                             "series in the INA database for the ID " + str(params["calibration_id"]))
 
-
         duplicate_border_conditions, duplicate_key = check_duplicate_output_series_json(
             params["plan_series_list"], scheduled_config)
 
         if duplicate_border_conditions:
             return send_bad_request('The output series (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' +
                                     duplicate_key[2] + ') is duplicated. The scheduled task run can not be updated.')
+
+        duplicate_output_series, duplicate_key = check_duplicate_output_series_json(params["plan_series_list"],
+                                                                                    scheduled_config)
+
+        if duplicate_output_series:
+            return send_bad_request(
+                'The output series (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' + duplicate_key[
+                    2] + ') is duplicated. The scheduled task run can not be created.')
 
         schedule_task_service.update_from_json(scheduled_task_id, **params)
         response = jsonify({"message": f"Scheduled task with id {scheduled_task_id} edited successfully"})
@@ -250,6 +257,15 @@ def create_scheduled_task():
                 })
                 response.status_code = 400
                 return response
+        duplicate_output_series, duplicate_key = check_duplicate_output_series_json(params["plan_series_list"])
+
+        if duplicate_output_series:
+            response = jsonify({
+                "message": 'The output series (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' + duplicate_key[
+                    2] + ') is duplicated. The scheduled task run can not be created.'
+            })
+            response.status_code = 400
+            return response
 
         if body.get("start_condition_type") == "initial_flows":
             params["initial_flows"] = create_initial_flows_from_json(body.get("start_condition_type"),
