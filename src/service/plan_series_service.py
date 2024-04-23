@@ -141,7 +141,7 @@ def check_duplicate_output_series(form):
     return False, plan_series, (var.river, var.reach, var.river_stat)
 
 
-def check_duplicate_output_series_json(plan_series, schedule_config: ScheduledTask):
+def check_duplicate_output_series_json(plan_series, schedule_config: ScheduledTask = None):
     dict_plan_series = {}
     if schedule_config:
         for var in schedule_config.plan_series_list:
