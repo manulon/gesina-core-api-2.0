@@ -149,7 +149,6 @@ def check_duplicate_output_series_json(plan_series, schedule_config: ScheduledTa
 
     if not plan_series:
         return False, None
-    print(plan_series)
     for var in plan_series:
         if (var.get("river"), var.get("reach"), var.get("river_stat")) in dict_plan_series:
             return True, (var.get("river"), var.get("reach"), var.get("river_stat"))
