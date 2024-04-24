@@ -131,8 +131,9 @@ def edit_scheduled_task(scheduled_task_id):
                 calibration_id)
 
             if not exists_forecast_and_observation_values:
-                return send_bad_request("The scheduled task could not be created due to the absence of a boundary "
-                                        "series in the INA database for the ID " + str(calibration_id))
+                return send_bad_request(f'The scheduled task could not be created due to the absence of a boundary '
+                                        f'series in the INA database for the calibration ID {str(calibration_id)} and'
+                                        f' series id {params["border_conditions"][0].get("series_id")} ')
 
         duplicate_output_series, duplicate_key = check_duplicate_output_series_json(params["plan_series_list"],
                                                                                     scheduled_config)
