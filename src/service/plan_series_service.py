@@ -138,7 +138,7 @@ def check_duplicate_output_series(form):
         else:
             dict_plan_series[(var.river, var.reach, var.river_stat)] = 'value'
 
-    return False, plan_series, (var.river, var.reach, var.river_stat)
+    return False, None,None
 
 
 def check_duplicate_output_series_json(plan_series, schedule_config: ScheduledTask = None):

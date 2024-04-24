@@ -5,7 +5,9 @@ from src.persistance.scheduled_task import ScheduledTask, ExecutionPlanScheduleT
 from src.persistance import User
 from src.persistance.session import get_session
 from src.service import project_file_service, plan_file_service, file_storage_service, execution_plan_service
+from src.service.exception.file_exception import FileUploadError
 from src.service.file_storage_service import save_restart_file, FileType
+from src.service.initial_flow_service import create_initial_flows_from_form
 from src.service.user_service import get_current_user
 from src.service import initial_flow_service
 from src.service import border_series_service
@@ -51,13 +53,13 @@ def update(_id, form):
         schedule_config.observation_days = form.observation_days.data
         schedule_config.forecast_days = form.forecast_days.data
         schedule_config.start_condition_type = form.start_condition_type.data
-        update_series_list(session, _id, retrieve_series(form, _id))
-        update_plan_series_list(session, _id, retrieve_plan_series(form, _id))
+        border_series_service.update_series_list(session, _id, border_series_service.retrieve_series(form, _id))
+        plan_series_service.update_plan_series_list(session, _id, plan_series_service.retrieve_plan_series(form, _id))
 
         if form.start_condition_type.data == "restart_file" and form.restart_file.data:
             save_restart_file(form.restart_file.data, schedule_config.id)
         else:
-            update_initial_flows(session, _id, retrieve_initial_flows_from_form(form, _id))
+            initial_flow_service.update_initial_flows(session, _id, initial_flow_service.retrieve_initial_flows_from_form(form, _id))
 
         project_file_service.process_project_template(form.project_file.data, _id)
         plan_file_service.process_plan_template(form.plan_file.data, _id)
