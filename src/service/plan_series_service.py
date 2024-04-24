@@ -141,17 +141,19 @@ def check_duplicate_output_series(form):
     return False, plan_series, (var.river, var.reach, var.river_stat)
 
 
-def check_duplicate_output_series_json(plan_series, schedule_config: ScheduledTask):
+def check_duplicate_output_series_json(plan_series, schedule_config: ScheduledTask = None):
     dict_plan_series = {}
     if schedule_config:
         for var in schedule_config.plan_series_list:
             dict_plan_series[(var.river, var.reach, var.river_stat)] = 'value'
 
+    if not plan_series:
+        return False, None
     for var in plan_series:
-        if (var.river, var.reach, var.river_stat) in dict_plan_series:
-            return True, (var.river, var.reach, var.river_stat)
+        if (var.get("river"), var.get("reach"), var.get("river_stat")) in dict_plan_series:
+            return True, (var.get("river"), var.get("reach"), var.get("river_stat"))
         else:
-            dict_plan_series[(var.river, var.reach, var.river_stat)] = 'value'
+            dict_plan_series[(var.get("river"), var.get("reach"), var.get("river_stat"))] = 'value'
 
     return False, None
 

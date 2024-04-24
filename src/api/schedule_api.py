@@ -110,35 +110,30 @@ def edit_scheduled_task(scheduled_task_id):
             if len(params["border_conditions"]) == 0 and len(scheduled_config.border_conditions) == 0:
                 return send_bad_request("There must be at least one border condition set to enable the scheduled "
                                         "task.")
-            if len(params["border_conditions"]) != 0:
-                if not params['observation_days'] and not scheduled_config.observation_days:
-                    return send_bad_request("observation_days must be set")
-                observation_days = params['observation_days'] if params[
-                    'observation_days'] else scheduled_config.observation_days
+        if len(params["border_conditions"]) != 0:
+            if not params['observation_days'] and not scheduled_config.observation_days:
+                return send_bad_request("observation_days must be set")
 
-                if not params['forecast_days'] and not scheduled_config.forecast_days:
-                    return send_bad_request("forecast_days must be set")
-                forecast_days = params['forecast_days'] if params['forecast_days'] else scheduled_config.forecast_days
+            if not params['forecast_days'] and not scheduled_config.forecast_days:
+                return send_bad_request("forecast_days must be set")
 
-                if not params['calibration_id'] and not scheduled_config.calibration_id:
-                    return send_bad_request("calibration_id must be set")
-                calibration_id = params['calibration_id'] if params[
-                    'calibration_id'] else scheduled_config.calibration_id
+            if not params['calibration_id'] and not scheduled_config.calibration_id:
+                return send_bad_request("calibration_id must be set")
 
-                exists_forecast_and_observation_values = forecast_and_observation_values_exists_json(
-                    params["border_conditions"], observation_days, forecast_days,
-                    calibration_id)
+            observation_days = params['observation_days'] if params[
+                'observation_days'] else scheduled_config.observation_days
+            forecast_days = params['forecast_days'] if params['forecast_days'] else scheduled_config.forecast_days
+            calibration_id = params['calibration_id'] if params[
+                'calibration_id'] else scheduled_config.calibration_id
 
-                if not exists_forecast_and_observation_values:
-                    return send_bad_request("The scheduled task could not be created due to the absence of a boundary "
-                                            "series in the INA database for the ID " + str(params["calibration_id"]))
+            exists_forecast_and_observation_values = forecast_and_observation_values_exists_json(
+                params["border_conditions"], observation_days, forecast_days,
+                calibration_id)
 
-        duplicate_border_conditions, duplicate_key = check_duplicate_output_series_json(
-            params["plan_series_list"], scheduled_config)
-
-        if duplicate_border_conditions:
-            return send_bad_request('The output series (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' +
-                                    duplicate_key[2] + ') is duplicated. The scheduled task run can not be updated.')
+            if not exists_forecast_and_observation_values:
+                return send_bad_request(f'The scheduled task could not be created due to the absence of a boundary '
+                                        f'series in the INA database for the calibration ID {str(calibration_id)} and'
+                                        f' series id {params["border_conditions"][0].get("series_id")} ')
 
         duplicate_output_series, duplicate_key = check_duplicate_output_series_json(params["plan_series_list"],
                                                                                     scheduled_config)
@@ -228,46 +223,27 @@ def create_scheduled_task():
             "plan_series_list": retrieve_plan_series_json(body.get("plan_series_file"), body.get("plan_series_list")),
         }
 
-        if params["enabled"]:
-            if len(params["border_conditions"]) == 0:
-                response = jsonify({
-                    "message": "There must be at least one boundary series in order to create the scheduled task.",
-                })
-                response.status_code = 400
-                return response
-            else:
-                exists_forecast_and_observation_values = forecast_and_observation_values_exists_json(
-                    params["border_conditions"], params["observation_days"], params["forecast_days"],
-                    params["calibration_id"])
+        if params["border_conditions"]:
+            if not params['observation_days'] and not params['forecast_days'] and not params['calibration_id']:
+                return send_bad_request("observation_days forcast_days and calibration_id must be set")
 
-                if not exists_forecast_and_observation_values:
-                    response = jsonify({
-                        "message": "The scheduled task could not be created due to the absence of a boundary series in the INA database for the ID " + str(
-                            params["calibration_id"]),
-                    })
-                    response.status_code = 400
-                    return response
+            exists_forecast_and_observation_values = forecast_and_observation_values_exists_json(
+                params["border_conditions"], params["observation_days"], params["forecast_days"],
+                params["calibration_id"])
 
-            duplicate_border_conditions, duplicate_key = check_duplicate_output_series_json(params["plan_series_list"])
+            if not exists_forecast_and_observation_values:
+                return send_bad_request("The scheduled task could not be created due to the absence of a boundary "
+                                        "series in the INA database for the ID " + str(params["calibration_id"]))
 
-            if duplicate_border_conditions:
-                response = jsonify({
-                    "message": 'The output series (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' +
-                               duplicate_key[2] + ') is duplicated. The scheduled task run can not be created.'
-                })
-                response.status_code = 400
-                return response
         duplicate_output_series, duplicate_key = check_duplicate_output_series_json(params["plan_series_list"])
 
         if duplicate_output_series:
-            response = jsonify({
-                "message": 'The output series (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' + duplicate_key[
-                    2] + ') is duplicated. The scheduled task run can not be created.'
-            })
-            response.status_code = 400
-            return response
+            return send_bad_request('The output series (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' +
+                                    duplicate_key[2] + ') is duplicated. The scheduled task run can not be created.')
 
         if body.get("start_condition_type") == "initial_flows":
+            if not params["initial_flows"]:
+                return send_bad_request("intial_flows must be set")
             params["initial_flows"] = create_initial_flows_from_json(body.get("start_condition_type"),
                                                                      body.get("initial_flow_file"),
                                                                      body.get("initial_flow_list"))

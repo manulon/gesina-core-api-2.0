@@ -351,9 +351,9 @@ def save_or_create_schedule_config(schedule_config_id):
                 error_message = 'Tiene que haber al menos una condicion de borde para poder crear la corrida programada'
                 return render_schedule_view(form, schedule_config, [error_message])
     
-        duplicate_border_conditions, plan_series, duplicate_key = check_duplicate_output_series(form)
+        duplicate_output_series, plan_series, duplicate_key = check_duplicate_output_series(form)
 
-        if duplicate_border_conditions:
+        if duplicate_output_series:
             error_message = 'La serie de salida (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' + duplicate_key[2] + ') está duplicada. No puede crearse la corrida programada.'
             return render_schedule_view(form, schedule_config, [error_message])
             
