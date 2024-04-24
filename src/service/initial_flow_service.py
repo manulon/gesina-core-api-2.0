@@ -134,5 +134,5 @@ def process_initial_flows_csv_file(initial_flow_file, scheduled_config_id=None):
                 result.append(initial_flow)
         else:
             raise FileUploadError("Error: Archivo .csv inválido - Initial flow service")
-
+    initial_flow_file.seek(0)
     return result

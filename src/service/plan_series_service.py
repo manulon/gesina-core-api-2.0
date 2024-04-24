@@ -123,7 +123,7 @@ def process_plan_series_csv_file(plan_series_file, scheduled_config_id=None):
                 result.append(plan_series)
         else:
             raise FileUploadError("Error: Archivo .csv inválido - Plan series service")
-
+    plan_series_file.seek(0)
     return result
 
 

@@ -166,7 +166,7 @@ def process_series_csv_file(series_file, scheduled_config_id=None):
                 result.append(border_condition)
         else:
             raise FileUploadError("Error: Archivo .csv inválido - Border series service")
-
+    series_file.seek(0)
     return result
 
 
