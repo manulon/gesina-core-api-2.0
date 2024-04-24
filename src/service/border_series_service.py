@@ -212,7 +212,8 @@ def forecast_and_observation_values_exists_json(border_conditions, observation_d
     timeend = end_date + timedelta(1)
 
     if len(border_conditions) > 0:
-        url = f"{config.ina_url}/sim/calibrados/{calibration_id}/corridas/last?series_id={border_conditions[0].series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
+        series_id = border_conditions[0].get("series_id")
+        url = f"{config.ina_url}/sim/calibrados/{calibration_id}/corridas/last?series_id={series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
         response = None
         for i in range(config.max_retries):
             response = requests.get(

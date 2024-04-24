@@ -110,29 +110,29 @@ def edit_scheduled_task(scheduled_task_id):
             if len(params["border_conditions"]) == 0 and len(scheduled_config.border_conditions) == 0:
                 return send_bad_request("There must be at least one border condition set to enable the scheduled "
                                         "task.")
-            if len(params["border_conditions"]) != 0:
-                if not params['observation_days'] and not scheduled_config.observation_days:
-                    return send_bad_request("observation_days must be set")
+        if len(params["border_conditions"]) != 0:
+            if not params['observation_days'] and not scheduled_config.observation_days:
+                return send_bad_request("observation_days must be set")
 
-                if not params['forecast_days'] and not scheduled_config.forecast_days:
-                    return send_bad_request("forecast_days must be set")
+            if not params['forecast_days'] and not scheduled_config.forecast_days:
+                return send_bad_request("forecast_days must be set")
 
-                if not params['calibration_id'] and not scheduled_config.calibration_id:
-                    return send_bad_request("calibration_id must be set")
+            if not params['calibration_id'] and not scheduled_config.calibration_id:
+                return send_bad_request("calibration_id must be set")
 
-                observation_days = params['observation_days'] if params[
-                    'observation_days'] else scheduled_config.observation_days
-                forecast_days = params['forecast_days'] if params['forecast_days'] else scheduled_config.forecast_days
-                calibration_id = params['calibration_id'] if params[
-                    'calibration_id'] else scheduled_config.calibration_id
+            observation_days = params['observation_days'] if params[
+                'observation_days'] else scheduled_config.observation_days
+            forecast_days = params['forecast_days'] if params['forecast_days'] else scheduled_config.forecast_days
+            calibration_id = params['calibration_id'] if params[
+                'calibration_id'] else scheduled_config.calibration_id
 
-                exists_forecast_and_observation_values = forecast_and_observation_values_exists_json(
-                    params["border_conditions"], observation_days, forecast_days,
-                    calibration_id)
+            exists_forecast_and_observation_values = forecast_and_observation_values_exists_json(
+                params["border_conditions"], observation_days, forecast_days,
+                calibration_id)
 
-                if not exists_forecast_and_observation_values:
-                    return send_bad_request("The scheduled task could not be created due to the absence of a boundary "
-                                            "series in the INA database for the ID " + str(params["calibration_id"]))
+            if not exists_forecast_and_observation_values:
+                return send_bad_request("The scheduled task could not be created due to the absence of a boundary "
+                                        "series in the INA database for the ID " + str(calibration_id))
 
         duplicate_output_series, duplicate_key = check_duplicate_output_series_json(params["plan_series_list"],
                                                                                     scheduled_config)
