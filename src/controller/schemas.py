@@ -47,6 +47,7 @@ class ScheduleTaskSchema(Schema):
     start_datetime = fields.DateTime()
     enabled = fields.Bool()
     geometry = fields.Str()  # Ensure this correctly serializes the Geometry relationship
+    user_id = fields.Int()
     user = fields.Str()  # Ensure this correctly serializes the User relationship
     initial_flows = fields.List(fields.Nested(InitialFlowSchema))
     border_conditions = fields.List(fields.Nested(BorderConditionSchema))

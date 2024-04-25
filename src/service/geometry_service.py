@@ -30,7 +30,6 @@ def create(file_name, file_data, description, user):
             return geometry
         
     except Exception as e:
-        print(e)
         raise e
 
 
