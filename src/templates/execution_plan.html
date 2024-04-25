@@ -77,10 +77,10 @@
                     </div>
                     <div class="d-flex align-items-center">
                         <div class="text-left">
-                            <button class="btn btn-outline-secondary" onclick="duplicateSimulation({{ execution_plan.id }})">
+                            <a class="btn btn-outline-secondary" onclick="duplicateSimulation({{ execution_plan.id }})">
                                 <i class="fa-solid fa-clipboard"></i>
                                 Duplicar Simulación
-                            </button>
+                            </a>
                         </div>
                         <div class="text-right ml-auto">
                             <a class="btn btn-secondary" href="{{ url_for('view_controller.execution_plan_list') }}">Volver</a>
