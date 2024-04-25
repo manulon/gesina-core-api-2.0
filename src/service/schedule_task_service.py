@@ -212,9 +212,12 @@ def create_from_form(form, border_conditions, plan_series):
 
 def get_schedule_tasks(name=None, user_first_name=None, user_last_name=None, start_condition_type=None, date_from=None,
                        date_to=None, enabled=None, frequency=None, calibration_id=None,
-                       calibration_id_for_simulations=None):
+                       calibration_id_for_simulations=None, reduced=False):
     with get_session() as session:
         query = session.query(ScheduledTask).order_by(ScheduledTask.id.desc())
+        if reduced:
+            query = query.with_entities(ScheduledTask.id, ScheduledTask.created_at,ScheduledTask.name,ScheduledTask.user_id, ScheduledTask.description, ScheduledTask.enabled)
+
         if name is not None:
             query = query.filter(func.lower(ScheduledTask.name).like(func.lower(f"%{name}%")))
         if user_first_name is not None or user_last_name is not None:

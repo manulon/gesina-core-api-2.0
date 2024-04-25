@@ -50,7 +50,6 @@ def health_check():
 
 @app.errorhandler(HTTPStatus.NOT_FOUND)
 def page_not_found(e):
-    print("no found")
     return redirect(url_for("view_controller.home")), HTTPStatus.MOVED_PERMANENTLY
 
 @app.route('/list_routes')

@@ -227,11 +227,15 @@ def delete_execution_plan(execution_plan_id):
     return True   
 
 def get_execution_plans(plan_name=None, user_first_name=None, user_last_name=None, status=None, date_from=None,
-                        date_to=None):
+                        date_to=None, reduced = False):
     execution_plans = []
     with get_session() as session:
 
-        query = session.query(ExecutionPlan).order_by(ExecutionPlan.id.desc())
+        query = session.query(ExecutionPlan)
+        if reduced:
+            query = query.with_entities(ExecutionPlan.plan_name,ExecutionPlan.id,ExecutionPlan.user_id,
+                                        ExecutionPlan.created_at,ExecutionPlan.status)
+        query = query.order_by(ExecutionPlan.id.desc())
 
         if plan_name is not None:
             query = query.filter(ExecutionPlan.plan_name.like(f"%{plan_name}%"))

@@ -46,7 +46,6 @@ def retrieve_series_json(series_list_file, series_list, scheduled_config_id=None
     merged_series = from_csv + from_json
     for series in merged_series:
         if not bool(regex.match(SERIES_INTERVAL_REGEX, series.interval)):
-            print(series.interval)
             raise SeriesUploadError("Error: Interval con formato incorrecto")
     return merged_series
 
@@ -166,7 +165,7 @@ def process_series_csv_file(series_file, scheduled_config_id=None):
                 result.append(border_condition)
         else:
             raise FileUploadError("Error: Archivo .csv inválido - Border series service")
-
+    series_file.seek(0)
     return result
 
 
