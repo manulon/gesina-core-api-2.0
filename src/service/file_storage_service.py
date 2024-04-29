@@ -8,6 +8,7 @@ from minio.commonconfig import CopySource
 import base64
 
 from src import logger, config
+from src.logger import get_logger
 
 from src.service.exception.file_exception import FileUploadError, FilePreSignedUrlError
 from werkzeug.utils import secure_filename
@@ -71,9 +72,12 @@ def save_plan_template_file(data, scheduled_task_id):
 
 
 def save_file(file_type, file, filename, _id=None):
-    if isinstance(file, io.BytesIO) or isinstance(file, bytes):
+    if isinstance(file, io.BytesIO):
         data = file
         lent = len(data.getvalue())
+    elif isinstance(file,bytes):
+        data = io.BytesIO(file)
+        lent = len(file)
     else:
         file_bytes = file.read()
         lent = len(file_bytes)
@@ -93,6 +97,7 @@ def save_file(file_type, file, filename, _id=None):
         return minio_path
     except Exception as exception:
         error_message = "Error uploading file"
+        get_logger().error(exception,exc_info=True)
         raise FileUploadError(error_message)
 
 
@@ -284,7 +289,7 @@ def get_scheduled_task_files(scheduled_task_id, with_content=False):
     files = []
     for file in executions_files:
         files.append({
-            "name": file.object_name,
+            "name": file.object_name.split("/")[-1],
             "content": base64.b64encode(get_file(file.object_name).data).decode("ascii")
         })
     return files

@@ -7,7 +7,6 @@ from datetime import timedelta
 from src import config
 import requests
 
-from src.logger import get_logger
 from src.persistance.scheduled_task import (
     BorderCondition,
     BorderConditionType, ScheduledTask,
@@ -165,7 +164,9 @@ def process_series_csv_file(series_file, scheduled_config_id=None):
                 result.append(border_condition)
         else:
             raise FileUploadError("Error: Archivo .csv inválido - Border series service")
-    series_file.seek(0)
+
+    if series_file is not None:
+            series_file.seek(0)
     return result
 
 
@@ -211,7 +212,10 @@ def forecast_and_observation_values_exists_json(border_conditions, observation_d
     timeend = end_date + timedelta(1)
 
     if len(border_conditions) > 0:
-        series_id = border_conditions[0].get("series_id")
+        if str(type(border_conditions[0])).__contains__("BorderCondition") :
+            series_id = border_conditions[0].series_id
+        else:
+            series_id = border_conditions[0].get("series_id")
         url = f"{config.ina_url}/sim/calibrados/{calibration_id}/corridas/last?series_id={series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
         response = None
         for i in range(config.max_retries):

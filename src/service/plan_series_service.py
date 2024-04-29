@@ -1,5 +1,7 @@
 import csv
 import io
+
+from src.controller.schemas import PLAN_SERIES_SCHEMA
 from src.persistance.scheduled_task import (
     BorderCondition,
     PlanSeries, ScheduledTask,
@@ -123,7 +125,8 @@ def process_plan_series_csv_file(plan_series_file, scheduled_config_id=None):
                 result.append(plan_series)
         else:
             raise FileUploadError("Error: Archivo .csv inválido - Plan series service")
-    plan_series_file.seek(0)
+    if plan_series_file is not None:
+        plan_series_file.seek(0)
     return result
 
 
@@ -148,6 +151,8 @@ def check_duplicate_output_series_json(plan_series, schedule_config: ScheduledTa
 
     if not plan_series:
         return False, None
+    if str(type(plan_series[0])).__contains__("PlanSeries"):
+        plan_series = PLAN_SERIES_SCHEMA.dump(plan_series,many=True)
     for var in plan_series:
         if (var.get("river"), var.get("reach"), var.get("river_stat")) in dict_plan_series:
             return True, (var.get("river"), var.get("reach"), var.get("river_stat"))
