@@ -14,16 +14,27 @@ from src.service import border_series_service
 from src.service import plan_series_service
 
 
-def create(params, start_condition_type, restart_file_data, project_file_data, plan_file_data):
+def contains_restart_file(objects):
+    for obj in objects:
+        if 'restart_file.rst' == obj['name']:
+            return True
+    return False
+
+
+def create(params, start_condition_type, restart_file_data, project_file_data, plan_file_data, files = []):
     with get_session() as session:
         scheduled_task = ScheduledTask(**params)
         session.add(scheduled_task)
 
         session.commit()
         session.refresh(scheduled_task)
-        if start_condition_type == "restart_file":
+        if start_condition_type == "restart_file" and not contains_restart_file(files):
             save_restart_file(restart_file_data, scheduled_task.id)
-
+        if len(files) > 0:
+            for file in files:
+                name = file["name"]
+                contentB64 = file["content"]
+                file_storage_service.upload_from_base64(scheduled_task.id,name,contentB64)
         project_file_service.process_project_template(
             project_file_data, scheduled_task.id
         )
@@ -280,7 +291,6 @@ def delete_scheduled_task(scheduled_task_id):
         return True
     except Exception as e:
         print("error while deleting scheduled task: " + scheduled_task_id)
-        print(e)
         raise e
 
 

@@ -70,3 +70,4 @@ class UserSchema(Schema):
 
 SCHEDULE_TASK_SCHEMA = ScheduleTaskSchema()
 USER_SCHEMA = UserSchema()
+PLAN_SERIES_SCHEMA = PlanSeriesSchema()

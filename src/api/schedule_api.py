@@ -1,6 +1,6 @@
 from flask import request, jsonify, Blueprint
 
-from src.api.utils import validate_fields
+from src.api.utils import validate_fields, validate_files_for_scheduled_task, send_bad_request, get_file_if_present
 from src.controller.schemas import SCHEDULE_TASK_SCHEMA
 from src.logger import get_logger
 from src.service import schedule_task_service, api_authentication_service, file_storage_service
@@ -22,6 +22,9 @@ def get_scheduled_task(scheduled_task_id):
         if not task:
             raise Exception(f"Scheduled task with id {scheduled_task_id} not found")
         obj = SCHEDULE_TASK_SCHEMA.dump(task)
+        if request.args.get("with_files") == "true":
+            files = file_storage_service.get_scheduled_task_files(scheduled_task_id)
+            obj["files"] = files
         return jsonify(obj)
     except Exception as e:
         logger = get_logger()
@@ -131,7 +134,7 @@ def edit_scheduled_task(scheduled_task_id):
                 calibration_id)
 
             if not exists_forecast_and_observation_values:
-                return send_bad_request(f'The scheduled task could not be created due to the absence of a boundary '
+                return send_bad_request(f'The scheduled task could not be edited due to the absence of a boundary '
                                         f'series in the INA database for the calibration ID {str(calibration_id)} and'
                                         f' series id {params["border_conditions"][0].get("series_id")} ')
 
@@ -199,9 +202,10 @@ def create_scheduled_task():
         required_fields = [
             "frequency", "calibration_id", "calibration_id_for_simulations", "enabled",
             "name", "description", "geometry_id", "start_datetime", "start_condition_type",
-            "observation_days", "forecast_days", "border_conditions", "project_file", "plan_file"
+            "observation_days", "forecast_days", "border_conditions"
         ]
         missing_fields = validate_fields(body, required_fields)
+        missing_fields = validate_files_for_scheduled_task(body, missing_fields)
         enabled = body.get("enabled")
         if missing_fields and (enabled is True):
             return jsonify(
@@ -250,11 +254,12 @@ def create_scheduled_task():
         start_condition_type = body.get("start_condition_type")
         restart_file_data = None if body.get("restart_file") is None else file_storage_service.get_file(
             body.get("restart_file"))
-        project_file_data = file_storage_service.get_file(body.get("project_file"))
-        plan_file_data = file_storage_service.get_file(body.get("plan_file"))
+
+        project_file_data = get_file_if_present(body, "project_file")
+        plan_file_data = get_file_if_present(body, "plan_file")
 
         scheduled_task = schedule_task_service.create(params, start_condition_type, restart_file_data,
-                                                      project_file_data, plan_file_data)
+                                                      project_file_data, plan_file_data, files=body.get("files"))
         return jsonify({"message": "Success at creating scheduled task",
                         "id": scheduled_task.id})
 
@@ -287,7 +292,4 @@ def copy_schedule_task():
         return response
 
 
-def send_bad_request(message):
-    response = jsonify({"message": message})
-    response.status_code = 400
-    return response
+

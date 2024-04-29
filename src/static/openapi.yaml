@@ -29,7 +29,6 @@ paths:
         - name: full_content
           in: query
           required: false
-          default: false
           schema:
             type: boolean
           description: whether the files come with the full content (true) or no (false, default)
@@ -560,77 +559,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                frequency:
-                  type: integer
-                  example: 360
-                calibration_id:
-                  type: integer
-                  example: 5
-                calibration_id_for_simulations:
-                  type: integer
-                  example: 24
-                enabled:
-                  type: boolean
-                  example: true
-                name:
-                  type: string
-                  example: "Paraná"
-                description:
-                  type: string
-                  example: "Corrida periódica del rio Paraná"
-                geometry_id:
-                  type: integer
-                  example: 1
-                start_datetime:
-                  type: string
-                  format: date-time
-                  example: "2021-12-21T00:00:00"
-                start_condition_type:
-                  type: string
-                  enum:
-                    - initial_flows
-                    - restart_file
-                observation_days:
-                  type: integer
-                  example: 5
-                forecast_days:
-                  type: integer
-                  example: 7
-                border_conditions:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/BorderConditionSchema'
-                plan_series_list:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/PlanSeriesSchema'
-                project_file:
-                  type: string
-                  example: "execution-plan/1/1.prj"
-                plan_file:
-                  type: string
-                  example: "execution-plan/1/1.p01"
-                restart_file:
-                  type: string
-                  example: "scheduled-task/1/restart_file.rst"
-              required:
-                - frequency
-                - calibration_id
-                - calibration_id_for_simulations
-                - enabled
-                - name
-                - description
-                - geometry_id
-                - start_datetime
-                - start_condition_type
-                - observation_days
-                - forecast_days
-                - border_conditions
-                - project_file
-                - plan_file
-                - restart_file
+                $ref: '#/components/schemas/CreateScheduledTaskRequest'
       responses:
         '200':
           description: Scheduled task created successfully
@@ -1297,3 +1226,87 @@ components:
         password:
           type: string
           description: New password of the user.
+    CreateScheduledTaskRequest:
+      type: object
+      required:
+        - frequency
+        - calibration_id
+        - calibration_id_for_simulations
+        - enabled
+        - name
+        - description
+        - geometry_id
+        - start_datetime
+        - start_condition_type
+        - observation_days
+        - forecast_days
+        - border_conditions
+      properties:
+        frequency:
+          type: integer
+          example: 360
+        calibration_id:
+          type: integer
+          example: 5
+        calibration_id_for_simulations:
+          type: integer
+          example: 24
+        enabled:
+          type: boolean
+          example: true
+        name:
+          type: string
+          example: "Paraná"
+        description:
+          type: string
+          example: "Corrida periódica del rio Paraná"
+        geometry_id:
+          type: integer
+          example: 1
+        start_datetime:
+          type: string
+          format: date-time
+          example: "2021-12-21T00:00:00"
+        start_condition_type:
+          type: string
+          enum:
+            - initial_flows
+            - restart_file
+        observation_days:
+          type: integer
+          example: 5
+        forecast_days:
+          type: integer
+          example: 7
+        border_conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/BorderConditionSchema'
+        plan_series_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlanSeriesSchema'
+        project_file:
+          type: string
+          example: "execution-plan/1/1.prj"
+          description: The path of the project file to copy.
+        plan_file:
+          type: string
+          example: "execution-plan/1/1.p01"
+          description: The path of the plan file to copy.
+        restart_file:
+          type: string
+          example: "scheduled-task/1/restart_file.rst"
+          description: The path of the restart file to copy.
+        files:
+          type: array
+          description: An array with files encoded in base 64 to that come from a get schedule task output.
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: the name of the file
+              content:
+                type: string
+                description: the base64 string encoded file
