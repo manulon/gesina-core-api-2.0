@@ -1,7 +1,7 @@
 from flask_wtf.file import FileField
 from sqlalchemy import func
 
-from src.persistance.scheduled_task import ScheduledTask, ExecutionPlanScheduleTaskMapping
+from src.persistance.scheduled_task import ScheduledTask, ExecutionPlanScheduleTaskMapping, BorderCondition, PlanSeries
 from src.persistance import User
 from src.persistance.session import get_session
 from src.service import project_file_service, plan_file_service, file_storage_service, execution_plan_service
@@ -310,6 +310,35 @@ def create_copy(name, description, frequency, start_datetime,
                 observation_days, forecast_days, initial_flows,
                 border_conditions, plan_series_list, calibration_id,
                 calibration_id_for_simulations):
+    
+    new_border_conditions = []
+    for bc in border_conditions:
+        new_bc = BorderCondition(
+            scheduled_task_id = bc.scheduled_task_id,
+            river = bc.river,
+            reach = bc.reach,
+            river_stat = bc.river_stat,
+            interval = bc.interval,
+            type = bc.type,
+            series_id = bc.series_id
+        )
+        new_border_conditions.append(new_bc)
+
+
+    new_plan_series_list = []
+    for ps in plan_series_list:
+        new_ps = PlanSeries(
+            river = ps.river,
+            reach = ps.reach,
+            river_stat = ps.river_stat,
+            stage_series_id = ps.stage_series_id,
+            flow_series_id = ps.flow_series_id,
+            scheduled_task_id = ps.scheduled_task_id,
+            stage_datum = ps.stage_datum
+        )
+        new_plan_series_list.append(new_ps)
+
+
     with get_session() as session:
         scheduled_task = ScheduledTask(
             name=name,
@@ -323,8 +352,8 @@ def create_copy(name, description, frequency, start_datetime,
             observation_days=observation_days,
             forecast_days=forecast_days,
             initial_flows=initial_flows,
-            border_conditions=border_conditions,
-            plan_series_list=plan_series_list,
+            border_conditions=new_border_conditions,
+            plan_series_list=new_plan_series_list,
             calibration_id=calibration_id,
             calibration_id_for_simulations=calibration_id_for_simulations
         )
