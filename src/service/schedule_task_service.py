@@ -16,7 +16,7 @@ from src.service import plan_series_service
 
 def contains_restart_file(objects):
     for obj in objects:
-        if 'restart_file.rst' == obj['name']:
+        if 'restart_file.rst' in obj['name']:
             return True
     return False
 
