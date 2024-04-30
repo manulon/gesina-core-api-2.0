@@ -288,14 +288,18 @@ def get_scheduled_task_files(scheduled_task_id, with_content=False):
     executions_files = list_execution_files(FileType.SCHEDULED_TASK, scheduled_task_id)
     files = []
     for file in executions_files:
-        files.append({
-            "name": file.object_name.split("/")[-1],
-            "content": base64.b64encode(get_file(file.object_name).data).decode("ascii")
-        })
+        obj = {
+            "name": file.object_name,
+        }
+
+        if with_content == "true":
+            obj["content"] = base64.b64encode(get_file(file.object_name).data).decode("ascii")
+        files.append(obj)
     return files
 
 
 def upload_from_base64(scheduled_task_id, file_name, file_base64):
     base64_bytes = file_base64.encode("ascii")
     decoded_bytes = base64.b64decode(base64_bytes)
-    return save_file(FileType.SCHEDULED_TASK, decoded_bytes, file_name, scheduled_task_id)
+    name = file_name.split("/")[-1]
+    return save_file(FileType.SCHEDULED_TASK, decoded_bytes, name, scheduled_task_id)

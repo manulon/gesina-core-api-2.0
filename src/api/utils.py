@@ -10,7 +10,7 @@ def validate_fields(body, required_fields):
 
 def validate_files_for_scheduled_task(body, missing_fields):
     files = body.get("files")
-    existing_files = set(obj['name'] for obj in files)
+    existing_files = set(obj['name'].split("/")[-1] for obj in files)
     prj = body.get("project_file")
     plan = body.get("plan_file")
     if prj is None and "prj_template.txt" not in existing_files:

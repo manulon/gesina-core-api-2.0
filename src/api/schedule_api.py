@@ -22,9 +22,9 @@ def get_scheduled_task(scheduled_task_id):
         if not task:
             raise Exception(f"Scheduled task with id {scheduled_task_id} not found")
         obj = SCHEDULE_TASK_SCHEMA.dump(task)
-        if request.args.get("with_files") == "true":
-            files = file_storage_service.get_scheduled_task_files(scheduled_task_id)
-            obj["files"] = files
+
+        files = file_storage_service.get_scheduled_task_files(scheduled_task_id,request.args.get("with_files"))
+        obj["files"] = files
         return jsonify(obj)
     except Exception as e:
         logger = get_logger()
