@@ -38,7 +38,7 @@ def create_geometry():
     
     except Exception as e:
         logger = get_logger()
-        logger.error(e)
+        logger.error(e, exc_info=True)
         response = jsonify({"error": str(e)})
         response.status_code = 400
         return response
@@ -67,7 +67,7 @@ def get_geometry(geometry_id):
     
     except Exception as e:
         logger = get_logger()
-        logger.error(e)
+        logger.error(e, exc_info=True)
         response = jsonify({"error": f"Error while getting geometry: {str(e)}"})
         response.status_code = 400
         return response
@@ -92,7 +92,7 @@ def get_geometries():
     
     except Exception as e:
         logger = get_logger()
-        logger.error(e)
+        logger.error(e, exc_info=True)
         response = jsonify({"error": f"Error while getting geometries: {str(e)}"})
         response.status_code = 400
         return response
@@ -111,7 +111,7 @@ def delete_geometry(geometry_id):
         return response
     except Exception as e:
         logger = get_logger()
-        logger.error(e)
+        logger.error(e, exc_info=True)
         response = jsonify({"message": "error deleting geometry " + geometry_id,
                             "error": str(e)})
         response.status_code = 400
@@ -130,7 +130,7 @@ def edit_geometry(geometry_id):
         return jsonify({"message": f"successfully edited geometry with id: {geometry_id}"})
     except Exception as e:
         logger = get_logger()
-        logger.error(e)
+        logger.error(e, exc_info=True)
         response = jsonify({"message": "error deleting editing plan " + geometry_id,
                             "error": str(e)})
         response.status_code = 400
