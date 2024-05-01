@@ -67,7 +67,16 @@ class UserSchema(Schema):
     admin_role = fields.Bool()
     active = fields.Bool()
 
+class GeometrySchema(Schema):
+    id = fields.Int()
+    name = fields.Str()
+    description = fields.Str()
+    created_at = fields.DateTime("%Y-%m-%dT%H:%M:%S")
+    user_id = fields.Int()
+    active = fields.Bool()
+    user = fields.Str() 
 
 SCHEDULE_TASK_SCHEMA = ScheduleTaskSchema()
 USER_SCHEMA = UserSchema()
 PLAN_SERIES_SCHEMA = PlanSeriesSchema()
+GEOMETRY_SCHEMA = GeometrySchema()
