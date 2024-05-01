@@ -25,16 +25,10 @@ def retrieve_initial_flows_json(initial_flow_file, initial_flow_list, scheduled_
 
 
 def create_initial_flows_from_form(form):
-    if form.start_condition_type.data == "restart_file":
-        # TODO manejar logica para el restart file
-        do = "something"
-
     return retrieve_initial_flows_from_form(form)
 
 
-def create_initial_flows_from_json(start_condition_type, initial_flow_file, initial_flow_list):
-    if start_condition_type == "restart_file":
-        do = "nothing"
+def create_initial_flows_from_json(initial_flow_file, initial_flow_list):
     return retrieve_initial_flows_json(initial_flow_file, initial_flow_list)
 
 

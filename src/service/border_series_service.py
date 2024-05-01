@@ -67,7 +67,6 @@ def update_series_list(session, scheduled_config_id, series):
 
 
 def update_border_condition(condition, new_condition):
-    # TODO validate values
     for key, value in new_condition.items():
         if key in BORDER_SERIES_CSV_HEADERS:
             setattr(condition, key, value)

@@ -247,9 +247,8 @@ def create_scheduled_task():
 
         if body.get("start_condition_type") == "initial_flows":
             if not params["initial_flows"]:
-                return send_bad_request("intial_flows must be set")
-            params["initial_flows"] = create_initial_flows_from_json(body.get("start_condition_type"),
-                                                                     body.get("initial_flow_file"),
+                return send_bad_request("initial_flows must be set")
+            params["initial_flows"] = create_initial_flows_from_json(body.get("initial_flow_file"),
                                                                      body.get("initial_flow_list"))
         start_condition_type = body.get("start_condition_type")
         restart_file_data = None if body.get("restart_file") is None else file_storage_service.get_file(

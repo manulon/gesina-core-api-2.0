@@ -33,7 +33,6 @@ def update_plan_series_list(session, scheduled_config_id, plan_series_list):
 
 
 def update_plan_series(plan, new_plan):
-    # TODO validate values
     for key, value in new_plan.items():
         if key in PLAN_SERIES_CSV_HEADERS:
             setattr(plan, key, value)
