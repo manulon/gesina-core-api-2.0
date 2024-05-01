@@ -12,6 +12,7 @@ from sqlalchemy import and_, func
 
 import io
 
+
 def create_from_form(form):
     plan_name = form.plan_name.data
     geometry_id = form.geometry_option.data
@@ -40,6 +41,7 @@ def create_from_form(form):
         ],
     )
 
+
 def copy_execution_plan(execution_plan_id):
     e = get_execution_plan(execution_plan_id)
     if e is None:
@@ -47,27 +49,34 @@ def copy_execution_plan(execution_plan_id):
     output_list = []
     for output in e.execution_plan_output_list:
         output_list.append(ExecutionPlanOutput(
-                river=output.river,
-                reach=output.reach,
-                river_stat=output.river_stat,
-                stage_datum=output.stage_datum
-            ))
+            river=output.river,
+            reach=output.reach,
+            river_stat=output.river_stat,
+            stage_datum=output.stage_datum
+        ))
     execution_plan = create_copy(e.plan_name, e.geometry, e.user, output_list)
     file_storage_service.copy_execution_files(execution_plan_id, execution_plan.id)
     return execution_plan
 
-def create_from_json(execution_plan, user_id):
-    return create(
-        execution_plan.get('plan_name'),
-        execution_plan.get('geometry_id'),
+
+def create_from_json(body, user_id):
+    files_b64 = False
+    files = body.get("files")
+    if files is not None:
+        files_b64 = True
+    else:
+        files = []
+    exec_plan = create(
+        body.get('plan_name'),
+        body.get('geometry_id'),
         user_id,
-        execution_plan.get('project_file', {}).get('filename'),
-        None if execution_plan.get('project_file', {}).get('data') is None else io.BytesIO(execution_plan.get('project_file', {}).get('data').encode('utf-8')),
-        execution_plan.get('plan_file', {}).get('filename'),
-        None if execution_plan.get('plan_file', {}).get('data') is None else io.BytesIO(execution_plan.get('plan_file', {}).get('data').encode('utf-8')),
-        execution_plan.get('flow_file', {}).get('filename'),
-        None if execution_plan.get('flow_file', {}).get('data') is None else io.BytesIO(execution_plan.get('flow_file', {}).get('data').encode('utf-8')),
-        None if execution_plan.get('restart_file', {}).get('data') is None else io.BytesIO(execution_plan.get('restart_file', {}).get('data').encode('utf-8')),
+        body.get('project_file'),
+        None,
+        body.get('plan_file'),
+        None,
+        body.get('flow_file'),
+        None,
+        None,
         [
             ExecutionPlanOutput(
                 river=d.get("river"),
@@ -75,10 +84,15 @@ def create_from_json(execution_plan, user_id):
                 river_stat=d.get("river_stat"),
                 stage_datum=d.get("stage_datum")
             )
-            for d in execution_plan.get('execution_output_list', [])
+            for d in body.get('execution_output_list', [])
         ],
-        restart_name=execution_plan.get('restart_file', {}).get('filename')
+        body.get('restart_file'),
+        files_b64
     )
+
+    file_storage_service.upload_files_from_base64(files, FileType.EXECUTION_PLAN, exec_plan.id)
+    return exec_plan
+
 
 def create_from_scheduler(
         execution_plan_name,
@@ -130,6 +144,7 @@ def create_from_scheduler(
 
     return execution_plan
 
+
 def create(
         execution_plan_name,
         geometry_id,
@@ -142,7 +157,8 @@ def create(
         flow_file,
         restart_file=None,
         execution_plan_output_list=None,
-        restart_name=None
+        restart_name=None,
+        files_b64=False
 ):
     with get_session() as session:
         execution_plan = ExecutionPlan(
@@ -159,50 +175,52 @@ def create(
 
         file_storage_service.copy_geometry_to(execution_plan_id, geometry.name)
 
-        if project_file is not None:
-            file_storage_service.save_file(
-                FileType.EXECUTION_PLAN,
-                project_file,
-                project_name,
-                execution_plan_id,
-            )
-        else:
-            file_storage_service.copy_execution_file(project_name, execution_plan_id)
+        if not files_b64:
+            if project_file is not None:
+                file_storage_service.save_file(
+                    FileType.EXECUTION_PLAN,
+                    project_file,
+                    project_name,
+                    execution_plan_id,
+                )
+            else:
+                file_storage_service.copy_execution_file(project_name, execution_plan_id)
 
-        if plan_file is not None:
-            file_storage_service.save_file(
-                FileType.EXECUTION_PLAN,
-                plan_file,
-                plan_name,
-                execution_plan_id,
-            )
-        else:
-            file_storage_service.copy_execution_file(plan_name,execution_plan_id)
+            if plan_file is not None:
+                file_storage_service.save_file(
+                    FileType.EXECUTION_PLAN,
+                    plan_file,
+                    plan_name,
+                    execution_plan_id,
+                )
+            else:
+                file_storage_service.copy_execution_file(plan_name, execution_plan_id)
 
-        if flow_file is not None:
-            file_storage_service.save_file(
-                FileType.EXECUTION_PLAN,
-                flow_file,
-                flow_name,
-                execution_plan_id,
-            )
-        else:
-            file_storage_service.copy_execution_file(flow_name,execution_plan_id)
-        restart_file_name = "restart_file.rst"
-        if not isinstance(restart_file, io.BytesIO) and restart_file is not None:
-            restart_file_name = restart_file.filename
+            if flow_file is not None:
+                file_storage_service.save_file(
+                    FileType.EXECUTION_PLAN,
+                    flow_file,
+                    flow_name,
+                    execution_plan_id,
+                )
+            else:
+                file_storage_service.copy_execution_file(flow_name, execution_plan_id)
+            restart_file_name = "restart_file.rst"
+            if not isinstance(restart_file, io.BytesIO) and restart_file is not None:
+                restart_file_name = restart_file.filename
 
-        if restart_file is not None:
-            file_storage_service.save_file(
-                FileType.EXECUTION_PLAN,
-                restart_file,
-                restart_file_name,
-                execution_plan_id,
-            )
-        elif restart_name is not None:
-            file_storage_service.copy_execution_file(restart_name, execution_plan_id, restart_file_name)
+            if restart_file is not None:
+                file_storage_service.save_file(
+                    FileType.EXECUTION_PLAN,
+                    restart_file,
+                    restart_file_name,
+                    execution_plan_id,
+                )
+            elif restart_name is not None:
+                file_storage_service.copy_execution_file(restart_name, execution_plan_id, restart_file_name)
 
         return execution_plan
+
 
 def create_copy(execution_plan_name,
                 geometry_id,
@@ -224,6 +242,7 @@ def create_copy(execution_plan_name,
         file_storage_service.copy_geometry_to(execution_plan_id, geometry.name)
         return execution_plan
 
+
 def delete_execution_plan(execution_plan_id):
     execution_plan = get_execution_plan(execution_plan_id)
     if execution_plan is None:
@@ -232,17 +251,18 @@ def delete_execution_plan(execution_plan_id):
         session.delete(execution_plan)
         session.commit()
     file_storage_service.delete_execution_files(execution_plan_id)
-    return True   
+    return True
+
 
 def get_execution_plans(plan_name=None, user_first_name=None, user_last_name=None, status=None, date_from=None,
-                        date_to=None, reduced = False):
+                        date_to=None, reduced=False):
     execution_plans = []
     with get_session() as session:
 
         query = session.query(ExecutionPlan)
         if reduced:
-            query = query.with_entities(ExecutionPlan.plan_name,ExecutionPlan.id,ExecutionPlan.user_id,
-                                        ExecutionPlan.created_at,ExecutionPlan.status)
+            query = query.with_entities(ExecutionPlan.plan_name, ExecutionPlan.id, ExecutionPlan.user_id,
+                                        ExecutionPlan.created_at, ExecutionPlan.status)
         query = query.order_by(ExecutionPlan.id.desc())
 
         if plan_name is not None:
@@ -266,11 +286,13 @@ def get_execution_plans(plan_name=None, user_first_name=None, user_last_name=Non
 
     return execution_plans
 
+
 def get_execution_plan(execution_plan_id):
     with get_session() as session:
         return (
             session.query(ExecutionPlan).filter_by(id=execution_plan_id).one_or_none()
         )
+
 
 def get_execution_plans_by_dates(date_from, date_to):
     with get_session() as session:
@@ -284,6 +306,7 @@ def get_execution_plans_by_dates(date_from, date_to):
             )
             .all()
         )
+
 
 def get_execution_plans_json(offset=0, limit=9999, date_from=None, date_to=None, user_first_name=None,
                              user_last_name=None, name=None, status=None):
@@ -312,6 +335,7 @@ def get_execution_plans_json(offset=0, limit=9999, date_from=None, date_to=None,
         response_list.append(execution_plan_row)
     return response_list
 
+
 def get_execution_plans_grouped_by_interval(interval):
     with get_session() as session:
         query = f"""SELECT COUNT(*) AS QUANTITY,
@@ -325,12 +349,14 @@ def get_execution_plans_grouped_by_interval(interval):
 
         return session.execute(query)
 
+
 def update_execution_plan_status(execution_plan_id, status: ExecutionPlanStatus):
     execution_plan = get_execution_plan(execution_plan_id)
 
     with get_session() as session:
         session.add(execution_plan)
         execution_plan.status = status
+
 
 def update_finished_execution_plan(execution_plan_id, start_datetime, end_datetime):
     execution_plan = get_execution_plan(execution_plan_id)
@@ -340,6 +366,7 @@ def update_finished_execution_plan(execution_plan_id, start_datetime, end_dateti
         execution_plan.status = ExecutionPlanStatus.FINISHED
         execution_plan.start_datetime = start_datetime
         execution_plan.end_datetime = end_datetime
+
 
 def edit_execution_plan(execution_plan_id, plan_name=None, geometry_id=None, project_file=None, plan_file=None,
                         flow_file=None, restart_file=None, execution_plan_output=None):

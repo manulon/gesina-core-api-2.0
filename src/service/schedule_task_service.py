@@ -1,4 +1,3 @@
-from flask_wtf.file import FileField
 from sqlalchemy import func
 
 from src.persistance.scheduled_task import ScheduledTask, ExecutionPlanScheduleTaskMapping, BorderCondition, PlanSeries, InitialFlow
@@ -30,11 +29,9 @@ def create(params, start_condition_type, restart_file_data, project_file_data, p
         session.refresh(scheduled_task)
         if start_condition_type == "restart_file" and not contains_restart_file(files):
             save_restart_file(restart_file_data, scheduled_task.id)
-        if len(files) > 0:
-            for file in files:
-                name = file["name"]
-                contentB64 = file["content"]
-                file_storage_service.upload_from_base64(scheduled_task.id,name,contentB64)
+
+        file_storage_service.upload_files_from_base64(files,FileType.SCHEDULED_TASK,scheduled_task.id)
+
         project_file_service.process_project_template(
             project_file_data, scheduled_task.id
         )

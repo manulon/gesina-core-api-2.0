@@ -846,7 +846,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ExecutionPlanOutput'
-        execution_files:
+        files:
           type: array
           items:
             type: object
@@ -879,17 +879,30 @@ components:
         geometry_id:
           type: integer
         project_file:
-          $ref: '#/components/schemas/FileInput'
+          type: String
+          description: the minio path to the file to copy.
         plan_file:
-          $ref: '#/components/schemas/FileInput'
+          description: the minio path to the file to copy.
         flow_file:
-          $ref: '#/components/schemas/FileInput'
+          description: the minio path to the file to copy.
         restart_file:
-          $ref: '#/components/schemas/FileInput'
+          description: the minio path to the file to copy.
         execution_output_list:
           type: array
           items:
             $ref: '#/components/schemas/ExecutionPlanOutput'
+        files:
+          type: array
+          description: An array with files encoded in base 64 that come from a get schedule task output.
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: the name of the file
+              content:
+                type: string
+                description: the base64 string encoded file
       required:
         - plan_name
         - geometry_id
@@ -1300,7 +1313,7 @@ components:
           description: The path of the restart file to copy.
         files:
           type: array
-          description: An array with files encoded in base 64 to that come from a get schedule task output.
+          description: An array with files encoded in base 64 that come from a get schedule task output.
           items:
             type: object
             properties:

@@ -75,7 +75,7 @@ def save_file(file_type, file, filename, _id=None):
     if isinstance(file, io.BytesIO):
         data = file
         lent = len(data.getvalue())
-    elif isinstance(file,bytes):
+    elif isinstance(file, bytes):
         data = io.BytesIO(file)
         lent = len(file)
     else:
@@ -97,7 +97,7 @@ def save_file(file_type, file, filename, _id=None):
         return minio_path
     except Exception as exception:
         error_message = "Error uploading file"
-        get_logger().error(exception,exc_info=True)
+        get_logger().error(exception, exc_info=True)
         raise FileUploadError(error_message)
 
 
@@ -284,22 +284,32 @@ def delete_scheduled_task(scheduled_task_id):
         raise Exception(error_message) from e
 
 
-def get_scheduled_task_files(scheduled_task_id, with_content=False):
-    executions_files = list_execution_files(FileType.SCHEDULED_TASK, scheduled_task_id)
+def get_files_for_id(file_type, id, with_content=False):
+    executions_files = list_execution_files(file_type, id)
     files = []
     for file in executions_files:
-        obj = {
-            "name": file.object_name,
-        }
+        if ".g01" not in file.object_name:  # filtro archivos de geometria
+            obj = {
+                "name": file.object_name,
+            }
 
-        if with_content == "true":
-            obj["content"] = base64.b64encode(get_file(file.object_name).data).decode("ascii")
-        files.append(obj)
+            if with_content == "true":
+                obj["content"] = base64.b64encode(get_file(file.object_name).data).decode("ascii")
+            files.append(obj)
     return files
 
 
-def upload_from_base64(scheduled_task_id, file_name, file_base64):
+def upload_from_base64(file_type: FileType, id, file_name, file_base64):
     base64_bytes = file_base64.encode("ascii")
     decoded_bytes = base64.b64decode(base64_bytes)
     name = file_name.split("/")[-1]
-    return save_file(FileType.SCHEDULED_TASK, decoded_bytes, name, scheduled_task_id)
+    return save_file(file_type, decoded_bytes, name, id)
+
+
+def upload_files_from_base64(files, file_type: FileType, id):
+    if len(files) > 0:
+        for file in files:
+            name = file.get("name")
+            contentB64 = file.get("content")
+            if contentB64:
+                upload_from_base64(file_type, id, name, contentB64)
