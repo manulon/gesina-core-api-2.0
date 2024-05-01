@@ -3,6 +3,7 @@ import io
 from flask import request, jsonify, Blueprint
 
 from src import logger
+from src.logger import get_logger
 from src.exception.delete_geometry_exception import GeometryInUseException
 from src.persistance.geometry import Geometry
 from src.service import (
@@ -36,6 +37,7 @@ def create_geometry():
         return { "file": geometry.name , "id": geometry.id}
     
     except Exception as e:
+        logger = get_logger()
         logger.error(e)
         response = jsonify({"error": str(e)})
         response.status_code = 400
@@ -64,6 +66,7 @@ def get_geometry(geometry_id):
         return response
     
     except Exception as e:
+        logger = get_logger()
         logger.error(e)
         response = jsonify({"error": f"Error while getting geometry: {str(e)}"})
         response.status_code = 400
@@ -88,6 +91,7 @@ def get_geometries():
         return response
     
     except Exception as e:
+        logger = get_logger()
         logger.error(e)
         response = jsonify({"error": f"Error while getting geometries: {str(e)}"})
         response.status_code = 400
@@ -106,6 +110,7 @@ def delete_geometry(geometry_id):
         response.status_code = dge.status_code
         return response
     except Exception as e:
+        logger = get_logger()
         logger.error(e)
         response = jsonify({"message": "error deleting geometry " + geometry_id,
                             "error": str(e)})
@@ -124,6 +129,7 @@ def edit_geometry(geometry_id):
         )
         return jsonify({"message": f"successfully edited geometry with id: {geometry_id}"})
     except Exception as e:
+        logger = get_logger()
         logger.error(e)
         response = jsonify({"message": "error deleting editing plan " + geometry_id,
                             "error": str(e)})
