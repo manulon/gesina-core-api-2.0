@@ -65,7 +65,7 @@ def create_execution_plan():
                 {"error": "Missing required fields for execution plan", "missing": missing_fields}), 400
         execution_plan = execution_plan_service.create_from_json(body,
                                                                  api_authentication_service.get_current_user_id())
-        return {"new_execution_plan_id": execution_plan.id}
+        return {"id": execution_plan.id}
     except Exception as e:
         get_logger().error(e,exc_info=True)
         response = jsonify({"error": str(e)})
