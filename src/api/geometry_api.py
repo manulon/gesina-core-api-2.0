@@ -78,7 +78,7 @@ def get_geometries():
         geometries = geometry_service.get_geometries()
 
         if geometries is None:
-            response = jsonify({"error": f"There are no geometries available"})
+            response = jsonify({"error": "There are no geometries available"})
             response.status_code = 404
             return response
 
