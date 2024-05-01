@@ -1,7 +1,7 @@
 from flask_wtf.file import FileField
 from sqlalchemy import func
 
-from src.persistance.scheduled_task import ScheduledTask, ExecutionPlanScheduleTaskMapping, BorderCondition, PlanSeries
+from src.persistance.scheduled_task import ScheduledTask, ExecutionPlanScheduleTaskMapping, BorderCondition, PlanSeries, InitialFlow
 from src.persistance import User
 from src.persistance.session import get_session
 from src.service import project_file_service, plan_file_service, file_storage_service, execution_plan_service
@@ -314,7 +314,6 @@ def create_copy(name, description, frequency, start_datetime,
     new_border_conditions = []
     for bc in border_conditions:
         new_bc = BorderCondition(
-            scheduled_task_id = bc.scheduled_task_id,
             river = bc.river,
             reach = bc.reach,
             river_stat = bc.river_stat,
@@ -333,11 +332,19 @@ def create_copy(name, description, frequency, start_datetime,
             river_stat = ps.river_stat,
             stage_series_id = ps.stage_series_id,
             flow_series_id = ps.flow_series_id,
-            scheduled_task_id = ps.scheduled_task_id,
             stage_datum = ps.stage_datum
         )
         new_plan_series_list.append(new_ps)
 
+    new_initial_flows = []
+    for inf in initial_flows:
+        new_if = InitialFlow(
+            river = inf.river,
+            reach = inf.reach,
+            river_stat = inf.river_stat,
+            flow = inf.flow
+        )
+        new_initial_flows.append(new_if)
 
     with get_session() as session:
         scheduled_task = ScheduledTask(
@@ -351,7 +358,7 @@ def create_copy(name, description, frequency, start_datetime,
             start_condition_type=start_condition_type,
             observation_days=observation_days,
             forecast_days=forecast_days,
-            initial_flows=initial_flows,
+            initial_flows=new_initial_flows,
             border_conditions=new_border_conditions,
             plan_series_list=new_plan_series_list,
             calibration_id=calibration_id,
