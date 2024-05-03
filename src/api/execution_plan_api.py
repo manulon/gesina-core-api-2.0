@@ -164,6 +164,20 @@ def execute_plan(execution_id):
                             "error": str(e)})
         response.status_code = 400
         return response
+    
+@EXECUTION_PLAN_API_BLUEPRINT.post("/cancel/<execution_id>")
+def cancel_execution_plan(execution_id):
+    from src.tasks import cancel_simulation
+
+    try:
+        cancel_simulation(execution_id)
+        return get_execution_plan(execution_id)
+    except Exception as e:
+        logger.error(e)
+        response = jsonify({"message": "error while cancelling execution plan " + execution_id,
+                            "error": str(e)})
+        response.status_code = 400
+        return response
 
 
 @EXECUTION_PLAN_API_BLUEPRINT.get("/files/<execution_plan_id>")
