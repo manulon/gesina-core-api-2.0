@@ -198,7 +198,7 @@ def queue_or_fake_simulate(execution_id, calibration_id_for_simulations=None):
 
 
 def cancel_simulation(execution_id):
-    win_logger = get_logger(execution_id)
+    from src import logger
 
     execution_plan = execution_plan_service.get_execution_plan(execution_id)
 
@@ -207,12 +207,12 @@ def cancel_simulation(execution_id):
         execution_plan_service.update_execution_plan_status(
             execution_id, ExecutionPlanStatus.CANCELED
         )
-        win_logger.info(f"status: PENDING - Canceled simulation with execution id: {execution_id}")
+        logger.info(f"status: PENDING - Canceled simulation with execution id: {execution_id}")
 
     else: 
 
         task_id = execution_task_service.get_task_id_by_execution_id(execution_id)
-        win_logger.info(f"status: RUNNING - TASK ID to be canceled: {task_id}")
+        logger.info(f"status: RUNNING - TASK ID to be canceled: {task_id}")
         
         if task_id is not None:
             try:
@@ -220,11 +220,11 @@ def cancel_simulation(execution_id):
                 execution_plan_service.update_execution_plan_status(
                     execution_id, ExecutionPlanStatus.CANCELED
                 )
-                win_logger.info(f"status: CANCELED - Canceled simulation with execution id: {execution_id}")
+                logger.info(f"status: CANCELED - Canceled simulation with execution id: {execution_id}")
             except NotImplementedError as e:
                 print(f"Termination requested")
         else:
-           win_logger.info(f"No task found for execution id: {execution_id}")
+           logger.info(f"No task found for execution id: {execution_id}")
 
         return
         
