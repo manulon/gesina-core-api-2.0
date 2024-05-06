@@ -1,9 +1,8 @@
 import csv
 import io
 
-from src.controller.schemas import PLAN_SERIES_SCHEMA
+from src.persistance.schemas import PLAN_SERIES_SCHEMA
 from src.persistance.scheduled_task import (
-    BorderCondition,
     PlanSeries, ScheduledTask,
 )
 from src.persistance.session import get_session

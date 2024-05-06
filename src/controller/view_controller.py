@@ -2,7 +2,7 @@ import sqlalchemy
 from flask import Blueprint, render_template, url_for, redirect, request, jsonify
 
 from src import logger
-from src.controller.schemas import ActivityParams
+from src.persistance.schemas import ActivityParams
 from src.login_manager import user_is_authenticated
 from src.service import (
     geometry_service,

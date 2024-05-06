@@ -1,10 +1,10 @@
 from io import BytesIO
 
-from flask import Blueprint, jsonify, send_file, request
+from flask import Blueprint, jsonify, send_file
 
 from src.login_manager import user_is_authenticated
 from src.service import schedule_task_service, list_utils_service, file_storage_service, user_service
-from src.controller.schemas import SCHEDULE_TASK_SCHEMA
+from src.persistance.schemas import SCHEDULE_TASK_SCHEMA
 from src.service.file_storage_service import FileType
 
 SCHEDULE_TASK_BLUEPRINT = Blueprint("schedule_controller", __name__)

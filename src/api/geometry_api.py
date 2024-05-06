@@ -1,18 +1,12 @@
-import io
-
 from flask import request, jsonify, Blueprint
 
-from src import logger
 from src.logger import get_logger
 from src.exception.delete_geometry_exception import GeometryInUseException
-from src.persistance.geometry import Geometry
 from src.service import (
     geometry_service,
-    file_storage_service,
     api_authentication_service
 )
-from src.service.file_storage_service import FileType
-from src.controller.schemas import GEOMETRY_SCHEMA
+from src.persistance.schemas import GEOMETRY_SCHEMA
 
 GEOMETRY_API_BLUEPRINT = Blueprint("geometry", __name__, url_prefix="/geometry")
 

@@ -1,6 +1,6 @@
-from flask import Blueprint, jsonify, redirect, url_for, request, render_template
+from flask import Blueprint, jsonify, redirect, url_for, render_template
 
-from src.controller.schemas import USER_SCHEMA
+from src.persistance.schemas import USER_SCHEMA
 from src.login_manager import user_is_authenticated
 from src.service import user_service
 from src.view.forms.users_forms import EditUserForm, RegisterForm
