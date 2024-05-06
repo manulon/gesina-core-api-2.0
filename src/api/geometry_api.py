@@ -10,6 +10,7 @@ from src.persistance.schemas import GEOMETRY_SCHEMA
 
 GEOMETRY_API_BLUEPRINT = Blueprint("geometry", __name__, url_prefix="/geometry")
 
+
 @GEOMETRY_API_BLUEPRINT.post("/")
 def create_geometry():
     try:
@@ -27,15 +28,16 @@ def create_geometry():
             "Creada usando API",
             api_authentication_service.get_current_user()
         )
-        
-        return { "file": geometry.name , "id": geometry.id}
-    
+
+        return {"file": geometry.name, "id": geometry.id}
+
     except Exception as e:
         logger = get_logger()
         logger.error(e, exc_info=True)
         response = jsonify({"error": str(e)})
         response.status_code = 400
         return response
+
 
 @GEOMETRY_API_BLUEPRINT.get("/<geometry_id>")
 def get_geometry(geometry_id):
@@ -45,7 +47,7 @@ def get_geometry(geometry_id):
             response = jsonify({"error": f"Geometry {geometry_id} does not exist"})
             response.status_code = 404
             return response
-                        
+
         geometry_dict = {
             "id": geometry.id,
             "name": geometry.name,
@@ -58,14 +60,15 @@ def get_geometry(geometry_id):
         response = jsonify(geometry_dict)
         response.status_code = 200
         return response
-    
+
     except Exception as e:
         logger = get_logger()
         logger.error(e, exc_info=True)
         response = jsonify({"error": f"Error while getting geometry: {str(e)}"})
         response.status_code = 400
         return response
-    
+
+
 @GEOMETRY_API_BLUEPRINT.get("/all")
 def get_geometries():
     try:
@@ -83,14 +86,15 @@ def get_geometries():
         )
         response.status_code = 200
         return response
-    
+
     except Exception as e:
         logger = get_logger()
         logger.error(e, exc_info=True)
         response = jsonify({"error": f"Error while getting geometries: {str(e)}"})
         response.status_code = 400
         return response
-    
+
+
 @GEOMETRY_API_BLUEPRINT.delete("/<geometry_id>")
 def delete_geometry(geometry_id):
     try:
@@ -99,7 +103,8 @@ def delete_geometry(geometry_id):
         response.status_code = 200
         return response
     except GeometryInUseException as dge:
-        logger.error(dge)
+        logger = get_logger()
+        logger.error(dge, exc_info=True)
         response = jsonify({"message": str(dge)})
         response.status_code = dge.status_code
         return response
@@ -110,7 +115,8 @@ def delete_geometry(geometry_id):
                             "error": str(e)})
         response.status_code = 400
         return response
-    
+
+
 @GEOMETRY_API_BLUEPRINT.patch("/<geometry_id>")
 def edit_geometry(geometry_id):
     try:
@@ -118,7 +124,7 @@ def edit_geometry(geometry_id):
         description = body.get("description")
 
         geometry_service.edit_geometry(
-            geometry_id, 
+            geometry_id,
             description
         )
         return jsonify({"message": f"successfully edited geometry with id: {geometry_id}"})
@@ -129,5 +135,3 @@ def edit_geometry(geometry_id):
                             "error": str(e)})
         response.status_code = 400
         return response
-    
-    
