@@ -1,7 +1,7 @@
 from flask import request, jsonify, Blueprint
 
 from src.api.utils import validate_fields, validate_files_for_scheduled_task, send_bad_request, get_file_if_present
-from src.controller.schemas import SCHEDULE_TASK_SCHEMA
+from src.persistance.schemas import SCHEDULE_TASK_SCHEMA
 from src.logger import get_logger
 from src.service import schedule_task_service, api_authentication_service, file_storage_service
 from src.service.border_series_service import forecast_and_observation_values_exists_json, retrieve_series_json
