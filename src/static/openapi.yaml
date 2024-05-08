@@ -82,6 +82,32 @@ paths:
           description: Successfully edited the execution plan.
         '400':
           description: Error occurred while editing the execution plan.
+  /execution_plan/cancel/{execution_plan_id}:
+    post:
+      summary: Cancel an execution plan execution
+      operationId: cancelExecutionPlan
+      tags:
+        - Execution Plan
+      parameters:
+        - name: execution_plan_id
+          in: path
+          description: ID of the execution plan to cancel
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionPlan'
+        '400':
+          description: Error cancelling execution plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /execution_plan/copy:
     post:
@@ -368,7 +394,34 @@ paths:
           description: Geometry not found
         '500':
           description: Internal server error
-
+  /geometry/all:
+    get:
+      summary: Get all geometries
+      operationId: getAllGeometries
+      tags:
+        - Geometry
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Geometry'
+        '404':
+          description: No geometries available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Error getting geometries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
   /schedule_task/{scheduled_task_id}:
     get:
       tags:
@@ -1329,3 +1382,10 @@ components:
               content:
                 type: string
                 description: the base64 string encoded file
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        error:
+          type: string
