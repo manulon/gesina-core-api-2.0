@@ -394,7 +394,34 @@ paths:
           description: Geometry not found
         '500':
           description: Internal server error
-
+  /geometry/all:
+    get:
+      summary: Get all geometries
+      operationId: getAllGeometries
+      tags:
+        - Geometry
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Geometry'
+        '404':
+          description: No geometries available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Error getting geometries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+                
   /schedule_task/{scheduled_task_id}:
     get:
       tags:
