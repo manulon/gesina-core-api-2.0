@@ -288,7 +288,7 @@ def get_files_for_id(file_type, id, with_content=False):
     executions_files = list_execution_files(file_type, id)
     files = []
     for file in executions_files:
-        if ".g01" not in file.object_name:  # filtro archivos de geometria
+        if ".g" not in file.object_name:  # filtro archivos de geometria
             obj = {
                 "name": file.object_name,
             }

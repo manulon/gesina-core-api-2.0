@@ -62,13 +62,16 @@ def copy_execution_plan(execution_plan_id):
 def create_from_json(body, user_id):
     files_b64 = False
     files = body.get("files")
+    geometry_id = body.get("geometry_id")
+    if not geometry_service.get_geometry(geometry_id):
+        raise Exception(f"Geometry with id {geometry_id} not found")
     if files is not None:
         files_b64 = True
     else:
         files = []
     exec_plan = create(
         body.get('plan_name'),
-        body.get('geometry_id'),
+        geometry_id,
         user_id,
         body.get('project_file'),
         None,
