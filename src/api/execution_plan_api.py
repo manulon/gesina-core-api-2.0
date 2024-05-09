@@ -1,5 +1,3 @@
-import io
-
 from flask import request, jsonify, Blueprint
 
 from src import logger
