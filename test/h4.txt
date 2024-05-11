@@ -1,0 +1,7 @@
+1,Cocinar
+2,primeros Auxilios
+3,Meteorología
+4,biología
+5,pilotear helicoptero
+6,comunicaciones
+7,mecanica
