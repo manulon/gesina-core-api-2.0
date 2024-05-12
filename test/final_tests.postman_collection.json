@@ -442,7 +442,7 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "./test/h4.txt"
+									"src": "./h4.txt"
 								}
 							]
 						},
