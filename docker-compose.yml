@@ -66,7 +66,7 @@ services:
       context: .
       dockerfile: test/Dockerfile
     entrypoint: newman
-    command: run gesina_api.postman_collection.json  --environment=testing.postman_environment.json --env-var="BaseUrl=http://web:5001" --reporters cli
+    command: run final_tests.postman_collection.json  --environment=testing.postman_environment.json --env-var="BaseUrl=http://localhost:5001" --reporters cli #(replace 'localhost' with IP Addr)
     depends_on:
       - web
 volumes:
