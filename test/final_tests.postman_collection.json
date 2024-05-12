@@ -410,7 +410,7 @@
 									"    postman.clearEnvironmentVariable('geometryID');",
 									"    postman.setEnvironmentVariable('geometryID', responseJson.id);",
 									"    pm.expect(responseJson.file).to.be.a('string');",
-									"    pm.expect(responseJson.file).to.eql('h4.txt');",
+									"    pm.expect(responseJson.file).to.eql('DeltaParana_2016.g23');",
 									"});"
 								],
 								"type": "text/javascript",
@@ -442,7 +442,7 @@
 								{
 									"key": "file",
 									"type": "file",
-									"src": "./h4.txt"
+									"src": "./DeltaParana_2016.g23"
 								}
 							]
 						},
