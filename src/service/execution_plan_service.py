@@ -55,26 +55,29 @@ def copy_execution_plan(execution_plan_id):
             stage_datum=output.stage_datum
         ))
     execution_plan = create_copy(e.plan_name, e.geometry, e.user, output_list)
-    file_storage_service.copy_execution_files(execution_plan_id, execution_plan.id)
+    file_storage_service.copy_execution_files(FileType.EXECUTION_PLAN, execution_plan_id, execution_plan.id)
     return execution_plan
 
 
 def create_from_json(body, user_id):
     files_b64 = False
     files = body.get("files")
+    geometry_id = body.get("geometry_id")
+    if not geometry_service.get_geometry(geometry_id):
+        raise Exception(f"Geometry with id {geometry_id} not found")
     if files is not None:
         files_b64 = True
     else:
         files = []
     exec_plan = create(
         body.get('plan_name'),
-        body.get('geometry_id'),
+        geometry_id,
         user_id,
-        body.get('project_file'),
         None,
-        body.get('plan_file'),
         None,
-        body.get('flow_file'),
+        None,
+        None,
+        None,
         None,
         None,
         [
@@ -90,7 +93,7 @@ def create_from_json(body, user_id):
         files_b64
     )
 
-    file_storage_service.upload_files_from_base64(files, FileType.EXECUTION_PLAN, exec_plan.id)
+    file_storage_service.upload_files_from_array(files, FileType.EXECUTION_PLAN, exec_plan.id)
     return exec_plan
 
 
@@ -324,6 +327,7 @@ def get_execution_plans_json(offset=0, limit=9999, date_from=None, date_to=None,
                 FileType.EXECUTION_PLAN, execution_plan.id
             )
         ]
+        execution_files = file_storage_service.get_files_for_id(FileType.EXECUTION_PLAN, execution_plan.id, False)
         execution_plan_row = {
             "id": execution_plan.id,
             "plan_name": execution_plan.plan_name,

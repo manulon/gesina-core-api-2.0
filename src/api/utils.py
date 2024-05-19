@@ -1,3 +1,5 @@
+import re
+
 from flask import jsonify
 
 from src.service import file_storage_service
@@ -8,14 +10,33 @@ def validate_fields(body, required_fields):
     return missing_fields
 
 
+def get_hecras_file_type(filename):
+    if 'plan_template' in filename:
+        return "plan_file"
+    if "prj_template" in filename:
+        return 'project_file'
+    patterns = {
+        "plan_file": r'^.+\.p\d{2}$',
+        "flow_file": r'^.+\.(u|f|q)\d{2}$',
+        "project_file": r'^.+\.prj$',
+        "restart_file": r'^.+\.rst$'
+    }
+    for file_type, pattern in patterns.items():
+        regex = re.compile(pattern)
+        if regex.match(filename):
+            return file_type
+
+    return None
+
 def validate_files_for_scheduled_task(body, missing_fields):
     files = body.get("files")
-    existing_files = set(obj['name'].split("/")[-1] for obj in files)
-    prj = body.get("project_file")
-    plan = body.get("plan_file")
-    if prj is None and "prj_template.txt" not in existing_files:
+    try:
+        existing_files = set(obj['type'] for obj in files)
+    except KeyError as e:
+        raise Exception("type is a mandatory field for each file")
+    if "project_file" not in existing_files:
         missing_fields.append("project file")
-    if plan is None and "plan_template.txt" not in existing_files:
+    if "plan_file" not in existing_files:
         missing_fields.append("plan file")
     return missing_fields
 
