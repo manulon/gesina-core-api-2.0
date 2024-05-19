@@ -20,28 +20,30 @@ from src.service.exception.activity_exception import (
 
 
 def handle_activity_dates(date_from_param, date_to_param):
-    if date_from_param and date_to_param:
-        date_from = datetime.strptime(date_from_param, "%d/%m/%Y").date()
-        date_to = datetime.strptime(date_to_param, "%d/%m/%Y").date()
-        if date_from > date_to:
-            raise ActivityInvalidDates("Fecha desde no puede ser mayor a fecha hasta.")
-        if (date_to - date_from).days > 30:
-            raise ActivityMaxDaysReached("La longitud máxima de días es de 30")
-    elif date_from_param and not date_to_param:
-        date_from = datetime.strptime(date_from_param, "%d/%m/%Y").date()
-        date_to = date_from + timedelta(weeks=1)
-        date_to = (datetime.now() + timedelta(days=1)).date() if date_to > datetime.now().date() else date_to
-    elif not date_from_param and date_to_param:
-        date_to = datetime.strptime(date_to_param, "%d/%m/%Y").date()
-        date_from = date_to - timedelta(weeks=1)
-        if date_to > datetime.now().date():
+    try:
+        if date_from_param and date_to_param:
+            date_from = datetime.strptime(date_from_param, "%d/%m/%Y").date()
+            date_to = datetime.strptime(date_to_param, "%d/%m/%Y").date()
+            if date_from > date_to:
+                raise ActivityInvalidDates("Fecha desde no puede ser mayor a fecha hasta.")
+            if (date_to - date_from).days > 30:
+                raise ActivityMaxDaysReached("La longitud máxima de días es de 30")
+        elif date_from_param and not date_to_param:
+            date_from = datetime.strptime(date_from_param, "%d/%m/%Y").date()
+            date_to = date_from + timedelta(weeks=1)
+            date_to = (datetime.now() + timedelta(days=1)).date() if date_to > datetime.now().date() else date_to
+        elif not date_from_param and date_to_param:
+            date_to = datetime.strptime(date_to_param, "%d/%m/%Y").date()
+            date_from = date_to - timedelta(weeks=1)
+            if date_to > datetime.now().date():
+                date_to = (datetime.now() - timedelta(days=1)).date()
+        else:
+            date_from = (datetime.now() - timedelta(weeks=1)).date()
             date_to = (datetime.now() - timedelta(days=1)).date()
-    else:
-        date_from = (datetime.now() - timedelta(weeks=1)).date()
-        date_to = (datetime.now() - timedelta(days=1)).date()
 
-    return date_from, date_to
-
+        return date_from, date_to
+    except ValueError:
+        raise ValueError("Las fechas deben estar en formato dd/mm/yyyy")
 
 def get_activity(activity_params):
     plt.close("all")

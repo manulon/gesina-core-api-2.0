@@ -881,6 +881,108 @@ paths:
                   error:
                     type: string
 
+  /activity/success_percentage:
+    get:
+      summary: Retrieve success percentage data.
+      parameters:
+        - name: date_from
+          in: query
+          description: Start date for activity data.
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          description: End date for activity data.
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    Label:
+                      type: string
+                    Value:
+                      type: integer
+          examples:
+            Success:
+              summary: Successful response example
+              value:
+                - Label: "Label 1"
+                  Value: 80
+                - Label: "Label 2"
+                  Value: 90
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+      tags:
+        - Activity
+  /activity/average_time_execution:
+    get:
+      summary: Retrieve average time execution data.
+      tags:
+        - Activity
+      parameters:
+        - name: date_from
+          in: query
+          description: Start date for execution time data.
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          description: End date for execution time data.
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    Label:
+                      type: string
+                    Value:
+                      type: integer
+          examples:
+            Success:
+              summary: Successful response example
+              value:
+                - Label: "Label 1"
+                  Value: 1000
+                - Label: "Label 2"
+                  Value: 2000
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
 components:
   securitySchemes:
     basicAuth: # Name of the security scheme
