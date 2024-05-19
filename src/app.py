@@ -12,6 +12,7 @@ from src.api.execution_plan_api import EXECUTION_PLAN_API_BLUEPRINT
 from src.api.geometry_api import GEOMETRY_API_BLUEPRINT
 from src.api.schedule_api import SCHEDULE_API_BLUEPRINT
 from src.api.user_api import USER_API_BLUEPRINT
+from src.api.activity_api import ACTIVITY_API_BLUEPRINT
 from src.encoders import CustomJSONEncoder
 from src.translations import gettext, pretty_date
 
@@ -34,6 +35,7 @@ API_BLUEPRINT.register_blueprint(EXECUTION_PLAN_API_BLUEPRINT)
 API_BLUEPRINT.register_blueprint(GEOMETRY_API_BLUEPRINT)
 API_BLUEPRINT.register_blueprint(SCHEDULE_API_BLUEPRINT)
 API_BLUEPRINT.register_blueprint(USER_API_BLUEPRINT)
+API_BLUEPRINT.register_blueprint(ACTIVITY_API_BLUEPRINT)
 app.register_blueprint(API_BLUEPRINT)
 
 app.jinja_env.globals.update(gettext=gettext)
