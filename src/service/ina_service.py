@@ -5,11 +5,13 @@ import logging
 import requests
 import pandas as pd
 from datetime import timedelta, datetime
+from pytz import utc
+import dateutil.parser
 
 from src import config, logger
 
 
-def obtain_obeservations_for_stations(stations, timestart, timeend):
+def obtain_observations_for_stations(stations, timestart, timeend):
     dfs = []
     for index, row in stations.T.iteritems():
         id_serie = row["series_id"]
@@ -123,8 +125,8 @@ def C_corr_ultimas(id_Mod, corrida_id, est_id):
 
 
 def obtain_curated_series(series_id, calibration_id, timestart, timeend):
-    format_time = lambda d: d.strftime("%Y-%m-%d")
-    timestart = timestart - timedelta(1)
+    format_time = lambda d: d.replace(hour=0,minute=0,second=0,microsecond=0).astimezone(utc).isoformat()[0:19] + ".000Z" # .strftime("%Y-%m-%dT03:00:00.000Z")
+    # timestart = timestart - timedelta(1)
     timeend = timeend + timedelta(1)
 
     url = f"{config.ina_url}/sim/calibrados/{calibration_id}/corridas/last?series_id={series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
@@ -147,8 +149,11 @@ def obtain_curated_series(series_id, calibration_id, timestart, timeend):
         f"Obtained {len(data)} values. First value is from {data[0][0]}. Last value is from {data[-1][0]}"
     )
 
-    return [round(float(i[2]), 3) for i in data]
-
+    return {
+        "values": [round(float(i[2]), 3) for i in data],
+        "timestart": dateutil.parser.isoparse(data[0][0]),
+        "timeend": dateutil.parser.isoparse(data[-1][0])
+    }
 
 def send_info_to_ina(
     forecast_date, dates, values, series_id, calibration_id_for_simulations, win_logger

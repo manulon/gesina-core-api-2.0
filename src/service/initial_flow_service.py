@@ -3,6 +3,7 @@ import io
 from src.persistance.scheduled_task import (
     InitialFlow,
 )
+from src.persistance.session import get_session
 from src.service import file_storage_service
 from src.service.exception.file_exception import FileUploadError
 
@@ -24,16 +25,11 @@ def retrieve_initial_flows_json(initial_flow_file, initial_flow_list, scheduled_
 
 
 def create_initial_flows_from_form(form):
-    if form.start_condition_type.data == "restart_file":
-        # TODO manejar logica para el restart file
-        do = "something"
-
     return retrieve_initial_flows_from_form(form)
 
-def create_initial_flows_from_json(start_condition_type,initial_flow_file,initial_flow_list):
-    if start_condition_type == "restart_file":
-        do = "nothing"
-    return retrieve_initial_flows_json(initial_flow_file,initial_flow_list)
+
+def create_initial_flows_from_json(initial_flow_file, initial_flow_list):
+    return retrieve_initial_flows_json(initial_flow_file, initial_flow_list)
 
 
 def update_initial_flows(session, scheduled_config_id, initial_flows):
@@ -41,11 +37,13 @@ def update_initial_flows(session, scheduled_config_id, initial_flows):
     for each_initial_flow in initial_flows:
         session.add(each_initial_flow)
 
+
 def update_initial_flow(initial_flow, new_initial_flow):
-    #TODO validate values
+    # TODO validate values
     for key, value in new_initial_flow.items():
         if key in INITIAL_FLOW_CSV_HEADER:
             setattr(initial_flow, key, value)
+
 
 def process_initial_flows_form(initial_flow_list, scheduled_config_id=None):
     result = []
@@ -66,31 +64,6 @@ def process_initial_flows_form(initial_flow_list, scheduled_config_id=None):
                 flow=each_initial_flow.flow.data,
             )
         result.append(initial_flow)
-    return result
-
-def process_initial_flows_json(initial_flow_list, scheduled_config_id=None):
-    print("creando inital flows")
-    print(f"initial_flow_list {initial_flow_list}")
-    result = []
-    for each_initial_flow in initial_flow_list:
-        if scheduled_config_id:
-            initial_flow = InitialFlow(
-                scheduled_task_id=scheduled_config_id,
-                river=each_initial_flow.get("river"),
-                reach=each_initial_flow.get("reach"),
-                river_stat=each_initial_flow.get("river_stat"),
-                flow=each_initial_flow.get("flow"),
-            )
-        else:
-            initial_flow = InitialFlow(
-                river=each_initial_flow.get("river"),
-                reach=each_initial_flow.get("reach"),
-                river_stat=each_initial_flow.get("river_stat"),
-                flow=each_initial_flow.get("flow"),
-            )
-        result.append(initial_flow)
-
-    print(f"RESULT INITIAL FLOWS {result}")
     return result
 
 
@@ -116,6 +89,15 @@ def process_initial_flows_json(initial_flow_list, scheduled_config_id=None):
             )
         result.append(initial_flow)
     return result
+
+
+def add_initial_flow_to_scheduled_task(oneSeries, scheduled_config_id):
+    if not scheduled_config_id:
+        raise Exception("Scheduled config id not present while adding new border series")
+    initial_flow_list = process_initial_flows_json([oneSeries],scheduled_config_id)
+    with get_session() as session:
+        session.add(initial_flow_list[0])
+
 
 
 def process_initial_flows_csv_file(initial_flow_file, scheduled_config_id=None):
@@ -146,5 +128,6 @@ def process_initial_flows_csv_file(initial_flow_file, scheduled_config_id=None):
                 result.append(initial_flow)
         else:
             raise FileUploadError("Error: Archivo .csv inválido - Initial flow service")
-
+    if initial_flow_file is not None:
+        initial_flow_file.seek(0)
     return result

@@ -1,0 +1,752 @@
+{
+	"info": {
+		"_postman_id": "08a40bf6-fdd9-4c9f-bab3-91b1139b4830",
+		"name": "[TESTS]",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25830281",
+		"_collection_link": "https://grey-shuttle-58525.postman.co/workspace/My-Workspace~28280de1-20aa-4d11-8b2d-0a1978d73ec4/collection/18051689-08a40bf6-fdd9-4c9f-bab3-91b1139b4830?action=share&source=collection_link&creator=25830281"
+	},
+	"item": [
+		{
+			"name": "Scheduled Tasks",
+			"item": [
+				{
+					"name": "CREATE scheduled b64 Copy 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"create schedule task works fine\", () => {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.id).to.be.a('number');",
+									"    postman.clearEnvironmentVariable('schedule_task_id');",
+									"    postman.setEnvironmentVariable('schedule_task_id', responseJson.id);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"border_conditions\": [\n        {\n            \"id\": 248,\n            \"interval\": \"1-HOUR\",\n            \"reach\": \"Desembocadura\",\n            \"river\": \"Bravo\",\n            \"river_stat\": \"0\",\n            \"scheduled_task_id\": 2,\n            \"series_id\": 31556,\n            \"type\": \"Stage Hydrograph\"\n        },\n        {\n            \"id\": 249,\n            \"interval\": \"1-HOUR\",\n            \"reach\": \"Desembocadura\",\n            \"river\": \"Mini\",\n            \"river_stat\": \"0\",\n            \"scheduled_task_id\": 2,\n            \"series_id\": 31558,\n            \"type\": \"Stage Hydrograph\"\n        },\n        {\n            \"id\": 250,\n            \"interval\": \"1-HOUR\",\n            \"reach\": \"Desembocadura\",\n            \"river\": \"BarcaGrande\",\n            \"river_stat\": \"0\",\n            \"scheduled_task_id\": 2,\n            \"series_id\": 31562,\n            \"type\": \"Stage Hydrograph\"\n        },\n        {\n            \"id\": 251,\n            \"interval\": \"1-HOUR\",\n            \"reach\": \"Desembocadura\",\n            \"river\": \"Sauce\",\n            \"river_stat\": \"0\",\n            \"scheduled_task_id\": 2,\n            \"series_id\": 31561,\n            \"type\": \"Stage Hydrograph\"\n        },\n        {\n            \"id\": 252,\n            \"interval\": \"1-DAY\",\n            \"reach\": \"ParanaAA\",\n            \"river\": \"Parana\",\n            \"river_stat\": \"224000\",\n            \"scheduled_task_id\": 2,\n            \"series_id\": 35205,\n            \"type\": \"Stage Hydrograph\"\n        },\n        {\n            \"id\": 253,\n            \"interval\": \"1-HOUR\",\n            \"reach\": \"Desembocadura\",\n            \"river\": \"LaBarquita\",\n            \"river_stat\": \"0\",\n            \"scheduled_task_id\": 2,\n            \"series_id\": 31568,\n            \"type\": \"Stage Hydrograph\"\n        },\n        {\n            \"id\": 254,\n            \"interval\": \"1-HOUR\",\n            \"reach\": \"Desembocadura\",\n            \"river\": \"CanaldelEste\",\n            \"river_stat\": \"0\",\n            \"scheduled_task_id\": 2,\n            \"series_id\": 31564,\n            \"type\": \"Stage Hydrograph\"\n        },\n        {\n            \"id\": 255,\n            \"interval\": \"1-HOUR\",\n            \"reach\": \"Desembocadura\",\n            \"river\": \"Lujan\",\n            \"river_stat\": \"0\",\n            \"scheduled_task_id\": 2,\n            \"series_id\": 31557,\n            \"type\": \"Stage Hydrograph\"\n        },\n        {\n            \"id\": 256,\n            \"interval\": \"1-HOUR\",\n            \"reach\": \"Desembocadura\",\n            \"river\": \"SanAntonio\",\n            \"river_stat\": \"0\",\n            \"scheduled_task_id\": 2,\n            \"series_id\": 31560,\n            \"type\": \"Stage Hydrograph\"\n        },\n        {\n            \"id\": 257,\n            \"interval\": \"1-DAY\",\n            \"reach\": \"1\",\n            \"river\": \"Lujan\",\n            \"river_stat\": \"30.664\",\n            \"scheduled_task_id\": 2,\n            \"series_id\": 31530,\n            \"type\": \"Flow Hydrograph\"\n        },\n        {\n            \"id\": 258,\n            \"interval\": \"1-HOUR\",\n            \"reach\": \"Desembocadura\",\n            \"river\": \"Palmas\",\n            \"river_stat\": \"6246.783\",\n            \"scheduled_task_id\": 2,\n            \"series_id\": 31565,\n            \"type\": \"Stage Hydrograph\"\n        },\n        {\n            \"id\": 259,\n            \"interval\": \"1-HOUR\",\n            \"reach\": \"Desembocadura\",\n            \"river\": \"Gutierrez\",\n            \"river_stat\": \"1960.748\",\n            \"scheduled_task_id\": 2,\n            \"series_id\": 31567,\n            \"type\": \"Stage Hydrograph\"\n        },\n        {\n            \"id\": 260,\n            \"interval\": \"1-HOUR\",\n            \"reach\": \"Desembocadura\",\n            \"river\": \"Guazu           \",\n            \"river_stat\": \"8000\",\n            \"scheduled_task_id\": 2,\n            \"series_id\": 31566,\n            \"type\": \"Stage Hydrograph\"\n        },\n        {\n            \"id\": 261,\n            \"interval\": \"1-DAY\",\n            \"reach\": \"Ibicuy\",\n            \"river\": \"Ibicuy          \",\n            \"river_stat\": \"67.930* \",\n            \"scheduled_task_id\": 2,\n            \"series_id\": 31570,\n            \"type\": \"Lateral Inflow Hydrograph\"\n        }\n    ],\n    \"calibration_id\": 487,\n    \"calibration_id_for_simulations\": 487,\n    \"created_at\": \"2024-04-08T19:55:36\",\n    \"description\": \"asdf\",\n    \"enabled\": true,\n    \"files\": [\n        {\n            \"content\": \"Z29sYSAxIDIgMw==\",\n            \"name\": \"scheduled-task/2/plan_template.txt\",\n            \"type\": \"plan_file\"\n        },\n        {\n            \"content\": \"UHJvaiBUaXRsZT0kUFJPSkVDVF9USVRMRQ0KQ3VycmVudCBQbGFuPXAwMQ0KRGVmYXVsdCBFeHAvQ29udHI9MC4zLDAuMQ0KU0kgVW5pdHMNCkdlb20gRmlsZT1nMDENClVuc3RlYWR5IEZpbGU9dTAxDQpQbGFuIEZpbGU9cDAxDQpZIEF4aXMgVGl0bGU9RWxldmF0aW9uDQpYIEF4aXMgVGl0bGUoUEYpPU1haW4gQ2hhbm5lbCBEaXN0YW5jZQ0KWCBBeGlzIFRpdGxlKFhTKT1TdGF0aW9uDQpCRUdJTiBERVNDUklQVElPTjoNCg0KRU5EIERFU0NSSVBUSU9OOg0KRFNTIFN0YXJ0IERhdGU9JFNUQVJUX0RBVEUNCkRTUyBTdGFydCBUaW1lPSRTVEFSVF9USU1FDQpEU1MgRW5kIERhdGU9JEVORF9EQVRFDQpEU1MgRW5kIFRpbWU9JEVORF9USU1FDQpEU1MgRXhwb3J0IEZpbGVuYW1lPQ0KRFNTIEV4cG9ydCBSYXRpbmcgQ3VydmVzPSAwIA0KRFNTIEV4cG9ydCBSYXRpbmcgQ3VydmUgU29ydGVkPSAwIA0KRFNTIEV4cG9ydCBWb2x1bWUgRmxvdyBDdXJ2ZXM9IDAgDQpEWEYgRmlsZW5hbWU9Li5cSElEUk9ERUxUQVxNb2RlbG8tRGVsdGFQYXJhbmFfMjAxN19wcmVcRGVsdGFQYXJhbmFfMjAxNi4NCkRYRiBPZmZzZXRYPSAwIA0KRFhGIE9mZnNldFk9IDAgDQpEWEYgU2NhbGVYPSAxIA0KRFhGIFNjYWxlWT0gMTAgDQpHSVMgRXhwb3J0IFByb2ZpbGVzPSAwIA0K\",\n            \"name\": \"scheduled-task/2/prj_template.txt\",\n            \"type\": \"project_file\"\n        },\n        {\n            \"content\": \"Z29sYSAxIDIgMw==\",\n            \"name\": \"scheduled-task/2/restart_file.rst\",\n            \"type\": \"restart_file\"\n        }\n    ],\n    \"forecast_days\": 1,\n    \"frequency\": 5,\n    \"geometry\": \"DeltaParana_2017.g01\",\n    \"geometry_id\": 2,\n    \"id\": 2,\n    \"initial_flows\": [],\n    \"name\": \"Corrida parana 2\",\n    \"observation_days\": 1,\n    \"plan_series_list\": [\n        {\n            \"flow_series_id\": -1,\n            \"id\": 119,\n            \"reach\": \"4\",\n            \"river\": \"Guazu\",\n            \"river_stat\": \"4\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.717,\n            \"stage_series_id\": 2830\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 120,\n            \"reach\": \" Desembocadura\",\n            \"river\": \"Guazu\",\n            \"river_stat\": \"8000\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.327,\n            \"stage_series_id\": 1710\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 121,\n            \"reach\": \"3\",\n            \"river\": \"Guazu\",\n            \"river_stat\": \"1\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.209,\n            \"stage_series_id\": 1712\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 122,\n            \"reach\": \" Desembocadura\",\n            \"river\": \"Gutierrez\",\n            \"river_stat\": \"19967.07\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.39,\n            \"stage_series_id\": 44\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 123,\n            \"reach\": \" Ibicuy\",\n            \"river\": \"Ibicuy\",\n            \"river_stat\": \"7.16\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.456,\n            \"stage_series_id\": 45\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 124,\n            \"reach\": \"1\",\n            \"river\": \"Lujan\",\n            \"river_stat\": \"24.421\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.0,\n            \"stage_series_id\": 42\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 125,\n            \"reach\": \"1\",\n            \"river\": \"Lujan\",\n            \"river_stat\": \"18.0191\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": -0.074,\n            \"stage_series_id\": 50\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 126,\n            \"reach\": \"2\",\n            \"river\": \"Lujan\",\n            \"river_stat\": \"5.828\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": -0.099,\n            \"stage_series_id\": 49\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 127,\n            \"reach\": \" Desembocadura\",\n            \"river\": \"Mini\",\n            \"river_stat\": \"11.9\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": -0.286,\n            \"stage_series_id\": 51\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 128,\n            \"reach\": \"2\",\n            \"river\": \"Palmas\",\n            \"river_stat\": \"101864.4\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 1.156,\n            \"stage_series_id\": 1714\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 129,\n            \"reach\": \"3\",\n            \"river\": \"Palmas\",\n            \"river_stat\": \"94654.47\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": -0.556,\n            \"stage_series_id\": 151\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 130,\n            \"reach\": \"3\",\n            \"river\": \"Palmas\",\n            \"river_stat\": \"68418.45\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.243,\n            \"stage_series_id\": 5907\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 131,\n            \"reach\": \"4\",\n            \"river\": \"Palmas\",\n            \"river_stat\": \"57113.41\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.418,\n            \"stage_series_id\": 41\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 132,\n            \"reach\": \"4\",\n            \"river\": \"Palmas\",\n            \"river_stat\": \"49019.05\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.03,\n            \"stage_series_id\": 1711\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 133,\n            \"reach\": \"5\",\n            \"river\": \"Palmas\",\n            \"river_stat\": \"45033.09\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": -0.656,\n            \"stage_series_id\": 6163\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 134,\n            \"reach\": \"8\",\n            \"river\": \"Palmas\",\n            \"river_stat\": \"21307.62\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.0,\n            \"stage_series_id\": 9999\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 135,\n            \"reach\": \" Desembocadura\",\n            \"river\": \"Palmas\",\n            \"river_stat\": \"6246.783\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": -0.337,\n            \"stage_series_id\": 1702\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 136,\n            \"reach\": \" ParanaAA\",\n            \"river\": \"Parana\",\n            \"river_stat\": \"224000\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 9.432,\n            \"stage_series_id\": 5901\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 137,\n            \"reach\": \" ParanaAA\",\n            \"river\": \"Parana\",\n            \"river_stat\": \"18.96\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 6.763,\n            \"stage_series_id\": 1725\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 138,\n            \"reach\": \" 2b\",\n            \"river\": \"Parana\",\n            \"river_stat\": \"237194.8\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.0,\n            \"stage_series_id\": 1770\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 139,\n            \"reach\": \" 2b\",\n            \"river\": \"Parana\",\n            \"river_stat\": \"223194.8\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 3.625,\n            \"stage_series_id\": 1723\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 140,\n            \"reach\": \" 2b\",\n            \"river\": \"Parana\",\n            \"river_stat\": \"188533.7\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 3.032,\n            \"stage_series_id\": 1722\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 141,\n            \"reach\": \" 2b\",\n            \"river\": \"Parana\",\n            \"river_stat\": \"143588.9\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 1.981,\n            \"stage_series_id\": 5905\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 142,\n            \"reach\": \"3\",\n            \"river\": \"Parana\",\n            \"river_stat\": \"126030.6\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 1.954,\n            \"stage_series_id\": 36\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 143,\n            \"reach\": \"3\",\n            \"river\": \"Parana\",\n            \"river_stat\": \"94846.95\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 1.642,\n            \"stage_series_id\": 37\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 144,\n            \"reach\": \"3\",\n            \"river\": \"Parana\",\n            \"river_stat\": \"44071.76\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.714,\n            \"stage_series_id\": 38\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 145,\n            \"reach\": \"4\",\n            \"river\": \"Parana\",\n            \"river_stat\": \"498.7283\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 1.37,\n            \"stage_series_id\": 1717\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 146,\n            \"reach\": \" RioBaradero\",\n            \"river\": \"RioBaradero\",\n            \"river_stat\": \" 29.092*\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.641,\n            \"stage_series_id\": 39\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 147,\n            \"reach\": \" Victoria\",\n            \"river\": \"Victoria\",\n            \"river_stat\": \"82.92\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 1.536,\n            \"stage_series_id\": 5894\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 148,\n            \"reach\": \"1\",\n            \"river\": \"CarabelasGrande\",\n            \"river_stat\": \"33.3\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.0,\n            \"stage_series_id\": 5876\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 149,\n            \"reach\": \" Desembocadura\",\n            \"river\": \"Gutierrez\",\n            \"river_stat\": \"1960.748\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.0,\n            \"stage_series_id\": 1836\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 150,\n            \"reach\": \" Desembocadura\",\n            \"river\": \"Bravo\",\n            \"river_stat\": \"0\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.0,\n            \"stage_series_id\": 1832\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 151,\n            \"reach\": \" Desembocadura\",\n            \"river\": \"Sauce\",\n            \"river_stat\": \"0\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.0,\n            \"stage_series_id\": 1842\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 152,\n            \"reach\": \" Desembocadura\",\n            \"river\": \"BarcaGrande\",\n            \"river_stat\": \"0\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.0,\n            \"stage_series_id\": 1831\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 153,\n            \"reach\": \" Desembocadura\",\n            \"river\": \"LaBarquita\",\n            \"river_stat\": \"0\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.0,\n            \"stage_series_id\": 1837\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 154,\n            \"reach\": \" Desembocadura\",\n            \"river\": \"Mini\",\n            \"river_stat\": \"0\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.0,\n            \"stage_series_id\": 1839\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 155,\n            \"reach\": \" Desembocadura\",\n            \"river\": \"CanaldelEste\",\n            \"river_stat\": \"0\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.0,\n            \"stage_series_id\": 1833\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 156,\n            \"reach\": \" Desembocadura\",\n            \"river\": \"SanAntonio\",\n            \"river_stat\": \"0\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.0,\n            \"stage_series_id\": 1841\n        },\n        {\n            \"flow_series_id\": -1,\n            \"id\": 157,\n            \"reach\": \" Desembocadura\",\n            \"river\": \"Lujan\",\n            \"river_stat\": \"0\",\n            \"scheduled_task_id\": 2,\n            \"stage_datum\": 0.0,\n            \"stage_series_id\": 1838\n        }\n    ],\n    \"start_condition_type\": \"restart_file\",\n    \"start_datetime\": \"2024-04-09T19:54:00\",\n    \"user\": \"Admin Ina\",\n    \"user_id\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/schedule_task",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"schedule_task"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a single scheduled task Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Scheduled task is Paraná\", () => {",
+									"  const responseJson = pm.response.json();",
+									"  pm.expect(responseJson.id).to.eql(Number(environment[\"schedule_task_id\"]));",
+									"",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BaseUrl}}/api/schedule_task/{{schedule_task_id}}",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"schedule_task",
+								"{{schedule_task_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete scheduled task Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.test(\"Scheduled task is correctly deleted\", () => {",
+									"  const responseJson = pm.response.json();",
+									"    pm.response.to.have.status(200);",
+									"    pm.expect(responseJson.message).to.contain(\"deleted successfully\");",
+									"",
+									"",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BaseUrl}}/api/schedule_task/{{schedule_task_id}}",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"schedule_task",
+								"{{schedule_task_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Execution Plan",
+			"item": [
+				{
+					"name": "CREATE execution plan b64 Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"create execution plan works fine\", () => {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.id).to.be.a('number');",
+									"    postman.clearEnvironmentVariable('execution_plan_id');",
+									"    postman.setEnvironmentVariable('execution_plan_id', responseJson.id);",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"connection": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "session=.eJxljjtuxDAMRK8iqF4E-n98hhTpg4VBiaRtxFkHll0Ei717tEG6VMSQ84ZzlyOv0GZqcni_S3H0IT-pNZhIXuTbStBIrNsklps4NgG19qM45qWJr-55kdfH5T_3uk0T4ZNp5y_B57p-P83XS_-4U5vlwLA26nJBOUidgALbkBCCUwQ-ZYxa62yqtr5AiRF8jsoboMSebDTgyWXns7IeqABkA446YVMgIFSAwCUAMlNSIXNgj64HagwuJcrJWHCmqqI95156PBvtf226rG3n8dg-6NYX0epSlCLXn0eHiD0_5YqV0ASH4LLXTBzl4wdl1Wcc.ZVaT8w.PGHHVD9auxQZI3s1gSRXry27cU4",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"created_at\": \"2024-05-09 19:20:15.685215\",\n    \"end_datetime\": \"2024-05-09 19:20:15.685065\",\n    \"execution_output_list\": [],\n    \"files\": [\n        {\n            \"content\": \"aG9sYSAxMiAyMw==\",\n            \"name\": \"execution-plan/92/1.p03\",\n            \"type\": \"plan_file\"\n\n        },\n        {\n            \"content\": \"Z29sYSAxIDIgMw==\",\n            \"name\": \"execution-plan/92/1.prj\",\n            \"type\": \"project_file\"\n\n        },\n        {\n            \"content\": \"Z29sYSAxIGQgYXNk\",\n            \"name\": \"execution-plan/92/1.u03\",\n            \"type\": \"flow_file\"\n\n        },\n        {\n            \"content\": \"YXNkZmFzZGZhc2RmYXNkZg==\",\n            \"name\": \"execution-plan/92/restart_file.rst\",\n            \"type\": \"restart_file\"\n\n        }\n    ],\n    \"geometry\": \"Modelo1-Atucha.g01\",\n    \"geometry_id\": 1,\n    \"id\": 92,\n    \"plan_name\": \"ejemplo-ina\",\n    \"result_files\": [],\n    \"start_datetime\": \"2024-05-09 19:20:15.684787\",\n    \"status\": \"PENDING\",\n    \"user_id\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/execution_plan",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"execution_plan"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get a single scheduled task Copy 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Execution plan is created\", () => {",
+									"  const responseJson = pm.response.json();",
+									"  pm.expect(responseJson.id).to.eql(Number(environment[\"execution_plan_id\"]));",
+									"",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BaseUrl}}/api/execution_plan/{{execution_plan_id}}?full_content=true",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"execution_plan",
+								"{{execution_plan_id}}"
+							],
+							"query": [
+								{
+									"key": "full_content",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE execution plan Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"",
+									"pm.test(\"Execution plan is correctly deleted\", () => {",
+									"  const responseJson = pm.response.json();",
+									"    pm.response.to.have.status(200);",
+									"    pm.expect(responseJson.message).to.contain(\"deleted successfully\");",
+									"",
+									"",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "session=.eJxljjtuxDAMRK8iqF4E-n98hhTpg4VBiaRtxFkHll0Ei717tEG6VMSQ84ZzlyOv0GZqcni_S3H0IT-pNZhIXuTbStBIrNsklps4NgG19qM45qWJr-55kdfH5T_3uk0T4ZNp5y_B57p-P83XS_-4U5vlwLA26nJBOUidgALbkBCCUwQ-ZYxa62yqtr5AiRF8jsoboMSebDTgyWXns7IeqABkA446YVMgIFSAwCUAMlNSIXNgj64HagwuJcrJWHCmqqI95156PBvtf226rG3n8dg-6NYX0epSlCLXn0eHiD0_5YqV0ASH4LLXTBzl4wdl1Wcc.ZVaT8w.PGHHVD9auxQZI3s1gSRXry27cU4",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"plan_name\": \"Dummy Plan\",\n    \"geometry_id\": 1,\n    \"user_id\": 1,\n    \"project_file\": {\n        \"filename\": \"dummy_project_file.txt\",\n        \"data\": \"This is the content of the project file.\"\n    },\n    \"plan_file\": {\n        \"filename\": \"dummy_plan_file.txt\",\n        \"data\": \"This is the content of the plan file.\"\n    },\n    \"flow_file\": {\n        \"filename\": \"dummy_flow_file.txt\",\n        \"data\": \"This is the content of the flow file.\"\n    },\n    \"restart_file\": {\n        \"data\": \"This is the content of the restart file.\"\n    },\n    \"output_list_data\": \n    [\n        {\"river\": \"River1\", \"reach\": \"Reach1\", \"river_stat\": \"High\"},\n        {\"river\": \"River2\", \"reach\": \"Reach2\", \"river_stat\": \"Low\"}\n    ]\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/execution_plan/{{execution_plan_id}}",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"execution_plan",
+								"{{execution_plan_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Geometry",
+			"item": [
+				{
+					"name": "CREATE geometry",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Create new geometry with file\", () => {",
+									"    const responseJson = pm.response.json();",
+									"    pm.expect(responseJson.id).to.be.a('number');",
+									"    postman.clearEnvironmentVariable('geometryID');",
+									"    postman.setEnvironmentVariable('geometryID', responseJson.id);",
+									"    pm.expect(responseJson.file).to.be.a('string');",
+									"    pm.expect(responseJson.file).to.eql('DeltaParana_2016.g23');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "./DeltaParana_2016.g23"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/geometry",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"geometry"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET geometry",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Get new geometry\", () => {",
+									"  const responseJson = pm.response.json();",
+									"  pm.expect(responseJson.user).to.eql(\"Admin Ina\");",
+									"  pm.expect(responseJson.description).to.eql(\"Creada usando API\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/geometry/{{geometryID}}",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"geometry",
+								"{{geometryID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "EDIT geometry",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"New geometry edited\", () => {",
+									"  const responseJson = pm.response.json();",
+									"  pm.expect(responseJson.message).to.be.a('string');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"description\": \"Editada por API\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/geometry/{{geometryID}}",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"geometry",
+								"{{geometryID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET geometry after edit",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Get new geometry edited\", () => {",
+									"  const responseJson = pm.response.json();",
+									"  pm.expect(responseJson.user).to.eql(\"Admin Ina\");",
+									"  pm.expect(responseJson.description).to.eql(\"Editada por API\");",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{BaseUrl}}/api/geometry/{{geometryID}}",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"geometry",
+								"{{geometryID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE geometry",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"New geometry deleted\", () => {",
+									"  const responseJson = pm.response.json();",
+									"  pm.expect(responseJson.message).to.be.a('string');",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@ina.com.ar",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{BaseUrl}}/api/geometry/{{geometryID}}",
+							"host": [
+								"{{BaseUrl}}"
+							],
+							"path": [
+								"api",
+								"geometry",
+								"{{geometryID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "password",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "admin@ina.com.ar",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

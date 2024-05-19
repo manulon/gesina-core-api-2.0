@@ -7,6 +7,7 @@ from datetime import timedelta
 from apscheduler.schedulers.background import BlockingScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.executors.pool import ThreadPoolExecutor
+from sqlalchemy.dialects.postgresql import psycopg2
 
 from src.service import execution_plan_service
 from src import config
@@ -38,6 +39,7 @@ scheduler = BlockingScheduler(
 )
 
 SIMULATION_DURATION = 60
+FORECAST_LAG_HOURS = 3
 
 logger = logging.getLogger("apscheduler")
 
@@ -46,16 +48,44 @@ class ScheduledTaskJob:
     def __init__(self, task_id: int):
         self.scheduled_task = task_id
 
-    def simulate(self, flow_file=None):
+    def simulate(self, flow_file=None,adjust_dates=True):
         scheduled_task = get_schedule_task_config(self.scheduled_task)
+        if scheduled_task is None:
+            # Este if esta puesto para arreglar este issue https://github.com/jbianchi81/gesina/issues/18
+            # El error ocurre cuando la scheduled task se elimina entre que se crea el job y se ejecuta el simulate
+            logger.info("A job has started for a scheduled task that no longer exist. Job canceled")
+            scheduler.remove_job(str(self.scheduled_task))
+            return
+        logger.error("Starting simulation")
         locale = timezone("America/Argentina/Buenos_Aires")
-        today = datetime.now(tz=locale).replace(minute=0)
+        today = datetime.now(tz=locale).replace(minute=0,second=0,microsecond=0) - timedelta(hours=FORECAST_LAG_HOURS) # .replace(minute=0)
         start_date = today - timedelta(scheduled_task.observation_days)
         end_date = today + timedelta(scheduled_task.forecast_days)
         logger.error(f"Start Date: {start_date} and End Date: {end_date}")
 
         simulation_name = f'{scheduled_task.name.replace(" ", "_")}-{start_date.strftime("%Y%m%d_%Hhs")}'
-        
+
+        # flow_file = flow_file or build_flow(
+        #     use_restart=use_restart, initial_flows=scheduled_task.initial_flows
+        # )
+
+        use_restart = scheduled_task.start_condition_type == "restart_file"
+
+        if flow_file is None:
+            flow_file, max_start_date, min_end_date = flow_file or new_build_flow(
+                scheduled_task.border_conditions,
+                use_restart,
+                "restart_file.rst",
+                scheduled_task.initial_flows,
+                scheduled_task.calibration_id,
+                start_date,
+                end_date,
+            )
+            if adjust_dates and min_end_date < end_date:
+                logger.error("Adjusting end date to %s" % min_end_date.isoformat())
+                end_date = min_end_date.astimezone(locale)
+        flow_name = "scheduled_task.u01"
+
         project_file = build_project(
             scheduled_task.id, simulation_name, start_date, end_date
         )
@@ -63,23 +93,6 @@ class ScheduledTaskJob:
 
         plan_file = build_plan(scheduled_task.id, simulation_name, start_date, end_date)
         plan_name = "scheduled-task.p01"
-
-        use_restart = scheduled_task.start_condition_type == "restart_file"
-        
-        # flow_file = flow_file or build_flow(
-        #     use_restart=use_restart, initial_flows=scheduled_task.initial_flows
-        # )
-
-        flow_file = flow_file or new_build_flow(
-            scheduled_task.border_conditions,
-            use_restart,
-            "restart_file.rst",
-            scheduled_task.initial_flows,
-            scheduled_task.calibration_id,
-            start_date,
-            end_date,
-        )
-        flow_name = "scheduled_task.u01"
 
         execution_plan = execution_plan_service.create_from_scheduler(
             simulation_name,
@@ -101,7 +114,7 @@ class ScheduledTaskJob:
         execution_plan_service.update_execution_plan_status(execution_plan.id, ExecutionPlanStatus.RUNNING)
         try:
             queue_or_fake_simulate(
-                execution_plan.id, 
+                execution_plan.id,
                 scheduled_task.calibration_id_for_simulations
             )
         except Exception as e:
@@ -148,6 +161,22 @@ def check_for_scheduled_tasks():
                 scheduler.remove_job(job_id)
 
 
+
+
 if __name__ == "__main__":
+    job_store = jobstores["default"]
+    # Se eliminan todos los jobs que no tienen id numerico , son jobs seteados en ejecuciones anteriores de tipo
+    # check_for_scheduled_tasks
+    try:
+        for job in job_store.get_all_jobs():
+            if not job.id.isnumeric():
+                job_store.remove_job(job.id)
+    except Exception as e:
+        if "relation \"apscheduler_jobs\" does not exist" not in str(e):
+            raise e
+        else:
+            logger.info("Creando tabla apscheduler_jobs en la base de datos")
+
     scheduler.add_job(check_for_scheduled_tasks, "interval", seconds=10)
     scheduler.start()
+

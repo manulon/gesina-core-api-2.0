@@ -1,9 +1,8 @@
 import sqlalchemy
 from flask import Blueprint, render_template, url_for, redirect, request, jsonify
 
-import requests
-from src import logger, config
-from src.controller.schemas import ActivityParams
+from src import logger
+from src.persistance.schemas import ActivityParams
 from src.login_manager import user_is_authenticated
 from src.service import (
     geometry_service,
@@ -17,7 +16,8 @@ from src.service import (
 from src.service.exception.activity_exception import ActivityException
 from src.service.exception.file_exception import FileUploadError
 from src.service.exception.series_exception import SeriesUploadError
-from src.service.border_series_service import retrieve_series
+from src.service.border_series_service import forecast_and_observation_values_exists
+from src.service.plan_series_service import check_duplicate_output_series
 from src.service.file_storage_service import FileType, save_file
 from src.service.ina_service import validate_connection_to_service
 from src.view.forms.execution_plan_form import ExecutionPlanForm, EditedExecutionPlanForm
@@ -30,9 +30,6 @@ from src.view.forms.schedule_config_form import (
     PlanSeriesForm,
 )
 from src.view.forms.users_forms import EditUserForm
-from pytz import utc, timezone
-from datetime import datetime
-from datetime import timedelta
 
 
 VIEW_BLUEPRINT = Blueprint("view_controller", __name__)
@@ -341,18 +338,31 @@ def save_or_create_schedule_config(schedule_config_id):
     schedule_config = schedule_task_service.get_schedule_task_config(schedule_config_id)
     form = ScheduleConfigForm()
 
-    exists_forecast_and_observation_values, border_conditions = forecast_and_observation_values_exists(form)
+    border_conditions = []
 
-    if not exists_forecast_and_observation_values:
-        error_message = 'No se pudo crear la ejecucion programada debido a que no se encontró una serie de borde en la base de datos del INA.'
-        return render_schedule_view(form, schedule_config, [error_message])
+    if form.enabled.data:
+        exists_forecast_and_observation_values, border_conditions = forecast_and_observation_values_exists(form)
+
+        if not exists_forecast_and_observation_values:
+            if border_conditions == None:
+                error_message = 'No se pudo crear la ejecucion programada debido a que no se encontró una serie de borde en la base de datos del INA para el ID ' + str(form.calibration_id.data)
+                return render_schedule_view(form, schedule_config, [error_message])
+            else:
+                error_message = 'Tiene que haber al menos una condicion de borde para poder crear la corrida programada'
+                return render_schedule_view(form, schedule_config, [error_message])
     
+    duplicate_output_series, plan_series, duplicate_key = check_duplicate_output_series(form)
+
+    if duplicate_output_series:
+        error_message = 'La serie de salida (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' + duplicate_key[2] + ') está duplicada. No puede crearse la corrida programada.'
+        return render_schedule_view(form, schedule_config, [error_message])
+            
     try:
         if form.validate_on_submit():
                 if schedule_config_id:
                     schedule_task_service.update(schedule_config_id, form)
                 else:
-                    schedule_config = schedule_task_service.create_from_form(form, border_conditions)
+                    schedule_config = schedule_task_service.create_from_form(form, border_conditions, plan_series)
                 success_message = "Configuración actualizada con éxito."
                 return redirect(
                     url_for(
@@ -368,32 +378,6 @@ def save_or_create_schedule_config(schedule_config_id):
         logger.error(exception)
         error_message = "Error actualizando la configuración."
         return render_schedule_view(form, schedule_config, [error_message])
-
-def forecast_and_observation_values_exists(form):
-    locale = timezone("America/Argentina/Buenos_Aires")
-    today = datetime.now(tz=locale).replace(minute=0)
-    start_date = today - timedelta(form.observation_days.data)
-    end_date = today + timedelta(form.forecast_days.data)
-
-    format_time = lambda d: d.strftime("%Y-%m-%d")
-    timestart = start_date - timedelta(1)
-    timeend = end_date + timedelta(1)
-
-    border_conditions = retrieve_series(form)
-
-    url = f"{config.ina_url}/sim/calibrados/{form.calibration_id.data}/corridas/last?series_id={border_conditions[0].series_id}&timestart={format_time(timestart)}&timeend={format_time(timeend)}"
-
-    response = None
-    for i in range(config.max_retries):
-        response = requests.get(
-            url, headers={"Authorization": f"Bearer {config.ina_token}"}
-        )
-        if response.status_code == 200 and len(response.json()["series"]) > 0:
-            return True, border_conditions
-        else:
-            return False, None
-        
-    return False, None
 
 @VIEW_BLUEPRINT.route("/schedule_tasks/validate_border_conditions", methods=["POST"])
 def validate_connection_to_schedule_conditions():
@@ -510,6 +494,7 @@ def render_plan_series_list(plan_series_list, form):
         plan_form.river_stat = plan.river_stat
         plan_form.stage_series_id = plan.stage_series_id
         plan_form.flow_series_id = plan.flow_series_id
+        plan_form.stage_datum = plan.stage_datum
         form.plan_series_list.append_entry(plan_form)
 
 def clean_form_list(form_list):

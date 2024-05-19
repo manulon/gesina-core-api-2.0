@@ -7,6 +7,7 @@ from sqlalchemy import (
     Enum,
     DateTime,
     String,
+    Numeric
 )
 import enum
 from sqlalchemy.orm import relationship
@@ -50,13 +51,11 @@ class ExecutionPlan(Base):
         return ""
 
     def to_dict(self):
-        # Create a dictionary containing the object's attributes
-
         execution_output_list = [{"river": i.river,
                                   "river_stat": i.river_stat,
-                                  "reach": i.reach}
-                                 for i in self.execution_plan_output_list
-                                 ]
+                                  "reach": i.reach,
+                                  "stage_datum": float(i.stage_datum) if i.stage_datum is not None else None}
+                                 for i in self.execution_plan_output_list]
 
         attributes = {
             "id": self.id,
@@ -87,3 +86,4 @@ class ExecutionPlanOutput(Base):
     )
     stage_series_id = Column(Integer)
     flow_series_id = Column(Integer)
+    stage_datum = Column(Numeric, default=None)

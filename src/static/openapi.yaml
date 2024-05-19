@@ -29,10 +29,9 @@ paths:
         - name: full_content
           in: query
           required: false
-          default: false
           schema:
             type: boolean
-          description: whether the files come with the full content (true) or no (false, default)
+          description: whether the files come with the full content in base64 (true) or no (false, default)
       responses:
         '200':
           description: Successful response
@@ -83,6 +82,32 @@ paths:
           description: Successfully edited the execution plan.
         '400':
           description: Error occurred while editing the execution plan.
+  /execution_plan/cancel/{execution_plan_id}:
+    post:
+      summary: Cancel an execution plan execution
+      operationId: cancelExecutionPlan
+      tags:
+        - Execution Plan
+      parameters:
+        - name: execution_plan_id
+          in: path
+          description: ID of the execution plan to cancel
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionPlan'
+        '400':
+          description: Error cancelling execution plan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /execution_plan/copy:
     post:
@@ -369,6 +394,33 @@ paths:
           description: Geometry not found
         '500':
           description: Internal server error
+  /geometry/all:
+    get:
+      summary: Get all geometries
+      operationId: getAllGeometries
+      tags:
+        - Geometry
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Geometry'
+        '404':
+          description: No geometries available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Error getting geometries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /schedule_task/{scheduled_task_id}:
     get:
@@ -383,6 +435,12 @@ paths:
           schema:
             type: integer
           description: The ID of the scheduled task to retrieve
+        - name: full_content
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: whether the files come with the full content in base64 (true) or no (false, default)
       responses:
         '200':
           description: Successful operation
@@ -560,77 +618,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                frequency:
-                  type: integer
-                  example: 360
-                calibration_id:
-                  type: integer
-                  example: 5
-                calibration_id_for_simulations:
-                  type: integer
-                  example: 24
-                enabled:
-                  type: boolean
-                  example: true
-                name:
-                  type: string
-                  example: "Paraná"
-                description:
-                  type: string
-                  example: "Corrida periódica del rio Paraná"
-                geometry_id:
-                  type: integer
-                  example: 1
-                start_datetime:
-                  type: string
-                  format: date-time
-                  example: "2021-12-21T00:00:00"
-                start_condition_type:
-                  type: string
-                  enum:
-                    - initial_flows
-                    - restart_file
-                observation_days:
-                  type: integer
-                  example: 5
-                forecast_days:
-                  type: integer
-                  example: 7
-                border_conditions:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/BorderConditionSchema'
-                plan_series_list:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/PlanSeriesSchema'
-                project_file:
-                  type: string
-                  example: "execution-plan/1/1.prj"
-                plan_file:
-                  type: string
-                  example: "execution-plan/1/1.p01"
-                restart_file:
-                  type: string
-                  example: "scheduled-task/1/restart_file.rst"
-              required:
-                - frequency
-                - calibration_id
-                - calibration_id_for_simulations
-                - enabled
-                - name
-                - description
-                - geometry_id
-                - start_datetime
-                - start_condition_type
-                - observation_days
-                - forecast_days
-                - border_conditions
-                - project_file
-                - plan_file
-                - restart_file
+                $ref: '#/components/schemas/CreateScheduledTaskRequest'
       responses:
         '200':
           description: Scheduled task created successfully
@@ -881,6 +869,108 @@ paths:
                   error:
                     type: string
 
+  /activity/success_percentage:
+    get:
+      summary: Retrieve success percentage data.
+      parameters:
+        - name: date_from
+          in: query
+          description: Start date for activity data.
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          description: End date for activity data.
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    Label:
+                      type: string
+                    Value:
+                      type: integer
+          examples:
+            Success:
+              summary: Successful response example
+              value:
+                - Label: "Label 1"
+                  Value: 80
+                - Label: "Label 2"
+                  Value: 90
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+      tags:
+        - Activity
+  /activity/average_time_execution:
+    get:
+      summary: Retrieve average time execution data.
+      tags:
+        - Activity
+      parameters:
+        - name: date_from
+          in: query
+          description: Start date for execution time data.
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: date_to
+          in: query
+          description: End date for execution time data.
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    Label:
+                      type: string
+                    Value:
+                      type: integer
+          examples:
+            Success:
+              summary: Successful response example
+              value:
+                - Label: "Label 1"
+                  Value: 1000
+                - Label: "Label 2"
+                  Value: 2000
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
 components:
   securitySchemes:
     basicAuth: # Name of the security scheme
@@ -917,7 +1007,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ExecutionPlanOutput'
-        execution_files:
+        files:
           type: array
           items:
             type: object
@@ -935,6 +1025,9 @@ components:
           type: string
         river_stat:
           type: string
+        stage_datum:
+          type: float
+          example: 1.6
       required:
         - river
         - reach
@@ -946,18 +1039,26 @@ components:
           type: string
         geometry_id:
           type: integer
-        project_file:
-          $ref: '#/components/schemas/FileInput'
-        plan_file:
-          $ref: '#/components/schemas/FileInput'
-        flow_file:
-          $ref: '#/components/schemas/FileInput'
-        restart_file:
-          $ref: '#/components/schemas/FileInput'
         execution_output_list:
           type: array
           items:
             $ref: '#/components/schemas/ExecutionPlanOutput'
+        files:
+          type: array
+          description: An array with files encoded in base 64 that come from a get schedule task output.
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: the name of the file or the path to the file to copy if the content is not set
+              content:
+                type: string
+                description: the base64 string encoded file
+              'type':
+                type: string
+                description: The hecras file type. It can be plan_file project_file restart_file or flow_file
+                enum: [ plan_file, project_file, restart_file, flow_file ]
       required:
         - plan_name
         - geometry_id
@@ -1140,17 +1241,17 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/BorderConditionSchema'
-          description: List of border conditions associated with the scheduled task
+          description: List of border conditions associated with the scheduled task. If the border condition id is set then that border condition is edited. If not, a new one will be created
         plan_series_list:
           type: array
           items:
             $ref: '#/components/schemas/PlanSeriesSchema'
-          description: List of plan series associated with the scheduled task
+          description: List of plan series associated with the scheduled task. If the plan series id is set then that border condition is edited. If not, a new one will be created
         initial_flows:
           type: array
           items:
             $ref: '#/components/schemas/InitialFlowSchema'
-          description: List of initial flows associated with the scheduled task
+          description: List of initial flows associated with the scheduled task. If the initial flow id is set then that border condition is edited. If not, a new one will be created
       required:
         - frequency
         - calibration_id
@@ -1211,6 +1312,8 @@ components:
         scheduled_task_id:
           type: integer
           example: 6
+        stage_datum:
+          type: float
     BorderConditionSchema:
       type: object
       properties:
@@ -1292,3 +1395,86 @@ components:
         password:
           type: string
           description: New password of the user.
+    CreateScheduledTaskRequest:
+      type: object
+      required:
+        - frequency
+        - calibration_id
+        - calibration_id_for_simulations
+        - enabled
+        - name
+        - description
+        - geometry_id
+        - start_datetime
+        - start_condition_type
+        - observation_days
+        - forecast_days
+        - border_conditions
+      properties:
+        frequency:
+          type: integer
+          example: 360
+        calibration_id:
+          type: integer
+          example: 5
+        calibration_id_for_simulations:
+          type: integer
+          example: 24
+        enabled:
+          type: boolean
+          example: true
+        name:
+          type: string
+          example: "Paraná"
+        description:
+          type: string
+          example: "Corrida periódica del rio Paraná"
+        geometry_id:
+          type: integer
+          example: 1
+        start_datetime:
+          type: string
+          format: date-time
+          example: "2021-12-21T00:00:00"
+        start_condition_type:
+          type: string
+          enum:
+            - initial_flows
+            - restart_file
+        observation_days:
+          type: integer
+          example: 5
+        forecast_days:
+          type: integer
+          example: 7
+        border_conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/BorderConditionSchema'
+        plan_series_list:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlanSeriesSchema'
+        files:
+          type: array
+          description: An array with files encoded in base 64 that come from a get schedule task output.
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: the name of the file or the path to the file to copy if the content is not set
+              content:
+                type: string
+                description: the base64 string encoded file
+              'type':
+                type: string
+                description: The hecras file type. It can be plan_file project_file restart_file or flow_file
+                enum: [ plan_file, project_file, restart_file, flow_file ]
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        error:
+          type: string

@@ -1,0 +1,113 @@
+Geom Title=Geo_2018
+Program Version=4.10
+Viewing Rectangle= 5330059.7 , 5725287.73 , 6538802.45 , 6140970.8 
+
+Junct Name=Mini-Canal4     
+Junct Desc=, 0 , 0 ,-1 ,0
+Junct X Y & Text X Y=5631031,6221498,5631031,6221498
+Up River,Reach=Canal4          ,Canal4          
+Up River,Reach=Mini            ,1               
+Dn River,Reach=Mini            ,2               
+Junc L&A=2118,0
+Junc L&A=3850,0
+
+Junct Name=Bifurcacion     
+Junct Desc=, 0 , 0 ,-1 ,0
+Junct X Y & Text X Y=5436310.5,6426505.5,5436310.5,6426505.5
+Up River,Reach=Parana          ,ParanaAA        
+Dn River,Reach=Victoria        ,Victoria        
+Dn River,Reach=Parana          ,2               
+Junc L&A=10000,0
+Junc L&A=10000,0
+
+Junct Name=Guazu-Palmas    
+Junct Desc=, 0 , 0 ,-1 ,0
+Junct X Y & Text X Y=5566141.5,6268370.5,5566141.5,6268370.5
+Up River,Reach=Parana          ,4               
+Dn River,Reach=Guazu           ,1               
+Dn River,Reach=Palmas          ,1               
+Junc L&A=4000,0
+Junc L&A=4000,0
+
+Junct Name=Guazu-Zanja-Tal 
+Junct Desc=, 0 , 0 ,-1 ,0
+Junct X Y & Text X Y=5571995.5,6258643.5,5571995.5,6258643.5
+Up River,Reach=Guazu           ,1               
+Dn River,Reach=Talavera        ,1               
+Dn River,Reach=Guazu           ,2               
+Dn River,Reach=ZanjaMercadal   ,ZanjaMercadal   
+Junc L&A=6000,
+Junc L&A=883.48,
+Junc L&A=500,
+
+Junct Name=Pav-Vict-Iby    
+Junct Desc=, 0 , 0 ,-1 ,0
+Junct X Y & Text X Y=5519145.5,6322383.5,5519145.5,6322383.5
+Up River,Reach=Pavon           ,Pavon           
+Up River,Reach=Victoria        ,Victoriab       
+Dn River,Reach=Ibicuy          ,Ibicuy          
+Junc L&A=7000,0
+Junc L&A=7000,0
+
+Junct Name=Guazu-Ibicuy    
+Junct Desc=, 0 , 0 ,-1 ,0
+Junct X Y & Text X Y=5576628.5,6259579.5,5576628.5,6259579.5
+Up River,Reach=Ibicuy          ,Ibicuy          
+Up River,Reach=Guazu           ,2               
+Dn River,Reach=Guazu           ,3               
+Junc L&A=6000,
+Junc L&A=5000,
+
+Junct Name=Guazu-Bravo     
+Junct Desc=, 0 , 0 ,-1 ,0
+Junct X Y & Text X Y=5613924,6244243,5613924,6244243
+Up River,Reach=Guazu           ,5               
+Dn River,Reach=Guazu           ,6               
+Dn River,Reach=Bravo           ,1               
+Junc L&A=1700,
+Junc L&A=1000,
+
+Junct Name=Guazu-Mini      
+Junct Desc=, 0 , 0 ,-1 ,0
+Junct X Y & Text X Y=5628338.5,6233341,5628338.5,6233341
+Up River,Reach=Guazu           ,6               
+Dn River,Reach=Mini            ,1               
+Dn River,Reach=Guazu           ,7               
+Junc L&A=1200,0
+Junc L&A=711.333,0
+
+Junct Name=Bravo-Sauce     
+Junct Desc=, 0 , 0 ,-1 ,0
+Junct X Y & Text X Y=5633800,6247041.5,5633800,6247041.5
+Up River,Reach=Bravo           ,2               
+Dn River,Reach=Bravo           ,Desembocadura   
+Dn River,Reach=Sauce           ,Desembocadura   
+Junc L&A=4000,0
+Junc L&A=700,0
+
+Junct Name=Guazu-Barca     
+Junct Desc=, 0 , 0 ,-1 ,0
+Junct X Y & Text X Y=5630044,6233502,5630044,6233502
+Up River,Reach=Guazu           ,7               
+Dn River,Reach=Guazu           ,Desembocadura   
+Dn River,Reach=BarcaGrande     ,1               
+Junc L&A=1300,
+Junc L&A=1500,
+
+Junct Name=Guazu-Car       
+Junct Desc=, 0 , 0 ,-1 ,0
+Junct X Y & Text X Y=5606379.5,6243507.5,5606379.5,6243507.5
+Up River,Reach=Guazu           ,4               
+Dn River,Reach=Guazu           ,5               
+Dn River,Reach=CarabelasGrande ,1               
+Junc L&A=200,
+Junc L&A=1000,
+
+Junct Name=Serna-Seoane-Can
+Junct Desc=, 0 , 0 ,-1 ,0
+Junct X Y & Text X Y=5628447,6218859,5628447,6218859
+Up River,Reach=GdorDeLaSerna   ,GdorDeLaSerna   
+Up River,Reach=CanalSeoane     ,CanalSeoane     
+Dn River,Reach=Canal4          ,Canal4          
+Junc L&A=1000,
+Junc L&A=1000,

@@ -1,13 +1,13 @@
 from flask import request, jsonify, Blueprint
 
-from src.api.utils import validate_fields
-from src.controller.schemas import SCHEDULE_TASK_SCHEMA
+from src.api.utils import validate_fields, validate_files_for_scheduled_task, send_bad_request, get_file_if_present
+from src.persistance.schemas import SCHEDULE_TASK_SCHEMA
 from src.logger import get_logger
 from src.service import schedule_task_service, api_authentication_service, file_storage_service
-from src.service.border_series_service import retrieve_series_json
+from src.service.border_series_service import forecast_and_observation_values_exists_json, retrieve_series_json
 from src.service.exception.file_exception import FileUploadError
 from src.service.initial_flow_service import create_initial_flows_from_json
-from src.service.plan_series_service import retrieve_plan_series_json
+from src.service.plan_series_service import check_duplicate_output_series_json, retrieve_plan_series_json
 from src.service.file_storage_service import FileType
 
 SCHEDULE_API_BLUEPRINT = Blueprint("scheduled_task", __name__, url_prefix="/schedule_task")
@@ -19,7 +19,12 @@ def get_scheduled_task(scheduled_task_id):
         if not scheduled_task_id.isnumeric():
             raise Exception("Id is not numeric")
         task = schedule_task_service.get_schedule_task_config(scheduled_task_id)
+        if not task:
+            raise Exception(f"Scheduled task with id {scheduled_task_id} not found")
         obj = SCHEDULE_TASK_SCHEMA.dump(task)
+
+        files = file_storage_service.get_files_for_id(FileType.SCHEDULED_TASK,scheduled_task_id, request.args.get("full_content"))
+        obj["files"] = files
         return jsonify(obj)
     except Exception as e:
         logger = get_logger()
@@ -45,7 +50,7 @@ def list_schedule_tasks():
                                                                   args.get('enabled'),
                                                                   args.get('frequency'),
                                                                   args.get('calibration_id'),
-                                                                  args.get('calibration_id_for_simulations'))
+                                                                  args.get('calibration_id_for_simulations'), reduced=True)
 
         return jsonify(
             SCHEDULE_TASK_SCHEMA.dump(
@@ -71,6 +76,8 @@ def delete_scheduled_task(scheduled_task_id):
         response.status_code = 200
         return response
     except Exception as e:
+        logger = get_logger()
+        logger.error(e, exc_info=True)
         response = jsonify({"message": "error deleting geometry " + scheduled_task_id,
                             "error": str(e)})
         response.status_code = 400
@@ -92,22 +99,70 @@ def edit_scheduled_task(scheduled_task_id):
             'enabled': body.get('enabled'),
             'observation_days': body.get('observation_days'),
             'forecast_days': body.get('forecast_days'),
-            'start_condition_type': body.get('start_condition_type'), # Initial flow or restart file
+            'start_condition_type': body.get('start_condition_type'),  # Initial flow or restart file
             'border_conditions': body.get('border_conditions'),
             'plan_series_list': body.get('plan_series_list'),
             'initial_flows': body.get('initial_flows')
         }
+
+        scheduled_config = schedule_task_service.get_schedule_task_config(scheduled_task_id)
+        if not scheduled_config:
+            raise Exception(f"Scheduled task with id {scheduled_task_id} not found")
+
+        if params["enabled"]:
+            if len(params["border_conditions"]) == 0 and len(scheduled_config.border_conditions) == 0:
+                return send_bad_request("There must be at least one border condition set to enable the scheduled "
+                                        "task.")
+        if len(params["border_conditions"]) != 0:
+            if not params['observation_days'] and not scheduled_config.observation_days:
+                return send_bad_request("observation_days must be set")
+
+            if not params['forecast_days'] and not scheduled_config.forecast_days:
+                return send_bad_request("forecast_days must be set")
+
+            if not params['calibration_id'] and not scheduled_config.calibration_id:
+                return send_bad_request("calibration_id must be set")
+
+            observation_days = params['observation_days'] if params[
+                'observation_days'] else scheduled_config.observation_days
+            forecast_days = params['forecast_days'] if params['forecast_days'] else scheduled_config.forecast_days
+            calibration_id = params['calibration_id'] if params[
+                'calibration_id'] else scheduled_config.calibration_id
+
+            exists_forecast_and_observation_values = forecast_and_observation_values_exists_json(
+                params["border_conditions"], observation_days, forecast_days,
+                calibration_id)
+
+            if not exists_forecast_and_observation_values:
+                return send_bad_request(f'The scheduled task could not be edited due to the absence of a boundary '
+                                        f'series in the INA database for the calibration ID {str(calibration_id)} and'
+                                        f' series id {params["border_conditions"][0].get("series_id")} ')
+
+        duplicate_output_series, duplicate_key = check_duplicate_output_series_json(params["plan_series_list"],
+                                                                                    scheduled_config)
+
+        if duplicate_output_series:
+            return send_bad_request(
+                'The output series (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' + duplicate_key[
+                    2] + ') is duplicated. The scheduled task run can not be created.')
+
         schedule_task_service.update_from_json(scheduled_task_id, **params)
         response = jsonify({"message": f"Scheduled task with id {scheduled_task_id} edited successfully"})
         response.status_code = 200
     except FileUploadError as file_error:
+        logger = get_logger()
+        logger.error(file_error, exc_info=True)
         response = jsonify(
             {"message": f"You must upload all the required files to enable execution", "error": str(file_error)})
         response.status_code = 400
     except KeyError as ke:
+        logger = get_logger()
+        logger.error(ke, exc_info=True)
         response = jsonify({"message": f"Error editing scheduled task {scheduled_task_id}", "error": str(ke)})
         response.status_code = 400
     except Exception as e:
+        logger = get_logger()
+        logger.error(e, exc_info=True)
         response = jsonify({"message": f"Error editing scheduled task {scheduled_task_id}", "error": str(e)})
         response.status_code = 400
     return response
@@ -147,9 +202,10 @@ def create_scheduled_task():
         required_fields = [
             "frequency", "calibration_id", "calibration_id_for_simulations", "enabled",
             "name", "description", "geometry_id", "start_datetime", "start_condition_type",
-            "observation_days", "forecast_days", "border_conditions", "project_file", "plan_file"
+            "observation_days", "forecast_days", "border_conditions"
         ]
         missing_fields = validate_fields(body, required_fields)
+        missing_fields = validate_files_for_scheduled_task(body, missing_fields)
         enabled = body.get("enabled")
         if missing_fields and (enabled is True):
             return jsonify(
@@ -170,18 +226,34 @@ def create_scheduled_task():
             "border_conditions": retrieve_series_json(body.get("series_list_file"), body.get("border_conditions")),
             "plan_series_list": retrieve_plan_series_json(body.get("plan_series_file"), body.get("plan_series_list")),
         }
+
+        if params["border_conditions"]:
+            if not params['observation_days'] and not params['forecast_days'] and not params['calibration_id']:
+                return send_bad_request("observation_days forcast_days and calibration_id must be set")
+
+            exists_forecast_and_observation_values = forecast_and_observation_values_exists_json(
+                params["border_conditions"], params["observation_days"], params["forecast_days"],
+                params["calibration_id"])
+
+            if not exists_forecast_and_observation_values:
+                return send_bad_request("The scheduled task could not be created due to the absence of a boundary "
+                                        "series in the INA database for the ID " + str(params["calibration_id"]))
+
+        duplicate_output_series, duplicate_key = check_duplicate_output_series_json(params["plan_series_list"])
+
+        if duplicate_output_series:
+            return send_bad_request('The output series (' + duplicate_key[0] + ', ' + duplicate_key[1] + ', ' +
+                                    duplicate_key[2] + ') is duplicated. The scheduled task run can not be created.')
+
         if body.get("start_condition_type") == "initial_flows":
-            params["initial_flows"] = create_initial_flows_from_json(body.get("start_condition_type"),
-                                                                     body.get("initial_flow_file"),
+            if not params["initial_flows"]:
+                return send_bad_request("initial_flows must be set")
+            params["initial_flows"] = create_initial_flows_from_json(body.get("initial_flow_file"),
                                                                      body.get("initial_flow_list"))
         start_condition_type = body.get("start_condition_type")
-        restart_file_data = None if body.get("restart_file") is None else file_storage_service.get_file(
-            body.get("restart_file"))
-        project_file_data = file_storage_service.get_file(body.get("project_file"))
-        plan_file_data = file_storage_service.get_file(body.get("plan_file"))
 
-        scheduled_task = schedule_task_service.create(params, start_condition_type, restart_file_data,
-                                                      project_file_data, plan_file_data)
+        scheduled_task = schedule_task_service.create(params, start_condition_type, None,
+                                                      None, None, files=body.get("files"))
         return jsonify({"message": "Success at creating scheduled task",
                         "id": scheduled_task.id})
 
@@ -201,7 +273,7 @@ def copy_schedule_task():
     try:
         copy_from_id = request.args.get('copyFrom', '')
         if copy_from_id is None:
-            return jsonify({"error": "copyFrom parameter not specified"}),400
+            return jsonify({"error": "copyFrom parameter not specified"}), 400
         schedule_task = schedule_task_service.copy_schedule_task(copy_from_id)
         response = jsonify({"message": "Scheduled task with id " + copy_from_id + " copied successfully",
                             "id": schedule_task.id})
@@ -212,3 +284,6 @@ def copy_schedule_task():
                             "error": str(e)})
         response.status_code = 400
         return response
+
+
+

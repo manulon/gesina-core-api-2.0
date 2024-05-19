@@ -1,5 +1,3 @@
-import io
-
 from flask import request, jsonify, Blueprint
 
 from src import logger
@@ -11,7 +9,7 @@ from src.service import (
     file_storage_service,
     api_authentication_service
 )
-from src.service.file_storage_service import FileType
+from src.service.file_storage_service import FileType, get_files_for_id
 
 EXECUTION_PLAN_API_BLUEPRINT = Blueprint("execution_plan", __name__, url_prefix="/execution_plan")
 
@@ -23,13 +21,6 @@ def get_execution_plan(execution_plan_id):
         if execution_plan is None:
             raise Exception(f'Execution plan {execution_plan_id} does not exist')
         execution_plan_dict = execution_plan.to_dict()
-        execution_files = [
-            f.object_name
-            for f in file_storage_service.list_execution_files(
-                FileType.EXECUTION_PLAN, execution_plan_id
-            )
-        ]
-        full_content_param = request.args.get('full_content', '').lower() == 'true'
 
         result_files = [
             f.object_name
@@ -37,24 +28,13 @@ def get_execution_plan(execution_plan_id):
                 FileType.RESULT, execution_plan_id
             )
         ]
-        if full_content_param:
-            execution_plan_dict["execution_files"] = []
-            execution_plan_dict["result_files"] = []
-            for i in execution_files:
-                data = file_storage_service.get_file(i).data
-                file = {"name": i.split("/")[-1], "content": str(data)}
-                execution_plan_dict["execution_files"].append(file)
-            for i in result_files:
-                data = file_storage_service.get_file(i).data
-                file = {"name": i.split("/")[-1], "content": str(data)}
-                execution_plan_dict["result_files"].append(file)
 
-        else:
-            execution_plan_dict["execution_files"] = [{"name": i.split("/")[-1]} for i in execution_files]
-            execution_plan_dict["result_files"] = [{"name": i.split("/")[-1]} for i in result_files]
+        execution_plan_dict["files"] = get_files_for_id(FileType.EXECUTION_PLAN,execution_plan_id, request.args.get('full_content', '').lower())
+        execution_plan_dict["result_files"] = result_files
 
         return jsonify(execution_plan_dict)
     except Exception as e:
+        get_logger().error(e,exc_info=True)
         response = jsonify({"error while getting execution plan": str(e)})
         response.status_code = 400
         return response
@@ -83,8 +63,9 @@ def create_execution_plan():
                 {"error": "Missing required fields for execution plan", "missing": missing_fields}), 400
         execution_plan = execution_plan_service.create_from_json(body,
                                                                  api_authentication_service.get_current_user_id())
-        return {"new_execution_plan_id": execution_plan.id}
+        return jsonify({"id": execution_plan.id})
     except Exception as e:
+        get_logger().error(e,exc_info=True)
         response = jsonify({"error": str(e)})
         response.status_code = 400
         return response
@@ -178,6 +159,20 @@ def execute_plan(execution_id):
     except Exception as e:
         logger.error(e)
         response = jsonify({"message": "error while running execution plan " + execution_id,
+                            "error": str(e)})
+        response.status_code = 400
+        return response
+    
+@EXECUTION_PLAN_API_BLUEPRINT.post("/cancel/<execution_id>")
+def cancel_execution_plan(execution_id):
+    from src.tasks import cancel_simulation
+
+    try:
+        cancel_simulation(execution_id)
+        return get_execution_plan(execution_id)
+    except Exception as e:
+        logger.error(e)
+        response = jsonify({"message": "error while cancelling execution plan " + execution_id,
                             "error": str(e)})
         response.status_code = 400
         return response

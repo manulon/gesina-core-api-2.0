@@ -30,7 +30,6 @@ def create(file_name, file_data, description, user):
             return geometry
         
     except Exception as e:
-        print(e)
         raise e
 
 
@@ -59,6 +58,8 @@ def get_geometry(geometry_id):
 def delete_geometry(geometry_id):
     try:
         geometry = get_geometry(geometry_id)
+        if not geometry:
+            raise Exception(f"Geometry with id {geometry_id} does not exist")
         geometry_name = geometry.name
         with get_session() as session:
             execution_plan = session.query(ExecutionPlan).filter(ExecutionPlan.geometry_id == geometry_id).first()

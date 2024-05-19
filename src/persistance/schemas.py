@@ -26,6 +26,7 @@ class PlanSeriesSchema(Schema):
     stage_series_id = fields.Int()
     flow_series_id = fields.Int()
     scheduled_task_id = fields.Int()
+    stage_datum = fields.Float()
 
 
 class InitialFlowSchema(Schema):
@@ -46,6 +47,7 @@ class ScheduleTaskSchema(Schema):
     start_datetime = fields.DateTime()
     enabled = fields.Bool()
     geometry = fields.Str()  # Ensure this correctly serializes the Geometry relationship
+    user_id = fields.Int()
     user = fields.Str()  # Ensure this correctly serializes the User relationship
     initial_flows = fields.List(fields.Nested(InitialFlowSchema))
     border_conditions = fields.List(fields.Nested(BorderConditionSchema))
@@ -65,6 +67,16 @@ class UserSchema(Schema):
     admin_role = fields.Bool()
     active = fields.Bool()
 
+class GeometrySchema(Schema):
+    id = fields.Int()
+    name = fields.Str()
+    description = fields.Str()
+    created_at = fields.DateTime("%Y-%m-%dT%H:%M:%S")
+    user_id = fields.Int()
+    active = fields.Bool()
+    user = fields.Str() 
 
 SCHEDULE_TASK_SCHEMA = ScheduleTaskSchema()
 USER_SCHEMA = UserSchema()
+PLAN_SERIES_SCHEMA = PlanSeriesSchema()
+GEOMETRY_SCHEMA = GeometrySchema()

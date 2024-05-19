@@ -5,10 +5,12 @@ from enum import Enum
 
 from minio import Minio
 from minio.commonconfig import CopySource
-from minio.error import S3Error
-import shutil
+import base64
 
 from src import logger, config
+from src.api.utils import get_hecras_file_type
+from src.logger import get_logger
+from src.service import plan_file_service, project_file_service
 
 from src.service.exception.file_exception import FileUploadError, FilePreSignedUrlError
 from werkzeug.utils import secure_filename
@@ -39,12 +41,14 @@ class FileType(Enum):
     RESULT = RESULT_FOLDER
     SCHEDULED_TASK = SCHEDULED_TASK_FOLDER
 
+
 def copy_geometry_to(execution_id, geometry_filename):
     minio_client.copy_object(
         ROOT_BUCKET,
         f"{EXECUTION_FOLDER}/{execution_id}/{geometry_filename}",
         CopySource(ROOT_BUCKET, f"{GEOMETRY_FOLDER}/{geometry_filename}"),
     )
+
 
 def copy_restart_file_to(execution_id, scheduled_task_id):
     minio_client.copy_object(
@@ -56,19 +60,26 @@ def copy_restart_file_to(execution_id, scheduled_task_id):
         ),
     )
 
+
 def save_restart_file(data, scheduled_task_id):
     return save_file(FileType.SCHEDULED_TASK, data, RESTART_FILE_NAME, scheduled_task_id)
+
 
 def save_project_template_file(data, scheduled_task_id):
     return save_file(FileType.SCHEDULED_TASK, data, PROJECT_TEMPLATE_FILE_NAME, scheduled_task_id)
 
+
 def save_plan_template_file(data, scheduled_task_id):
     return save_file(FileType.SCHEDULED_TASK, data, PLAN_TEMPLATE_FILE_NAME, scheduled_task_id)
+
 
 def save_file(file_type, file, filename, _id=None):
     if isinstance(file, io.BytesIO):
         data = file
         lent = len(data.getvalue())
+    elif isinstance(file, bytes):
+        data = io.BytesIO(file)
+        lent = len(file)
     else:
         file_bytes = file.read()
         lent = len(file_bytes)
@@ -88,7 +99,9 @@ def save_file(file_type, file, filename, _id=None):
         return minio_path
     except Exception as exception:
         error_message = "Error uploading file"
+        get_logger().error(exception, exc_info=True)
         raise FileUploadError(error_message)
+
 
 def get_geometry_url(name):
     try:
@@ -98,6 +111,7 @@ def get_geometry_url(name):
     except Exception as exception:
         error_message = f"Error generating presigned url for {name}"
         raise FilePreSignedUrlError(error_message)
+
 
 def is_project_template_present(schedule_task_id):
     try:
@@ -111,6 +125,7 @@ def is_project_template_present(schedule_task_id):
         logger.error(error_message, exception)
         return False
 
+
 def is_plan_template_present(schedule_task_id):
     try:
         minio_client.stat_object(
@@ -122,6 +137,7 @@ def is_plan_template_present(schedule_task_id):
         error_message = f"Plan template file for {schedule_task_id} doesn't exist"
         logger.error(error_message, exception)
         return False
+
 
 def is_restart_file_present(schedule_task_id):
     try:
@@ -135,17 +151,21 @@ def is_restart_file_present(schedule_task_id):
         logger.warning(error_message)
         return False
 
+
 def list_execution_files(file_type, execution_id):
     return minio_client.list_objects(ROOT_BUCKET, f"{file_type.value}/{execution_id}/")
+
 
 def get_file(file_path):
     logging.info(f"Obtaining file {file_path} from bucket {ROOT_BUCKET}")
     return minio_client.get_object(ROOT_BUCKET, file_path)
 
+
 def get_file_by_type(file_type, filename):
     logging.info(f"Obtaining file {filename} as {file_type.name}")
     file_path = f"{file_type.value}/{filename}"
     return get_file(file_path)
+
 
 def download_files_for_execution(base_path, execution_id):
     if not os.path.exists(base_path):
@@ -164,6 +184,7 @@ def download_files_for_execution(base_path, execution_id):
             with open(f"{base_path}\\{file_name}", "wb") as f:
                 f.write(response.data)
 
+
 def save_result_for_execution(base_path, execution_id):
     logger.info(f"Saving result files for execution: {execution_id}")
 
@@ -171,26 +192,29 @@ def save_result_for_execution(base_path, execution_id):
         with open(f"{base_path}\\{filename}", "rb") as file:
             save_file(FileType.RESULT, file, filename, execution_id)
 
-def copy_execution_files(id_copy_from, id_copy_to):
-    execution_files = [f.object_name for f in list_execution_files(FileType.EXECUTION_PLAN, id_copy_from)]
-    for file in execution_files:
-        copy_execution_file(file, id_copy_to)
 
-    return list_execution_files(FileType.EXECUTION_PLAN, id_copy_to)
+def copy_execution_files(file_type: FileType, id_copy_from, id_copy_to):
+    execution_files = [f.object_name for f in list_execution_files(file_type, id_copy_from)]
+    for file in execution_files:
+        copy_execution_file(file_type, file, id_copy_to)
+
+    return list_execution_files(file_type, id_copy_to)
+
 
 def copy_execution_files_scheduled(id_copy_from, id_copy_to):
     execution_files = [f.object_name for f in list_execution_files(FileType.SCHEDULED_TASK, id_copy_from)]
     for file in execution_files:
-        copy_execution_file_scheduled(file, id_copy_to)
-
+        copy_execution_file(FileType.SCHEDULED_TASK,file,id_copy_to)
     return list_execution_files(FileType.SCHEDULED_TASK, id_copy_to)
 
-def copy_execution_file(file_to_copy, id_copy_to, new_name=None):
-    minio_path = f"{FileType.EXECUTION_PLAN.value}"
+
+def copy_execution_file(file_type: FileType, file_to_copy, id_copy_to, new_name=None):
+    minio_path = file_type.value
     minio_path += f"/{id_copy_to}"
     minio_path += f"/{new_name}" if new_name is not None else f"/{secure_filename(file_to_copy.split('/')[-1])}"
     minio_client.copy_object(ROOT_BUCKET, minio_path, CopySource(ROOT_BUCKET, file_to_copy))
     return minio_path
+
 
 def copy_execution_file_scheduled(file_to_copy, id_copy_to, new_name=None):
     minio_path = f"{FileType.SCHEDULED_TASK.value}"
@@ -198,6 +222,7 @@ def copy_execution_file_scheduled(file_to_copy, id_copy_to, new_name=None):
     minio_path += f"/{new_name}" if new_name is not None else f"/{secure_filename(file_to_copy.split('/')[-1])}"
     minio_client.copy_object(ROOT_BUCKET, minio_path, CopySource(ROOT_BUCKET, file_to_copy))
     return minio_path
+
 
 def delete_execution_files(local_directory_path):
     try:
@@ -213,11 +238,14 @@ def delete_execution_files(local_directory_path):
         print(error_message)
         raise Exception(error_message) from e
 
+
 def delete_file(file_to_delete):
     minio_client.remove_object(ROOT_BUCKET, f"{file_to_delete}")
 
+
 def delete_execution_file(execution_plan_id, filename):
     delete_file(f"{EXECUTION_FOLDER}/{execution_plan_id}/{filename}")
+
 
 def delete_execution_file_for_type(execution_plan_id, file_to_delete):
     try:
@@ -230,6 +258,7 @@ def delete_execution_file_for_type(execution_plan_id, file_to_delete):
         error_message = f"Error while deleting execution file {file_to_delete}"
         raise Exception(error_message) from e
 
+
 def delete_geometry_file(file_name):
     try:
         minio_client.remove_object(ROOT_BUCKET, f"{GEOMETRY_FOLDER}/{file_name}")
@@ -238,11 +267,11 @@ def delete_geometry_file(file_name):
         print(error_message)
         raise Exception(error_message) from e
 
+
 def delete_scheduled_task(scheduled_task_id):
     try:
-        executions_files = list_execution_files(FileType.SCHEDULED_TASK, scheduled_task_id) 
-        
-           
+        executions_files = list_execution_files(FileType.SCHEDULED_TASK, scheduled_task_id)
+
         # Para hacer en un futuro, eliminar los resultados de las corridas
         # result_files = list_execution_files(FileType.RESULT, scheduled_task_id)
         # local_files = list(executions_files) + list(result_files)
@@ -254,3 +283,43 @@ def delete_scheduled_task(scheduled_task_id):
         error_message = f"Error deleting objects from Minio bucket: {e}"
         print(error_message)
         raise Exception(error_message) from e
+
+
+def get_files_for_id(file_type, id, with_content=False):
+    executions_files = list_execution_files(file_type, id)
+    files = []
+    for file in executions_files:
+        if ".g" not in file.object_name:  # filtro archivos de geometria
+            obj = {
+                "name": file.object_name,
+            }
+
+            if with_content == "true":
+                obj["content"] = base64.b64encode(get_file(file.object_name).data).decode("ascii")
+            obj['type'] = get_hecras_file_type(file.object_name)
+            files.append(obj)
+    return files
+
+
+def upload_from_base64(file_type: FileType, id, file_name, file_base64):
+    base64_bytes = file_base64.encode("ascii")
+    decoded_bytes = base64.b64decode(base64_bytes)
+    name = file_name.split("/")[-1]
+    if file_type == FileType.SCHEDULED_TASK:
+        hecras_file_type = get_hecras_file_type(file_name)
+        if hecras_file_type == "plan_file":
+            return plan_file_service.process_plan_template(io.BytesIO(decoded_bytes), id)
+        if hecras_file_type == "project_file":
+            return project_file_service.process_project_template(io.BytesIO(decoded_bytes), id)
+
+    return save_file(file_type, decoded_bytes, name, id)
+
+
+def upload_files_from_array(files, file_type: FileType, id):
+    for file in files:
+        name = file.get("name")
+        contentB64 = file.get("content")
+        if contentB64:
+            upload_from_base64(file_type, id, name, contentB64)
+        else:
+            copy_execution_file(file_type, name, id)
