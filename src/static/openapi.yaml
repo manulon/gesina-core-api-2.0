@@ -884,15 +884,6 @@ components:
           type: string
         geometry_id:
           type: integer
-        project_file:
-          type: String
-          description: the minio path to the file to copy.
-        plan_file:
-          description: the minio path to the file to copy.
-        flow_file:
-          description: the minio path to the file to copy.
-        restart_file:
-          description: the minio path to the file to copy.
         execution_output_list:
           type: array
           items:
@@ -905,10 +896,14 @@ components:
             properties:
               name:
                 type: string
-                description: the name of the file
+                description: the name of the file or the path to the file to copy if the content is not set
               content:
                 type: string
                 description: the base64 string encoded file
+              'type':
+                type: string
+                description: The hecras file type. It can be plan_file project_file restart_file or flow_file
+                enum: [ plan_file, project_file, restart_file, flow_file ]
       required:
         - plan_name
         - geometry_id
@@ -1305,18 +1300,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PlanSeriesSchema'
-        project_file:
-          type: string
-          example: "execution-plan/1/1.prj"
-          description: The path of the project file to copy.
-        plan_file:
-          type: string
-          example: "execution-plan/1/1.p01"
-          description: The path of the plan file to copy.
-        restart_file:
-          type: string
-          example: "scheduled-task/1/restart_file.rst"
-          description: The path of the restart file to copy.
         files:
           type: array
           description: An array with files encoded in base 64 that come from a get schedule task output.
@@ -1325,7 +1308,12 @@ components:
             properties:
               name:
                 type: string
-                description: the name of the file
+                description: the name of the file or the path to the file to copy if the content is not set
               content:
                 type: string
                 description: the base64 string encoded file
+              'type':
+                type: string
+                description: The hecras file type. It can be plan_file project_file restart_file or flow_file
+                enum: [ plan_file, project_file, restart_file, flow_file ]
+

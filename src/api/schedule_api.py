@@ -50,7 +50,7 @@ def list_schedule_tasks():
                                                                   args.get('enabled'),
                                                                   args.get('frequency'),
                                                                   args.get('calibration_id'),
-                                                                  args.get('calibration_id_for_simulations'))
+                                                                  args.get('calibration_id_for_simulations'), reduced=True)
 
         return jsonify(
             SCHEDULE_TASK_SCHEMA.dump(
@@ -251,14 +251,9 @@ def create_scheduled_task():
             params["initial_flows"] = create_initial_flows_from_json(body.get("initial_flow_file"),
                                                                      body.get("initial_flow_list"))
         start_condition_type = body.get("start_condition_type")
-        restart_file_data = None if body.get("restart_file") is None else file_storage_service.get_file(
-            body.get("restart_file"))
 
-        project_file_data = get_file_if_present(body, "project_file")
-        plan_file_data = get_file_if_present(body, "plan_file")
-
-        scheduled_task = schedule_task_service.create(params, start_condition_type, restart_file_data,
-                                                      project_file_data, plan_file_data, files=body.get("files"))
+        scheduled_task = schedule_task_service.create(params, start_condition_type, None,
+                                                      None, None, files=body.get("files"))
         return jsonify({"message": "Success at creating scheduled task",
                         "id": scheduled_task.id})
 

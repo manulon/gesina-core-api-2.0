@@ -1,6 +1,7 @@
 from sqlalchemy import func
 
-from src.persistance.scheduled_task import ScheduledTask, ExecutionPlanScheduleTaskMapping, BorderCondition, PlanSeries, InitialFlow
+from src.persistance.scheduled_task import ScheduledTask, ExecutionPlanScheduleTaskMapping, BorderCondition, PlanSeries, \
+    InitialFlow
 from src.persistance import User
 from src.persistance.session import get_session
 from src.service import project_file_service, plan_file_service, file_storage_service, execution_plan_service
@@ -20,7 +21,7 @@ def contains_restart_file(objects):
     return False
 
 
-def create(params, start_condition_type, restart_file_data, project_file_data, plan_file_data, files = []):
+def create(params, start_condition_type, restart_file_data, project_file_data, plan_file_data, files=[]):
     with get_session() as session:
         scheduled_task = ScheduledTask(**params)
         session.add(scheduled_task)
@@ -30,7 +31,7 @@ def create(params, start_condition_type, restart_file_data, project_file_data, p
         if start_condition_type == "restart_file" and not contains_restart_file(files):
             save_restart_file(restart_file_data, scheduled_task.id)
 
-        file_storage_service.upload_files_from_base64(files,FileType.SCHEDULED_TASK,scheduled_task.id)
+        file_storage_service.upload_files_from_array(files, FileType.SCHEDULED_TASK, scheduled_task.id)
 
         project_file_service.process_project_template(
             project_file_data, scheduled_task.id
@@ -67,7 +68,8 @@ def update(_id, form):
         if form.start_condition_type.data == "restart_file" and form.restart_file.data:
             save_restart_file(form.restart_file.data, schedule_config.id)
         else:
-            initial_flow_service.update_initial_flows(session, _id, initial_flow_service.retrieve_initial_flows_from_form(form, _id))
+            initial_flow_service.update_initial_flows(session, _id,
+                                                      initial_flow_service.retrieve_initial_flows_from_form(form, _id))
 
         project_file_service.process_project_template(form.project_file.data, _id)
         plan_file_service.process_plan_template(form.plan_file.data, _id)
@@ -91,9 +93,9 @@ def _update_objects(old_objects, new_objects, update_func, attr_name, _id=None):
             if attr_name == "border_conditions":
                 border_series_service.add_series_to_scheduled_task(new_object, _id)
             elif attr_name == "plan_series_list":
-                plan_series_service.add_series_to_scheduled_task(new_object,_id)
+                plan_series_service.add_series_to_scheduled_task(new_object, _id)
             elif attr_name == "initial_flows":
-                initial_flow_service.add_initial_flow_to_scheduled_task(new_object,_id)
+                initial_flow_service.add_initial_flow_to_scheduled_task(new_object, _id)
         else:
             for obj in old_objects:
                 try:
@@ -224,7 +226,8 @@ def get_schedule_tasks(name=None, user_first_name=None, user_last_name=None, sta
     with get_session() as session:
         query = session.query(ScheduledTask).order_by(ScheduledTask.id.desc())
         if reduced:
-            query = query.with_entities(ScheduledTask.id, ScheduledTask.created_at,ScheduledTask.name,ScheduledTask.user_id, ScheduledTask.description, ScheduledTask.enabled)
+            query = query.with_entities(ScheduledTask.id, ScheduledTask.created_at, ScheduledTask.name,
+                                        ScheduledTask.user_id, ScheduledTask.description, ScheduledTask.enabled)
 
         if name is not None:
             query = query.filter(func.lower(ScheduledTask.name).like(func.lower(f"%{name}%")))
@@ -307,39 +310,37 @@ def create_copy(name, description, frequency, start_datetime,
                 observation_days, forecast_days, initial_flows,
                 border_conditions, plan_series_list, calibration_id,
                 calibration_id_for_simulations):
-    
     new_border_conditions = []
     for bc in border_conditions:
         new_bc = BorderCondition(
-            river = bc.river,
-            reach = bc.reach,
-            river_stat = bc.river_stat,
-            interval = bc.interval,
-            type = bc.type,
-            series_id = bc.series_id
+            river=bc.river,
+            reach=bc.reach,
+            river_stat=bc.river_stat,
+            interval=bc.interval,
+            type=bc.type,
+            series_id=bc.series_id
         )
         new_border_conditions.append(new_bc)
-
 
     new_plan_series_list = []
     for ps in plan_series_list:
         new_ps = PlanSeries(
-            river = ps.river,
-            reach = ps.reach,
-            river_stat = ps.river_stat,
-            stage_series_id = ps.stage_series_id,
-            flow_series_id = ps.flow_series_id,
-            stage_datum = ps.stage_datum
+            river=ps.river,
+            reach=ps.reach,
+            river_stat=ps.river_stat,
+            stage_series_id=ps.stage_series_id,
+            flow_series_id=ps.flow_series_id,
+            stage_datum=ps.stage_datum
         )
         new_plan_series_list.append(new_ps)
 
     new_initial_flows = []
     for inf in initial_flows:
         new_if = InitialFlow(
-            river = inf.river,
-            reach = inf.reach,
-            river_stat = inf.river_stat,
-            flow = inf.flow
+            river=inf.river,
+            reach=inf.reach,
+            river_stat=inf.river_stat,
+            flow=inf.flow
         )
         new_initial_flows.append(new_if)
 
