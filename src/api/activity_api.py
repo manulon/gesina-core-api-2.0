@@ -16,10 +16,12 @@ def get_activity():
             total_executions = success_count[i] + error_count[i]
             data.append({labels[i] : "No activity" if total_executions == 0 else int(100*(success_count[i] / total_executions))})
         return jsonify(data)
-    except ValueError as e:
+    except Exception as e:
         response = jsonify({"error": str(e)})
         response.status_code = 400
         return response
+
+
 
 @ACTIVITY_API_BLUEPRINT.get("/average_time_execution")
 def get_average_time_execution():
@@ -31,7 +33,7 @@ def get_average_time_execution():
         for i in range(len(labels)):
             data.append({ labels[i] : times[i]})
         return jsonify(data)
-    except ValueError as e:
+    except Exception as e:
         response = jsonify({"error": str(e)})
         response.status_code = 400
         return response
